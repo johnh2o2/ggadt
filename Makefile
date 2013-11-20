@@ -1,6 +1,8 @@
 FORT=gfortran
+INCLUDES=-I./inc
+LIBS=-L./lib
 
 
 all:
-	$(FORT) -c ggadt.f95
-	$(FORT) -o ggadt ggadt.o
+	$(FORT) $(LIBS) -lm -lfftw3 $(INCLUDES) -c spheres.f03
+	$(FORT) -o spheres $(LIBS) -lm -lfftw3 spheres.o
