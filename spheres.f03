@@ -1,147 +1,150 @@
-! 11/11/2013--John Hoffman
+! 11/11/2013--JOHN HOFFMAN
 !=========================
-! This will be:
-! (1) a test of the programming, since we can directly compare to Mie Theory
-! (2) a future module that will be used for collections of spheres.
+! THIS WILL BE:
+! (1) A TEST OF THE PROGRAMMING, SINCE WE CAN DIRECTLY COMPARE TO MIE THEORY
+! (2) A FUTURE MODULE THAT WILL BE USED FOR COLLECTIONS OF SPHERES.
 
-program spheres
-	use, intrinsic :: iso_c_binding
-	real :: xmin, xmax, ymin, ymax, zmin, zmax, dx, dy, dz, k, Ephot, adust, PI
-	real, dimension(2048) :: x, y, z, kx, ky, thetax, thetay, scatterx, scattery
-	double complex, dimension(2048,2048) :: sh, ftsh
-	integer :: i, j
+PROGRAM SPHERES
+	USE, INTRINSIC :: ISO_C_BINDING
+	REAL :: XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX, DX, DY, DZ, K, EPHOT, ADUST, PI, BOX_WIDTH
+	INTEGER :: NGRID
+	PARAMETER (NGRID=512)
 
-	adust = 0.2 ! micrometers
-	Ephot = 1.0 ! keV
+	REAL, DIMENSION(NGRID) :: X, Y, Z, KX, KY, THETAX, THETAY, SCATTERX, SCATTERY
+	DOUBLE COMPLEX, DIMENSION(NGRID,NGRID) :: SH, FTSH
+	INTEGER :: I, J
+
+	ADUST = 0.20 ! MICROMETERS
+	EPHOT = 0.5  ! KEV
 
 	PI = 3.14159
-	k = (2*PI/1.239842)*1000*Ephot*adust 
+	K = (2*PI/1.239842)*1000*EPHOT
 
-	xmin = -50*adust
-	ymin = -50*adust
-	zmin = -50*adust
-	xmax = 50*adust
-	ymax = 50*adust
-	zmax = 50*adust
-	! set x, y, and z arrays
-	dx = (xmax-xmin)/(SIZE(x)-1)
-	dy = (ymax-ymin)/(SIZE(y)-1)
-	dz = (zmax-zmin)/(SIZE(z)-1)
+	BOX_WIDTH = 32.0
 
-	do i=1,SIZE(x)
-		x(i) = xmin + (i-1)*dx
-	end do
-	do i=1,SIZE(y)
-		y(i) = ymin + (i-1)*dy
-	end do
-	do i=1,SIZE(z)
-		z(i) = zmin + (i-1)*dz
-	end do
+	XMIN = -BOX_WIDTH*ADUST/2.0
+	YMIN = -BOX_WIDTH*ADUST/2.0
+	ZMIN = -1*ADUST
+	XMAX = BOX_WIDTH*ADUST/2.0
+	YMAX = BOX_WIDTH*ADUST/2.0
+	ZMAX = 1*ADUST
+	! SET X, Y, AND Z ARRAYS
+	DX = (XMAX-XMIN)/(SIZE(X)-1)
+	DY = (YMAX-YMIN)/(SIZE(Y)-1)
+	DZ = (ZMAX-ZMIN)/(SIZE(Z)-1)
 
-
-	! set shadow function
-	do i=1,size(x,1)
-		do j=1,size(y,1)
-			sh(i,j) = shadow(x(i),y(j),zmax,zmin)
-		end do
-	end do
-
-	ftsh = fft(sh,x,y)
-	!print *,ftsh
-	kx = get_k(x)
-	ky = get_k(y)
-
-	do i=1,SIZE(kx)
-		thetax(i) = ASIN(kx(i)/k)
-		thetay(i) = ASIN(ky(i)/k)
-	end do
-
-	! Now output results from phi = 0 (using only nhat = cos(theta)zhat + sin(theta)xhat)
-	print *,"#theta (radians)   [dscat/domega (x-axis)] [dscat/domega (y-axis)]"
-	do i=1,size(x)
-		scatterx(i) = (abs(ftsh(i,1))**2)/(k**2)
-		scattery(i) = (abs(ftsh(1,i))**2)/(k**2)
-		print *,thetax(i),' ',scatterx(i),' ',scattery(i)
-	end do
-contains
-
-function index_of_refraction(x,y,z)
-implicit none
- 	complex(C_DOUBLE_COMPLEX) :: m, index_of_refraction
- 	real :: r,r_sph,l, mreal, mimag
- 	real, intent(in) :: x,y,z
-
- 	mreal = 1-7.152*(10**(-4))
- 	mimag = 1.887*(10**(-4))
-
- 	m = CMPLX(mreal, mimag)
- 	r_sph = 1.0*adust
- 	r = sqrt(x**2 + y**2)
- 	index_of_refraction = 0
- 	if (r > r_sph) then
- 		index_of_refraction = 0
- 	else 
- 		l = 2*sqrt(r_sph**2 - r**2)
- 		if ( (z < -(l/2)) .OR. (z > (l/2))) then
- 			index_of_refraction = 0
- 		else
- 			index_of_refraction = m
- 		end if 
- 	end if
-end function index_of_refraction
-
-function phi(x,y,z,zmin)
-	implicit none
-	integer :: N, i
-	real, intent(in) :: x,y,z,zmin
-	real :: dZ, zt
-	complex(C_DOUBLE_COMPLEX) :: phi
-	phi = (0,0)
-	N = 300
-	dZ = (z - zmin)/N
-	do i=0,N
-		zt = zmin + i*dZ
-		phi = phi + dZ*index_of_refraction(x,y,zt)
-	end do 
-end function phi
-
-function shadow(x,y,z,zmin)
-	implicit none
-	real, intent(in) :: x,y,z,zmin
-	complex(C_DOUBLE_COMPLEX) :: shadow 
-	shadow = 1-exp((0.0,1.0)*phi(x,y,z,zmin))
-end function shadow
-
-function get_k(x)
-	implicit none
-	real, intent(in) :: x(:)
-	integer :: n, i, j 
+	DO I=1,SIZE(X)
+		X(I) = XMIN + (I-1)*DX
+	END DO
+	DO I=1,SIZE(Y)
+		Y(I) = YMIN + (I-1)*DY
+	END DO
+	DO I=1,SIZE(Z)
+		Z(I) = ZMIN + (I-1)*DZ
+	END DO
 	
-	real :: L, PI
-	real, dimension(SIZE(x)) :: get_k
 
-	PI = 3.14159
-	n = SIZE(x)
-    L = x(n) - x(1)
-    do i=1,n
-    	get_k(i) = (PI*i)/L
-    end do
-end function get_k
+	! SET SHADOW FUNCTION
+	DO I=1,SIZE(X)
+		DO J=1,SIZE(Y)
+			SH(I,J) = SHADOW(X(I),Y(J),ZMAX)
+		END DO
+	END DO
 
-function FFT(f,x,y)
-	use, intrinsic :: iso_c_binding
-       include 'fftw3.f03'
-    real, intent(in) :: x(:), y(:)
-    complex(C_DOUBLE_COMPLEX), intent(inout) :: f(:,:)
-    type(C_PTR) :: plan
-    complex(C_DOUBLE_COMPLEX), dimension(SIZE(x),SIZE(y)) :: FFT
-    integer :: nx, ny, i, j
+	FTSH = FFT(SH,X,Y)
 
-    nx = SIZE(x)
-    ny = SIZE(y)
-    plan = fftw_plan_dft_2d(ny, nx, f ,FFT, FFTW_FORWARD,FFTW_ESTIMATE)
-    call fftw_execute_dft(plan, f, FFT)
-    call fftw_destroy_plan(plan)
-end function FFT
-end program spheres
+	KX = GET_K(X)
+	KY = GET_K(Y)
+
+	DO I=1,SIZE(X)
+		DO J=1,SIZE(Y)
+			FTSH(I,J) = FTSH(I,J)*(K**2)/(2*PI)*DX*DY
+		END DO
+	END DO
+
+	DO I=1,SIZE(KX)
+		THETAX(I) = ASIN(KX(I)/K)
+		THETAY(I) = ASIN(KY(I)/K)
+	END DO
+
+	PRINT *,"#THETA (RADIANS)   [DSCAT/DOMEGA (X-AXIS)] [DSCAT/DOMEGA (Y-AXIS)]"
+	DO I=1,SIZE(X)
+		SCATTERX(I) = (ABS(FTSH(I,1))**2)/(K**2)
+		SCATTERY(I) = (ABS(FTSH(1,I))**2)/(K**2)
+		PRINT *,THETAX(I),' ',SCATTERX(I)/(PI*ADUST**2),' ',SCATTERY(I)/(PI*ADUST**2)
+	END DO
+CONTAINS
+
+FUNCTION INDEX_OF_REFRACTION(X,Y,Z)
+IMPLICIT NONE
+ 	COMPLEX(C_DOUBLE_COMPLEX) :: M, INDEX_OF_REFRACTION
+ 	REAL :: R,R_SPH,L, MREAL, MIMAG
+ 	REAL, INTENT(IN) :: X,Y,Z
+
+ 	MREAL = -7.152E-4
+ 	MIMAG = 1.887E-4
+
+ 	M = CMPLX(MREAL, MIMAG)
+
+ 	R_SPH = ADUST
+ 	R = SQRT(X**2 + Y**2)
+ 	INDEX_OF_REFRACTION = (0,0)
+ 	IF (R < R_SPH) THEN
+ 		L = SQRT(R_SPH**2 - R**2)
+ 		IF ( ABS(Z)-L < 0 ) THEN
+ 			INDEX_OF_REFRACTION = M
+ 		END IF 
+ 	END IF
+END FUNCTION INDEX_OF_REFRACTION
+
+FUNCTION PHI(X,Y,Z)
+	IMPLICIT NONE
+	INTEGER :: I
+	REAL, INTENT(IN) :: X,Y,Z
+	REAL :: ZT
+	COMPLEX(C_DOUBLE_COMPLEX) :: PHI
+	PHI = (0,0)
+	DO I=0,NGRID
+		ZT = ZMIN + I*DZ
+		PHI = PHI + DZ*INDEX_OF_REFRACTION(X,Y,ZT)
+	END DO 
+	PHI = K*PHI
+END FUNCTION PHI
+
+FUNCTION SHADOW(X,Y,Z)
+	IMPLICIT NONE
+	REAL, INTENT(IN) :: X,Y,Z
+	COMPLEX(C_DOUBLE_COMPLEX) :: SHADOW 
+	SHADOW = 1-EXP( (0.0,1.0)*PHI(X,Y,Z) )
+END FUNCTION SHADOW
+
+FUNCTION GET_K(X)
+	IMPLICIT NONE
+	REAL, INTENT(IN) :: X(:)
+	INTEGER :: N, I, J 
+	REAL :: L
+	REAL, DIMENSION(SIZE(X)) :: GET_K
+	N = SIZE(X)
+    L = X(N) - X(1)
+    DO I=1,N
+    	GET_K(I) = (2*PI*(I-1))/L
+    END DO
+END FUNCTION GET_K
+
+FUNCTION FFT(F,X,Y)
+	USE, INTRINSIC :: ISO_C_BINDING
+       INCLUDE 'FFTW3.F03'
+    REAL, INTENT(IN) :: X(:), Y(:)
+    COMPLEX(C_DOUBLE_COMPLEX), INTENT(INOUT) :: F(:,:)
+    TYPE(C_PTR) :: PLAN
+    COMPLEX(C_DOUBLE_COMPLEX), DIMENSION(SIZE(X),SIZE(Y)) :: FFT
+    INTEGER :: NX, NY, I, J
+
+    NX = SIZE(X)
+    NY = SIZE(Y)
+    PLAN = FFTW_PLAN_DFT_2D(NY, NX, F ,FFT, FFTW_BACKWARD,FFTW_ESTIMATE)
+    CALL FFTW_EXECUTE_DFT(PLAN, F, FFT)
+    CALL FFTW_DESTROY_PLAN(PLAN)
+END FUNCTION FFT
+END PROGRAM SPHERES
 
