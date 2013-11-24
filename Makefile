@@ -1,17 +1,36 @@
-FORT=gfortran
-INCLUDES=-I./inc
-LIBS=-L./lib
+VERSION = 0.11
 
+FF = gfortran
+FFLAGS = -O3
+LIBS = -L./lib -lfftw3
+INC = -I./inc
+EXECUTABLE=ggadt_v$(VERSION)
+SRCDIR=./src
+#SOURCES=$(wildcard $(SRCDIR)/*.f)
+DRIVERSRC=ggadt.f03
+DRIVEROBJ=ggadt.o
 
-all: test spheres
+MODULESRC=params.f03 sphere.f03 fftwmod.f03
+OBJECTS=$(patsubst %.f03,%.o,$(MODULESRC))
 
-test:
-	$(FORT) $(LIBS) -lm -lfftw3 $(INCLUDES) -c test.f03
-	$(FORT) -o test $(LIBS) -lm -lfftw3 test.o
+all: $(EXECUTABLE)
 
-spheres:
-	$(FORT) $(LIBS) -lm -lfftw3 $(INCLUDES) -c spheres.f03
-	$(FORT) -o spheres $(LIBS) -lm -lfftw3 spheres.o
+$(EXECUTABLE): $(OBJECTS) $(DRIVEROBJ)
+
+	$(FF) $(LIBS) $(INC) $(FFLAGS) $(DRIVEROBJ) $(OBJECTS) -o $@
+
+%.o: $(SRCDIR)/%.f03
+	$(FF) -c $(LIBS) $(INC) $(FFLAGS) $<
+
+test: clean all
+	./$(EXECUTABLE)  > testdat.dat
+	ipython scripts/plot.py
+
+test2d: clean all
+	./$(EXECUTABLE)  > testdat.dat
+	ipython scripts/plot2d.py
 
 clean:
-	rm -f test spheres *o
+	rm -f $(OBJECTS) $(EXECUTABLE) $(DRIVEROBJ)
+	rm -f *o *mod 
+	rm -f $(SRCDIR)/*mod

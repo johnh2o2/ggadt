@@ -1,0 +1,40 @@
+! Parameter file for GGADT.
+MODULE PARAMS
+
+SAVE
+
+
+REAL, PARAMETER 				::	A_EFF		= 0.2	! Micrometers
+REAL, PARAMETER					::	EPHOT		= 0.5	! keV
+CHARACTER(LEN=30), PARAMETER 	::	GEOMETRY 	= 'SPHERE'
+
+INTEGER, PARAMETER 				:: 	NGRID 		= 2048
+REAL, PARAMETER 				:: 	PI			= 3.14159
+REAL, PARAMETER 				::	BOX_WIDTH	= 16.0
+
+! If GEOMETRY == SPHERE:
+REAL, PARAMETER					:: 	GRAIN_A 	= A_EFF 
+REAL, PARAMETER 				::	IOR_IM		=  3.201E-3
+REAL, PARAMETER 				:: 	IOR_RE		= -2.079E-3
+
+! If GEOMETRY == SPHEROID:
+! ===============================================
+! REAL, PARAMETER			::	GRAIN_A 	= A_EFF
+! REAL, PARAMETER			::	GRAIN_B 	= A_EFF
+! REAL, PARAMETER			::	GRAIN_C 	= A_EFF
+! REAL, PARAMETER 			::	IOR_IM		= 
+! REAL, PARAMETER 			:: 	IOR_RE		= 
+
+! if GEOMETRY == GRID:
+! ===============================================
+! CHARACTER, PARAMETER		:: 	GRID_FILE 	= "ggadt_grid.dat"
+! REAL, PARAMETER			::	
+
+! if GEOMETRY == COLLECTION_OF_SPHERES
+! CHARACTER, PARAMETER		:: SPHERES_FILE = "ggadt_spheres.dat"
+! INTEGER, PARAMETER		:: 
+
+LOGICAL, PARAMETER 				::	MPI_MODE 	= .FALSE.
+CHARACTER(LEN=10), PARAMETER 	::  FFT_TYPE	= "FFTW"
+
+END MODULE PARAMS
