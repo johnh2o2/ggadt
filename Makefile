@@ -1,4 +1,4 @@
-VERSION = 0.11
+VERSION = 0.12
 
 FF = gfortran
 FFLAGS = -O3

@@ -1,5 +1,5 @@
 GFORTRAN module version '9' created from src/sphere.f03
-MD5:c43416406d3cee086fddc87164e575da -- If you edit this, you'll get what you deserve.
+MD5:3ed2c80ad9aee0a2e08599e51275e3f0 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () ()
 () () () ())
@@ -288,6 +288,24 @@ DECL UNKNOWN 0 0 FUNCTION) (COMPLEX 8 0 1 0 COMPLEX ()) 92 0 (93 94 95
 96) () 91 () () () 0 0)
 97 'sphere' 'sphere' '' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
+86 'x' '' '' 85 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+87 'y' '' '' 85 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+88 'z' '' '' 85 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+89 'k' '' '' 85 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+93 'x' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+94 'y' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+95 'z' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+96 'k' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+71 'x' '' '' 70 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
 23 'Cptr' '__iso_c_binding' '' 22 ((DERIVED IN UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0 VALUE DUMMY) (DERIVED 2 0 0 0 DERIVED ()) 0 0 () () 0 () ()
 () 0 0 0)
@@ -310,24 +328,6 @@ UNKNOWN 0 0 VALUE DUMMY) (DERIVED 3 0 0 0 DERIVED ()) 0 0 () () 0 () ()
 29 'fptr' '__iso_c_binding' '' 27 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 DUMMY PROC_POINTER) (VOID 0 0 0 0 VOID ()) 0 0 () ()
 0 () () () 0 0)
-86 'x' '' '' 85 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
-REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-87 'y' '' '' 85 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
-REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-88 'z' '' '' 85 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
-REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-89 'k' '' '' 85 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
-REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-93 'x' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
-REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-94 'y' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
-REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-95 'z' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
-REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-96 'k' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
-REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-71 'x' '' '' 70 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
-UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
 )
 
 ('C_funptr' 0 3 'C_ptr' 0 2 '__convert_c4_c8' 0 6 '__iso_c_binding' 0 7
