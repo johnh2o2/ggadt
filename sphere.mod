@@ -1,5 +1,5 @@
 GFORTRAN module version '9' created from src/sphere.f03
-MD5:6aea9c9c1b5ed46bd55674ee12a7e9d7 -- If you edit this, you'll get what you deserve.
+MD5:c63725c6074d9745bb4fda300553abf4 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () ()
 () () () ())
@@ -258,7 +258,7 @@ INTEGER 4 0 0 0 INTEGER ()) 0 '10'))) 0 0 () (CONSTANT (CHARACTER 1 0 0
 77 'geometry' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '30'))) 0 0 () (CONSTANT (CHARACTER 1 0 0
-0 CHARACTER (())) 0 30 'ELLIPSOID                     ') () 0 () () () 0
+0 CHARACTER (())) 0 30 'SPHERES                       ') () 0 () () () 0
 0)
 78 'grain_a' 'params' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0 DIMENSION) (REAL 4 0 0 0 REAL ()) 0 0 () (1 0
@@ -275,7 +275,7 @@ UNKNOWN IMPLICIT-SAVE 0 0) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0 () (
 CONSTANT (LOGICAL 4 0 0 0 LOGICAL ()) 0 0) () 0 () () () 0 0)
 82 'ngrid' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '2048') () 0 () () () 0 0)
+INTEGER 4 0 0 0 INTEGER ()) 0 '128') () 0 () () () 0 0)
 83 'params' 'params' '' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
 84 'phi_sphere' 'sphere' '' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
@@ -284,10 +284,16 @@ DECL UNKNOWN 0 0 FUNCTION IMPLICIT_PURE) (COMPLEX 8 0 1 0 COMPLEX ()) 85
 90 'pi' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () (CONSTANT (REAL 4 0 0 0
 REAL ()) 0 '0.3243f40@1') () 0 () () () 0 0)
-91 'shadow_sphere' 'sphere' '' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
-DECL UNKNOWN 0 0 FUNCTION) (COMPLEX 8 0 1 0 COMPLEX ()) 92 0 (93 94 95
-96) () 91 () () () 0 0)
-97 'sphere' 'sphere' '' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+91 'rot_matrix' 'params' '' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
+DECL UNKNOWN 0 0 DIMENSION FUNCTION IMPLICIT_PURE ALWAYS_EXPLICIT) (
+REAL 4 0 0 0 REAL ()) 92 0 (93) (2 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0
+INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '3') (
+CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0
+INTEGER ()) 0 '3')) 91 () () () 0 0)
+94 'shadow_sphere' 'sphere' '' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
+DECL UNKNOWN 0 0 FUNCTION) (COMPLEX 8 0 1 0 COMPLEX ()) 95 0 (96 97 98
+99) () 94 () () () 0 0)
+100 'sphere' 'sphere' '' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
 23 'Cptr' '__iso_c_binding' '' 22 ((DERIVED IN UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0 VALUE DUMMY) (DERIVED 2 0 0 0 DERIVED ()) 0 0 () () 0 () ()
@@ -319,13 +325,17 @@ REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
 REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
 89 'k' '' '' 85 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
 REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-93 'x' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+93 'eul_ang' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DIMENSION DUMMY) (REAL 4 0 0 0 REAL ()) 0 0 () (1 0 EXPLICIT (CONSTANT (
+INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
+0 '3')) 0 () () () 0 0)
+96 'x' '' '' 95 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
 REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-94 'y' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+97 'y' '' '' 95 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
 REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-95 'z' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+98 'z' '' '' 95 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
 REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-96 'k' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+99 'k' '' '' 95 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
 REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
 71 'x' '' '' 70 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
 UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
@@ -349,5 +359,5 @@ UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
 'c_short' 0 66 'c_signed_char' 0 67 'c_size_t' 0 68 'c_sizeof' 0 69
 'c_vertical_tab' 0 72 'cmplx' 0 73 'delm' 0 74 'ephot' 0 75 'fft_type' 0
 76 'geometry' 0 77 'grain_a' 0 78 'ior_im' 0 79 'ior_re' 0 80 'mpi_mode'
-0 81 'ngrid' 0 82 'params' 0 83 'phi_sphere' 0 84 'pi' 0 90
-'shadow_sphere' 0 91 'sphere' 0 97)
+0 81 'ngrid' 0 82 'params' 0 83 'phi_sphere' 0 84 'pi' 0 90 'rot_matrix'
+0 91 'shadow_sphere' 0 94 'sphere' 0 100)

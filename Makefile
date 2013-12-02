@@ -1,4 +1,4 @@
-VERSION = 0.12
+VERSION = 0.13
 
 FF = gfortran
 FFLAGS = -O3
@@ -10,7 +10,7 @@ SRCDIR=./src
 DRIVERSRC=ggadt.f03
 DRIVEROBJ=ggadt.o
 
-MODULESRC=params.f03 sphere.f03 ellipsoid.f03 fftwmod.f03
+MODULESRC=params.f03 sphere.f03 spheres.f03 ellipsoid.f03 fftwmod.f03
 OBJECTS=$(patsubst %.f03,%.o,$(MODULESRC))
 
 all: $(EXECUTABLE)

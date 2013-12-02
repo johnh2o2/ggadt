@@ -7,6 +7,7 @@
 PROGRAM GGADT
 	USE, INTRINSIC :: ISO_C_BINDING
 	USE SPHERE
+	USE SPHERES
 	USE ELLIPSOID
 	USE PARAMS
 	USE FFTW
@@ -18,7 +19,7 @@ PROGRAM GGADT
 	REAL, DIMENSION(3) :: postemp, etemp
 	INTEGER :: I, J
 	CHARACTER(len=32) :: arg
-	If (GEOMETRY == 'SPHERE') THEN 
+	If ((GEOMETRY == 'SPHERE') .or. (GEOMETRY == 'SPHERES')) THEN 
   		GRAIN_A(1) = A_EFF 
   		GRAIN_A(2) = A_EFF
   		GRAIN_A(3) = A_EFF
@@ -30,8 +31,9 @@ PROGRAM GGADT
   		GRAIN_A(1) = GRAIN_A(1)*L
   		GRAIN_A(2) = GRAIN_A(2)*L
   		GRAIN_A(3) = GRAIN_A(3)*L
-	ELSE 
+  	ELSE
 		PRINT *,"Cannot understand ", GEOMETRY
+		CALL EXIT()
 	END IF 
 	
 	!I = 0
@@ -64,10 +66,11 @@ PROGRAM GGADT
 	DO I=1,SIZE(Z)
 		Z(I) = ZMIN + (I-1)*DZ
 	END DO
-	
+	print *,"Geometry = ",GEOMETRY
 
 	! SET SHADOW FUNCTION
 	IF (GEOMETRY .EQ. "SPHERE") THEN 
+		print *, "SPHERE Mode..."
 		DO I=1,SIZE(X)
 			DO J=1,SIZE(Y)
 				SH(I,J) = SHADOW_SPHERE(X(I),Y(J),ZMAX, K ) 
@@ -77,6 +80,7 @@ PROGRAM GGADT
 	   ! CALL EXIT()
 
 	ELSE IF (GEOMETRY .EQ. "ELLIPSOID") THEN 
+		print *, "ELLIPSOID Mode..."
 		DO I=1,SIZE(X)
 			DO J=1,SIZE(Y)
 				SH(I,J) = SHADOW_ELLIPSOID(X(I),Y(J),ZMAX, K ) 
@@ -87,7 +91,10 @@ PROGRAM GGADT
 			END DO
 		END DO
 		! CALL EXIT()
-	!ELSE IF (GEOMETRY == "COLLECTION_OF_SPHERES") THEN 
+	ELSE IF (GEOMETRY .EQ. "SPHERES") THEN 
+		print *,"SPHERES Mode..."
+		SH = SHADOW_SPHERES(X,Y,K)
+		!call exit()
 	!	DO I=1,SIZE(X)
 	!		DO J=1,SIZE(Y)
 	!			SH(I,J) = SHADOW_SPHCOLL(X(I),Y(J),ZMAX)
@@ -103,7 +110,7 @@ PROGRAM GGADT
 		print *,'GEOMETRY = "',GEOMETRY,'" is not a valid option.'
 		call exit()
 	END IF  
-	
+	call exit()
 
 	FTSH = FFT(SH,X,Y)
 
