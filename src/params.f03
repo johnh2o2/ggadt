@@ -6,24 +6,20 @@ SAVE
 
 REAL, PARAMETER 				::	A_EFF		= 0.2	! Micrometers
 REAL, PARAMETER					::	EPHOT		= 0.5	! keV
-CHARACTER(LEN=30), PARAMETER 	::	GEOMETRY 	= 'SPHERE'
+CHARACTER(LEN=30), PARAMETER 	::	GEOMETRY 	= 'ELLIPSOID'
 
 INTEGER, PARAMETER 				:: 	NGRID 		= 2048
 REAL, PARAMETER 				:: 	PI			= 3.14159
 REAL, PARAMETER 				::	BOX_WIDTH	= 16.0
-
-! If GEOMETRY == SPHERE:
-REAL, PARAMETER					:: 	GRAIN_A 	= A_EFF 
 REAL, PARAMETER 				::	IOR_IM		=  3.201E-3
 REAL, PARAMETER 				:: 	IOR_RE		= -2.079E-3
+REAL, dimension(3)				:: 	GRAIN_A 
+LOGICAL, PARAMETER 				::	MPI_MODE 	= .FALSE.
+CHARACTER(LEN=10), PARAMETER 	::  FFT_TYPE	= "FFTW"
 
-! If GEOMETRY == SPHEROID:
-! ===============================================
-! REAL, PARAMETER			::	GRAIN_A 	= A_EFF
-! REAL, PARAMETER			::	GRAIN_B 	= A_EFF
-! REAL, PARAMETER			::	GRAIN_C 	= A_EFF
-! REAL, PARAMETER 			::	IOR_IM		= 
-! REAL, PARAMETER 			:: 	IOR_RE		= 
+
+! REAL, PARAMETER 				::	IOR_IM		= 
+! REAL, PARAMETER 				:: 	IOR_RE		= 
 
 ! if GEOMETRY == GRID:
 ! ===============================================
@@ -34,7 +30,6 @@ REAL, PARAMETER 				:: 	IOR_RE		= -2.079E-3
 ! CHARACTER, PARAMETER		:: SPHERES_FILE = "ggadt_spheres.dat"
 ! INTEGER, PARAMETER		:: 
 
-LOGICAL, PARAMETER 				::	MPI_MODE 	= .FALSE.
-CHARACTER(LEN=10), PARAMETER 	::  FFT_TYPE	= "FFTW"
+
 
 END MODULE PARAMS

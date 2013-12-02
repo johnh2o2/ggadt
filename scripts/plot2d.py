@@ -1,4 +1,5 @@
 from math import *
+import sys
 import numpy as np 
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
@@ -28,7 +29,7 @@ for i in range(0,NX):
 		z.append(func(x_temp, y_temp))
 '''
 
-fname = 'testdat.dat'
+fname = 'testdat2d.dat'
 data_dt = np.dtype([('x', np.float_), ('y', np.float_), ('f', np.float_)])
 data = np.loadtxt(fname,dtype=data_dt)
 
@@ -36,6 +37,19 @@ x = data['x']
 y = data['y']
 z = data['f']
 
+ALL_ZERO = True 
+
+for Z in z:
+	if Z != 0:
+		print "Not all zero :)"
+		ALL_ZERO = False
+		break
+
+if ALL_ZERO:
+	print "ALL ZERO!"
+	sys.exit()
+
+print "Span: ",z.min()," to ",z.max()
 nx = 0
 ny = 0
 

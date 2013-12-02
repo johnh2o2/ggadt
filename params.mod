@@ -1,5 +1,5 @@
 GFORTRAN module version '9' created from src/params.f03
-MD5:7c4bb196ce4b5a8d8b46ca96bd544197 -- If you edit this, you'll get what you deserve.
+MD5:e93d7cec5fa232e6118315e129a40c56 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () () ()
 () () ())
@@ -30,11 +30,12 @@ INTEGER 4 0 0 0 INTEGER ()) 0 '10'))) 0 0 () (CONSTANT (CHARACTER 1 0 0
 6 'geometry' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '30'))) 0 0 () (CONSTANT (CHARACTER 1 0 0
-0 CHARACTER (())) 0 30 'SPHERE                        ') () 0 () () () 0
+0 CHARACTER (())) 0 30 'ELLIPSOID                     ') () 0 () () () 0
 0)
-7 'grain_a' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () (CONSTANT (
-REAL 4 0 0 0 REAL ()) 0 '0.3333334@0') () 0 () () () 0 0)
+7 'grain_a' 'params' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+EXPLICIT-SAVE 0 0 DIMENSION) (REAL 4 0 0 0 REAL ()) 0 0 () (1 0 EXPLICIT
+(CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0
+INTEGER ()) 0 '3')) 0 () () () 0 0)
 8 'ior_im' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () (CONSTANT (REAL 4 0 0 0
 REAL ()) 0 '0.d1c7de0@-2') () 0 () () () 0 0)

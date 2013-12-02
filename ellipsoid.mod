@@ -1,5 +1,5 @@
-GFORTRAN module version '9' created from src/sphere.f03
-MD5:6aea9c9c1b5ed46bd55674ee12a7e9d7 -- If you edit this, you'll get what you deserve.
+GFORTRAN module version '9' created from src/ellipsoid.f03
+MD5:3a61a8d7ba01f681fd98ee8b5a98b498 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () ()
 () () () ())
@@ -243,52 +243,67 @@ UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (CHARACTER 1 0 1
 1 CHARACTER ((CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1'))) 0 0 () (
 CONSTANT (CHARACTER 1 0 1 1 UNKNOWN (())) 0 1 '\U0000000b') () 0 () () ()
 2 40)
-73 'cmplx' '(intrinsic)' '' 1 ((PROCEDURE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN UNKNOWN 0 0 FUNCTION) (REAL 4 0 0 0 REAL ()) 0 0 () () 73 () ()
+73 'chord_ellipsoid' 'ellipsoid' '' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC DECL UNKNOWN 0 0 FUNCTION IMPLICIT_PURE) (REAL 4 0 0 0 REAL
+()) 74 0 (75 76) () 73 () () () 0 0)
+77 'cmplx' '(intrinsic)' '' 1 ((PROCEDURE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 FUNCTION) (REAL 4 0 0 0 REAL ()) 0 0 () () 77 () ()
 () 0 0)
-74 'delm' 'sphere' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
-EXPLICIT-SAVE 0 0) (COMPLEX 8 0 1 0 COMPLEX ()) 0 0 () () 0 () () () 0 0)
-75 'ephot' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+78 'delm' 'ellipsoid' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN EXPLICIT-SAVE 0 0) (COMPLEX 8 0 1 0 COMPLEX ()) 0 0 () () 0 () ()
+() 0 0)
+79 'ellipsoid' 'ellipsoid' '' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0
+0)
+80 'ephot' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () (CONSTANT (REAL 4 0 0 0
 REAL ()) 0 '0.8000000@0') () 0 () () () 0 0)
-76 'fft_type' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+81 'euler_angles' 'ellipsoid' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN EXPLICIT-SAVE 0 0 DIMENSION) (REAL 4 0 0 0 REAL ())
+0 0 () (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (
+CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '3')) 0 () () () 0 0)
+82 'fft_type' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '10'))) 0 0 () (CONSTANT (CHARACTER 1 0 0
 0 CHARACTER (())) 0 10 'FFTW      ') () 0 () () () 0 0)
-77 'geometry' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+83 'geometry' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '30'))) 0 0 () (CONSTANT (CHARACTER 1 0 0
 0 CHARACTER (())) 0 30 'ELLIPSOID                     ') () 0 () () () 0
 0)
-78 'grain_a' 'params' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+84 'grain_a' 'params' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0 DIMENSION) (REAL 4 0 0 0 REAL ()) 0 0 () (1 0
 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '3')) 0 () () () 0 0)
-79 'ior_im' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+85 'ior_im' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () (CONSTANT (
 REAL 4 0 0 0 REAL ()) 0 '0.d1c7de0@-2') () 0 () () () 0 0)
-80 'ior_re' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+86 'ior_re' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () (CONSTANT (
 REAL 4 0 0 0 REAL ()) 0 '-0.883fd50@-2') () 0 () () () 0 0)
-81 'mpi_mode' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+87 'mpi_mode' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0 () (
 CONSTANT (LOGICAL 4 0 0 0 LOGICAL ()) 0 0) () 0 () () () 0 0)
-82 'ngrid' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+88 'ngrid' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '2048') () 0 () () () 0 0)
-83 'params' 'params' '' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+89 'params' 'params' '' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
-84 'phi_sphere' 'sphere' '' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
-DECL UNKNOWN 0 0 FUNCTION IMPLICIT_PURE) (COMPLEX 8 0 1 0 COMPLEX ()) 85
-0 (86 87 88 89) () 84 () () () 0 0)
-90 'pi' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+90 'phi_ellipsoid' 'ellipsoid' '' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC DECL UNKNOWN 0 0 FUNCTION) (COMPLEX 8 0 1 0 COMPLEX ()) 91 0
+(92 93 94 95) () 90 () () () 0 0)
+96 'pi' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () (CONSTANT (REAL 4 0 0 0
 REAL ()) 0 '0.3243f40@1') () 0 () () () 0 0)
-91 'shadow_sphere' 'sphere' '' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
-DECL UNKNOWN 0 0 FUNCTION) (COMPLEX 8 0 1 0 COMPLEX ()) 92 0 (93 94 95
-96) () 91 () () () 0 0)
-97 'sphere' 'sphere' '' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
-UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
+97 'rot_matrix' 'ellipsoid' '' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
+DECL UNKNOWN 0 0 DIMENSION FUNCTION IMPLICIT_PURE ALWAYS_EXPLICIT) (
+REAL 4 0 0 0 REAL ()) 98 0 (99) (2 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0
+INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '3') (
+CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0
+INTEGER ()) 0 '3')) 97 () () () 0 0)
+100 'shadow_ellipsoid' 'ellipsoid' '' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC DECL UNKNOWN 0 0 FUNCTION) (COMPLEX 8 0 1 0 COMPLEX ()) 101
+0 (102 103 104 105) () 100 () () () 0 0)
 23 'Cptr' '__iso_c_binding' '' 22 ((DERIVED IN UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0 VALUE DUMMY) (DERIVED 2 0 0 0 DERIVED ()) 0 0 () () 0 () ()
 () 0 0 0)
@@ -311,22 +326,35 @@ UNKNOWN 0 0 VALUE DUMMY) (DERIVED 3 0 0 0 DERIVED ()) 0 0 () () 0 () ()
 29 'fptr' '__iso_c_binding' '' 27 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 DUMMY PROC_POINTER) (VOID 0 0 0 0 VOID ()) 0 0 () ()
 0 () () () 0 0)
-86 'x' '' '' 85 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+99 'eul_ang' '' '' 98 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DIMENSION DUMMY) (REAL 4 0 0 0 REAL ()) 0 0 () (1 0 EXPLICIT (CONSTANT (
+INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
+0 '3')) 0 () () () 0 0)
+75 'pos' '' '' 74 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DIMENSION DUMMY) (REAL 4 0 0 0 REAL ()) 0 0 () (1 0 EXPLICIT (CONSTANT (
+INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
+0 '3')) 0 () () () 0 0)
+76 'r' '' '' 74 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DIMENSION
+DUMMY) (REAL 4 0 0 0 REAL ()) 0 0 () (2 0 EXPLICIT (CONSTANT (INTEGER 4
+0 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '3') (
+CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0
+INTEGER ()) 0 '3')) 0 () () () 0 0)
+92 'x' '' '' 91 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
 REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-87 'y' '' '' 85 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+93 'y' '' '' 91 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
 REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-88 'z' '' '' 85 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+94 'z' '' '' 91 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
 REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-89 'k' '' '' 85 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
+95 'k' '' '' 91 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
 REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-93 'x' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
-REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-94 'y' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
-REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-95 'z' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
-REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-96 'k' '' '' 92 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
-REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+102 'x' '' '' 101 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY)
+(REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+103 'y' '' '' 101 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY)
+(REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+104 'z' '' '' 101 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY)
+(REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+105 'k' '' '' 101 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY)
+(REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
 71 'x' '' '' 70 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY) (
 UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
 )
@@ -347,7 +375,8 @@ UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
 'c_long_double_complex' 0 59 'c_long_long' 0 60 'c_new_line' 0 61
 'c_null_char' 0 62 'c_null_funptr' 0 63 'c_null_ptr' 0 64 'c_ptr' 0 65
 'c_short' 0 66 'c_signed_char' 0 67 'c_size_t' 0 68 'c_sizeof' 0 69
-'c_vertical_tab' 0 72 'cmplx' 0 73 'delm' 0 74 'ephot' 0 75 'fft_type' 0
-76 'geometry' 0 77 'grain_a' 0 78 'ior_im' 0 79 'ior_re' 0 80 'mpi_mode'
-0 81 'ngrid' 0 82 'params' 0 83 'phi_sphere' 0 84 'pi' 0 90
-'shadow_sphere' 0 91 'sphere' 0 97)
+'c_vertical_tab' 0 72 'chord_ellipsoid' 0 73 'cmplx' 0 77 'delm' 0 78
+'ellipsoid' 0 79 'ephot' 0 80 'euler_angles' 0 81 'fft_type' 0 82
+'geometry' 0 83 'grain_a' 0 84 'ior_im' 0 85 'ior_re' 0 86 'mpi_mode' 0
+87 'ngrid' 0 88 'params' 0 89 'phi_ellipsoid' 0 90 'pi' 0 96 'rot_matrix'
+0 97 'shadow_ellipsoid' 0 100)

@@ -10,7 +10,7 @@ SRCDIR=./src
 DRIVERSRC=ggadt.f03
 DRIVEROBJ=ggadt.o
 
-MODULESRC=params.f03 sphere.f03 fftwmod.f03
+MODULESRC=params.f03 sphere.f03 ellipsoid.f03 fftwmod.f03
 OBJECTS=$(patsubst %.f03,%.o,$(MODULESRC))
 
 all: $(EXECUTABLE)
@@ -27,7 +27,7 @@ test: clean all
 	ipython scripts/plot.py
 
 test2d: clean all
-	./$(EXECUTABLE)  > testdat.dat
+	./$(EXECUTABLE)  > testdat2d.dat
 	ipython scripts/plot2d.py
 
 clean:
