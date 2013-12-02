@@ -1,5 +1,5 @@
 GFORTRAN module version '9' created from src/params.f03
-MD5:26fd76bbf96785937dee539c279e42a1 -- If you edit this, you'll get what you deserve.
+MD5:ea743d9c50827a7bb53c173aace998c1 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () () ()
 () () ())
@@ -19,7 +19,7 @@ IMPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () (CONSTANT (REAL 4 0 0 0
 REAL ()) 0 '0.3333334@0') () 0 () () () 0 0)
 3 'box_width' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () (CONSTANT (
-REAL 4 0 0 0 REAL ()) 0 '0.1000000@2') () 0 () () () 0 0)
+REAL 4 0 0 0 REAL ()) 0 '0.2000000@2') () 0 () () () 0 0)
 4 'ephot' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () (CONSTANT (REAL 4 0 0 0
 REAL ()) 0 '0.8000000@0') () 0 () () () 0 0)
@@ -47,7 +47,7 @@ UNKNOWN IMPLICIT-SAVE 0 0) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0 () (
 CONSTANT (LOGICAL 4 0 0 0 LOGICAL ()) 0 0) () 0 () () () 0 0)
 11 'ngrid' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '128') () 0 () () () 0 0)
+INTEGER 4 0 0 0 INTEGER ()) 0 '2048') () 0 () () () 0 0)
 12 'params' 'params' '' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
 13 'pi' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN

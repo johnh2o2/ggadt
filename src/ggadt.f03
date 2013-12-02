@@ -66,7 +66,7 @@ PROGRAM GGADT
 	DO I=1,SIZE(Z)
 		Z(I) = ZMIN + (I-1)*DZ
 	END DO
-	print *,"Geometry = ",GEOMETRY
+	!print *,"Geometry = ",GEOMETRY
 
 	! SET SHADOW FUNCTION
 	IF (GEOMETRY .EQ. "SPHERE") THEN 
@@ -92,8 +92,20 @@ PROGRAM GGADT
 		END DO
 		! CALL EXIT()
 	ELSE IF (GEOMETRY .EQ. "SPHERES") THEN 
-		print *,"SPHERES Mode..."
+		!print *,"SPHERES Mode..."
+		call READ_SPHERES()
 		SH = SHADOW_SPHERES(X,Y,K)
+		DO I=1,SIZE(X)
+			DO J=1,SIZE(Y)
+				!PRINT *,X(I)," ",Y(J)," ",ABS(SH(I,J))
+			END DO
+		END DO
+		DEALLOCATE(POS)
+		DEALLOCATE(POS_ROT)
+		DEALLOCATE(RADII)
+		DEALLOCATE(IOR_R)
+		DEALLOCATE(IOR_I)
+		!call exit()
 		!call exit()
 	!	DO I=1,SIZE(X)
 	!		DO J=1,SIZE(Y)
@@ -110,7 +122,7 @@ PROGRAM GGADT
 		print *,'GEOMETRY = "',GEOMETRY,'" is not a valid option.'
 		call exit()
 	END IF  
-	call exit()
+	!call exit()
 
 	FTSH = FFT(SH,X,Y)
 

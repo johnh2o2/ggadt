@@ -1,5 +1,5 @@
 GFORTRAN module version '9' created from src/ellipsoid.f03
-MD5:76cef12cc484adc949918e4d9327959a -- If you edit this, you'll get what you deserve.
+MD5:0d54a01c4219eb4f36e362dd5e09c85c -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () ()
 () () () ())
@@ -35,7 +35,7 @@ IMPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () (CONSTANT (REAL 4 0 0 0
 REAL ()) 0 '0.3333334@0') () 0 () () () 0 0)
 9 'box_width' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () (CONSTANT (
-REAL 4 0 0 0 REAL ()) 0 '0.1000000@2') () 0 () () () 0 0)
+REAL 4 0 0 0 REAL ()) 0 '0.2000000@2') () 0 () () () 0 0)
 10 'c_alert' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (CHARACTER 1 0 1
 1 CHARACTER ((CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1'))) 0 0 () (
@@ -286,7 +286,7 @@ UNKNOWN IMPLICIT-SAVE 0 0) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0 () (
 CONSTANT (LOGICAL 4 0 0 0 LOGICAL ()) 0 0) () 0 () () () 0 0)
 88 'ngrid' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '128') () 0 () () () 0 0)
+INTEGER 4 0 0 0 INTEGER ()) 0 '2048') () 0 () () () 0 0)
 89 'params' 'params' '' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
 90 'phi_ellipsoid' 'ellipsoid' '' 1 ((PROCEDURE UNKNOWN-INTENT
