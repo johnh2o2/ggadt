@@ -14,12 +14,16 @@ PROGRAM GGADT
 	IMPLICIT NONE
 
 	REAL :: XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX, DX, DY, DZ, K, L
-	REAL, DIMENSION(NGRID) :: X, Y, Z, KX, KY, THETAX, THETAY, SCATTERX, SCATTERY
+	REAL, DIMENSION(NGRID) :: X, Y, Z, KX, KY, THETAX, THETAY
 	DOUBLE COMPLEX, DIMENSION(NGRID,NGRID) :: SH, FTSH
-	REAL, DIMENSION(3) :: postemp, etemp
-	INTEGER :: I, J
+	REAL, DIMENSION(NGRID,NGRID) :: SCATTER, SCATTER_TEMP
+	REAL, DIMENSION(3) :: EUL_ANG
+	INTEGER :: I, J, EULX, EULY, EULZ
 	CHARACTER(len=32) :: arg
 	If ((GEOMETRY == 'SPHERE') .or. (GEOMETRY == 'SPHERES')) THEN 
+		IF (GEOMETRY == 'SPHERES') THEN
+			call READ_SPHERES()
+		END IF 
   		GRAIN_A(1) = A_EFF 
   		GRAIN_A(2) = A_EFF
   		GRAIN_A(3) = A_EFF
@@ -52,10 +56,12 @@ PROGRAM GGADT
 	XMAX = BOX_WIDTH*A_EFF/2.0
 	YMAX = BOX_WIDTH*A_EFF/2.0
 	ZMAX = 2*A_EFF
-	! SET X, Y, AND Z ARRAYS
+
 	DX = (XMAX-XMIN)/(SIZE(X)-1)
 	DY = (YMAX-YMIN)/(SIZE(Y)-1)
 	DZ = (ZMAX-ZMIN)/(SIZE(Z)-1)
+
+	
 
 	DO I=1,SIZE(X)
 		X(I) = XMIN + (I-1)*DX
@@ -66,86 +72,121 @@ PROGRAM GGADT
 	DO I=1,SIZE(Z)
 		Z(I) = ZMIN + (I-1)*DZ
 	END DO
-	!print *,"Geometry = ",GEOMETRY
-
-	! SET SHADOW FUNCTION
-	IF (GEOMETRY .EQ. "SPHERE") THEN 
-		print *, "SPHERE Mode..."
-		DO I=1,SIZE(X)
-			DO J=1,SIZE(Y)
-				SH(I,J) = SHADOW_SPHERE(X(I),Y(J),ZMAX, K ) 
-		
-			END DO
-		END DO
-	   ! CALL EXIT()
-
-	ELSE IF (GEOMETRY .EQ. "ELLIPSOID") THEN 
-		print *, "ELLIPSOID Mode..."
-		DO I=1,SIZE(X)
-			DO J=1,SIZE(Y)
-				SH(I,J) = SHADOW_ELLIPSOID(X(I),Y(J),ZMAX, K ) 
-				!etemp = (/ 0, 0, 0 /)
-				!postemp = (/ X(I), Y(J), ZMAX /)
-				!SH(I,J) = CHORD(postemp,ROT_MATRIX(etemp))
-				!PRINT *,X(I)," ",Y(J)," ",ABS(SH(I,J))
-			END DO
-		END DO
-		! CALL EXIT()
-	ELSE IF (GEOMETRY .EQ. "SPHERES") THEN 
-		!print *,"SPHERES Mode..."
-		call READ_SPHERES()
-		SH = SHADOW_SPHERES(X,Y,K)
-		DO I=1,SIZE(X)
-			DO J=1,SIZE(Y)
-				!PRINT *,X(I)," ",Y(J)," ",ABS(SH(I,J))
-			END DO
-		END DO
-		DEALLOCATE(POS)
-		DEALLOCATE(POS_ROT)
-		DEALLOCATE(RADII)
-		DEALLOCATE(IOR_R)
-		DEALLOCATE(IOR_I)
-		!call exit()
-		!call exit()
-	!	DO I=1,SIZE(X)
-	!		DO J=1,SIZE(Y)
-	!			SH(I,J) = SHADOW_SPHCOLL(X(I),Y(J),ZMAX)
-	!		END DO
-	!	END DO
-	!ELSE IF (GEOMETRY == "GRID") THEN 
-	!	DO I=1,SIZE(X)
-	!		DO J=1,SIZE(Y)
-	!			SH(I,J) = SHADOW_GRID(X(I),Y(J),ZMAX)
-	!		END DO
-	!	END DO
-	ELSE
-		print *,'GEOMETRY = "',GEOMETRY,'" is not a valid option.'
-		call exit()
-	END IF  
-	!call exit()
-
-	FTSH = FFT(SH,X,Y)
-
 	KX = GET_K(X)
 	KY = GET_K(Y)
-
-	DO I=1,SIZE(X)
-		DO J=1,SIZE(Y)
-			FTSH(I,J) = FTSH(I,J)*(K**2)/(2*PI)*DX*DY
-		END DO
-	END DO
-
 	DO I=1,SIZE(KX)
 		THETAX(I) = ASIN(KX(I)/K)
 		THETAY(I) = ASIN(KY(I)/K)
 	END DO
+	
+	if (EULER_ANGLE_MODE .eq. 'SEQUENTIAL') THEN 
+		NANGLE = INT(NANGLE**(1.0/3.0))
+	ELSE IF (EULER_ANGLE_MODE .eq. 'RANDOM') THEN
+		call RANDOM_SEED()
+	END IF 
 
-	PRINT *,"#THETA (RADIANS)   [DSCAT/DOMEGA (X-AXIS)] [DSCAT/DOMEGA (Y-AXIS)]"
+	IF (GEOMETRY .EQ. "SPHERE") THEN
+		DO I=1,SIZE(X)
+			DO J=1,SIZE(Y)
+				SH(I,J) = SHADOW_SPHERE(X(I),Y(J),ZMAX, K )*(-1.0)**(I+J)
+		
+			END DO
+		END DO
+	ELSE
+		if (EULER_ANGLE_MODE .eq. 'SEQUENTIAL') THEN 
+			DO EULX=1,NANGLE
+				EUL_ANG(1) = 2*PI*(EULX-1)/NANGLE
+				write(0,*) "Eul Angle ",EULX," of ", NANGLE
+				DO EULY=1,NANGLE
+					EUL_ANG(2) = 2*PI*(EULY-1)/NANGLE
+					DO EULZ=1,NANGLE
+						EUL_ANG(3) = 2*PI*(EULZ-1)/NANGLE
+						IF (GEOMETRY .EQ. "ELLIPSOID") THEN 
+							DO I=1,SIZE(X)
+								DO J=1,SIZE(Y)
+									SH(I,J) = SHADOW_ELLIPSOID(X(I),Y(J), K, EUL_ANG )*(-1.0)**(I+J) 
+								END DO
+							END DO
+							FTSH = FFT(SH,X,Y)
+						END IF 
+						IF (GEOMETRY .eq. 'SPHERES')	THEN
+							SH = SHADOW_SPHERES(X,Y,K,EUL_ANG)
+							FTSH = FFT(SH,X,Y)
+						END IF 
+						DO I=1,SIZE(X)
+							DO J=1,SIZE(Y)
+								SCATTER(I,J) = SCATTER(I,J) + ABS((K*FTSH(I,J)*DX*DY))**2/(4*PI*(PI*A_EFF)**2)
+							END DO
+						END DO
+					END DO
+				END DO
+			END DO 
+		else if (EULER_ANGLE_MODE .eq. 'RANDOM') THEN 
+			DO EULX=1,NANGLE
+				call RANDOM_NUMBER(EUL_ANG)
+				EUL_ANG(1) = 2*PI*EUL_ANG(1) 
+				EUL_ANG(2) = 2*PI*EUL_ANG(2) 
+				EUL_ANG(3) = 2*PI*EUL_ANG(3) 
+				IF (GEOMETRY .EQ. "ELLIPSOID") THEN 
+					DO I=1,SIZE(X)
+						DO J=1,SIZE(Y)
+							SH(I,J) = SHADOW_ELLIPSOID(X(I),Y(J), K, EUL_ANG ) 
+						END DO
+					END DO
+					FTSH = FFT(SH,X,Y)
+				END IF 
+				IF (GEOMETRY .eq. 'SPHERES')	THEN
+					!SH = PHI_SPHERES(X,Y,K)
+					!DO I=1,SIZE(X)
+				    !	DO J=1,SIZE(Y)
+					!		PRINT *, X(I), Y(J), ABS(SH(I,J))
+					!	END DO
+					!END DO
+					!call exit()
+					SH = SHADOW_SPHERES(X,Y,K,EUL_ANG)
+					FTSH = FFT(SH,X,Y)
+				END IF 
+				DO I=1,SIZE(X)
+					DO J=1,SIZE(Y)
+						SCATTER(I,J) = SCATTER(I,J) + ABS((K*FTSH(I,J)*DX*DY))**2/(4*PI*(PI*A_EFF)**2)
+					END DO
+				END DO
+				
+			END DO
+		else
+			print *,"Do not understand EULER_ANGLE_MODE=", EULER_ANGLE_MODE
+			call exit()
+		end if
+		IF (GEOMETRY .eq. 'SPHERES')	THEN
+			DEALLOCATE(POS)
+			DEALLOCATE(POS_ROT)
+			DEALLOCATE(RADII)
+			DEALLOCATE(IOR_R)
+			DEALLOCATE(IOR_I)
+		END IF 
+	END IF 
+	IF (GEOMETRY /= 'SPHERE') THEN
+		DO I=1,SIZE(X)
+			DO J=1,SIZE(Y)
+				IF  (EULER_ANGLE_MODE .eq. 'RANDOM') THEN 
+					SCATTER(I,J) = SCATTER(I,J)/(NANGLE)
+				ELSE 
+					SCATTER(I,J) = SCATTER(I,J)/(NANGLE**3)
+				END IF
+
+			END DO
+		END DO
+	END IF 
 	DO I=1,SIZE(X)
-		SCATTERX(I) = (ABS(FTSH(I,1))**2)/(K**2)
-		SCATTERY(I) = (ABS(FTSH(1,I))**2)/(K**2)
-		PRINT *,THETAX(I),' ',SCATTERX(I)/(PI*A_EFF**2),' ',SCATTERY(I)/(PI*A_EFF**2)
+		DO J=1,SIZE(Y)
+			print *,THETAX(I),THETAY(J),SCATTER(I,J)
+		END DO
 	END DO
+
+	!DO I=1,SIZE(X)
+	!	print *,THETAX(I),SCATTER(I,1),SCATTER(1,I)
+	!END DO
+
 
 CONTAINS
 
@@ -158,7 +199,7 @@ FUNCTION GET_K(X)
 	N = SIZE(X)
     L = X(N) - X(1)
     DO I=1,N
-    	GET_K(I) = (2*PI*(I-1))/L
+    	GET_K(I) = (2*PI*(I-1))/L - PI*(N-1)/L 
     END DO
 END FUNCTION GET_K
 

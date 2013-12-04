@@ -30,6 +30,11 @@ test2d: clean all
 	./$(EXECUTABLE)  > testdat2d.dat
 	ipython scripts/plot2d.py
 
+thetaphi: clean all
+	./$(EXECUTABLE)  > testdat_thetaphi.dat
+	ipython scripts/plot_thetaphi.py
+
+
 clean:
 	rm -f $(OBJECTS) $(EXECUTABLE) $(DRIVEROBJ)
 	rm -f *o *mod 
