@@ -1,6 +1,6 @@
 VERSION = 0.13
 
-FF = gfortran
+FF = gfortran-mp-4.8
 FFLAGS = -O3
 LIBS = -L./lib -lfftw3
 INC = -I./inc

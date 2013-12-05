@@ -116,7 +116,7 @@ MODULE SPHERES
 		DO I=1,NGRID
 			DO J=1,NGRID 
 				! Convert PHI grid to shadow grid*(-1)^(I+J) so the FFT is centered
-				SHADOW_SPHERES(I,J) = (-1.0)**(I+J)*(1-EXP( (0.0,1.0)*PHI(I,J) ))
+				SHADOW_SPHERES(I,J) = (-1.0)**(I+J+1)*(1-EXP( (0.0,1.0)*PHI(I,J) ))
 			END DO
 		END DO 
 		
