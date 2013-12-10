@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 
-fname = 'testdat.dat'
+fname = 'data/testdat.dat'
 data_dt = np.dtype([('theta', np.float_), ('dscatdomega_x', np.float_), ('dscatdomega_y', np.float_)])
 data = np.loadtxt(fname,dtype=data_dt)
 

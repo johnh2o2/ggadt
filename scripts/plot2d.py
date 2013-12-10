@@ -29,7 +29,7 @@ for i in range(0,NX):
 		z.append(func(x_temp, y_temp))
 '''
 
-fname = 'testdat2d.dat'
+fname = 'data/testdat2d.dat'
 data_dt = np.dtype([('x', np.float_), ('y', np.float_), ('f', np.float_)])
 data = np.loadtxt(fname,dtype=data_dt)
 

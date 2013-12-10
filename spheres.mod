@@ -1,5 +1,5 @@
 GFORTRAN module version '10' created from src/spheres.f03
-MD5:84d23a1b1ce1b27719f74559c3d7d3cc -- If you edit this, you'll get what you deserve.
+MD5:37a58bf3f6a99f765d051900456998e4 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () ()
 () () () ())
@@ -38,7 +38,7 @@ UNKNOWN EXPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0
 0)
 10 'box_width' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () (CONSTANT (
-REAL 4 0 0 0 REAL ()) 0 '0.4000000@2') () 0 () () () 0 0)
+REAL 4 0 0 0 REAL ()) 0 '0.1000000@2') () 0 () () () 0 0)
 11 'c_alert' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (CHARACTER 1 0 1
 1 CHARACTER ((CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1'))) 0 0 () (
@@ -279,7 +279,7 @@ INTEGER 4 0 0 0 INTEGER ()) 0 '10'))) 0 0 () (CONSTANT (CHARACTER 1 0 0
 88 'geometry' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '30'))) 0 0 () (CONSTANT (CHARACTER 1 0 0
-0 CHARACTER (())) 0 30 'ELLIPSOID                     ') () 0 () () () 0
+0 CHARACTER (())) 0 30 'SPHERES                       ') () 0 () () () 0
 0)
 89 'grain_a' 'params' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0 DIMENSION) (REAL 4 0 0 0 REAL ()) 0 0 () (1 0
@@ -465,10 +465,11 @@ INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
 0 '2048')) 0 () () () 0 0)
 141 'k' '' '' 138 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY)
 (REAL 4 0 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-142 'euler_angles' '' '' 138 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN
-0 0 DIMENSION DUMMY) (REAL 4 0 0 0 REAL ()) 0 0 () (1 0 EXPLICIT (
-CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0
-INTEGER ()) 0 '3')) 0 () () () 0 0)
+142 'rm' '' '' 138 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DIMENSION DUMMY) (REAL 4 0 0 0 REAL ()) 0 0 () (2 0 EXPLICIT (CONSTANT (
+INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
+0 '3') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER
+4 0 0 0 INTEGER ()) 0 '3')) 0 () () () 0 0)
 )
 
 ('C_funptr' 0 2 'C_ptr' 0 3 '__convert_c4_c8' 0 6 '__iso_c_binding' 0 7

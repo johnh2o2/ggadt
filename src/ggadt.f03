@@ -22,6 +22,8 @@ PROGRAM GGADT
 	REAL, DIMENSION(3,3) :: RM 
 	INTEGER :: I, J, EULX, EULY, EULZ
 	CHARACTER(len=32) :: arg
+
+	call set_parameters()
 	If ((GEOMETRY == 'SPHERE') .or. (GEOMETRY == 'SPHERES')) THEN 
 		IF (GEOMETRY == 'SPHERES') THEN
 			call READ_SPHERES()
@@ -108,10 +110,11 @@ PROGRAM GGADT
 					EUL_ANG(2) = 2*PI*(EULY-1)/NANGLE
 					DO EULZ=1,NANGLE
 						EUL_ANG(3) = 2*PI*(EULZ-1)/NANGLE
+						!RM = ROT_MATRIX(EUL_ANG)
+						RM = MATMUL(MATMUL(ROT_X(EUL_ANG(1)), ROT_Y(EUL_ANG(2))),ROT_Z(EUL_ANG(3)))
 						write (0,*) "EUL_ANG[",(EULX-1)*NANGLE*NANGLE+EULY*NANGLE+EULZ,"/",NANGLE**3,"]: ",EUL_ANG
 						IF (GEOMETRY .EQ. 'ELLIPSOID') THEN 
-							RM = ROT_MATRIX(EUL_ANG)
-							!RM = MATMUL(MATMUL(ROT_X(EUL_ANG(1)), ROT_Y(EUL_ANG(2))),ROT_Z(EUL_ANG(3)))
+							
 							DO I=1,SIZE(X)
 								DO J=1,SIZE(Y)
 									SH(I,J) = SHADOW_ELLIPSOID(X(I),Y(J), K, RM )*(-1.0)**(I+J+1) 
@@ -122,7 +125,7 @@ PROGRAM GGADT
 							FTSH = FFT(SH,X,Y)
 						END IF 
 						IF (GEOMETRY .eq. 'SPHERES')	THEN
-							SH = SHADOW_SPHERES(X,Y,K,EUL_ANG)
+							SH = SHADOW_SPHERES(X,Y,K,RM)
 							FTSH = FFT(SH,X,Y)
 						END IF 
 						DO I=1,SIZE(X)
@@ -135,13 +138,15 @@ PROGRAM GGADT
 			END DO 
 		else if (EULER_ANGLE_MODE .eq. 'RANDOM') THEN 
 			DO EULX=1,NANGLE
+				write(0,FMT="(A1,A,t21,F6.2,A)",ADVANCE="NO") achar(13), &
+					& " Percent Complete: ", (real(EULX-1)/real(NANGLE))*100.0, "%"
 				call RANDOM_NUMBER(EUL_ANG)
 				EUL_ANG(1) = 2*PI*EUL_ANG(1) 
 				EUL_ANG(2) = 2*PI*EUL_ANG(2) 
 				EUL_ANG(3) = 2*PI*EUL_ANG(3) 
 				!RM = ROT_MATRIX(EUL_ANG)
 				RM = MATMUL(MATMUL(ROT_X(EUL_ANG(1)), ROT_Y(EUL_ANG(2))),ROT_Z(EUL_ANG(3)))
-				write (0,*) "EUL_ANG[",EULX,"/",NANGLE,"]: ",EUL_ANG
+				!write (0,*) "EUL_ANG[",EULX,"/",NANGLE,"]: ",EUL_ANG
 				IF (GEOMETRY .EQ. "ELLIPSOID") THEN 
 					
 					DO I=1,SIZE(X)
@@ -161,7 +166,7 @@ PROGRAM GGADT
 					!	END DO
 					!END DO
 					!call exit()
-					SH = SHADOW_SPHERES(X,Y,K,EUL_ANG)
+					SH = SHADOW_SPHERES(X,Y,K,RM)
 					FTSH = FFT(SH,X,Y)
 				END IF 
 				DO I=1,SIZE(X)
@@ -197,7 +202,7 @@ PROGRAM GGADT
 	END IF 
 	DO I=1,SIZE(X)
 		DO J=1,SIZE(Y)
-			print *,THETAX(I),THETAY(J),SCATTER(I,J)
+		!	print *,THETAX(I),THETAY(J),SCATTER(I,J)
 			!print *,X(I),Y(J),CHRD(I,J)
 		END DO
 	END DO
@@ -221,6 +226,11 @@ FUNCTION GET_K(X)
     	GET_K(I) = (2*PI/L)*(I-0.5*(N+1)-0.5)
     END DO
 END FUNCTION GET_K
+
+ subroutine set_parameters()
+
+
+ end subroutine set_parameters
 
  subroutine init_random_seed()
 	implicit none

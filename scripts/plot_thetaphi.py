@@ -7,7 +7,7 @@ from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 
 conv = (360*60*60)/(2*np.pi)
-fname = 'testdat_thetaphi.dat'
+fname = 'data/testdat_thetaphi.dat'
 data_dt = np.dtype([('theta', np.float_), ('phi', np.float_), ('f', np.float_)])
 data = np.loadtxt(fname,dtype=data_dt)
 
@@ -82,7 +82,7 @@ n = 0
 while x[n] == x[0]: n+=1
 
 
-print int(sqrt(len(x))), n
+#print int(sqrt(len(x))), n
 #print x, y, z 
 
 
@@ -91,7 +91,7 @@ y = np.reshape(y,(n,n))
 z = np.reshape(z,(n,n))
 
 
-print "--Going to interpolate..."
+print "--Going to interpolate... (%d x %d grid)"%(n, n)
 BSPL = RectBivariateSpline(x[:,0],y[0,:],np.log10(z))
 zinterp = lambda xi,yi : BSPL.ev(xi,yi)
 print "  +Interpolated."

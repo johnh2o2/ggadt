@@ -1,5 +1,5 @@
 GFORTRAN module version '10' created from src/sphere.f03
-MD5:6c329ee59a8877dfc5b101e3a555d978 -- If you edit this, you'll get what you deserve.
+MD5:6e7d5a534b02a9c83788f99450876d03 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () ()
 () () () ())
@@ -35,7 +35,7 @@ IMPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () (CONSTANT (REAL 4 0 0 0
 REAL ()) 0 '0.3333334@0') () 0 () () () 0 0)
 9 'box_width' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 4 0 0 0 REAL ()) 0 0 () (CONSTANT (
-REAL 4 0 0 0 REAL ()) 0 '0.4000000@2') () 0 () () () 0 0)
+REAL 4 0 0 0 REAL ()) 0 '0.1000000@2') () 0 () () () 0 0)
 10 'c_alert' '__iso_c_binding' '' 1 ((PARAMETER UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 IS_C_INTEROP IS_ISO_C) (CHARACTER 1 0 1
 1 CHARACTER ((CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1'))) 0 0 () (
@@ -270,7 +270,7 @@ INTEGER 4 0 0 0 INTEGER ()) 0 '10'))) 0 0 () (CONSTANT (CHARACTER 1 0 0
 84 'geometry' 'params' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '30'))) 0 0 () (CONSTANT (CHARACTER 1 0 0
-0 CHARACTER (())) 0 30 'ELLIPSOID                     ') () 0 () () () 0
+0 CHARACTER (())) 0 30 'SPHERES                       ') () 0 () () () 0
 0)
 85 'grain_a' 'params' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0 DIMENSION) (REAL 4 0 0 0 REAL ()) 0 0 () (1 0
