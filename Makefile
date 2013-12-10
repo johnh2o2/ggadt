@@ -1,4 +1,4 @@
-VERSION = 0.14
+VERSION = 0.15
 FF = gfortran-mp-4.8
 #FF = gfortran
 FFLAGS = -O3
@@ -12,7 +12,7 @@ SRCDIR=./src
 DRIVERSRC=ggadt.f03
 DRIVEROBJ=ggadt.o
 
-MODULESRC=params.f03 sphere.f03 spheres.f03 ellipsoid.f03 fftwmod.f03
+MODULESRC=common.f03 sphere.f03 spheres.f03 ellipsoid.f03 fftwmod.f03 
 OBJECTS=$(patsubst %.f03,%.o,$(MODULESRC))
 
 all: $(EXECUTABLE)
@@ -41,3 +41,6 @@ clean:
 	rm -f $(OBJECTS) $(EXECUTABLE) $(DRIVEROBJ)
 	rm -f *o *mod 
 	rm -f $(SRCDIR)/*mod
+
+cleanplans:
+	rm -f plans/*

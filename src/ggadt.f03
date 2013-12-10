@@ -1,29 +1,38 @@
-! 11/11/2013--JOHN HOFFMAN
-!=========================
-! THIS WILL BE:
-! (1) A TEST OF THE PROGRAMMING, SINCE WE CAN DIRECTLY COMPARE TO MIE THEORY
-! (2) A FUTURE MODULE THAT WILL BE USED FOR COLLECTIONS OF SPHERES.
+! GGADT -- General Geometry Anomalous Diffraction Theory
+!
+! 	   | This code takes a parameter file as input, and prints
+!	   | dQscat/dOmega as a function of thetax and thetay
 
 PROGRAM GGADT
 	USE, INTRINSIC :: ISO_C_BINDING
 	USE SPHERE
 	USE SPHERES
 	USE ELLIPSOID
-	USE PARAMS
+	USE COMMON_MOD
 	USE FFTW
 	IMPLICIT NONE
 
+	
+	REAL, allocatable :: X(:), Y(:), Z(:), KX(:), KY(:), THETAX(:), THETAY(:)
+	COMPLEX(C_DOUBLE_COMPLEX), allocatable :: SH(:,:), FTSH(:,:)
+	REAL, allocatable :: CHRD(:,:), SCATTER(:,:), SCATTER_TEMP(:,:)
+
 	REAL :: XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX, DX, DY, DZ, K, L
-	REAL, DIMENSION(NGRID) :: X, Y, Z, KX, KY, THETAX, THETAY
-	DOUBLE COMPLEX, DIMENSION(NGRID,NGRID) :: SH, FTSH
-	REAL, DIMENSION(NGRID,NGRID) :: CHRD
-	REAL, DIMENSION(NGRID,NGRID) :: SCATTER, SCATTER_TEMP
 	REAL, DIMENSION(3) :: EUL_ANG
 	REAL, DIMENSION(3,3) :: RM 
-	INTEGER :: I, J, EULX, EULY, EULZ
-	CHARACTER(len=32) :: arg
+	INTEGER :: I, J, EULX, EULY, EULZ, AllocateStatus, num_args
+	CHARACTER(len=200) :: parameter_file_name
+	num_args = iargc()
 
-	call set_parameters()
+	if (num_args /= 1) THEN
+		write(0,*) "Incorrect usage. ./<prog> <paramfilename>", iargc()
+		CALL EXIT()
+	end if
+
+	call getarg(1,parameter_file_name)
+	call read_param_file(trim(adjustl(parameter_file_name)))
+	call allocate_vars()
+
 	If ((GEOMETRY == 'SPHERE') .or. (GEOMETRY == 'SPHERES')) THEN 
 		IF (GEOMETRY == 'SPHERES') THEN
 			call READ_SPHERES()
@@ -31,12 +40,10 @@ PROGRAM GGADT
   		GRAIN_A(1) = A_EFF 
   		GRAIN_A(2) = A_EFF
   		GRAIN_A(3) = A_EFF
-	ELSE If (GEOMETRY == 'ELLIPSOID') THEN	
-		GRAIN_A(1) = 1.0
-  		GRAIN_A(2) = 1.0/SQRT(2.0)
-  		!GRAIN_A(2) = 1.0
-  		GRAIN_A(3) = 1.0
+	ELSE If (GEOMETRY == 'ELLIPSOID') THEN
   		L = A_EFF/((GRAIN_A(1)*GRAIN_A(2)*GRAIN_A(3))**(1.0/3.0))
+  		! Normalize so that GRAIN_A(1), (2), (3) produce an ellipse with an effective
+  		! radius of A_EFF
   		GRAIN_A(1) = GRAIN_A(1)*L
   		GRAIN_A(2) = GRAIN_A(2)*L
   		GRAIN_A(3) = GRAIN_A(3)*L
@@ -45,13 +52,6 @@ PROGRAM GGADT
 		CALL EXIT()
 	END IF 
 	
-	!I = 0
-	!DO
-	!	CALL GET_COMMAND_ARGUMENT(I, ARG)
-	!	IF (LEN_TRIM(ARG) == 0) EXIT
-	!	WRITE (*,*) TRIM(ARG)
-	!	I = I+1
-	!END DO
 
 	K = (2*PI/1.239842)*1000*EPHOT
 
@@ -110,7 +110,6 @@ PROGRAM GGADT
 					EUL_ANG(2) = 2*PI*(EULY-1)/NANGLE
 					DO EULZ=1,NANGLE
 						EUL_ANG(3) = 2*PI*(EULZ-1)/NANGLE
-						!RM = ROT_MATRIX(EUL_ANG)
 						RM = MATMUL(MATMUL(ROT_X(EUL_ANG(1)), ROT_Y(EUL_ANG(2))),ROT_Z(EUL_ANG(3)))
 						write (0,*) "EUL_ANG[",(EULX-1)*NANGLE*NANGLE+EULY*NANGLE+EULZ,"/",NANGLE**3,"]: ",EUL_ANG
 						IF (GEOMETRY .EQ. 'ELLIPSOID') THEN 
@@ -144,28 +143,17 @@ PROGRAM GGADT
 				EUL_ANG(1) = 2*PI*EUL_ANG(1) 
 				EUL_ANG(2) = 2*PI*EUL_ANG(2) 
 				EUL_ANG(3) = 2*PI*EUL_ANG(3) 
-				!RM = ROT_MATRIX(EUL_ANG)
 				RM = MATMUL(MATMUL(ROT_X(EUL_ANG(1)), ROT_Y(EUL_ANG(2))),ROT_Z(EUL_ANG(3)))
-				!write (0,*) "EUL_ANG[",EULX,"/",NANGLE,"]: ",EUL_ANG
 				IF (GEOMETRY .EQ. "ELLIPSOID") THEN 
 					
 					DO I=1,SIZE(X)
 						DO J=1,SIZE(Y)
 							SH(I,J) = SHADOW_ELLIPSOID(X(I),Y(J), K, RM )*(-1.0)**(I+J+1) 
-							!CHRD(I,J) = CHORD_ELLIPSOID(X(I),Y(J),RM)
-							!WRITE (0,*) "JUST READ: ", CHRD(I,J)
 						END DO
 					END DO
 					FTSH = FFT(SH,X,Y)
 				END IF 
 				IF (GEOMETRY .eq. 'SPHERES')	THEN
-					!SH = PHI_SPHERES(X,Y,K)
-					!DO I=1,SIZE(X)
-				    !	DO J=1,SIZE(Y)
-					!		PRINT *, X(I), Y(J), ABS(SH(I,J))
-					!	END DO
-					!END DO
-					!call exit()
 					SH = SHADOW_SPHERES(X,Y,K,RM)
 					FTSH = FFT(SH,X,Y)
 				END IF 
@@ -200,9 +188,10 @@ PROGRAM GGADT
 			END DO
 		END DO
 	END IF 
+	print *, "# [thetax] [thetay] [dQscat/dOmega]"
 	DO I=1,SIZE(X)
 		DO J=1,SIZE(Y)
-		!	print *,THETAX(I),THETAY(J),SCATTER(I,J)
+			print *,THETAX(I),THETAY(J),SCATTER(I,J)
 			!print *,X(I),Y(J),CHRD(I,J)
 		END DO
 	END DO
@@ -227,12 +216,7 @@ FUNCTION GET_K(X)
     END DO
 END FUNCTION GET_K
 
- subroutine set_parameters()
-
-
- end subroutine set_parameters
-
- subroutine init_random_seed()
+subroutine init_random_seed()
 	implicit none
 	integer, allocatable :: seed(:)
 	integer :: i, n, un, istat, dt(8), pid, t(2), s
@@ -279,6 +263,34 @@ END FUNCTION GET_K
 	end if
 	call random_seed(put=seed)
 	end subroutine init_random_seed
+
+	subroutine allocate_vars()
+
+		ALLOCATE(X(NGRID),STAT = AllocateStatus)
+  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (X) ***"
+  		ALLOCATE(Y(NGRID),STAT = AllocateStatus)
+  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (Y) ***"
+  		ALLOCATE(Z(NGRID),STAT = AllocateStatus)
+  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (Z) ***"
+  		ALLOCATE(KX(NGRID),STAT = AllocateStatus)
+  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (KX) ***"
+  		ALLOCATE(KY(NGRID),STAT = AllocateStatus)
+  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (KY) ***"
+  		ALLOCATE(THETAX(NGRID),STAT = AllocateStatus)
+  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (THETAX) ***"
+  		ALLOCATE(THETAY(NGRID),STAT = AllocateStatus)
+  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (THETAY) ***"
+  		ALLOCATE(SH(NGRID,NGRID),STAT = AllocateStatus)
+  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (SH) ***"
+  		ALLOCATE(FTSH(NGRID,NGRID),STAT = AllocateStatus)
+  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (FTSH) ***"
+  		ALLOCATE(CHRD(NGRID,NGRID),STAT = AllocateStatus)
+  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (CHRD) ***"
+  		ALLOCATE(SCATTER(NGRID,NGRID),STAT = AllocateStatus)
+  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (SCATTER) ***"
+  		ALLOCATE(SCATTER_TEMP(NGRID,NGRID),STAT = AllocateStatus)
+  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (SCATTER_TEMP) ***"
+  	end subroutine allocate_vars
 
 
 END PROGRAM GGADT
