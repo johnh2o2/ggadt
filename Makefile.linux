@@ -1,9 +1,9 @@
-VERSION = 0.16
-FF = gfortran-mp-4.8
-#FF = gfortran
+VERSION = 0.15
+#FF = gfortran-mp-4.8
+FF = gfortran
 FFLAGS = -O3
 #LIBS = -L./lib -lfftw3
-INC = -I./inc
+#INC = -I./inc
 LIBS=-lfftw3
 INC= -I./inc
 EXECUTABLE=ggadt_v$(VERSION)
