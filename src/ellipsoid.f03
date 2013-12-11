@@ -1,69 +1,65 @@
-MODULE ELLIPSOID
+module ellipsoid
 
-	USE, INTRINSIC :: ISO_C_BINDING
-	USE COMMON_MOD
+	use, intrinsic :: iso_c_binding
+	use common_mod
 
-	IMPLICIT NONE
+	implicit none
 	
-	CONTAINS
+	contains
 
-	FUNCTION CHORD_ELLIPSOID(X,Y,R)
-		IMPLICIT NONE
-		REAL :: CHORD_ELLIPSOID
-		REAL :: D, temp
-		REAL, DIMENSION(3) :: C
-		REAL, DIMENSION(2) :: POS
-		REAL, INTENT(IN), DIMENSION(3,3) :: R
-		REAL, INTENT(IN) :: X, Y
-		INTEGER :: I,J,K,M
-		POS(1) = X
-		POS(2) = Y
-		!PRINT *,GRAIN_A(1), GRAIN_A(2), GRAIN_A(3), X, Y
-		!CALL EXIT()
-		C(1) = 0
-		C(2) = 0
-		C(3) = 0
-		DO I=1,3
-			temp = GRAIN_A(I)**(-2.0)
-			C(1) = C(1) + temp*R(I,3)**2
-			DO J=1,2
-				C(2) = C(2) + 2*temp*R(I,3)*R(I,J)*POS(J)
-				DO K=1,2
-					C(3) = C(3) + temp*R(I,J)*R(I,K)*POS(J)*POS(K)
-				END DO
-			END DO
-		END DO 
+	function chord_ellipsoid(x,y,r)
+		implicit none
+		real :: chord_ellipsoid
+		real :: d, temp
+		real, dimension(3) :: c
+		real, dimension(2) :: pos
+		real, intent(in), dimension(3,3) :: r
+		real, intent(in) :: x, y
+		integer :: i,j,k,m
+		pos(1) = x
+		pos(2) = y
+		c(1) = 0
+		c(2) = 0
+		c(3) = 0
+		do i=1,3
+			temp = grain_a(i)**(-2.0)
+			c(1) = c(1) + temp*r(i,3)**2
+			do j=1,2
+				c(2) = c(2) + 2*temp*r(i,3)*r(i,j)*pos(j)
+				do k=1,2
+					c(3) = c(3) + temp*r(i,j)*r(i,k)*pos(j)*pos(k)
+				end do
+			end do
+		end do 
 
 		
-		C(3) = C(3) - 1 
-		D    = C(2)*C(2)-4*C(1)*C(3)
+		c(3) = c(3) - 1 
+		d    = c(2)*c(2)-4*c(1)*c(3)
 	
 
-		IF ((D .lt. 0.0) .or. (C(1) .eq. 0.0)) THEN
-			CHORD_ELLIPSOID = 0.0
-			!WRITE(0,*) X, Y, "OOB"
-		ELSE
-			CHORD_ELLIPSOID = SQRT(D)/C(1)
-			!WRITE(0,*) X, Y, CHORD_ELLIPSOID
-		END IF
-	END FUNCTION CHORD_ELLIPSOID
+		if ((d .lt. 0.0) .or. (c(1) .eq. 0.0)) then
+			chord_ellipsoid = 0.0
+		else
+			chord_ellipsoid = sqrt(d)/c(1)
+		end if
+	end function chord_ellipsoid
 
-	FUNCTION PHI_ELLIPSOID(X,Y,K,R)
-		IMPLICIT NONE
-		REAL, INTENT(IN) :: X,Y,K
-		REAL, DIMENSION(3,3), INTENT(IN) :: R
-		COMPLEX(C_DOUBLE_COMPLEX) :: PHI_ELLIPSOID
-		PHI_ELLIPSOID = K*DELM*CHORD_ELLIPSOID(X,Y,R)
+	function phi_ellipsoid(x,y,k,r)
+		implicit none
+		real, intent(in) :: x,y,k
+		real, dimension(3,3), intent(in) :: r
+		complex(c_double_complex) :: phi_ellipsoid
+		phi_ellipsoid = k*delm*chord_ellipsoid(x,y,r)
 		
-	END FUNCTION PHI_ELLIPSOID
+	end function phi_ellipsoid
 
-	FUNCTION SHADOW_ELLIPSOID(X,Y,K,R)
-		IMPLICIT NONE
-		REAL, INTENT(IN) :: X,Y,K
-		REAL, DIMENSION(3,3), INTENT(IN) :: R
-		COMPLEX(C_DOUBLE_COMPLEX) :: SHADOW_ELLIPSOID
-		SHADOW_ELLIPSOID = 1.0-EXP( (0.0,1.0)*PHI_ELLIPSOID(X,Y,K,R) )
+	function shadow_ellipsoid(x,y,k,r)
+		implicit none
+		real, intent(in) :: x,y,k
+		real, dimension(3,3), intent(in) :: r
+		complex(c_double_complex) :: shadow_ellipsoid
+		shadow_ellipsoid = 1.0-exp( (0.0,1.0)*phi_ellipsoid(x,y,k,r) )
 		
-	END FUNCTION SHADOW_ELLIPSOID
+	end function shadow_ellipsoid
 
-END MODULE ELLIPSOID
+end module ellipsoid

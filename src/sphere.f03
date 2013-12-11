@@ -1,52 +1,52 @@
-MODULE SPHERE
+module sphere
 
-	USE, INTRINSIC :: ISO_C_BINDING
-	USE COMMON_MOD
+	use, intrinsic :: iso_c_binding
+	use common_mod
 	
 
-	CONTAINS
+	contains
 
-	FUNCTION CHORD_SPHERE(POS,POS_O,R)
-		IMPLICIT NONE
-		REAL, DIMENSION(3), INTENT(IN) :: POS, POS_O
-		REAL, INTENT(IN) :: R 
-		REAL :: L
-		REAL :: CHORD_SPHERE
-		L = R*R - (POS(1)-POS_O(1))**2  - (POS(2)-POS_O(2))**2
-		IF ((L .lt. 0) .or. (L .eq. 0)) THEN
-			CHORD_SPHERE = 0
-		ELSE
-			CHORD_SPHERE = 2*SQRT(L)
-		END IF 
-	END FUNCTION CHORD_SPHERE
+	function chord_sphere(pos,pos_o,r)
+		implicit none
+		real, dimension(3), intent(in) :: pos, pos_o
+		real, intent(in) :: r 
+		real :: l
+		real :: chord_sphere
+		l = r*r - (pos(1)-pos_o(1))**2  - (pos(2)-pos_o(2))**2
+		if ((l .lt. 0) .or. (l .eq. 0)) then
+			chord_sphere = 0
+		else
+			chord_sphere = 2*sqrt(l)
+		end if 
+	end function chord_sphere
 
-	FUNCTION PHI_SPHERE(X,Y,Z,K)
-		IMPLICIT NONE
-		REAL, INTENT(IN) :: X,Y,Z,K
-		REAL :: R, L, GR_A
-		COMPLEX(C_DOUBLE_COMPLEX) :: PHI_SPHERE
-		GR_A = SQRT(SUM(GRAIN_A*GRAIN_A))
-		R = SQRT(X*X + Y*Y)
-		L = SQRT(GR_A*GR_A - R*R)
-		PHI_SPHERE = (0,0)
+	function phi_sphere(x,y,z,k)
+		implicit none
+		real, intent(in) :: x,y,z,k
+		real :: r, l, gr_a
+		complex(c_double_complex) :: phi_sphere
+		gr_a = sqrt(sum(grain_a*grain_a))
+		r = sqrt(x*x + y*y)
+		l = sqrt(gr_a*gr_a - r*r)
+		phi_sphere = (0,0)
 
-		IF (R < GR_A) THEN 
-			IF (Z < L .AND. Z > -L) THEN 
-				PHI_SPHERE = K*DELM*(Z+L)
-			ELSE IF (Z > L) THEN
-				PHI_SPHERE = K*DELM*(2*L)
-			ELSE
-				PHI_SPHERE = (0,0)
-			END IF
-		END IF
-	END FUNCTION PHI_SPHERE
+		if (r < gr_a) then 
+			if (z < l .and. z > -l) then 
+				phi_sphere = k*delm*(z+l)
+			else if (z > l) then
+				phi_sphere = k*delm*(2*l)
+			else
+				phi_sphere = (0,0)
+			end if
+		end if
+	end function phi_sphere
 
-	FUNCTION SHADOW_SPHERE(X,Y,Z,K)
-		IMPLICIT NONE
-		REAL, INTENT(IN) :: X,Y,Z,K
-		COMPLEX(C_DOUBLE_COMPLEX) :: SHADOW_SPHERE
-		SHADOW_SPHERE = 1-EXP( (0.0,1.0)*PHI_SPHERE(X,Y,Z,K) )
+	function shadow_sphere(x,y,z,k)
+		implicit none
+		real, intent(in) :: x,y,z,k
+		complex(c_double_complex) :: shadow_sphere
+		shadow_sphere = 1-exp( (0.0,1.0)*phi_sphere(x,y,z,k) )
 		
-	END FUNCTION SHADOW_SPHERE
+	end function shadow_sphere
 
-END MODULE SPHERE
+end module sphere

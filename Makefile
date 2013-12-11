@@ -1,11 +1,11 @@
 VERSION = 0.15
-FF = gfortran-mp-4.8
-#FF = gfortran
+#FF = gfortran-mp-4.8
+FF = gfortran
 FFLAGS = -O3
-LIBS = -L./lib -lfftw3
-INC = -I./inc
-#LIBS=-lfftw3
-#INC= -I./inc
+#LIBS = -L./lib -lfftw3
+#INC = -I./inc
+LIBS=-lfftw3
+INC= -I./inc
 EXECUTABLE=ggadt_v$(VERSION)
 SRCDIR=./src
 #SOURCES=$(wildcard $(SRCDIR)/*.f)
@@ -24,18 +24,12 @@ $(EXECUTABLE): $(OBJECTS) $(DRIVEROBJ)
 %.o: $(SRCDIR)/%.f03
 	$(FF) -c $(LIBS) $(INC) $(FFLAGS) $<
 
+run: clean all
+	./$(EXECUTABLE) parameterfile.ini
+
 test: clean all
-	./$(EXECUTABLE)  > data/testdat.dat
-	ipython scripts/plot.py
-
-test2d: clean all
-	./$(EXECUTABLE)  > data/testdat2d.dat
-	ipython scripts/plot2d.py
-
-thetaphi: clean all
-	./$(EXECUTABLE)  > data/testdat_thetaphi.dat
+	./$(EXECUTABLE) parameterfile.ini  > data/testdat_thetaphi.dat
 	ipython scripts/plot_thetaphi.py
-
 
 clean:
 	rm -f $(OBJECTS) $(EXECUTABLE) $(DRIVEROBJ)

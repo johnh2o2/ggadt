@@ -1,297 +1,306 @@
-! GGADT -- General Geometry Anomalous Diffraction Theory
+! ggadt -- general geometry anomalous diffraction theory
 !
-! 	   | This code takes a parameter file as input, and prints
-!	   | dQscat/dOmega as a function of thetax and thetay
+! 	   | this code takes a parameter file as input, and prints
+!	   | dqscat/domega as a function of thetax and thetay
 
-PROGRAM GGADT
-	USE, INTRINSIC :: ISO_C_BINDING
-	USE SPHERE
-	USE SPHERES
-	USE ELLIPSOID
-	USE COMMON_MOD
-	USE FFTW
-	IMPLICIT NONE
+program ggadt
+	use, intrinsic :: iso_c_binding
+	use, intrinsic :: iso_fortran_env
+	use sphere
+	use spheres
+	use ellipsoid
+	use common_mod
+	use fftw
+	implicit none
 
 	
-	REAL, allocatable :: X(:), Y(:), Z(:), KX(:), KY(:), THETAX(:), THETAY(:)
-	COMPLEX(C_DOUBLE_COMPLEX), allocatable :: SH(:,:), FTSH(:,:)
-	REAL, allocatable :: CHRD(:,:), SCATTER(:,:), SCATTER_TEMP(:,:)
+	real, allocatable :: x(:), y(:), z(:), kx(:), ky(:), thetax(:), thetay(:)
+	complex(c_double_complex), allocatable :: sh(:,:), ftsh(:,:)
+	real, allocatable :: chrd(:,:), scatter(:,:), scatter_temp(:,:)
 
-	REAL :: XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX, DX, DY, DZ, K, L
-	REAL, DIMENSION(3) :: EUL_ANG
-	REAL, DIMENSION(3,3) :: RM 
-	INTEGER :: I, J, EULX, EULY, EULZ, AllocateStatus, num_args
-	CHARACTER(len=200) :: parameter_file_name
+	real :: xmin, xmax, ymin, ymax, zmin, zmax, dx, dy, dz, k, l
+	real, dimension(3) :: eul_ang
+	real, dimension(3,3) :: rm 
+	integer :: i, j, neul, allocatestatus, num_args, nangle_new
+	character(len=200) :: parameter_file_name
 	num_args = iargc()
 
-	if (num_args /= 1) THEN
-		write(0,*) "Incorrect usage. ./<prog> <paramfilename>", iargc()
-		CALL EXIT()
+	if (num_args /= 1) then
+		write(error_unit,*) "incorrect usage. ./<prog> <paramfilename>", iargc()
+		call exit()
 	end if
 
 	call getarg(1,parameter_file_name)
 	call read_param_file(trim(adjustl(parameter_file_name)))
-	call allocate_vars()
-
-	If ((GEOMETRY == 'SPHERE') .or. (GEOMETRY == 'SPHERES')) THEN 
-		IF (GEOMETRY == 'SPHERES') THEN
-			call READ_SPHERES()
-		END IF 
-  		GRAIN_A(1) = A_EFF 
-  		GRAIN_A(2) = A_EFF
-  		GRAIN_A(3) = A_EFF
-	ELSE If (GEOMETRY == 'ELLIPSOID') THEN
-  		L = A_EFF/((GRAIN_A(1)*GRAIN_A(2)*GRAIN_A(3))**(1.0/3.0))
-  		! Normalize so that GRAIN_A(1), (2), (3) produce an ellipse with an effective
-  		! radius of A_EFF
-  		GRAIN_A(1) = GRAIN_A(1)*L
-  		GRAIN_A(2) = GRAIN_A(2)*L
-  		GRAIN_A(3) = GRAIN_A(3)*L
-  	ELSE
-		PRINT *,"Cannot understand ", GEOMETRY
-		CALL EXIT()
-	END IF 
+	call initialize_and_allocate_vars()
+	call set_optimization_mode(fftw_optimization_mode_name)
 	
 
-	K = (2*PI/1.239842)*1000*EPHOT
+	if (geometry .eq. "sphere") then
+		do i=1,size(x)
+			do j=1,size(y)
+				sh(i,j) = shadow_sphere(x(i),y(j),zmax, k )*(-1.0)**(i+j+1)
+			end do
+		end do
 
-	XMIN = -BOX_WIDTH*A_EFF/2.0
-	YMIN = -BOX_WIDTH*A_EFF/2.0
-	ZMIN = -2*A_EFF
-	XMAX = BOX_WIDTH*A_EFF/2.0
-	YMAX = BOX_WIDTH*A_EFF/2.0
-	ZMAX = 2*A_EFF
+		ftsh = fft(sh,x,y)
 
-	DX = (XMAX-XMIN)/(SIZE(X)-1)
-	DY = (YMAX-YMIN)/(SIZE(Y)-1)
-	DZ = (ZMAX-ZMIN)/(SIZE(Z)-1)
-
-	
-
-	DO I=1,SIZE(X)
-		X(I) = XMIN + (I-1)*DX
-	END DO
-	DO I=1,SIZE(Y)
-		Y(I) = YMIN + (I-1)*DY
-	END DO
-	DO I=1,SIZE(Z)
-		Z(I) = ZMIN + (I-1)*DZ
-	END DO
-	KX = GET_K(X)
-	KY = GET_K(Y)
-	DO I=1,SIZE(KX)
-		THETAX(I) = ASIN(KX(I)/K)
-		THETAY(I) = ASIN(KY(I)/K)
-	END DO
-	
-	if (EULER_ANGLE_MODE .eq. 'SEQUENTIAL') THEN 
-		NANGLE = INT(NANGLE**(1.0/3.0))
-	ELSE IF (EULER_ANGLE_MODE .eq. 'RANDOM') THEN
-		call init_random_seed()
-	END IF 
-
-	IF (GEOMETRY .EQ. "SPHERE") THEN
-		DO I=1,SIZE(X)
-			DO J=1,SIZE(Y)
-				SH(I,J) = SHADOW_SPHERE(X(I),Y(J),ZMAX, K )*(-1.0)**(I+J+1)
-			END DO
-		END DO
-		FTSH = FFT(SH,X,Y)
-		DO I=1,SIZE(X)
-			DO J=1,SIZE(Y)
-				SCATTER(I,J) = SCATTER(I,J) + ABS((K*FTSH(I,J)*DX*DY))**2/(4*PI*(PI*A_EFF)**2)
-			END DO
-		END DO
-	ELSE
-		if (EULER_ANGLE_MODE .eq. 'SEQUENTIAL') THEN 
-			DO EULX=1,NANGLE
-				EUL_ANG(1) = 2*PI*(EULX-1)/NANGLE
-				DO EULY=1,NANGLE
-					EUL_ANG(2) = 2*PI*(EULY-1)/NANGLE
-					DO EULZ=1,NANGLE
-						EUL_ANG(3) = 2*PI*(EULZ-1)/NANGLE
-						RM = MATMUL(MATMUL(ROT_X(EUL_ANG(1)), ROT_Y(EUL_ANG(2))),ROT_Z(EUL_ANG(3)))
-						write (0,*) "EUL_ANG[",(EULX-1)*NANGLE*NANGLE+EULY*NANGLE+EULZ,"/",NANGLE**3,"]: ",EUL_ANG
-						IF (GEOMETRY .EQ. 'ELLIPSOID') THEN 
-							
-							DO I=1,SIZE(X)
-								DO J=1,SIZE(Y)
-									SH(I,J) = SHADOW_ELLIPSOID(X(I),Y(J), K, RM )*(-1.0)**(I+J+1) 
-								!	CHRD(I,J) = CHORD_ELLIPSOID(X(I),Y(J),RM)
-								!	WRITE (0,*) "JUST READ: ", CHRD(I,J)
-								END DO
-							END DO
-							FTSH = FFT(SH,X,Y)
-						END IF 
-						IF (GEOMETRY .eq. 'SPHERES')	THEN
-							SH = SHADOW_SPHERES(X,Y,K,RM)
-							FTSH = FFT(SH,X,Y)
-						END IF 
-						DO I=1,SIZE(X)
-							DO J=1,SIZE(Y)
-								SCATTER(I,J) = SCATTER(I,J) + LOG10(ABS((K*FTSH(I,J)*DX*DY))**2/(4*PI*(PI*A_EFF)**2))
-							END DO
-						END DO
-					END DO
-				END DO
-			END DO 
-		else if (EULER_ANGLE_MODE .eq. 'RANDOM') THEN 
-			DO EULX=1,NANGLE
-				write(0,FMT="(A1,A,t21,F6.2,A)",ADVANCE="NO") achar(13), &
-					& " Percent Complete: ", (real(EULX-1)/real(NANGLE))*100.0, "%"
-				call RANDOM_NUMBER(EUL_ANG)
-				EUL_ANG(1) = 2*PI*EUL_ANG(1) 
-				EUL_ANG(2) = 2*PI*EUL_ANG(2) 
-				EUL_ANG(3) = 2*PI*EUL_ANG(3) 
-				RM = MATMUL(MATMUL(ROT_X(EUL_ANG(1)), ROT_Y(EUL_ANG(2))),ROT_Z(EUL_ANG(3)))
-				IF (GEOMETRY .EQ. "ELLIPSOID") THEN 
-					
-					DO I=1,SIZE(X)
-						DO J=1,SIZE(Y)
-							SH(I,J) = SHADOW_ELLIPSOID(X(I),Y(J), K, RM )*(-1.0)**(I+J+1) 
-						END DO
-					END DO
-					FTSH = FFT(SH,X,Y)
-				END IF 
-				IF (GEOMETRY .eq. 'SPHERES')	THEN
-					SH = SHADOW_SPHERES(X,Y,K,RM)
-					FTSH = FFT(SH,X,Y)
-				END IF 
-				DO I=1,SIZE(X)
-					DO J=1,SIZE(Y)
-						SCATTER(I,J) = SCATTER(I,J) + ABS((K*FTSH(I,J)*DX*DY))**2/(4*PI*(PI*A_EFF)**2)
-					END DO
-				END DO
-				
-			END DO
-		else
-			print *,"Do not understand EULER_ANGLE_MODE=", EULER_ANGLE_MODE
-			call exit()
-		end if
-		IF (GEOMETRY .eq. 'SPHERES')	THEN
-			DEALLOCATE(POS)
-			DEALLOCATE(POS_ROT)
-			DEALLOCATE(RADII)
-			DEALLOCATE(IOR_R)
-			DEALLOCATE(IOR_I)
-		END IF 
-	END IF 
-	IF (GEOMETRY /= 'SPHERE') THEN
-		DO I=1,SIZE(X)
-			DO J=1,SIZE(Y)
-				IF  (EULER_ANGLE_MODE .eq. 'RANDOM') THEN 
-					SCATTER(I,J) = SCATTER(I,J)/REAL(NANGLE)
-				ELSE 
-					SCATTER(I,J) = SCATTER(I,J)/REAL(NANGLE**3)
-				END IF
-
-			END DO
-		END DO
-	END IF 
-	print *, "# [thetax] [thetay] [dQscat/dOmega]"
-	DO I=1,SIZE(X)
-		DO J=1,SIZE(Y)
-			print *,THETAX(I),THETAY(J),SCATTER(I,J)
-			!print *,X(I),Y(J),CHRD(I,J)
-		END DO
-	END DO
-
-	!DO I=1,SIZE(X)
-	!	print *,THETAX(I),SCATTER(I,1),SCATTER(1,I)
-	!END DO
-
-
-CONTAINS
-
-FUNCTION GET_K(X)
-	IMPLICIT NONE
-	REAL, INTENT(IN) :: X(:)
-	INTEGER :: N, I, J 
-	REAL :: L
-	REAL, DIMENSION(SIZE(X)) :: GET_K
-	N = SIZE(X)
-    L = X(N) - X(1)
-    DO I=1,N
-    	GET_K(I) = (2*PI/L)*(I-0.5*(N+1)-0.5)
-    END DO
-END FUNCTION GET_K
-
-subroutine init_random_seed()
-	implicit none
-	integer, allocatable :: seed(:)
-	integer :: i, n, un, istat, dt(8), pid, t(2), s
-	integer(8) :: count, tms
-
-	call random_seed(size = n)
-	allocate(seed(n))
-	! First try if the OS provides a random number generator
-	open(newunit=un, file="/dev/urandom", access="stream", &
-	     form="unformatted", action="read", status="old", iostat=istat)
-	if (istat == 0) then
-	   read(un) seed
-	   close(un)
+		do i=1,size(x)
+			do j=1,size(y)
+				scatter(i,j) = scatter(i,j) + abs((k*ftsh(i,j)*dx*dy))**2/(4*pi*(pi*a_eff)**2)
+			end do
+		end do
 	else
-	   ! Fallback to XOR:ing the current time and pid. The PID is
-	   ! useful in case one launches multiple instances of the same
-	   ! program in parallel.
-	   call system_clock(count)
-	   if (count /= 0) then
-	      t = transfer(count, t)
-	   else
-	      call date_and_time(values=dt)
-	      tms = (dt(1) - 1970) * 365_8 * 24 * 60 * 60 * 1000 &
-	           + dt(2) * 31_8 * 24 * 60 * 60 * 1000 &
-	           + dt(3) * 24 * 60 * 60 * 60 * 1000 &
-	           + dt(5) * 60 * 60 * 1000 &
-	           + dt(6) * 60 * 1000 + dt(7) * 1000 &
-	           + dt(8)
-	      t = transfer(tms, t)
-	   end if
-	   s = ieor(t(1), t(2))
-	   pid = getpid() + 1099279 ! Add a prime
-	   s = ieor(s, pid)
-	   if (n >= 3) then
-	      seed(1) = t(1) + 36269
-	      seed(2) = t(2) + 72551
-	      seed(3) = pid
-	      if (n > 3) then
-	         seed(4:) = s + 37 * (/ (i, i = 0, n - 4) /)
-	      end if
-	   else
-	      seed = s + 37 * (/ (i, i = 0, n - 1 ) /)
-	   end if
-	end if
-	call random_seed(put=seed)
+		do neul = 1,nangle
+			eul_ang = get_new_euler_angles(neul)
+			rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
+			
+
+			if (geometry .eq. 'ellipsoid') then 
+				do i=1,size(x)
+					do j=1,size(y)
+						sh(i,j) = shadow_ellipsoid(x(i),y(j), k, rm )*(-1.0)**(i+j+1) 
+					end do
+				end do
+			end if 
+
+			if (geometry .eq. 'spheres')	then
+				sh = shadow_spheres(x,y,k,rm)
+			end if 
+
+			ftsh = fft(sh,x,y)
+
+			do i=1,size(x)
+				do j=1,size(y)
+					scatter(i,j) = scatter(i,j) + abs((k*ftsh(i,j)*dx*dy))**2/(4*pi*(pi*a_eff)**2)
+				end do
+			end do
+
+			write(0,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
+					& " percent complete: ", (real(neul)/real(nangle))*100.0, "%"
+		end do
+	end if 
+ 
+	if (geometry /= 'sphere') then
+		do i=1,size(x)
+			do j=1,size(y)
+				scatter(i,j) = scatter(i,j)/real(nangle)
+			end do
+		end do
+	end if 
+
+	print *, "# [thetax] [thetay] [dqscat/domega]"
+	do i=1,size(x)
+		do j=1,size(y)
+			print *,thetax(i),thetay(j),scatter(i,j)
+		end do
+	end do
+	write(0,*) "done."
+
+	call cleanup()
+contains
+
+	function get_k(x)
+		implicit none
+		real, intent(in) :: x(:)
+		integer :: n, i, j 
+		real :: l
+		real, dimension(size(x)) :: get_k
+		n = size(x)
+	    l = x(n) - x(1)
+	    do i=1,n
+	    	get_k(i) = (2*pi/l)*(i-0.5*(n+1)-0.5)
+	    end do
+	end function get_k
+
+	subroutine initialize_and_allocate_vars()
+		allocate(x(ngrid),stat = allocatestatus)
+  		if (allocatestatus /= 0) stop "*** not enough memory (x) ***"
+  		allocate(y(ngrid),stat = allocatestatus)
+  		if (allocatestatus /= 0) stop "*** not enough memory (y) ***"
+  		allocate(z(ngrid),stat = allocatestatus)
+  		if (allocatestatus /= 0) stop "*** not enough memory (z) ***"
+  		allocate(kx(ngrid),stat = allocatestatus)
+  		if (allocatestatus /= 0) stop "*** not enough memory (kx) ***"
+  		allocate(ky(ngrid),stat = allocatestatus)
+  		if (allocatestatus /= 0) stop "*** not enough memory (ky) ***"
+  		allocate(thetax(ngrid),stat = allocatestatus)
+  		if (allocatestatus /= 0) stop "*** not enough memory (thetax) ***"
+  		allocate(thetay(ngrid),stat = allocatestatus)
+  		if (allocatestatus /= 0) stop "*** not enough memory (thetay) ***"
+  		allocate(sh(ngrid,ngrid),stat = allocatestatus)
+  		if (allocatestatus /= 0) stop "*** not enough memory (sh) ***"
+  		allocate(ftsh(ngrid,ngrid),stat = allocatestatus)
+  		if (allocatestatus /= 0) stop "*** not enough memory (ftsh) ***"
+  		allocate(chrd(ngrid,ngrid),stat = allocatestatus)
+  		if (allocatestatus /= 0) stop "*** not enough memory (chrd) ***"
+  		allocate(scatter(ngrid,ngrid),stat = allocatestatus)
+  		if (allocatestatus /= 0) stop "*** not enough memory (scatter) ***"
+  		allocate(scatter_temp(ngrid,ngrid),stat = allocatestatus)
+  		if (allocatestatus /= 0) stop "*** not enough memory (scatter_temp) ***"
+
+		if (euler_angle_mode == 'sequential') then
+			nangle_new = int(real(nangle)**(1.0/3.0))**3
+			if (nangle /= nangle_new) then
+				write (error_unit,*) ""
+				write (error_unit,*) "   + nangle: ",nangle,"-->",nangle_new
+				nangle = nangle_new
+			endif
+		else if (euler_angle_mode == 'random') then
+			call init_random_seed()
+		else 
+			write(error_unit,*) " ***error: do not understand euler_angle_mode=",euler_angle_mode
+			call exit()
+		end if 
+
+		if ((geometry == 'sphere') .or. (geometry == 'spheres')) then 
+			if (geometry == 'spheres') then
+				call read_spheres()
+			end if 
+	  		grain_a(1) = a_eff 
+	  		grain_a(2) = a_eff
+	  		grain_a(3) = a_eff
+		else if (geometry == 'ellipsoid') then
+	  		l = a_eff/((grain_a(1)*grain_a(2)*grain_a(3))**(1.0/3.0))
+	  		! normalize so that grain_a(1), (2), (3) produce an ellipse with an effective
+	  		! radius of a_eff
+	  		grain_a(1) = grain_a(1)*l
+	  		grain_a(2) = grain_a(2)*l
+	  		grain_a(3) = grain_a(3)*l
+	  	else
+			print *,"cannot understand ", geometry
+			call exit()
+		end if 
+		
+
+		k = (2*pi/1.239842)*1000*ephot
+
+		xmin = -box_width*a_eff/2.0
+		ymin = -box_width*a_eff/2.0
+		zmin = -2*a_eff
+		xmax = box_width*a_eff/2.0
+		ymax = box_width*a_eff/2.0
+		zmax = 2*a_eff
+
+		dx = (xmax-xmin)/(size(x)-1)
+		dy = (ymax-ymin)/(size(y)-1)
+		dz = (zmax-zmin)/(size(z)-1)
+
+		
+
+		do i=1,size(x)
+			x(i) = xmin + (i-1)*dx
+		end do
+		do i=1,size(y)
+			y(i) = ymin + (i-1)*dy
+		end do
+		do i=1,size(z)
+			z(i) = zmin + (i-1)*dz
+		end do
+		kx = get_k(x)
+		ky = get_k(y)
+		do i=1,size(kx)
+			thetax(i) = asin(kx(i)/k)
+			thetay(i) = asin(ky(i)/k)
+		end do		
+  	end subroutine initialize_and_allocate_vars
+
+  	subroutine init_random_seed()
+		implicit none
+		integer, allocatable :: seed(:)
+		integer :: i, n, un, istat, dt(8), pid, t(2), s
+		integer(8) :: count, tms
+
+		call random_seed(size = n)
+		allocate(seed(n))
+		! first try if the os provides a random number generator
+		!open(un, file="/dev/urandom", access="stream", &
+		!     form="unformatted", action="read", status="old", iostat=istat)
+		istat = 1
+		if (istat == 0) then
+		   read(un) seed
+		   close(un)
+		else
+		   ! fallback to xor:ing the current time and pid. the pid is
+		   ! useful in case one launches multiple instances of the same
+		   ! program in parallel.
+		   call system_clock(count)
+		   if (count /= 0) then
+		      t = transfer(count, t)
+		   else
+		      call date_and_time(values=dt)
+		      tms = (dt(1) - 1970) * 365_8 * 24 * 60 * 60 * 1000 &
+		           + dt(2) * 31_8 * 24 * 60 * 60 * 1000 &
+		           + dt(3) * 24 * 60 * 60 * 60 * 1000 &
+		           + dt(5) * 60 * 60 * 1000 &
+		           + dt(6) * 60 * 1000 + dt(7) * 1000 &
+		           + dt(8)
+		      t = transfer(tms, t)
+		   end if
+		   s = ieor(t(1), t(2))
+		   pid = getpid() + 1099279 ! add a prime
+		   s = ieor(s, pid)
+		   if (n >= 3) then
+		      seed(1) = t(1) + 36269
+		      seed(2) = t(2) + 72551
+		      seed(3) = pid
+		      if (n > 3) then
+		         seed(4:) = s + 37 * (/ (i, i = 0, n - 4) /)
+		      end if
+		   else
+		      seed = s + 37 * (/ (i, i = 0, n - 1 ) /)
+		   end if
+		end if
+		call random_seed(put=seed)
 	end subroutine init_random_seed
 
-	subroutine allocate_vars()
-
-		ALLOCATE(X(NGRID),STAT = AllocateStatus)
-  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (X) ***"
-  		ALLOCATE(Y(NGRID),STAT = AllocateStatus)
-  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (Y) ***"
-  		ALLOCATE(Z(NGRID),STAT = AllocateStatus)
-  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (Z) ***"
-  		ALLOCATE(KX(NGRID),STAT = AllocateStatus)
-  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (KX) ***"
-  		ALLOCATE(KY(NGRID),STAT = AllocateStatus)
-  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (KY) ***"
-  		ALLOCATE(THETAX(NGRID),STAT = AllocateStatus)
-  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (THETAX) ***"
-  		ALLOCATE(THETAY(NGRID),STAT = AllocateStatus)
-  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (THETAY) ***"
-  		ALLOCATE(SH(NGRID,NGRID),STAT = AllocateStatus)
-  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (SH) ***"
-  		ALLOCATE(FTSH(NGRID,NGRID),STAT = AllocateStatus)
-  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (FTSH) ***"
-  		ALLOCATE(CHRD(NGRID,NGRID),STAT = AllocateStatus)
-  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (CHRD) ***"
-  		ALLOCATE(SCATTER(NGRID,NGRID),STAT = AllocateStatus)
-  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (SCATTER) ***"
-  		ALLOCATE(SCATTER_TEMP(NGRID,NGRID),STAT = AllocateStatus)
-  		IF (AllocateStatus /= 0) STOP "*** Not enough memory (SCATTER_TEMP) ***"
-  	end subroutine allocate_vars
+  	function get_new_euler_angles(i)
+  		real, dimension(3) :: get_new_euler_angles
+  		integer, intent(in) :: i
+  		integer :: cbrt_nangle, nx, ny, nz
 
 
-END PROGRAM GGADT
+  		if (euler_angle_mode .eq. 'sequential') then 
+  			cbrt_nangle = int(nangle**(1.0/3.0))
+			nx = mod(i/(cbrt_nangle*cbrt_nangle), 	cbrt_nangle)
+			ny = mod(i/(cbrt_nangle), 				cbrt_nangle)
+			nz = mod(i, 							cbrt_nangle) 
+			get_new_euler_angles(1) = 2*pi*(nx-1)/cbrt_nangle
+			get_new_euler_angles(2) = 2*pi*(ny-1)/cbrt_nangle
+			get_new_euler_angles(3) = 2*pi*(nz-1)/cbrt_nangle
+		else
+			call random_number(get_new_euler_angles)
+			get_new_euler_angles(1) = 2*pi*get_new_euler_angles(1)
+			get_new_euler_angles(2) = 2*pi*get_new_euler_angles(2) 
+			get_new_euler_angles(3) = 2*pi*get_new_euler_angles(3)
+		endif
+	end function get_new_euler_angles
+
+	subroutine cleanup()
+		deallocate(x)
+		deallocate(y)
+		deallocate(z)
+		deallocate(kx)
+		deallocate(ky)
+		deallocate(thetax)
+		deallocate(thetay)
+		deallocate(sh)
+		deallocate(ftsh)
+		deallocate(scatter)
+
+		deallocate(scatter_temp)
+		deallocate(chrd)
+  		
+
+		if (geometry .eq. 'spheres')	then
+			deallocate(pos)
+			deallocate(pos_rot)
+			deallocate(radii)
+			deallocate(ior_r)
+			deallocate(ior_i)
+		end if
+	end subroutine cleanup
+
+
+end program ggadt
 

@@ -94,7 +94,7 @@ ax.set_ylabel("$\\theta_Y$ [arcseconds]")
 ax.set_xlabel("$\\theta_X$ [arcseconds]")
 ax.axis([xplot.min(),xplot.max(),xplot.min(),xplot.max()])
 plt.colorbar(colorplot)
-
+f.savefig("dQscat_dOmega_2d.png")
 
 # Plot (1) radial average of dQscat/dOmega, 
 #      (2) variance about this average, 
@@ -142,7 +142,10 @@ for i,phi in enumerate(phis):
 
 ax2.set_ylabel("$dQ_{scat.}/d\\Omega$")
 ax2.set_xlabel("$\\theta$ [arcseconds]")
+ax2.set_xlim(xmin,xmax)
 ax2.set_yscale('log')
 ax2.legend(loc='best')
+
+f2.savefig("dQscat_dOmega_1d.png")
 
 plt.show()

@@ -1,49 +1,74 @@
-MODULE FFTW
-    USE, INTRINSIC :: ISO_C_BINDING
-       INCLUDE 'fftw3.f03'
-    LOGICAL :: FIRST_TIME = .TRUE.
-    TYPE(C_PTR) :: PLAN
-    INTEGER ::  MODE= FFTW_ESTIMATE
-    CHARACTER(len=100) :: PLAN_FILENAME
-CONTAINS
+module fftw
+    use, intrinsic :: iso_c_binding
+       include 'fftw3.f03'
+    logical :: first_time = .true.
+    type(c_ptr) :: plan
+    integer ::  mode = fftw_estimate
+    character(len=100) :: mode_name
+    character(len=100) :: plan_filename
 
-FUNCTION FFT(F,X,Y)
-	
-    REAL, INTENT(IN) :: X(:), Y(:)
-    COMPLEX(C_DOUBLE_COMPLEX), INTENT(INOUT) :: F(:,:)
-    COMPLEX(C_DOUBLE_COMPLEX), DIMENSION(SIZE(X),SIZE(Y)) :: FFT
-    INTEGER :: NX, NY, I, J
-    INTEGER :: ERROR
+contains
+
+    subroutine set_optimization_mode(mode_name_in)
+        character(len=100), intent(in) :: mode_name_in
+
+        mode_name = mode_name_in
+
+        select case (mode_name)
+        case('fftw_estimate')
+            mode = fftw_estimate
+        case('fftw_patient')
+            mode = fftw_patient
+        case('fftw_exhaustive')
+            mode = fftw_exhaustive
+        case('fftw_measure')
+            mode = fftw_measure
+        case default
+            mode = fftw_estimate 
+        end select
+    end subroutine set_optimization_mode
+
+    function fft(f,x,y)
+        
+        real, intent(in) :: x(:), y(:)
+        complex(c_double_complex), intent(inout) :: f(:,:)
+        complex(c_double_complex), dimension(size(x),size(y)) :: fft
+        integer :: nx, ny, i, j
+        integer :: error
 
 
-    NX = SIZE(X)
-    NY = SIZE(Y)
-    IF (FIRST_TIME) THEN
-        WRITE(0,*) NEW_LINE('A')//"  Finding best FFT algorithm to use..."
-        write(PLAN_FILENAME,'(A,I0.4,A,I0.4,A,I0.3,A,A)') "plans/plan_nx",NX,"_ny",NY,"_fftw_mode",MODE,".plan",CHAR(0)
-        ERROR = fftw_import_wisdom_from_filename(trim(adjustl(PLAN_FILENAME)))
-        IF (ERROR == 0) THEN
-            write (0,*) "   --> No previous wisdom detected:"
-            write (0,*) "       |  FFTW will search for fastest FFT algorithm. This may "
-            write (0,*) "       |  take several minutes, depending on your grid size."
+        nx = size(x)
+        ny = size(y)
+        if (first_time) then
+            write(0,*) new_line('a')//"        /"
+            write(0,*) " FFTW: | Finding best fft algorithm to use..."
+            write(plan_filename,'(a,i0.4,a,i0.4,a,i0.3,a,a)') "plans/plan_nx",nx,"_ny",ny,"_fftw_mode",mode,".plan",char(0)
+            error = fftw_import_wisdom_from_filename(trim(adjustl(plan_filename)))
+            if (error == 0) then
+                write (0,*) "   --> | No previous wisdom detected:"
+                write (0,*) "       |"
+                write (0,*) "       |  FFTW will search for fastest FFT algorithm (using",trim(adjustl(mode_name)),")."
+                write (0,*) "       |  this may take several minutes, depending on your grid size."
+                write (0,*) "       |"
 
-            PLAN = FFTW_PLAN_DFT_2D(NY, NX, F ,FFT, FFTW_BACKWARD,MODE)
-            ERROR = FFTW_EXPORT_WISDOM_TO_FILENAME(PLAN_FILENAME)
-            IF (ERROR == 0) THEN
-                write (0,*) "   *** ERROR: Couldn't save plan to ",trim(adjustl(PLAN_FILENAME))
-            ELSE
-                write (0,*) "     + Successfully saved plan to ",trim(adjustl(PLAN_FILENAME))
-            ENDIF
-        ELSE
-            write (0,*) "   --> Found and loaded previous wisdom from '",trim(adjustl(PLAN_FILENAME)),"'"
-            PLAN = FFTW_PLAN_DFT_2D(NY, NX, F ,FFT, FFTW_BACKWARD,MODE)
-        END IF
-        WRITE(0,*) " [done]."
-        FIRST_TIME = .FALSE.
-    END IF
-    !write (0,*) "About to do FFT"
-    !PLAN = FFTW_PLAN_DFT_2D(NY, NX, F ,FFT, FFTW_BACKWARD,FFTW_PATIENT)
-    CALL FFTW_EXECUTE_DFT(PLAN, F, FFT)
-END FUNCTION FFT
+                plan = fftw_plan_dft_2d(ny, nx, f ,fft, fftw_backward,mode)
+                error = fftw_export_wisdom_to_filename(plan_filename)
+                if (error == 0) then
+                    write (0,*) "      ***FFTW ERROR: couldn't save plan to ",trim(adjustl(plan_filename))
+                else
+                    write (0,*) "      |+ Successfully saved plan to ",trim(adjustl(plan_filename))
+                endif
+            else
+                write (0,*) "       | + Found and loaded previous wisdom from '",trim(adjustl(plan_filename)),"'"
+                plan = fftw_plan_dft_2d(ny, nx, f ,fft, fftw_backward,mode)
+            end if
+            write (0,*) "       | Done."
+            write (0,*) "       \"
+            first_time = .false.
+        end if
+        !write (0,*) "about to do fft"
+        !plan = fftw_plan_dft_2d(ny, nx, f ,fft, fftw_backward,fftw_patient)
+        call fftw_execute_dft(plan, f, fft)
+    end function fft
 
-END MODULE FFTW
+end module fftw
