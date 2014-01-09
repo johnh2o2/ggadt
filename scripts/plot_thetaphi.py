@@ -17,7 +17,7 @@ ymax = xmax
 
 conv = (360*60*60)/(2*np.pi) # convert from radians to arcseconds (a more sensible unit)
 
-fname = 'data/testdat_thetaphi.dat'
+fname = 'data/testdat_answer.dat'
 data_dt = np.dtype([('theta', np.float_), ('phi', np.float_), ('f', np.float_)])
 data = np.loadtxt(fname,dtype=data_dt)
 

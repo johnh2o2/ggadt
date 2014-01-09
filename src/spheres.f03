@@ -51,7 +51,7 @@ module spheres
 
 		close(1)
 
-		! now normalize
+		! now ensure that a_eff is what the user wants
 		a_eff_temp = ((3*v)/(4*pi))**(1.0/3.0)
 		conv = a_eff/a_eff_temp
 
@@ -86,7 +86,7 @@ module spheres
 			yi = int((pos_rot(i,2) - radii(i) - x(1))/dyt) + 1
 			yf = int((pos_rot(i,2) + radii(i) - x(1))/dyt) + 1
 
-			m = cmplx(ior_r(i), ior_i(i)) ! ior - 1
+			m = cmplx(ior_r(i), ior_i(i)) ! index of refraction - 1
 			
 			do j=xi,xf
 				do n=yi,yf

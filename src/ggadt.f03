@@ -13,16 +13,19 @@ program ggadt
 	use fftw
 	implicit none
 
-	
+	! define allocatable arrays (sizes will depend on arguments)	
 	real, allocatable :: x(:), y(:), z(:), kx(:), ky(:), thetax(:), thetay(:)
 	complex(c_double_complex), allocatable :: sh(:,:), ftsh(:,:)
 	real, allocatable :: chrd(:,:), scatter(:,:), scatter_temp(:,:)
 
+	! other relevant variables
 	real :: xmin, xmax, ymin, ymax, zmin, zmax, dx, dy, dz, k, l
 	real, dimension(3) :: eul_ang
 	real, dimension(3,3) :: rm 
 	integer :: i, j, neul, allocatestatus, num_args, nangle_new
 	character(len=200) :: parameter_file_name
+
+	! read in arguments
 	num_args = iargc()
 
 	if (num_args /= 1) then
@@ -31,28 +34,43 @@ program ggadt
 	end if
 
 	call getarg(1,parameter_file_name)
+
+	! now set the parameters based on the defined values in 'parameter_file_name'
 	call read_param_file(trim(adjustl(parameter_file_name)))
 	call initialize_and_allocate_vars()
 	call set_optimization_mode(fftw_optimization_mode_name)
 	
 
+	
+
 	if (geometry .eq. "sphere") then
+
+		! For a spherical grain, only one orientation is necessary.
+
+
+		! (1) generate the 2-d grid of the "shadow function"
 		do i=1,size(x)
 			do j=1,size(y)
 				sh(i,j) = shadow_sphere(x(i),y(j),zmax, k )*(-1.0)**(i+j+1)
 			end do
 		end do
 
+		! (2) Fourier transform this grid
 		ftsh = fft(sh,x,y)
 
+
+		! (3) Normalize to correct physical value for the differential scattering cross section
 		do i=1,size(x)
 			do j=1,size(y)
 				scatter(i,j) = scatter(i,j) + abs((k*ftsh(i,j)*dx*dy))**2/(4*pi*(pi*a_eff)**2)
 			end do
 		end do
 	else
+		! Average over nangle orientations for non-spherical geometries
 		do neul = 1,nangle
 			eul_ang = get_new_euler_angles(neul)
+
+			! Rotation matrix
 			rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
 			
 
@@ -62,9 +80,10 @@ program ggadt
 						sh(i,j) = shadow_ellipsoid(x(i),y(j), k, rm )*(-1.0)**(i+j+1) 
 					end do
 				end do
-			end if 
+			end if
 
 			if (geometry .eq. 'spheres')	then
+				! shadow_spheres generates the entire 2-d array for you, not point-by-point.
 				sh = shadow_spheres(x,y,k,rm)
 			end if 
 
@@ -76,11 +95,13 @@ program ggadt
 				end do
 			end do
 
+			! Print progress report to stderr
 			write(0,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
 					& " percent complete: ", (real(neul)/real(nangle))*100.0, "%"
 		end do
 	end if 
  
+ 	! Convert sum to average
 	if (geometry /= 'sphere') then
 		do i=1,size(x)
 			do j=1,size(y)
@@ -89,6 +110,7 @@ program ggadt
 		end do
 	end if 
 
+	! output results
 	print *, "# [thetax] [thetay] [dqscat/domega]"
 	do i=1,size(x)
 		do j=1,size(y)
@@ -114,6 +136,8 @@ contains
 	end function get_k
 
 	subroutine initialize_and_allocate_vars()
+
+		! Allocate arrays!
 		allocate(x(ngrid),stat = allocatestatus)
   		if (allocatestatus /= 0) stop "*** not enough memory (x) ***"
   		allocate(y(ngrid),stat = allocatestatus)
@@ -139,6 +163,11 @@ contains
   		allocate(scatter_temp(ngrid,ngrid),stat = allocatestatus)
   		if (allocatestatus /= 0) stop "*** not enough memory (scatter_temp) ***"
 
+  		! 'sequential' euler angle mode means that the 
+  		! 	orientations are evenly spaced in theta and phi.
+
+  		! 'random' euler angle mode means that the
+  		! 	orientations are uniformly random on [0,2*pi)
 		if (euler_angle_mode == 'sequential') then
 			nangle_new = int(real(nangle)**(1.0/3.0))**3
 			if (nangle /= nangle_new) then
@@ -155,16 +184,16 @@ contains
 
 		if ((geometry == 'sphere') .or. (geometry == 'spheres')) then 
 			if (geometry == 'spheres') then
-				call read_spheres()
+				call read_spheres() ! Read in the spheres file.
 			end if 
-	  		grain_a(1) = a_eff 
+	  		grain_a(1) = a_eff		! set grain_a
 	  		grain_a(2) = a_eff
 	  		grain_a(3) = a_eff
 		else if (geometry == 'ellipsoid') then
 	  		l = a_eff/((grain_a(1)*grain_a(2)*grain_a(3))**(1.0/3.0))
 	  		! normalize so that grain_a(1), (2), (3) produce an ellipse with an effective
 	  		! radius of a_eff
-	  		grain_a(1) = grain_a(1)*l
+	  		grain_a(1) = grain_a(1)*l  ! normalize grain size to a_eff
 	  		grain_a(2) = grain_a(2)*l
 	  		grain_a(3) = grain_a(3)*l
 	  	else
@@ -173,8 +202,11 @@ contains
 		end if 
 		
 
-		k = (2*pi/1.239842)*1000*ephot
 
+
+		k = (2*pi/1.239842)*1000*ephot ! wavenumber
+
+		! set scale of grid
 		xmin = -box_width*a_eff/2.0
 		ymin = -box_width*a_eff/2.0
 		zmin = -2*a_eff
@@ -187,7 +219,7 @@ contains
 		dz = (zmax-zmin)/(size(z)-1)
 
 		
-
+		! set x,y,z, and thetax, thetay
 		do i=1,size(x)
 			x(i) = xmin + (i-1)*dx
 		end do
@@ -206,6 +238,7 @@ contains
   	end subroutine initialize_and_allocate_vars
 
   	subroutine init_random_seed()
+  		! initialize random number generator
 		implicit none
 		integer, allocatable :: seed(:)
 		integer :: i, n, un, istat, dt(8), pid, t(2), s

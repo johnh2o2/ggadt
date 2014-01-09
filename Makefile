@@ -1,11 +1,11 @@
 VERSION = 0.16
-FF = gfortran-mp-4.8
-#FF = gfortran
+#FF = gfortran-mp-4.8
+FF = gfortran
 FFLAGS = -O3
 #LIBS = -L./lib -lfftw3
-INC = -I./inc
-LIBS=-lfftw3
-INC= -I./inc
+#INC = -I./inc
+LIBS= -lfftw3
+#INC= -I./inc
 EXECUTABLE=ggadt_v$(VERSION)
 SRCDIR=./src
 #SOURCES=$(wildcard $(SRCDIR)/*.f)
@@ -19,10 +19,10 @@ all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS) $(DRIVEROBJ)
 
-	$(FF) $(LIBS) $(INC) $(FFLAGS) $(DRIVEROBJ) $(OBJECTS) -o $@
+	$(FF) $(INC) $(LIBS) $(FFLAGS) $(DRIVEROBJ) $(OBJECTS) -o $@
 
 %.o: $(SRCDIR)/%.f03
-	$(FF) -c $(LIBS) $(INC) $(FFLAGS) $<
+	$(FF) -c $(INC) $(LIBS) $(FFLAGS) $<
 
 run: clean all
 	./$(EXECUTABLE) parameterfile.ini
