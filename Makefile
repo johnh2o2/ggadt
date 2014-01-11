@@ -76,9 +76,9 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = .
-DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
+DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog COPYING \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/configure $(am__configure_deps) COPYING compile \
+	$(top_srcdir)/configure $(am__configure_deps) compile \
 	install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -187,12 +187,12 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/missing aclocal-1.14
+ACLOCAL = ${SHELL} /Users/jah5/Dropbox/GGADT/missing aclocal-1.14
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/missing autoconf
-AUTOHEADER = ${SHELL} /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/missing autoheader
-AUTOMAKE = ${SHELL} /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/missing automake-1.14
+AUTOCONF = ${SHELL} /Users/jah5/Dropbox/GGADT/missing autoconf
+AUTOHEADER = ${SHELL} /Users/jah5/Dropbox/GGADT/missing autoheader
+AUTOMAKE = ${SHELL} /Users/jah5/Dropbox/GGADT/missing automake-1.14
 AWK = awk
 CC = gcc
 CCDEPMODE = depmode=none
@@ -216,7 +216,7 @@ LDFLAGS =
 LIBOBJS = 
 LIBS = -lfftw3 -lm 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/missing makeinfo
+MAKEINFO = ${SHELL} /Users/jah5/Dropbox/GGADT/missing makeinfo
 MKDIR_P = ./install-sh -c -d
 OBJEXT = o
 PACKAGE = ggadt
@@ -231,10 +231,10 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = 
 VERSION = 0.17
-abs_builddir = /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT
-abs_srcdir = /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT
-abs_top_builddir = /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT
-abs_top_srcdir = /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT
+abs_builddir = /Users/jah5/Dropbox/GGADT
+abs_srcdir = /Users/jah5/Dropbox/GGADT
+abs_top_builddir = /Users/jah5/Dropbox/GGADT
+abs_top_srcdir = /Users/jah5/Dropbox/GGADT
 ac_ct_CC = gcc
 ac_ct_FC = gfortran
 am__include = include
@@ -254,7 +254,7 @@ host_alias =
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/install-sh
+install_sh = ${SHELL} /Users/jah5/Dropbox/GGADT/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale

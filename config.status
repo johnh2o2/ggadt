@@ -431,7 +431,7 @@ Copyright (C) 2012 Free Software Foundation, Inc.
 This config.status script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it."
 
-ac_pwd='/Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT'
+ac_pwd='/Users/jah5/Dropbox/GGADT'
 srcdir='.'
 INSTALL='/usr/bin/install -c'
 MKDIR_P='./install-sh -c -d'
@@ -634,12 +634,12 @@ S["mkdir_p"]="$(MKDIR_P)"
 S["MKDIR_P"]="./install-sh -c -d"
 S["INSTALL_STRIP_PROGRAM"]="$(install_sh) -c -s"
 S["STRIP"]=""
-S["install_sh"]="${SHELL} /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/install-sh"
-S["MAKEINFO"]="${SHELL} /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/missing makeinfo"
-S["AUTOHEADER"]="${SHELL} /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/missing autoheader"
-S["AUTOMAKE"]="${SHELL} /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/missing automake-1.14"
-S["AUTOCONF"]="${SHELL} /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/missing autoconf"
-S["ACLOCAL"]="${SHELL} /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/missing aclocal-1.14"
+S["install_sh"]="${SHELL} /Users/jah5/Dropbox/GGADT/install-sh"
+S["MAKEINFO"]="${SHELL} /Users/jah5/Dropbox/GGADT/missing makeinfo"
+S["AUTOHEADER"]="${SHELL} /Users/jah5/Dropbox/GGADT/missing autoheader"
+S["AUTOMAKE"]="${SHELL} /Users/jah5/Dropbox/GGADT/missing automake-1.14"
+S["AUTOCONF"]="${SHELL} /Users/jah5/Dropbox/GGADT/missing autoconf"
+S["ACLOCAL"]="${SHELL} /Users/jah5/Dropbox/GGADT/missing aclocal-1.14"
 S["VERSION"]="0.17"
 S["PACKAGE"]="ggadt"
 S["CYGPATH_W"]="echo"
