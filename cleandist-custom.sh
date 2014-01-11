@@ -7,8 +7,6 @@ rm -f config.status
 rm  -f config.log
 rm  -f configure
 rm  -f Makefile
-rm -f install-sh
-rm -f missing
 rm -f src/Makefile
 rm -f src/Makefile.in
 rm -f src/ggadt
