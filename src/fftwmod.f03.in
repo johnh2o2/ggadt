@@ -1,6 +1,6 @@
 module fftw
     use, intrinsic :: iso_c_binding
-       include '/usr/local/include/fftw3.f03'
+       include '@fftw3_inc_dir@/fftw3.f03'
     logical :: first_time = .true.
     type(c_ptr) :: plan
     integer ::  mode = fftw_estimate
