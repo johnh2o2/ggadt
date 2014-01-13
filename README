@@ -1,10 +1,10 @@
-README for ggadt -- John Hoffman (Jan 11, 2013)
+README for ggadt -- John Hoffman (Jan 12, 2013)
 
 As of now, I have gotten autoconf and automake to work with the current version of the program. This means that all one should have to do in order to compile the program is the following:
 
 --COMPILING--
 
-bash configure
+bash configure [--enable-openmp]
 make
 
 
