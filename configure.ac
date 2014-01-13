@@ -1,7 +1,8 @@
 AC_INIT([ggadt], [0.17], [jah5@princeton.edu])
 AC_PREREQ([2.69]) 
 AC_CONFIG_MACRO_DIRS([m4])
-
+[cp src/common.f03 src/serial/]
+[cp src/options.f03 src/serial/]
 AC_CONFIG_SRCDIR([src/serial/ggadt-serial.f03])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_ARG_ENABLE([mpi],

@@ -15,13 +15,13 @@ contains
         mode_name = mode_name_in
 
         select case (mode_name)
-        case('fftw_estimate')
+        case('estimate')
             mode = fftw_estimate
-        case('fftw_patient')
+        case('patient')
             mode = fftw_patient
-        case('fftw_exhaustive')
+        case('exhaustive')
             mode = fftw_exhaustive
-        case('fftw_measure')
+        case('measure')
             mode = fftw_measure
         case default
             mode = fftw_estimate 
