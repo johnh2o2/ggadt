@@ -1,0 +1,34 @@
+README for ggadt -- John Hoffman (Jan 12, 2013)
+
+As of now, I have gotten autoconf and automake to work with the current version of the program. This means that all one should have to do in order to compile the program is the following:
+
+--COMPILING--
+
+bash configure [--enable-openmp]
+make
+
+
+And now, the "ggadt" binary should be in the src/ directory.
+
+
+--MAKING CHANGES--
+
++ If you change the program, but **do not add any new files**, all you have to do to update the configuration scripts is to run the scripts that I have written in the parent directory:
+
+ bash reconf-custom.sh
+
+ That script (should) (1) erase all of the autoconf files (configure, config.log, config, etc.) and then (2) recreate them with the current source files.
+
++ If you add a new source file (say a new fortran module), you must change the "Makefile.am" file in the src/ directory. This is a 2-line file, and all you have to do is append a filename to the end of the "ggadt_SOURCES" line.
+
+--HOW TO USE GGADT--
+
+Very rough documentation:
+
+You call the program in the following way -- ./ggadt [paramfile]
+
+Where paramfile is the path to a parameter file (a sample parameter file is parameterfile.ini in the parent directory). Look at the parameterfile.ini to understand how the parameter files should be formatted.
+
+This will change in future versions. I would like to be able to specify parameters as command line arguments (i.e. ./ggadt --a_eff=0.2 --ephot=0.5 [...])
+
+

@@ -1,0 +1,1 @@
+SUBDIRS= serial @omp_dir@ @mpi_dir@
