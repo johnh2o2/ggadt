@@ -3,6 +3,8 @@ AC_PREREQ([2.69])
 AC_CONFIG_MACRO_DIRS([m4])
 [cp src/common.f03 src/serial/]
 [cp src/options.f03 src/serial/]
+[cp src/common.f03 src/omp/]
+[cp src/options.f03 src/omp/]
 AC_CONFIG_SRCDIR([src/serial/ggadt-serial.f03])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_ARG_ENABLE([mpi],
@@ -63,21 +65,36 @@ fi
 if test $mpi = true
 then
 	mpi_dir=[mpi]
-	#AC_CHECK_LIB(fftw3_mpi,fftw_mpi_init,,AC_MSG_ERROR([You do not have the MPI version of the FFTW3 library installed.]))
-	#AX_MPI(AC_MSG_NOTICE([ Found MPI compiler (${MPIFC}). ]), AC_MSG_ERROR([You do not seem to have any usable MPI compilers...]))
+	AC_MSG_ERROR([MPI is not available at this time.])
 	AC_CONFIG_FILES([ src/mpi/Makefile ])
 fi
 
+omp_lib=true
 if test $openmp = true
 then
 	omp_dir=[omp]
-	#AC_LANG([C])
-	#AC_OPENMP
-	#AC_CHECK_LIB(fftw3_threads,fftw_init_threads, , AC_MSG_ERROR([You do not have the OpenMP version of the FFTW3 library installed.]))
+	AC_OPENMP
+	AC_CHECK_HEADERS([omp.h fftw3.h])
+	CFLAGSOLD=$CFLAGS
+	LDFLAGSOLD=$LDFLAGS 
+	LDFLAGS="${LDFLAGSOLD} -lfftw3_omp -lfftw3"
+	CFLAGS="${CFLAGS_OLD} $OPENMP_CFLAGS"
+	AC_RUN_IFELSE([
+  		AC_LANG_PROGRAM([[ #include <omp.h> 
+  							#include<fftw3.h> 
+  							]], 
+  						[[int main() 
+  							{ fftw3_init_threads(); return 0; }
+  							]]
+  					)]
+  		, [  AC_MSG_NOTICE([ fftw3_omp OK! ]) ; omp_lib=" -lfftw3_omp"], AC_MSG_ERROR([fftw3_omp library not usable!!!])
+  	)
+	#AC_SEARCH_LIBS([fftw3_init_threads],[ fftw3_omp fftw3f_omp fftw3l_omp ], AC_MSG_NOTICE([Found OpenMP fftw library.]), AC_MSG_ERROR([Did not find OpenMP fftw library.]))
+	LDFLAGS=$LDFLAGSOLD
+	CFLAGS=$CFLAGSOLD
 	AC_LANG([Fortran])
 	AC_OPENMP
-	AC_MSG_NOTICE([Fortran OpenMP compiler: ${MPIFC}])
-
+	
 	AC_CONFIG_FILES([ src/omp/Makefile ])
 fi
 
@@ -87,5 +104,6 @@ AC_SUBST(fftw3_inc_dir)
 AC_SUBST(plan_dir)
 AC_SUBST(OPENMP_FCFLAGS)
 AC_SUBST(mpi_dir)
+AC_SUBST(omp_lib)
 AC_SUBST(omp_dir)
 AC_OUTPUT

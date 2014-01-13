@@ -4,36 +4,30 @@
 !	   | dqscat/domega as a function of thetax and thetay
 
 program ggadt
-	use, intrinsic :: iso_c_binding
-	use, intrinsic :: iso_fortran_env
-	use sphere
-	use spheres
-	use ellipsoid
-	use common_mod
-	use fftw
-	implicit none
+use, intrinsic :: iso_c_binding
+    use, intrinsic :: iso_fortran_env
+    use sphere
+    use spheres
+    use ellipsoid
+    use common_mod
+    use fftw
+    implicit none
 
-	
-	real, allocatable :: x(:), y(:), z(:), kx(:), ky(:), thetax(:), thetay(:)
-	complex(c_double_complex), allocatable :: sh(:,:), ftsh(:,:)
-	real, allocatable :: chrd(:,:), scatter(:,:), scatter_temp(:,:)
+    
+    real, allocatable :: x(:), y(:), z(:), kx(:), ky(:), thetax(:), thetay(:)
+    complex(c_double_complex), allocatable :: sh(:,:), ftsh(:,:)
+    real, allocatable :: chrd(:,:), scatter(:,:), scatter_temp(:,:)
 
-	real :: xmin, xmax, ymin, ymax, zmin, zmax, dx, dy, dz, k, l
-	real, dimension(3) :: eul_ang
-	real, dimension(3,3) :: rm 
-	integer :: i, j, neul, allocatestatus, num_args, nangle_new
-	character(len=200) :: parameter_file_name
-	num_args = iargc()
+    real :: xmin, xmax, ymin, ymax, zmin, zmax, dx, dy, dz, k, l
+    real, dimension(3) :: eul_ang
+    real, dimension(3,3) :: rm 
+    integer :: i, j, neul, allocatestatus, num_args, nangle_new
 
-	if (num_args /= 1) then
-		write(error_unit,*) "incorrect usage. ./<prog> <paramfilename>", iargc()
-		call exit()
-	end if
 
-	call getarg(1,parameter_file_name)
-	call read_param_file(trim(adjustl(parameter_file_name)))
-	call initialize_and_allocate_vars()
-	call set_optimization_mode(fftw_optimization_mode_name)
+    call set_parameter_values()
+    call print_parameters()
+    call initialize_and_allocate_vars()
+    call set_optimization_mode(fftw_optimization_mode_name)
 	
 
 	if (geometry .eq. "sphere") then

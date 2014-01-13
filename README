@@ -1,4 +1,6 @@
-README for ggadt -- John Hoffman (Jan 12, 2013)
+README for ggadt -- John Hoffman (Jan 13, 2013)
+
+ALERT: It seems Mac's "gcc" compiler (which is actually some front end for the clang compiler), does NOT allow you to use OpenMP. This means mac users are stuck with the serial version, unless they would like to custom install another OpenMP-compatible C compiler in order to install the FFTW3 OpenMP libraries.
 
 As of now, I have gotten autoconf and automake to work with the current version of the program. This means that all one should have to do in order to compile the program is the following:
 
