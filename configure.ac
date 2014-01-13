@@ -21,12 +21,16 @@ AC_ARG_ENABLE([openmp],
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-openmp]) ;;
 esac],[openmp=false])
 AM_CONDITIONAL([OMP], [test x$openmp = xtrue])
-AC_PREFIX_DEFAULT(.)
 AC_PROG_FC
 AC_CHECK_LIB([m],[cos])
 
+
+
 mpi_dir=
 omp_dir=
+
+plan_dir=$PWD/plans
+mkdir -p $plan_dir
 
 AC_CHECK_LIB(fftw3,fftw_plan_dft_1d,, AC_MSG_ERROR([Missing FFTW library]))
 
@@ -79,6 +83,7 @@ fi
 AC_PROG_INSTALL
 AC_CONFIG_FILES([ Makefile src/Makefile src/serial/Makefile src/serial/fftwmod-serial.f03 src/mpi/fftwmod-mpi.f03 src/omp/fftwmod-omp.f03 ])
 AC_SUBST(fftw3_inc_dir)
+AC_SUBST(plan_dir)
 AC_SUBST(OPENMP_FCFLAGS)
 AC_SUBST(mpi_dir)
 AC_SUBST(omp_dir)
