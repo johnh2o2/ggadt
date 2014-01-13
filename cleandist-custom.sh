@@ -16,6 +16,8 @@ rm -f src/serial/*o
 rm -f src/serial/*mod
 rm -f src/serial/Makefile.in
 rm -f src/serial/Makefile
+rm -f src/serial/options.f03
+rm -f src/serial/common.f03
 rm -f src/serial/fftwmod-serial.f03
 
 
@@ -27,6 +29,8 @@ rm -f src/mpi/ggadt-mpi
 rm -f src/mpi/fftwmod-mpi.f03
 
 rm -f src/omp/*mod
+rm -f src/omp/options.f03
+rm -f src/omp/common.f03
 rm -f src/omp/*o
 rm -f src/omp/Makefile
 rm -f src/omp/Makefile.in
