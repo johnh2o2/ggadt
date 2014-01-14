@@ -1,4 +1,4 @@
-AC_INIT([ggadt], [0.18], [jah5@princeton.edu])
+AC_INIT([ggadt], [0.9.0], [jah5@princeton.edu])
 AC_PREREQ([2.63]) 
 #AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/serial/ggadt-serial.f03])
@@ -23,7 +23,7 @@ AC_DEFINE_UNQUOTED(CONFIG_PREFIX, ["$ac_prefix"], [Default installation prefix.]
 
 #MPI is not currently operational (I can't find a Fortran 2003 MPI compiler...)
 AC_ARG_ENABLE([mpi],
-[  --enable-mpi    Compile mpi version],
+[  --enable-mpi    Compile mpi version (DO NOT USE, not operational.)],
 [case "${enableval}" in
   yes) mpi=true ;;
   no)  mpi=false ;;
@@ -128,8 +128,9 @@ omp_dir=
 if test $mpi = true
 then
 	mpi_dir=[mpi]
-	AC_MSG_ERROR([MPI is not available at this time.])
-	AC_CONFIG_FILES([ src/mpi/Makefile ])
+	AC_MSG_WARN([ |--+++++++--=========================================================== ])
+	AC_MSG_WARN([ |--WARNING-- MPI is NOT available at this time. Ignoring '--enable-mpi'])
+	AC_MSG_WARN([ |--+++++++--=========================================================== ])
 fi
 
 omp_lib=true
@@ -184,7 +185,14 @@ then
 fi
 
 AC_PROG_INSTALL
-AC_CONFIG_FILES([ Makefile src/Makefile src/serial/Makefile src/serial/fftwmod-serial.f03 src/mpi/fftwmod-mpi.f03 src/omp/fftwmod-omp.f03 ])
+AC_CONFIG_FILES([ 	Makefile 
+					src/Makefile 
+					src/serial/Makefile 
+					doc/Makefile 
+					src/serial/fftwmod-serial.f03 
+					src/mpi/fftwmod-mpi.f03 
+					src/omp/fftwmod-omp.f03 
+				])
 AC_SUBST(fftw3_inc_dir)
 AC_SUBST(plan_dir)
 AC_SUBST(OPENMP_FCFLAGS)

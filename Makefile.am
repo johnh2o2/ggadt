@@ -1,2 +1,2 @@
- EXTRA_DIST = reconf configure
- SUBDIRS = src
+ EXTRA_DIST = configure plots test scripts
+ SUBDIRS = src doc 
