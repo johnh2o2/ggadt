@@ -1,36 +1,20 @@
-README for ggadt -- John Hoffman (Jan 13, 2013)
-
-ALERT: It seems Mac's "gcc" compiler (which is actually some front end for the clang compiler), does NOT allow you to use OpenMP. This means mac users are stuck with the serial version, unless they would like to custom install another OpenMP-compatible C compiler in order to install the FFTW3 OpenMP libraries.
-
-As of now, I have gotten autoconf and automake to work with the current version of the program. This means that all one should have to do in order to compile the program is the following:
-
---COMPILING--
-
-bash configure [--enable-openmp]
-make
+GGADT version 0.9.0 -- Jan 14, 2014
+Authors: John Hoffman, Michael Tarczon
 
 
-And now, the "ggadt" binary should be in the src/ directory.
+GGADT calculates the x-ray scattering properties of dust
+in the interstellar medium. You define the geometry and composition
+of a dust grain, the energy of the incident x-ray photons, and a few other parameters. 
+GGADT then calculates the orientationally-averaged scattering 
+cross-section in the plane perpendicular to the incident photons. 
 
+--INSTALLATION/DEPENDENCIES--
 
---MAKING CHANGES--
+Please see the documentation in the doc/ directory. The ggadt.info file can be
+read by virtually any text reader. The INSTALL file in the top directory has
+more details about installing and working with the "configure" script.
 
-+ If you change the program, but **do not add any new files**, all you have to do to update the configuration scripts is to run the scripts that I have written in the parent directory:
+For HTML documentation: simply open ggadt.html/index.html in a browser of your choice.
 
- bash reconf-custom.sh
-
- That script (should) (1) erase all of the autoconf files (configure, config.log, config, etc.) and then (2) recreate them with the current source files.
-
-+ If you add a new source file (say a new fortran module), you must change the "Makefile.am" file in the src/ directory. This is a 2-line file, and all you have to do is append a filename to the end of the "ggadt_SOURCES" line.
-
---HOW TO USE GGADT--
-
-Very rough documentation:
-
-You call the program in the following way -- ./ggadt [paramfile]
-
-Where paramfile is the path to a parameter file (a sample parameter file is parameterfile.ini in the parent directory). Look at the parameterfile.ini to understand how the parameter files should be formatted.
-
-This will change in future versions. I would like to be able to specify parameters as command line arguments (i.e. ./ggadt --a_eff=0.2 --ephot=0.5 [...])
 
 

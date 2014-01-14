@@ -3,6 +3,8 @@ AC_PREREQ([2.63])
 #AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/serial/ggadt-serial.f03])
 AM_INIT_AUTOMAKE([subdir-objects])
+AC_PROG_CC
+AC_PROG_FC 
 
 #define default prefix
 AC_PREFIX_DEFAULT(/usr/local)
@@ -12,10 +14,6 @@ if test "x$ac_prefix" = "xNONE"; then
 fi
 AC_SUBST(ac_prefix)
 AC_DEFINE_UNQUOTED(CONFIG_PREFIX, ["$ac_prefix"], [Default installation prefix.])
-
-
-
-
 
 #MPI is not currently operational (I can't find a Fortran 2003 MPI compiler...)
 AC_ARG_ENABLE([mpi],
@@ -36,19 +34,6 @@ AC_ARG_ENABLE([openmp],
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-openmp]) ;;
 esac],[openmp=false])
 AM_CONDITIONAL([OMP], [test x$openmp = xtrue])
-
-
-# adds -pg compiler flag for using gprof
-AC_ARG_ENABLE([profiling],
-[  --enable-profiling    Add -pg compiler flag ],
-[case "${enableval}" in
-  yes) FCFLAGS="${FCFLAGS} -pg" ;;
-  no)  ;;
-  *) AC_MSG_ERROR([bad value ${enableval} for --enable-profiling]) ;;
-esac],[])
-
-
-AC_PROG_FC
 
 AC_CHECK_LIB([m],[cos]) #check for the math library
 AC_CHECK_LIB(fftw3,fftw_plan_dft_1d,, AC_MSG_ERROR([Missing FFTW library])) #check for fftw3 library
@@ -82,6 +67,8 @@ fi
 # Now make sure the Fortran compiler is sane.
 
 AC_LANG([Fortran])
+
+AC_FC_IMPLICIT_NONE([], [])
 
 AC_MSG_CHECKING([to see if Fortran supports iso_c_binding])
 AC_RUN_IFELSE([
@@ -119,6 +106,29 @@ AC_RUN_IFELSE([
   		AC_MSG_RESULT(no)
   	)
 
+# adds -pg compiler flag for using gprof
+AC_ARG_ENABLE([profiling],
+[  --enable-profiling    Add -pg compiler flag ],
+[case "${enableval}" in
+  yes) 
+		FCFLAGSOLD=$FCFLAGS
+		FCFLAGS="${FCFLAGS} -pg" 
+		AC_MSG_CHECKING([ if compiler recognizes -pg ])
+		AC_COMPILE_IFELSE([
+  			AC_LANG_PROGRAM([],	[[ 
+  									integer :: i 
+  								]]
+  				)],
+  		AC_MSG_RESULT(yes), 
+  		[	AC_MSG_RESULT(no) ; 
+  			FCFLAGS=$FCFLAGSOLD ; 
+  			AC_MSG_WARN([Your fortran compiler does not recognize the '-pg' tag. Ignoring --enable-profiling.]) 
+  		]
+  	)
+	;;
+  no)  ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-profiling]) ;;
+esac],[])
 
 
 # Where to put the FFTW plans 
