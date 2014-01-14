@@ -117,7 +117,7 @@ AC_RUN_IFELSE([
 
 # Where to put the FFTW plans 
 plan_dir="${HOME}/.ggadt/plans"
-mkdir -p $plan_dir
+
 
 AC_MSG_NOTICE([using $plan_dir as the directory to store FFTW plans])
 

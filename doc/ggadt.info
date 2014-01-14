@@ -1,10 +1,8 @@
 This is ggadt.info, produced by makeinfo version 4.8 from ggadt.texi.
 
-   This manual is for GNU Hello (version 0.9.0, 13 January 2014), which
-prints a friendly greeting (and serves as an example GNU package).
-
-   Copyright (C) 1992, 1993, 1996, 2002, 2005-2013 Free Software
-Foundation, Inc.
+   This manual is for GGADT (version 0.9.0, 14 January 2014), which
+calculates scattering properties of dust grains in the interstellar
+medium by using anomalous diffraction theory (ADT).
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -15,7 +13,7 @@ Foundation, Inc.
 
 INFO-DIR-SECTION Basics
 START-INFO-DIR-ENTRY
-* Hello: (hello).               Hello, GNU world.
+* GGADT: (ggadt).
 END-INFO-DIR-ENTRY
 
 
@@ -24,120 +22,115 @@ File: ggadt.info,  Node: Top,  Next: Overview,  Up: (dir)
 GGADT
 *****
 
-This manual is for GGADT (version 0.9.0, 13 January 2014), which
-calculates x-ray scattering for dust grains in the interstellar medium
-(ISM)
+This manual is for GGADT (version 0.9.0, 14 January 2014), which
+calculates scattering properties of dust grains in the interstellar
+medium by using anomalous diffraction theory (ADT).
 
 * Menu:
 
 * Overview::		General purpose and information.
-* Sample output::	Sample output from `ggadt'.
-* Invoking hello::	How to run `ggadt'.
-* Reporting bugs::	Sending bug reports and feature suggestions.
+* Installation::	How to install `ggadt' on your system.
+* Invoking ggadt::	Giving `ggadt' your input.
+* Example usage::	Quick examples to get you started.
+* Benchmarking::	Test speed
+* Plotting::		Using python (>=2.7 with matplotlib functionality)
 * GNU Free Documentation License:: Copying and sharing this documentation.
 * Concept index::	Index of concepts.
 
 
-File: ggadt.info,  Node: Overview,  Next: Sample output,  Prev: Top,  Up: Top
+File: ggadt.info,  Node: Overview,  Next: Installation,  Prev: Top,  Up: Top
 
 1 Overview
 **********
 
-The GNU `hello' program (`http://www.gnu.org/software/hello/') produces
-a familiar, friendly greeting.  It allows nonprogrammers to use a
-classic computer science tool which would otherwise be unavailable to
-them.  Because it is protected by the GNU General Public License, users
-are free (in perpetuity) to share and change it.
+The `ggadt' program calculates the x-ray scattering properties of dust
+in the interstellar medium. You define the geometry and composition of
+a dust grain, the energy of the incident x-ray photons, and a few other
+parameters.  The `ggadt' program then calculates the
+orientationally-averaged scattering cross-section in the plane
+perpendicular to the incident photons.
 
-   Not to spoil the joke, but of course the practical purpose of GNU
-Hello is to serve as a minimal example of a GNU package.  So, although
-most manuals don't need to discuss the implementation of the programs
-they document, that is part of the goal here.
+   GGADT was written by John Hoffman and Michael Tarczon.
 
-   First, GNU Hello follows the GNU coding standards (*note Preface:
-(standards)Top.) and GNU maintainer standards (*note Preface:
-(maintain)Top.).  These are the basic documents which all GNU packages
-should adhere to.
+* Menu:
 
-   The Hello package also implements recommended development practices
-not embodied in the standards, using other GNU packages and features:
-
-   * It uses Automake (*note Introduction: (automake)Top.) and hence
-     also Autoconf (*note Introduction: (autoconf)Top.)  for
-     configuration.
-
-   * It uses Gnulib (*note Introduction: (gnulib)Top.) to enhance
-     portability and avoid duplication of common sources.  Both
-     `gnulib-tool' and `srclist-update' are used, for purposes of
-     example.  See the `README-dev' file in the distribution.
-
-   * GNU Gettext (*note Introduction: (gettext)Top.) is used for
-     internationalization support.  Hello's greeting has been translated
-     into many languages.
-
-   * Internally, Hello uses the GNU `getopt_long' function (*note
-     Getopt Long Options: (libc)Getopt Long Options.) to parse options,
-     thus supporting GNU-style long options such as `--help'.
-
-   * The Hello Man page is generated with GNU `help2man' (*note
-     Overview: (help2man)Top.) from the `--help' output.  This relieves
-     the maintainers from the burden of updating separate man
-     documentation, yet provides a reasonable overview for man devotees.
-
-   * Finally, Texinfo (*note Introduction: (texinfo)Top.) is the
-     documentation format for this manual.  It supports output in Info,
-     HTML, PDF, DVI, plain text, XML, and other formats.
-
-
-   GNU Hello is implemented in C.  The GNU Gettext distribution contains
-"hello world" examples in many other programming languages; see the
-Gettext home page at `http://www.gnu.org/software/gettext/'.
-
-   The top-level `Makefile.am' in Hello also contains a few special
-targets for other projects to adapt as desired:
-
-`diff'
-     Make a diff from the previous release, assuming the current
-     tarball is in the current tarball.
-
-`po-check'
-     Verify that all source files using `_()' are included for
-     translation in `po/POTFILES.in', so translators will have all the
-     messages.
-
-`wwwdoc'
-     Sample procedure for updating the manual on the GNU web site, in
-     this case `http://www.gnu.org/software/hello/manual/'.
-
-   GNU Hello was written by Mike Haertel, David MacKenzie, Jan
-Brittenson, Charles Hannum, Roland McGrath, Noah Friedman, Karl
-Eichwalder, Karl Berry, and The King.
+* Language::				Comment about the usage of Fortran 2003
+* Scientific relevance::	What astrophysical problems GGADT may help investigate
 
 
-File: ggadt.info,  Node: Sample output,  Next: Invoking hello,  Prev: Overview,  Up: Top
+File: ggadt.info,  Node: Language,  Next: Scientific relevance,  Up: Overview
 
-2 Sample output
-***************
+1.1 Language
+============
 
-Here are some examples of running GNU Hello.
+GGADT is written in Fortran, using the Fortran 2003 standard. In the
+future, GGADT may be changed to comply with earlier Fortran standards
+(90 or 95) for compatibility reasons. Most importantly, this will allow
+for easier implementation of an MPI version of GGADT.
 
-   This is the output of the command `hello':
-
-     Hello, world!
-
-   This is the output of the command `hello --traditional':
-
-     hello, world
-
-   This is the output of the command `hello --greeting=hi':
-
-     hi
+   Fortran 2003 provides an easy way to interface Fortran programs with
+C libraries. In this case, Fortran 2003 made the FFTW3 library
+(`http://www.fftw.org/') easy to implement for performing fast Fourier
+transforms. FFTW3 is a well-tested, optimized, and popular suite for
+performing FFT's.
 
 
-File: ggadt.info,  Node: Invoking hello,  Next: Reporting bugs,  Prev: Sample output,  Up: Top
+File: ggadt.info,  Node: Scientific relevance,  Prev: Language,  Up: Overview
 
-3 Invoking `hello'
-******************
+1.2 Scientific relevance
+========================
+
+The ISM
+
+
+File: ggadt.info,  Node: Installation,  Next: Invoking ggadt,  Prev: Overview,  Up: Top
+
+2 Installation
+**************
+
+2.1 System requirements
+=======================
+
+GGADT should install easily on most _Unix-based systems_ (e.g. Linux,
+Mac) by following the standard GNU install procedures, described in
+`INSTALL'.
+
+   `./configure [--enable-openmp]' ...  `make' `make install'
+
+2.2 Package dependencies
+========================
+
+   * *FFTW 3+*
+        - If you wish to use the OpenMP variant of GGADT, you must have
+          the `fftw3_omp' libraries installed
+
+        - In order for GGADT to find the Fortran headers for FFTW3,
+          they must be in the standard location (`/usr/local/include'
+          or `usr/include') or in `$prefix/include' where `$prefix' is
+          defined by doing `./configure --prefix=<prefix>' ....
+
+
+   * For the OpenMP version of GGADT, you must have C and Fortran
+     compilers that are compatible with OpenMP 4.0. This version of
+     GGADT was tested with the GNU C and Fortran compilers (`gcc',
+     `gfortran') version 4.9. *Attention Mac users:* You must have the
+     command line tools from XCode installed, but beware of your
+     supplied version of `gcc' - it is NOT going to work for compiling
+     the OpenMP version of GGADT. The version of GCC that you get with
+     XCode is a front-end for the `clang' compiler and is quite dated.
+     We recommend obtaining later versions of GNU compilers, which you
+     can find here: `http://hpc.sourceforge.net/'.
+
+   * Python >=2.7 for some of the included scripts.
+
+   * matplotlib python library if you wish to use the included plotting
+     scripts.
+
+
+File: ggadt.info,  Node: Invoking ggadt,  Next: Example usage,  Prev: Installation,  Up: Top
+
+3 Invoking ggadt
+****************
 
 The format for running the `hello' program is:
 
@@ -184,44 +177,39 @@ their long-named equivalents) is specified, whichever comes last takes
 precedence.
 
 
-File: ggadt.info,  Node: Reporting bugs,  Next: GNU Free Documentation License,  Prev: Invoking hello,  Up: Top
+File: ggadt.info,  Node: Example usage,  Next: Benchmarking,  Prev: Invoking ggadt,  Up: Top
 
-4 Reporting bugs
-****************
+4 Example usage
+***************
 
-To report bugs, suggest enhancements or otherwise discuss GNU Hello,
-please send electronic mail to <bug-hello@gnu.org>.
+Here are some examples of running GNU Hello.
 
-   For bug reports, please include enough information for the
-maintainers to reproduce the problem.  Generally speaking, that means:
+   This is the output of the command `hello':
 
-   * The version numbers of Hello (which you can find by running
-     `hello --version') and any other program(s) or       manual(s)
-     involved.
+     Hello, world!
 
-   * Hardware and operating system names and versions.
+   This is the output of the command `hello --traditional':
 
-   * The contents of any input files necessary to reproduce the bug.
+     hello, world
 
-   * The expected behavior and/or output.
+   This is the output of the command `hello --greeting=hi':
 
-   * A description of the problem and samples of any erroneous output.
-
-   * Options you gave to `configure' other than specifying
-     installation directories.
-
-   * Anything else that you think would be helpful.
-
-   When in doubt whether something is needed or not, include it.  It's
-better to include too much than to leave out something important.
-
-   Patches are welcome; if possible, please make them with `diff -c'
-(*note Overview: (diff)Top.) and include `ChangeLog' entries (*note
-Change Log: (emacs)Change Log.).  Please follow the existing coding
-style.
+     hi
 
 
-File: ggadt.info,  Node: GNU Free Documentation License,  Next: Concept index,  Prev: Reporting bugs,  Up: Top
+File: ggadt.info,  Node: Benchmarking,  Next: Plotting,  Prev: Example usage,  Up: Top
+
+5 Benchmarking
+**************
+
+
+File: ggadt.info,  Node: Plotting,  Next: GNU Free Documentation License,  Prev: Benchmarking,  Up: Top
+
+6 Plotting
+**********
+
+
+File: ggadt.info,  Node: GNU Free Documentation License,  Next: Concept index,  Prev: Plotting,  Up: Top
 
 Appendix A GNU Free Documentation License
 *****************************************
@@ -715,67 +703,52 @@ Concept index
  [index ]
 * Menu:
 
-* --greeting:                            Invoking hello.       (line 16)
-* --help <1>:                            Overview.             (line 38)
-* --help:                                Invoking hello.       (line 20)
-* --next-generation:                     Invoking hello.       (line 31)
-* --traditional:                         Invoking hello.       (line 38)
-* --version:                             Invoking hello.       (line 42)
-* -g:                                    Invoking hello.       (line 16)
-* -h:                                    Invoking hello.       (line 20)
-* -n:                                    Invoking hello.       (line 31)
-* -t:                                    Invoking hello.       (line 38)
-* -v:                                    Invoking hello.       (line 42)
-* authors:                               Overview.             (line 72)
-* Autoconf:                              Overview.             (line 25)
-* Automake:                              Overview.             (line 25)
-* Berry, Karl:                           Overview.             (line 72)
-* Brittenson, Jan:                       Overview.             (line 72)
-* bug reporting:                         Reporting bugs.       (line  6)
-* checklist for bug reports:             Reporting bugs.       (line  9)
-* Eichwalder, Karl:                      Overview.             (line 72)
-* environment variables, help for:       Invoking hello.       (line 23)
-* examples:                              Sample output.        (line  6)
-* Friedman, Noah:                        Overview.             (line 72)
-* Gettext:                               Overview.             (line 34)
-* GNU coding standards:                  Overview.             (line 17)
-* GNU maintainer standards:              Overview.             (line 17)
-* Gnulib:                                Overview.             (line 29)
+* --greeting:                            Invoking ggadt.       (line 16)
+* --help:                                Invoking ggadt.       (line 20)
+* --next-generation:                     Invoking ggadt.       (line 31)
+* --traditional:                         Invoking ggadt.       (line 38)
+* --version:                             Invoking ggadt.       (line 42)
+* -g:                                    Invoking ggadt.       (line 16)
+* -h:                                    Invoking ggadt.       (line 20)
+* -n:                                    Invoking ggadt.       (line 31)
+* -t:                                    Invoking ggadt.       (line 38)
+* -v:                                    Invoking ggadt.       (line 42)
+* astrophysics:                          Scientific relevance. (line  6)
+* authors:                               Overview.             (line 13)
+* configure:                             Installation.         (line  6)
+* enable-mpi:                            Installation.         (line  6)
+* enable-openmp:                         Installation.         (line  6)
+* environment variables, help for:       Invoking ggadt.       (line 23)
+* examples:                              Example usage.        (line  6)
+* Fortran 2003:                          Language.             (line  6)
 * greetings:                             Overview.             (line  6)
-* Haertel, Mike:                         Overview.             (line 72)
-* Hannum, Charles:                       Overview.             (line 72)
-* help:                                  Invoking hello.       (line  6)
-* Help2man:                              Overview.             (line 42)
-* invoking:                              Invoking hello.       (line  6)
-* joke, not:                             Overview.             (line 12)
-* King, The:                             Overview.             (line 72)
-* MacKenzie, David:                      Overview.             (line 72)
-* Makefile.am targets:                   Overview.             (line 56)
-* McGrath, Roland:                       Overview.             (line 72)
-* modern:                                Invoking hello.       (line 38)
-* options:                               Invoking hello.       (line  6)
+* help:                                  Invoking ggadt.       (line  6)
+* Hoffman, John:                         Overview.             (line 13)
+* installing:                            Installation.         (line  6)
+* interstellar medium:                   Scientific relevance. (line  6)
+* invoking:                              Invoking ggadt.       (line  6)
+* modern:                                Invoking ggadt.       (line 38)
+* options:                               Invoking ggadt.       (line  6)
 * overview:                              Overview.             (line  6)
-* patches, contributing:                 Reporting bugs.       (line 32)
-* problems:                              Reporting bugs.       (line  6)
-* README-dev source file:                Overview.             (line 29)
-* reporting bugs:                        Reporting bugs.       (line  6)
-* sample output:                         Sample output.        (line  6)
-* srclist-update script:                 Overview.             (line 29)
-* standards, GNU coding:                 Overview.             (line 17)
-* standards, GNU maintainer:             Overview.             (line 17)
-* Texinfo:                               Overview.             (line 47)
-* traditional:                           Invoking hello.       (line 38)
-* usage:                                 Invoking hello.       (line  6)
+* relevance:                             Scientific relevance. (line  6)
+* sample output:                         Example usage.        (line  6)
+* Tarczon, Michael:                      Overview.             (line 13)
+* traditional:                           Invoking ggadt.       (line 38)
+* usage:                                 Invoking ggadt.       (line  6)
 
 
 
 Tag Table:
-Node: Top819
-Node: Overview1354
-Node: Sample output4552
-Node: Invoking hello4940
-Node: Reporting bugs6418
-Node: GNU Free Documentation License7709
-Node: Concept index32884
+Node: Top753
+Node: Overview1430
+Node: Language2108
+Node: Scientific relevance2776
+Node: Installation2917
+Node: Invoking ggadt4574
+Node: Example usage6046
+Node: Benchmarking6438
+Node: Plotting6559
+Node: GNU Free Documentation License6689
+Node: Concept index31858
 
 End Tag Table
