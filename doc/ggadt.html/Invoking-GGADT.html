@@ -1,0 +1,120 @@
+<html lang="en">
+<head>
+<title>Invoking GGADT - GGADT 0.9.0</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GGADT 0.9.0">
+<meta name="generator" content="makeinfo 4.8">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Installation.html#Installation" title="Installation">
+<link rel="next" href="Example-usage.html#Example-usage" title="Example usage">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This manual is for GGADT (version 0.9.0, 14 January 2014),
+which calculates scattering properties of dust grains in the interstellar
+medium by using anomalous diffraction theory (ADT).
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with no Front-Cover Texts,
+     and with no Back-Cover Texts.  A copy of the license is included
+     in the section entitled ``GNU Free Documentation License''.
+   -->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<div class="node">
+<p>
+<a name="Invoking-GGADT"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="Example-usage.html#Example-usage">Example usage</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Installation.html#Installation">Installation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">3 Invoking GGADT</h2>
+
+<p><a name="index-invoking-14"></a><a name="index-options-15"></a><a name="index-usage-16"></a><a name="index-help-17"></a>
+To see usage and all available options for <code>ggadt</code>, simply use the <samp><span class="option">h</span></samp> option:
+
+<pre class="example">     ggadt -h
+</pre>
+   <h3 class="section">3.1 Setting parameter values</h3>
+
+<p>The format for running the <samp><span class="command">ggadt</span></samp> program (either <code>ggadt-serial</code> or <code>ggadt-omp</code>) is:
+
+<pre class="example">     ggadt <var>option</var> ...
+</pre>
+   <p>With no options, <samp><span class="command">ggadt</span></samp> runs calculations on a set of default grain parameters. Parameters may be specified as command-line arguments,
+
+<pre class="example">     ggadt --parameter=value ...
+</pre>
+   <p>or in a parameter file that is specified as a command-line argument,
+
+<pre class="example">     ggadt --parameter-file-name=/path/to/parameterfile
+</pre>
+   <p>or a combination of the two:
+
+<pre class="example">     ggadt --parameter-file-name=/path/to/parametefile --parameter=value ...
+</pre>
+   <p>If a parameter is set by a command-line argument <em>and</em> by a parameter file, the command-line argument is used.
+
+<h3 class="section">3.2 Parameter file syntax</h3>
+
+<p>The syntax of parameter files is:
+
+<pre class="example">     #comment
+     parameter=value
+     another-parameter=another-value
+     ...
+</pre>
+   <h3 class="section">3.3 Options and parameters</h3>
+
+<p><samp><span class="command">ggadt</span></samp> supports the following options:
+
+   <p><a name="index-environment-variables_002c-help-for-18"></a>
+     <dl>
+<dt><samp><span class="option">--help</span></samp><dt><samp><span class="option">-h</span></samp><dd><a name="index-g_t_002d_002dhelp-19"></a><a name="index-g_t_002dh-20"></a>The `help' screen&ndash;prints usage information and available options.
+
+     <br><dt><samp><span class="option">--version</span></samp><dt><samp><span class="option">-v</span></samp><dd><a name="index-g_t_002d_002dversion-21"></a><a name="index-g_t_002dv-22"></a>Print the version number of GGADT on
+standard output and then exit successfully.
+
+     <br><dt><samp><span class="option">--parameter-file-name=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dparameter_002dfile_002dname-23"></a>Path to a correctly formatted parameter file.
+
+     <br><dt><samp><span class="option">--grain-geometry=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dgrain_002dgeometry-24"></a>Geometry of dust grain. Must be one of <code>SPHERE</code>, <code>ELLIPSOID</code>, <code>SPHERES</code>. A <code>SPHERES</code> grain geometry means that your grain is a conglomerate of smaller spheres. If you wish to use this grain geometry, you should supply a file (hereafter called a &ldquo;<em>cluster file</em>", see the next option) that defines the relative positions of the spheres that make up the grain. The sizes of these spheres will be normalized so that the effective radius of the grain is consistent with <samp><span class="option">aeff</span></samp>.
+
+     <br><dt><samp><span class="option">--cluster-file-name=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dcluster_002dfile_002dname-25"></a>Path to a correctly formatted cluster file. Several cluster files are included with the distribution, and if you wish to create your own, you must mimic exactly the format of these files.
+
+     <br><dt><samp><span class="option">--aeff=</span><var>value</var></samp><dd><a name="index-g_t_002d_002daeff-26"></a>Effective radius of dust grain. The effective radius is defined to be the radius of a sphere with the same volume as the dust grain.
+
+     <br><dt><samp><span class="option">--ephot=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dephot-27"></a>Energy of the incident X-ray photons in keV.
+
+     <br><dt><samp><span class="option">--RE-index-of-refraction=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dRE_002dindex_002dof_002drefraction-28"></a>The real component of the complex index of refraction, minus one.
+
+     <br><dt><samp><span class="option">--IM-index-of-refraction=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dIM_002dindex_002dof_002drefraction-29"></a>The imaginary component of the complex index of refraction.
+
+     <br><dt><samp><span class="option">--grid-width=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dgrid_002dwidth-30"></a>The width of the 2D numerical grid on which projected images of the dust grain are resolved, in units of the effective radius of the grain. Higher values (&gt;2) give you more angular resolution when calculating the differential scattering cross-section, at the cost of reducing the resolution of the dust grain on the grid.
+
+     <br><dt><samp><span class="option">--ngrid=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dngrid-31"></a>The number of grid points along one direction of the 2D numerical grid on which <em>images of the grain</em> are defined. See above for how to use this value together with <samp><span class="option">grid-width</span></samp> to give you the physical accuracy you desire.
+
+     <br><dt><samp><span class="option">--nangle=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dnangle-32"></a>The number of grain orientations relative to the incoming X-ray photon over which to average the differential cross-section.
+
+     <br><dt><samp><span class="option">--fftw-optimization=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dfftw_002doptimization-33"></a>Must be one of <code>ESTIMATE</code>, <code>MEASURE</code>, <code>PATIENT</code> or <code>EXHAUSTIVE</code>. FFTW wisdom is saved in <code>$HOME/.ggadt/plans</code>. For more information about what these tags mean and about FFTW wisdom, see <a href="http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans">http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans</a>.
+
+     <br><dt><samp><span class="option">--use-experimental-fft</span></samp><dt><samp><span class="option">-s</span></samp><dd><a name="index-g_t_002d_002duse_002dexperimental_002dfft-34"></a><a name="index-g_t_002ds-35"></a>Currently not operational, but we are experimenting with a few alternative methods for more efficiently performing the FFT.
+
+   </dl>
+
+   </body></html>
+
