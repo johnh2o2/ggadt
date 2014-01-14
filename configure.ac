@@ -14,11 +14,7 @@ AC_SUBST(ac_prefix)
 AC_DEFINE_UNQUOTED(CONFIG_PREFIX, ["$ac_prefix"], [Default installation prefix.])
 
 
-# Move shared files to serial and open-mp code versions
-[cp src/common.f03 src/serial/]
-[cp src/options.f03 src/serial/]
-[cp src/common.f03 src/omp/]
-[cp src/options.f03 src/omp/]
+
 
 
 #MPI is not currently operational (I can't find a Fortran 2003 MPI compiler...)
@@ -192,6 +188,7 @@ AC_CONFIG_FILES([ 	Makefile
 					src/serial/fftwmod-serial.f03 
 					src/mpi/fftwmod-mpi.f03 
 					src/omp/fftwmod-omp.f03 
+					src/common.f03
 				])
 AC_SUBST(fftw3_inc_dir)
 AC_SUBST(plan_dir)
@@ -200,3 +197,9 @@ AC_SUBST(mpi_dir)
 AC_SUBST(omp_lib)
 AC_SUBST(omp_dir)
 AC_OUTPUT
+
+# Move shared files to serial and open-mp code versions
+[cp src/common.f03 src/serial/]
+[cp src/options.f03 src/serial/]
+[cp src/common.f03 src/omp/]
+[cp src/options.f03 src/omp/]

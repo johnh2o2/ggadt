@@ -206,7 +206,7 @@ CFLAGS = -g -O2
 CPP = gcc -E
 CPPFLAGS = 
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"ggadt\" -DPACKAGE_TARNAME=\"ggadt\" -DPACKAGE_VERSION=\"0.9.0\" -DPACKAGE_STRING=\"ggadt\ 0.9.0\" -DPACKAGE_BUGREPORT=\"jah5@princeton.edu\" -DPACKAGE_URL=\"\" -DPACKAGE=\"ggadt\" -DVERSION=\"0.9.0\" -DCONFIG_PREFIX=\"/Users/jah5/.ggadt\" -DHAVE_LIBM=1 -DHAVE_LIBFFTW3=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_FFTW3_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STDIO_H=1 -DHAVE_OMP_H=1
+DEFS = -DPACKAGE_NAME=\"ggadt\" -DPACKAGE_TARNAME=\"ggadt\" -DPACKAGE_VERSION=\"0.9.0\" -DPACKAGE_STRING=\"ggadt\ 0.9.0\" -DPACKAGE_BUGREPORT=\"jah5@princeton.edu\" -DPACKAGE_URL=\"\" -DPACKAGE=\"ggadt\" -DVERSION=\"0.9.0\" -DCONFIG_PREFIX=\"/usr/local\" -DHAVE_LIBM=1 -DHAVE_LIBFFTW3=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_FFTW3_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STDIO_H=1 -DHAVE_OMP_H=1
 DEPDIR = .deps
 ECHO_C = 
 ECHO_N = -n
@@ -248,7 +248,7 @@ abs_top_builddir = /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT
 abs_top_srcdir = /Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT
 ac_ct_CC = gcc
 ac_ct_FC = gfortran
-ac_prefix = /Users/jah5/.ggadt
+ac_prefix = /usr/local
 am__include = include
 am__leading_dot = .
 am__quote = 
@@ -280,7 +280,7 @@ omp_dir = omp
 omp_lib =  -lfftw3_omp
 pdfdir = ${docdir}
 plan_dir = /Users/jah5/.ggadt/plans
-prefix = /Users/jah5/.ggadt
+prefix = /usr/local
 program_transform_name = s,x,x,
 psdir = ${docdir}
 sbindir = ${exec_prefix}/sbin

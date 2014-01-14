@@ -10,6 +10,7 @@ rm  -f Makefile.in
 rm -f Makefile
 rm -f src/Makefile
 rm -f src/Makefile.in
+rm -f src/common.f03
 
 rm -f src/serial/ggadt-serial
 rm -f src/serial/*o

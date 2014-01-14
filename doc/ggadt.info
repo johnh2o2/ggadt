@@ -30,7 +30,7 @@ medium by using anomalous diffraction theory (ADT).
 
 * Overview::		General purpose and information.
 * Installation::	How to install `ggadt' on your system.
-* Invoking ggadt::	Giving `ggadt' your input.
+* Invoking GGADT::	Giving `ggadt' your input.
 * Example usage::	Quick examples to get you started.
 * Benchmarking::	Test speed
 * Plotting::		Using python (>=2.7 with matplotlib functionality)
@@ -55,10 +55,10 @@ perpendicular to the incident photons.
 * Menu:
 
 * Language::				Comment about the usage of Fortran 2003
-* Scientific relevance::	What astrophysical problems GGADT may help investigate
+* Background::				What astrophysical problems GGADT may help investigate
 
 
-File: ggadt.info,  Node: Language,  Next: Scientific relevance,  Up: Overview
+File: ggadt.info,  Node: Language,  Next: Background,  Up: Overview
 
 1.1 Language
 ============
@@ -75,15 +75,21 @@ transforms. FFTW3 is a well-tested, optimized, and popular suite for
 performing FFT's.
 
 
-File: ggadt.info,  Node: Scientific relevance,  Prev: Language,  Up: Overview
+File: ggadt.info,  Node: Background,  Prev: Language,  Up: Overview
 
-1.2 Scientific relevance
-========================
+1.2 Background
+==============
+
+1.2.1 Dust in the interstellar medium (ISM)
+-------------------------------------------
 
 The ISM
 
+1.2.2 Anomalous Diffraction Theory
+----------------------------------
+
 
-File: ggadt.info,  Node: Installation,  Next: Invoking ggadt,  Prev: Overview,  Up: Top
+File: ggadt.info,  Node: Installation,  Next: Invoking GGADT,  Prev: Overview,  Up: Top
 
 2 Installation
 **************
@@ -95,106 +101,197 @@ GGADT should install easily on most _Unix-based systems_ (e.g. Linux,
 Mac) by following the standard GNU install procedures, described in
 `INSTALL'.
 
-   `./configure [--enable-openmp]' ...  `make' `make install'
+     ./configure [--enable-openmp] ...
+     make
+     make install
 
 2.2 Package dependencies
 ========================
 
-   * *FFTW 3+*
-        - If you wish to use the OpenMP variant of GGADT, you must have
-          the `fftw3_omp' libraries installed
+   * *FFTW 3*. Available at `http://www.fftw.org/'.
+        - _Further requirements for installing `ggadt-openmp'_: you
+          must have the `fftw3_omp' libraries installed. To do this,
+          specify the `--enable-openmp' option when running `configure'
+          for FFTW3.
 
-        - In order for GGADT to find the Fortran headers for FFTW3,
-          they must be in the standard location (`/usr/local/include'
-          or `usr/include') or in `$prefix/include' where `$prefix' is
-          defined by doing `./configure --prefix=<prefix>' ....
+        - _Location of the FFTW3 headers_: In order for GGADT to find
+          the Fortran headers for FFTW3, they must be in the standard
+          location (`/usr/local/include' or `usr/include') or in
+          `$prefix/include' where `$prefix' is defined by doing
+          `./configure --prefix=<prefix>' at the configuration step for
+          `ggadt'.
 
 
-   * For the OpenMP version of GGADT, you must have C and Fortran
-     compilers that are compatible with OpenMP 4.0. This version of
-     GGADT was tested with the GNU C and Fortran compilers (`gcc',
-     `gfortran') version 4.9. *Attention Mac users:* You must have the
-     command line tools from XCode installed, but beware of your
-     supplied version of `gcc' - it is NOT going to work for compiling
-     the OpenMP version of GGADT. The version of GCC that you get with
-     XCode is a front-end for the `clang' compiler and is quite dated.
-     We recommend obtaining later versions of GNU compilers, which you
-     can find here: `http://hpc.sourceforge.net/'.
+   * *Suitable C and Fortran compilers*: GGADT was developed using the
+     GNU compiler suite (version 4.9) throughout, but the `configure'
+     script will try to work with most common compilers. _Your Fortran
+     compiler must be able to compile Fortran 2003 code_.
 
-   * Python >=2.7 for some of the included scripts.
+        - *OpenMP*: _Further requirements for installing
+          `ggadt-openmp'_: For the OpenMP version of GGADT, you must
+          have C and Fortran compilers that are compatible with OpenMP
+          version 4.0. This version of GGADT was tested with the GNU C
+          and Fortran compilers (`gcc', `gfortran') version 4.9.
 
-   * matplotlib python library if you wish to use the included plotting
+
+   * *Mac users*
+        - Install the latest edition of *XCode command-line tools*. As
+          of Mac OSX v10.9.1, the command-line tools are not included
+          in XCode automatically, so you have to do this on your own.
+
+        - *Warning* about the "`gcc'" compiler included in the XCode
+          command line tools. As I understand it, this is actually a
+          front-end to a `clang' compiler, and will cause problems if
+          you try to compile `ggadt-openmp'. The `gcc' version is also
+          quite dated and might cause other problems. Your best bet is
+          to either use another compiler (try the Intel compiler suite)
+          or to download later versions of the GNU compilers. We
+          recommend obtaining later versions of GNU compilers, which
+          you can find here: `http://hpc.sourceforge.net/'.
+
+        - *MacPorts* - In order to avoid confusing the configuration
+          script, we recommend you avoid using MacPorts, as they have
+          their own directory structure and program names. It might
+          still be possible to work with MacPorts as long as all of the
+          MacPort program installations that you would need (i.e.
+          `gcc', `gfortran') have symlinks to the locations that GNU
+          Autoconf expects them to be. I.e., if you have a MacPort
+          installation of `gcc' called `gcc-4.8' in some local
+          directory, you should have a symlink to the binary `gcc-4.8'
+          file in `/usr/bin', with a symlink name of `gcc'. We haven't
+          tried this, and thus we offer no gaurantee that this would
+          work.
+
+   * (_Optional_) *Python 2.7* or later for some of the included
      scripts.
 
-
-File: ggadt.info,  Node: Invoking ggadt,  Next: Example usage,  Prev: Installation,  Up: Top
+   * (_Optional_ *matplotlib* python library if you wish to use the
+     included plotting scripts.
 
-3 Invoking ggadt
+
+File: ggadt.info,  Node: Invoking GGADT,  Next: Example usage,  Prev: Installation,  Up: Top
+
+3 Invoking GGADT
 ****************
 
-The format for running the `hello' program is:
+To see usage and all available options for `ggadt', simply use the `h'
+option:
 
-     hello OPTION ...
+     ggadt -h
 
-   With no options, `hello' prints the greeting `Hello, world!'.
+3.1 Setting parameter values
+============================
 
-   `hello' supports the following options:
+The format for running the `ggadt' program (either `ggadt-serial' or
+`ggadt-omp') is:
 
-`--greeting=TEXT'
-`-g TEXT'
-     Output TEXT instead of the default greeting.
+     ggadt OPTION ...
+
+   With no options, `ggadt' runs calculations on a set of default grain
+parameters. Parameters may be specified as command-line arguments,
+
+     ggadt --parameter=value ...
+
+   or in a parameter file that is specified as a command-line argument,
+
+     ggadt --parameter-file-name=/path/to/parameterfile
+
+   or a combination of the two:
+
+     ggadt --parameter-file-name=/path/to/parametefile --parameter=value ...
+
+   If a parameter is set by a command-line argument _and_ by a
+parameter file, the command-line argument is used.
+
+3.2 Parameter file syntax
+=========================
+
+The syntax of parameter files is:
+
+     #comment
+     parameter=value
+     another-parameter=another-value
+     ...
+
+3.3 Options and parameters
+==========================
+
+`ggadt' supports the following options:
 
 `--help'
 `-h'
-     Print an informative help message on standard output and exit
-     successfully.
-
-     For the `--help' output of GNU programs, it's strongly encouraged
-     to include a brief (one or two sentences) description of what the
-     program does, as well as the synopsis of how to run the program.
-     Any environment variables which affect execution should also be
-     mentioned (Hello doesn't have any).
-
-`--next-generation'
-`-n'
-     Output the greeting, but possibly including box-drawing characters
-     or other fancy stuff, especially in translated locales.  (If you
-     would like to volunteer to translate messages for GNU packages,
-     please see `http://translationproject.org'.)
-
-`--traditional'
-`-t'
-     Output the traditional greeting message `hello, world'.
+     The `help' screen-prints usage information and available options.
 
 `--version'
 `-v'
-     Print the version number and licensing information of Hello on
-     standard output and then exit successfully.
+     Print the version number of GGADT on standard output and then exit
+     successfully.
 
+`--parameter-file-name=VALUE'
+     Path to a correctly formatted parameter file.
 
-   If more than one of the greeting options (`-g', `-n', `-t', and
-their long-named equivalents) is specified, whichever comes last takes
-precedence.
+`--grain-geometry=VALUE'
+     Geometry of dust grain. Must be one of `SPHERE', `ELLIPSOID',
+     `SPHERES'. A `SPHERES' grain geometry means that your grain is a
+     conglomerate of smaller spheres. If you wish to use this grain
+     geometry, you should supply a file (hereafter called a "_cluster
+     file_", see the next option) that defines the relative positions
+     of the spheres that make up the grain. The sizes of these spheres
+     will be normalized so that the effective radius of the grain is
+     consistent with `aeff'.
+
+`--cluster-file-name=VALUE'
+     Path to a correctly formatted cluster file. Several cluster files
+     are included with the distribution, and if you wish to create your
+     own, you must mimic exactly the format of these files.
+
+`--aeff=VALUE'
+     Effective radius of dust grain. The effective radius is defined to
+     be the radius of a sphere with the same volume as the dust grain.
+
+`--ephot=VALUE'
+     Energy of the incident X-ray photons in keV.
+
+`--RE-index-of-refraction=VALUE'
+     The real component of the complex index of refraction, minus one.
+
+`--IM-index-of-refraction=VALUE'
+     The imaginary component of the complex index of refraction.
+
+`--grid-width=VALUE'
+     The width of the 2D numerical grid on which projected images of
+     the dust grain are resolved, in units of the effective radius of
+     the grain. Higher values (>2) give you more angular resolution
+     when calculating the differential scattering cross-section, at the
+     cost of reducing the resolution of the dust grain on the grid.
+
+`--ngrid=VALUE'
+     The number of grid points along one direction of the 2D numerical
+     grid on which _images of the grain_ are defined. See above for how
+     to use this value together with `grid-width' to give you the
+     physical accuracy you desire.
+
+`--nangle=VALUE'
+     The number of grain orientations relative to the incoming X-ray
+     photon over which to average the differential cross-section.
+
+`--fftw-optimization=VALUE'
+     Must be one of `ESTIMATE', `MEASURE', `PATIENT' or `EXHAUSTIVE'.
+     FFTW wisdom is saved in `$HOME/.ggadt/plans'. For more information
+     about what these tags mean and about FFTW wisdom, see
+     `http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans'.
+
+`--use-experimental-fft'
+`-s'
+     Currently not operational, but we are experimenting with a few
+     alternative methods for more efficiently performing the FFT.
+
 
 
-File: ggadt.info,  Node: Example usage,  Next: Benchmarking,  Prev: Invoking ggadt,  Up: Top
+File: ggadt.info,  Node: Example usage,  Next: Benchmarking,  Prev: Invoking GGADT,  Up: Top
 
 4 Example usage
 ***************
-
-Here are some examples of running GNU Hello.
-
-   This is the output of the command `hello':
-
-     Hello, world!
-
-   This is the output of the command `hello --traditional':
-
-     hello, world
-
-   This is the output of the command `hello --greeting=hi':
-
-     hi
 
 
 File: ggadt.info,  Node: Benchmarking,  Next: Plotting,  Prev: Example usage,  Up: Top
@@ -703,52 +800,57 @@ Concept index
  [index ]
 * Menu:
 
-* --greeting:                            Invoking ggadt.       (line 16)
-* --help:                                Invoking ggadt.       (line 20)
-* --next-generation:                     Invoking ggadt.       (line 31)
-* --traditional:                         Invoking ggadt.       (line 38)
-* --version:                             Invoking ggadt.       (line 42)
-* -g:                                    Invoking ggadt.       (line 16)
-* -h:                                    Invoking ggadt.       (line 20)
-* -n:                                    Invoking ggadt.       (line 31)
-* -t:                                    Invoking ggadt.       (line 38)
-* -v:                                    Invoking ggadt.       (line 42)
-* astrophysics:                          Scientific relevance. (line  6)
-* authors:                               Overview.             (line 13)
-* configure:                             Installation.         (line  6)
-* enable-mpi:                            Installation.         (line  6)
-* enable-openmp:                         Installation.         (line  6)
-* environment variables, help for:       Invoking ggadt.       (line 23)
-* examples:                              Example usage.        (line  6)
-* Fortran 2003:                          Language.             (line  6)
-* greetings:                             Overview.             (line  6)
-* help:                                  Invoking ggadt.       (line  6)
-* Hoffman, John:                         Overview.             (line 13)
-* installing:                            Installation.         (line  6)
-* interstellar medium:                   Scientific relevance. (line  6)
-* invoking:                              Invoking ggadt.       (line  6)
-* modern:                                Invoking ggadt.       (line 38)
-* options:                               Invoking ggadt.       (line  6)
-* overview:                              Overview.             (line  6)
-* relevance:                             Scientific relevance. (line  6)
-* sample output:                         Example usage.        (line  6)
-* Tarczon, Michael:                      Overview.             (line 13)
-* traditional:                           Invoking ggadt.       (line 38)
-* usage:                                 Invoking ggadt.       (line  6)
+* --aeff:                                Invoking GGADT.      (line  78)
+* --cluster-file-name:                   Invoking GGADT.      (line  73)
+* --ephot:                               Invoking GGADT.      (line  82)
+* --fftw-optimization:                   Invoking GGADT.      (line 108)
+* --grain-geometry:                      Invoking GGADT.      (line  63)
+* --grid-width:                          Invoking GGADT.      (line  91)
+* --help:                                Invoking GGADT.      (line  52)
+* --IM-index-of-refraction:              Invoking GGADT.      (line  88)
+* --nangle:                              Invoking GGADT.      (line 104)
+* --ngrid:                               Invoking GGADT.      (line  98)
+* --parameter-file-name:                 Invoking GGADT.      (line  60)
+* --RE-index-of-refraction:              Invoking GGADT.      (line  85)
+* --use-experimental-fft:                Invoking GGADT.      (line 115)
+* --version:                             Invoking GGADT.      (line  56)
+* -h:                                    Invoking GGADT.      (line  52)
+* -s:                                    Invoking GGADT.      (line 115)
+* -v:                                    Invoking GGADT.      (line  56)
+* astrophysics:                          Background.          (line   6)
+* authors:                               Overview.            (line  13)
+* background:                            Background.          (line   6)
+* configure:                             Installation.        (line   6)
+* enable-mpi:                            Installation.        (line   6)
+* enable-openmp:                         Installation.        (line   6)
+* environment variables, help for:       Invoking GGADT.      (line  50)
+* examples:                              Example usage.       (line   6)
+* Fortran 2003:                          Language.            (line   6)
+* greetings:                             Overview.            (line   6)
+* help:                                  Invoking GGADT.      (line   6)
+* Hoffman, John:                         Overview.            (line  13)
+* installing:                            Installation.        (line   6)
+* interstellar medium:                   Background.          (line   6)
+* invoking:                              Invoking GGADT.      (line   6)
+* options:                               Invoking GGADT.      (line   6)
+* overview:                              Overview.            (line   6)
+* sample output:                         Example usage.       (line   6)
+* Tarczon, Michael:                      Overview.            (line  13)
+* usage:                                 Invoking GGADT.      (line   6)
 
 
 
 Tag Table:
 Node: Top753
 Node: Overview1430
-Node: Language2108
-Node: Scientific relevance2776
-Node: Installation2917
-Node: Invoking ggadt4574
-Node: Example usage6046
-Node: Benchmarking6438
-Node: Plotting6559
-Node: GNU Free Documentation License6689
-Node: Concept index31858
+Node: Language2101
+Node: Background2759
+Node: Installation3030
+Node: Invoking GGADT6520
+Node: Example usage10474
+Node: Benchmarking10603
+Node: Plotting10724
+Node: GNU Free Documentation License10854
+Node: Concept index36023
 
 End Tag Table

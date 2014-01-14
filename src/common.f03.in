@@ -5,6 +5,11 @@ module common_mod
   save
 
   type(options_t) :: opts 
+
+  character(len=100), parameter ::  VERSION="GGADT (General Geometry Anomalous Diffraction Theory) v@PACKAGE_VERSION@"
+  character(len=100), parameter ::  INFO = "Written by John Hoffman (jah5@princeton.edu)&
+    & and Michael Tarczon (mtarczon@princeton.edu)"
+
   
   real, parameter               ::  pi          = 3.14159
   complex(c_double_complex)     ::  delm 
@@ -24,6 +29,7 @@ module common_mod
   real                          ::  ior_re     
   real, dimension(3)            ::  grain_a 
   logical                       ::  use_experimental_fft
+  logical                       ::  asked_for_version
   character(len=200)            ::  parameter_file_name
   character(len=100)            ::  fftw_optimization_mode_name
   character(len=100)            ::  sphlist_fname
@@ -34,15 +40,23 @@ module common_mod
       implicit none
       ! define help flag
       call define_help_flag(opts,print_help)
+      call define_flag(opts, "version",abbrev='v',&
+        description="Print version information")
+      call define_option_string(opts,"parameter-file-name","",required=.false.,&
+        description="Path to parameter file")
 
       ! Define command line options
 
+      call define_option_string(opts,"grain-geometry","sphere",required=.false.,&
+        description="SPHERES, ELLIPSOID, SPHERE")
+      call define_option_string(opts,"cluster-file-name","",required=.false.,&
+        description="Path to file that defines a grain made up of a cluster of spheres")
       call define_option_real(opts,"aeff",0.2,required=.false.,description="Effective radius of grain")
       call define_option_real(opts,"ephot",0.5,required=.false.,description="Energy of X-ray photon in keV")
       call define_option_real(opts,"RE-index-of-refraction",-2.079E-3,required=.false., &
-        description="Real component of the index of refraction (minus 1)")
+        description="Real component of the index of refraction, minus 1")
       call define_option_real(opts,"IM-index-of-refraction",3.201E-3,required=.false., &
-        description="Imaginary component of the index of refraction (minus 1)")
+        description="Imaginary component of the index of refraction")
       call define_option_real(opts,"grid-width",64.0,required=.false.,&
         description="Width of numerical grid as a fraction of a_eff.&
           & Higher values (>2) give you more angular resolution when calculating the scattering cross section,&
@@ -52,21 +66,14 @@ module common_mod
         description="Number of grid points along 1 dimension")
       call define_option_integer(opts,"nangle",100,required=.false.,&
         description="Number of orientations to average over")
-
-      call define_option_string(opts,"parameter-file-name","",required=.false.,&
-        description="Path to parameter file")
-      call define_option_string(opts,"grain-geometry","sphere",required=.false.,&
-        description="SPHERES, ELLIPSOID, SPHERE")
       call define_option_string(opts,"euler-angle-mode","random",required=.false.,&
         description="How to choose Euler angles (sequential, random)")
      
-
-      call define_flag(opts,"use-experimental-fft",abbrev='s',&
-        description="Possible speedup? Experimental!")
-      call define_option_string(opts,"cluster-file-name","",required=.false.,&
-        description="Path to file that defines a grain made up of a cluster of spheres")
+      
       call define_option_string(opts,"fftw-optimization","estimate",required=.false.,&
         description="[estimate,measure,patient,exhaustive]")
+      call define_flag(opts,"use-experimental-fft",abbrev='s',&
+        description="Possible speedup? Experimental!")
 
       ! Now process command line options and read any specified parameter file
 
@@ -90,7 +97,13 @@ module common_mod
       call get_option_real(opts,"grid-width",box_width)
       call get_option_string(opts,"cluster-file-name",sphlist_fname)
       call get_option_string(opts,"fftw-optimization",fftw_optimization_mode_name)
+      call get_flag(opts,"version",asked_for_version)
 
+      if (asked_for_version) then
+        print *, VERSION
+        print *, INFO 
+        stop
+      end if 
 
       ! Set to lower case
       fftw_optimization_mode_name = strlowcase(fftw_optimization_mode_name)
