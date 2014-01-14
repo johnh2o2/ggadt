@@ -42,7 +42,8 @@ contains
         if (first_time) then
             write(0,*) new_line('a')//"        /"
             write(0,*) " FFTW: | Finding best fft algorithm to use..."
-            write(plan_filename,'(a,i0.4,a,i0.4,a,i0.3,a,a)') "/Users/jah5/.ggadt/plans/plan_nx",nx,"_ny",ny,"_fftw_mode",mode,".plan",char(0)
+            write(plan_filename,'(a,i0.4,a,i0.4,a,i0.3,a,a)') "/Users/jah5/.ggadt/plans/&
+            &plan_nx",nx,"_ny",ny,"_fftw_mode",mode,".plan",char(0)
             error = fftw_import_wisdom_from_filename(trim(adjustl(plan_filename)))
             if (error == 0) then
                 write (0,*) "   --> | No previous wisdom detected:"

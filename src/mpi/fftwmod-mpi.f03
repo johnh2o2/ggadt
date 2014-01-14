@@ -1,6 +1,6 @@
 module fftw
     use, intrinsic :: iso_c_binding
-       include '@fftw3_inc_dir@/fftw3.f03'
+       include '/usr/local/include/fftw3.f03'
     logical :: first_time = .true.
     type(c_ptr) :: plan
     integer ::  mode = fftw_estimate
@@ -15,13 +15,13 @@ contains
         mode_name = mode_name_in
 
         select case (mode_name)
-        case('estimate')
+        case('fftw_estimate')
             mode = fftw_estimate
-        case('patient')
+        case('fftw_patient')
             mode = fftw_patient
-        case('exhaustive')
+        case('fftw_exhaustive')
             mode = fftw_exhaustive
-        case('measure')
+        case('fftw_measure')
             mode = fftw_measure
         case default
             mode = fftw_estimate 
@@ -42,8 +42,7 @@ contains
         if (first_time) then
             write(0,*) new_line('a')//"        /"
             write(0,*) " FFTW: | Finding best fft algorithm to use..."
-            write(plan_filename,'(a,i0.4,a,i0.4,a,i0.3,a,a)') "@plan_dir@/&
-            &plan_nx",nx,"_ny",ny,"_fftw_mode",mode,".plan",char(0)
+            write(plan_filename,'(a,i0.4,a,i0.4,a,i0.3,a,a)') "plans/plan_nx",nx,"_ny",ny,"_fftw_mode",mode,".plan",char(0)
             error = fftw_import_wisdom_from_filename(trim(adjustl(plan_filename)))
             if (error == 0) then
                 write (0,*) "   --> | No previous wisdom detected:"
@@ -55,9 +54,9 @@ contains
                 plan = fftw_plan_dft_2d(ny, nx, f ,fft, fftw_backward,mode)
                 error = fftw_export_wisdom_to_filename(plan_filename)
                 if (error == 0) then
-                    write (0,*) "  ***FFTW ERROR: couldn't save plan to ",trim(adjustl(plan_filename))
+                    write (0,*) "      ***FFTW ERROR: couldn't save plan to ",trim(adjustl(plan_filename))
                 else
-                    write (0,*) "       |+ Successfully saved plan to ",trim(adjustl(plan_filename))
+                    write (0,*) "      |+ Successfully saved plan to ",trim(adjustl(plan_filename))
                 endif
             else
                 write (0,*) "       | + Found and loaded previous wisdom from '",trim(adjustl(plan_filename)),"'"
