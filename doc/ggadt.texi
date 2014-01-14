@@ -74,119 +74,83 @@ medium by using anomalous diffraction theory (ADT).
 
 The @command{ggadt} program calculates the x-ray scattering properties of dust
 in the interstellar medium. You define the geometry and composition
-of a dust grain (there are a few ways to do this, 
-to be discussed later), the energy of the incident x-ray photons, along
-with a few other parameters. The @command{ggadt} program then calculates the
-orientationally-averaged scattering cross section in the plane perpendicular to
-the incident photons. 
-
-@cindex Fortran 2003
-
-
-
-@itemize @bullet
-@item
-@cindex Automake
-@cindex Autoconf
-It uses Automake (@pxref{Top,,Introduction,automake,GNU Automake}) and
-hence also Autoconf (@pxref{Top,,Introduction,autoconf,GNU Autoconf})
-for configuration.
-
-@item
-@cindex Gnulib
-@cindex @command{srclist-update} script
-@cindex @file{README-dev} source file
-It uses Gnulib (@pxref{Top,,Introduction,gnulib,GNU Gnulib}) to enhance
-portability and avoid duplication of common sources.  Both
-@code{gnulib-tool} and @code{srclist-update} are used, for purposes of
-example.  See the @file{README-dev} file in the distribution.
-
-@item
-@cindex Gettext
-GNU Gettext (@pxref{Top,,Introduction,gettext,GNU Gettext}) is used
-for internationalization support.  Hello's greeting has been translated
-into many languages.
-
-@item
-@opindex --help
-Internally, Hello uses the GNU @code{getopt_long} function
-(@pxref{Getopt Long Options,,,libc,GNU C Library}) to parse options,
-thus supporting GNU-style long options such as @option{--help}.
-
-@item
-@cindex Help2man
-The Hello Man page is generated with GNU @code{help2man}
-(@pxref{Top,,Overview,help2man,GNU @code{help2man}}) from the
-@option{--help} output.  This relieves the maintainers from the burden
-of updating separate man documentation, yet provides a reasonable
-overview for man devotees.
-
-@item
-@cindex Texinfo
-Finally, Texinfo (@pxref{Top,,Introduction,texinfo,Texinfo}) is the
-documentation format for this manual.  It supports output in Info,
-HTML, PDF, DVI, plain text, XML, and other formats.
-
-@end itemize
-
-GNU Hello is implemented in C@.  The GNU Gettext distribution contains
-``hello world'' examples in many other programming languages; see the
-Gettext home page at @url{http://www.gnu.org/software/gettext/}.
-
-@cindex @file{Makefile.am} targets
-The top-level @file{Makefile.am} in Hello also contains a few special
-targets for other projects to adapt as desired:
-
-@table @code
-@item diff
-Make a diff from the previous release, assuming the current tarball is
-in the current tarball.
-
-@item po-check
-Verify that all source files using @code{_()} are included for
-translation in @file{po/POTFILES.in}, so translators will have all the
-messages.
-
-@item wwwdoc
-Sample procedure for updating the manual on the GNU web site, in this
-case @url{http://www.gnu.org/software/hello/manual/}.
-@end table
+of a dust grain, the energy of the incident x-ray photons, and a few other parameters. 
+The @command{ggadt} program then calculates the orientationally-averaged scattering 
+cross-section in the plane perpendicular to the incident photons. 
 
 @cindex authors
 @cindex Hoffman, John
 @cindex Tarczon, Michael
 GGADT was written by John Hoffman and Michael Tarczon.
 
-
-@node Sample output
-@chapter Sample output
-
-@cindex sample output
-@cindex examples
-
-Here are some examples of running GNU Hello.
-
-This is the output of the command @samp{hello}:
-
-@example
-Hello, world!
-@end example
-
-This is the output of the command @samp{hello --traditional}:
-
-@example
-hello, world
-@end example
-
-This is the output of the command @samp{hello --greeting=hi}:
-
-@example
-hi
-@end example
+@menu
+* Language::				Comment about the usage of Fortran 2003
+* Scientific relevance::	What astrophysical problems GGADT may help investigate
+@end menu
 
 
-@node Invoking hello
-@chapter Invoking @command{hello}
+
+@node Language
+@section Language
+@cindex Fortran 2003
+
+GGADT is written in Fortran, using the Fortran 2003 standard. In the future, 
+GGADT may be changed to comply with earlier Fortran standards (90 or 95) for
+compatibility reasons. Most importantly, this will allow for easier implementation
+of an MPI version of GGADT. 
+
+Fortran 2003 provides an easy way to interface Fortran programs with C 
+libraries. In this case, Fortran 2003 made the FFTW3 library (@url{http://www.fftw.org/})
+easy to implement for performing fast Fourier transforms. FFTW3 is a well-tested, optimized, 
+and popular suite for performing FFT's.
+
+@node Scientific relevance
+@section Scientific relevance
+@cindex relevance
+@cindex interstellar medium
+@cindex astrophysics
+
+The ISM
+
+
+@node Installation
+@chapter Installation
+
+@cindex installing
+@cindex configure
+@cindex enable-openmp
+@cindex enable-mpi
+
+@section System requirements
+GGADT should install easily on most @emph{Unix-based systems} (e.g. Linux, Mac) by following the standard GNU install procedures, described in @file{INSTALL}.
+
+@code{./configure [--enable-openmp]} @dots{}
+@code{make}
+@code{make install}
+
+
+
+@section Package dependencies
+
+
+@itemize @bullet
+
+@item @strong{FFTW 3+}
+@itemize @minus
+@item If you wish to use the OpenMP variant of GGADT, you must have the @code{fftw3_omp} libraries installed
+@item In order for GGADT to find the Fortran headers for FFTW3, they must be in the standard location (@code{/usr/local/include} or @code{usr/include}) or in @code{$prefix/include} where @code{$prefix} is defined by doing @code{./configure --prefix=<prefix>} @dots{}.
+
+@end itemize
+
+@item For the OpenMP version of GGADT, you must have C and Fortran compilers that are compatible with OpenMP 4.0. This version of GGADT was tested with the GNU C and Fortran compilers (@code{gcc}, @code{gfortran}) version 4.9. @strong{Attention Mac users:} You must have the command line tools from XCode installed, but beware of your supplied version of @code{gcc} -- it is NOT going to work for compiling the OpenMP version of GGADT. The version of GCC that you get with XCode is a front-end for the @code{clang} compiler and is quite dated. We recommend obtaining later versions of GNU compilers, which you can find here: @url{http://hpc.sourceforge.net/}.
+@item Python >=2.7 for some of the included scripts.
+@item matplotlib python library if you wish to use the included plotting scripts.
+@end itemize
+
+
+
+@node Invoking ggadt
+@chapter Invoking ggadt
 
 @cindex invoking
 @cindex options
@@ -257,42 +221,38 @@ If more than one of the greeting options (@option{-g}, @option{-n},
 comes last takes precedence.
 
 
-@node Reporting bugs
-@chapter Reporting bugs
+@node Example usage
+@chapter Example usage
 
-@cindex bug reporting
-@cindex problems
-@cindex reporting bugs
+@cindex sample output
+@cindex examples
 
-To report bugs, suggest enhancements or otherwise discuss GNU Hello,
-please send electronic mail to @email{bug-hello@@gnu.org}.
+Here are some examples of running GNU Hello.
 
-@cindex checklist for bug reports
-For bug reports, please include enough information for the maintainers
-to reproduce the problem.  Generally speaking, that means:
+This is the output of the command @samp{hello}:
 
-@itemize @bullet
-@item The version numbers of Hello (which you can find by running
-      @w{@samp{hello --version}}) and any other program(s) or
-      manual(s) involved.
-@item Hardware and operating system names and versions.
-@item The contents of any input files necessary to reproduce the bug.
-@item The expected behavior and/or output.
-@item A description of the problem and samples of any erroneous output.
-@item Options you gave to @command{configure} other than specifying
-      installation directories.
-@item Anything else that you think would be helpful.
-@end itemize
+@example
+Hello, world!
+@end example
 
-When in doubt whether something is needed or not, include it.  It's
-better to include too much than to leave out something important.
+This is the output of the command @samp{hello --traditional}:
 
-@cindex patches, contributing
-Patches are welcome; if possible, please make them with @samp{@w{diff
--c}} (@pxref{Top,, Overview, diff, Comparing and Merging Files}) and
-include @file{ChangeLog} entries (@pxref{Change Log,,, emacs, The GNU
-Emacs Manual}).  Please follow the existing coding style.
+@example
+hello, world
+@end example
 
+This is the output of the command @samp{hello --greeting=hi}:
+
+@example
+hi
+@end example
+
+
+@node Benchmarking
+@chapter Benchmarking
+
+@node Plotting
+@chapter Plotting
 
 @node GNU Free Documentation License
 @appendix GNU Free Documentation License

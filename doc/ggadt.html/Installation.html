@@ -1,0 +1,74 @@
+<html lang="en">
+<head>
+<title>Installation - GGADT 0.9.0</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GGADT 0.9.0">
+<meta name="generator" content="makeinfo 4.8">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Overview.html#Overview" title="Overview">
+<link rel="next" href="Invoking-ggadt.html#Invoking-ggadt" title="Invoking ggadt">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This manual is for GGADT (version 0.9.0, 14 January 2014),
+which calculates scattering properties of dust grains in the interstellar
+medium by using anomalous diffraction theory (ADT).
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with no Front-Cover Texts,
+     and with no Back-Cover Texts.  A copy of the license is included
+     in the section entitled ``GNU Free Documentation License''.
+   -->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<div class="node">
+<p>
+<a name="Installation"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="Invoking-ggadt.html#Invoking-ggadt">Invoking ggadt</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Overview.html#Overview">Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">2 Installation</h2>
+
+<p><a name="index-installing-10"></a><a name="index-configure-11"></a><a name="index-enable_002dopenmp-12"></a><a name="index-enable_002dmpi-13"></a>
+
+<h3 class="section">2.1 System requirements</h3>
+
+<p>GGADT should install easily on most <em>Unix-based systems</em> (e.g. Linux, Mac) by following the standard GNU install procedures, described in <samp><span class="file">INSTALL</span></samp>.
+
+   <p><code>./configure [--enable-openmp]</code> <small class="dots">...</small>
+<code>make</code>
+<code>make install</code>
+
+<h3 class="section">2.2 Package dependencies</h3>
+
+     <ul>
+<li><strong>FFTW 3+</strong>
+          <ul>
+<li>If you wish to use the OpenMP variant of GGADT, you must have the <code>fftw3_omp</code> libraries installed
+<li>In order for GGADT to find the Fortran headers for FFTW3, they must be in the standard location (<code>/usr/local/include</code> or <code>usr/include</code>) or in <code>$prefix/include</code> where <code>$prefix</code> is defined by doing <code>./configure --prefix=&lt;prefix&gt;</code> <small class="dots">...</small>.
+
+     </ul>
+
+     <li>For the OpenMP version of GGADT, you must have C and Fortran compilers that are compatible with OpenMP 4.0. This version of GGADT was tested with the GNU C and Fortran compilers (<code>gcc</code>, <code>gfortran</code>) version 4.9. <strong>Attention Mac users:</strong> You must have the command line tools from XCode installed, but beware of your supplied version of <code>gcc</code> &ndash; it is NOT going to work for compiling the OpenMP version of GGADT. The version of GCC that you get with XCode is a front-end for the <code>clang</code> compiler and is quite dated. We recommend obtaining later versions of GNU compilers, which you can find here: <a href="http://hpc.sourceforge.net/">http://hpc.sourceforge.net/</a>. 
+<li>Python &gt;=2.7 for some of the included scripts. 
+<li>matplotlib python library if you wish to use the included plotting scripts. 
+</ul>
+
+   </body></html>
+
