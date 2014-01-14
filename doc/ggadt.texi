@@ -1,0 +1,366 @@
+\input texinfo @c -*-texinfo-*-
+@c %**start of header
+@setfilename ggadt.info
+@include version.texi
+@settitle GGADT @value{VERSION}
+
+@c Define a new index for options.
+@defcodeindex op
+@c Combine everything into one index (arbitrarily chosen to be the
+@c concept index).
+@syncodeindex op cp
+@c %**end of header
+
+@copying
+This manual is for GGADT (version @value{VERSION}, @value{UPDATED}),
+which calculates scattering properties of dust grains in the interstellar
+medium by using anomalous diffraction theory (ADT). 
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+@end quotation
+@end copying
+@c If your manual is published on paper by the FSF, it should include
+@c the standard FSF Front-Cover and Back-Cover Texts, as given in
+@c maintain.texi.
+
+@dircategory Basics
+@direntry
+* GGADT: (ggadt).        
+@end direntry
+
+@titlepage
+@title GGADT
+@subtitle for version @value{VERSION}, @value{UPDATED}
+@author John Hoffman (@email{jah5@@princeton.edu}), Michael Tarczon (@email{mtarczon@@princeton.edu})
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+
+@ifnottex
+
+@node Top
+@top GGADT
+This manual is for GGADT (version @value{VERSION}, @value{UPDATED}),
+which calculates scattering properties of dust grains in the interstellar
+medium by using anomalous diffraction theory (ADT). 
+@end ifnottex
+
+@menu
+* Overview::		General purpose and information.
+* Installation::	How to install @command{ggadt} on your system.
+* Invoking GGADT::	Giving @command{ggadt} your input.	
+* Example usage::	Quick examples to get you started.
+* GNU Free Documentation License:: Copying and sharing this documentation.
+* Concept index::	Index of concepts.
+@end menu
+
+
+@node Overview
+@chapter Overview
+
+@cindex greetings
+@cindex overview
+
+The @command{ggadt} program calculates the x-ray scattering properties of dust
+in the interstellar medium. You define the geometry and composition
+of a dust grain, the energy of the incident x-ray photons, and a few other parameters. 
+The @command{ggadt} program then calculates the orientationally-averaged scattering 
+cross-section in the plane perpendicular to the incident photons. 
+
+@cindex authors
+@cindex Hoffman, John
+@cindex Tarczon, Michael
+GGADT was written by John Hoffman and Michael Tarczon.
+
+@menu
+* Language::				Comment about the usage of Fortran 2003
+* Background::				What astrophysical problems GGADT may help investigate
+@end menu
+
+
+
+@node Language
+@section Language
+@cindex Fortran 2003
+
+GGADT is written in Fortran, using the Fortran 2003 standard. In the future, 
+GGADT may be changed to comply with earlier Fortran standards (90 or 95) for
+compatibility reasons. Most importantly, this will allow for easier implementation
+of an MPI version of GGADT. 
+
+Fortran 2003 provides an easy way to interface Fortran programs with C 
+libraries. In this case, Fortran 2003 made the FFTW3 library (@url{http://www.fftw.org/})
+easy to implement for performing fast Fourier transforms. FFTW3 is a well-tested, optimized, 
+and popular suite for performing FFT's.
+
+@node Background
+@section Background
+@cindex background
+@cindex interstellar medium
+@cindex astrophysics
+
+@subsection Dust in the interstellar medium (ISM)
+
+The interstellar medium (ISM) refers to everything that occupies the space between stars in our Milky Way galaxy. The ISM contains rich physics and is an active area of astrophysical research. Dust, molecules, gas, radiation, cosmic rays -- all of these are important constituents of the ISM, and all of these constituents play roles of varying dyanmical importance, depending on the local ISM environment in question. Several resources are available for delving deeper into the fascinating world of the ISM@footnote{Draine, Bruce T., Physics of the Interstellar and Intergalactic Medium, 2011, Princeton University Press, NJ.}.
+
+One area of active research in ISM physics is determining the size distribution and composition of interstellar dust. One way to probe the size distributions and dust composition is by measuring how ISM dust interacts with x-ray radiation.@footnote{Overbeck, J.W. 1965, ApJ, 141, 864}@footnote{Hayakawa, S. 1970, Prog. Theor. Phys., 43, 1224}@footnote{Martin, P.G. 1970, MNRAS, 149, 221} When looking at an x-ray source through interstellar dust, the scattering properties of the intermediate dust create an x-ray ``halo'' around the source.@footnote{Draine, B.T. 2003, ApJ, 598, 1026}.
+
+GGADT is designed to be a tool to test dust models against observations of x-ray halos. Since the size of a typical dust grain (0.1 micrometers) is large compared to typical x-ray wavelengths (1 nanometer), an approximation known as Anomalous Diffraction Theory (ADT)@footnote{van de Hulst H., Light scattering by small particles, 1957, J.Wiley & Sons, NY.} can be used to calculate the absorption and scattering properties of dust grains@footnote{Draine, B.T. and Allaf-Akbari, K. 2006, ApJ, 652, 1318}.
+
+@subsection Anomalous Diffraction Theory (ADT)
+
+The mathematics of what GGADT does is best explained in Draine and Allaf-Akbari 2006; we include a portion of that paper below.
+@quotation
+
+At X-ray energies materials have refractive indices very close to unity (|m - 1| << 1), and the dust grains responsible for most of the scattering are usually much larger than the wavelength of the incoming radiation (ka >> 1 [k is the wavenumber of the incident radiation, a is the effective radius of the grain]). In this regime, the scattering and absorption of X-rays can be calculated using an approximation first developed by van de Hulst (1957) and known as anomalous diffraction theory (ADT). ADT is a combination of ray-tracing optics (applicable because k*a >> 1) and Huygens' principle of propagation of a scalar field, applied to cases in which the electromagnetic wave can enter and propagate through the grain with essentially no reflection or refraction (|m - 1| << 1).
+
+Consider an incident plane wave @math{U_{inc} = U_0\exp(ikz)}, propagating in the z-direction. Under the conditions above, the plane wave, once reaching a plane V located just beyond the grain and normal to the direction of the propagation of the incident wave, will have changed by a fractional amount that we refer to as the @emph{shadow function}, @math{f(x,y)}: 
+
+@math{f(x,y) = 1-\phi(x,y)}
+
+where the complex phase function phi is 
+
+@math{\phi(x,y) = k\int_{-\infty}^{\infty}[1-m(x,y,z)]dz}
+
+where @math{m(x,y,z)} is the refractive index at the point @math{(x,y,z)}.
+
+Once the shadow function is known, Huygens' principle allows the amplitude of the scattered part of the wave, in the radiation zone, to be calculated as a Fourier transform of the shadow function over the plane V: 
+
+
+@math{U_{sca}(r\hat{n}) = U_0\frac{\exp{(ikr)}}{kr}S(\hat{n})}
+@math{S(\hat{n}) = S(k_x, k_y) = \frac{k^2}{2\pi}\int \exp{[i(k_xx+k_yy)]}f(x,y)dxdy}
+@math{k_x = k(\hat{n}\cdot\hat{x})}
+@math{k_y = k(\hat{n}\cdot\hat{y})}
+The scattering properties of the grain can be obtained from @math{S(\hat{n})}, with the differential scattering cross section given by 
+
+@math{\frac{d\sigma_{sca}}{d\Omega}(\hat{n}) = \frac{|S(\hat{n})|^2}{k^2}}
+
+ @author Draine and Allaf-Akbari 2006
+@end quotation
+
+@section Basic GGADT logic outline
+
+Thus, GGADT does the following:
+
+@enumerate
+
+@item Reads in dust and x-ray parameters
+@item For each of the @option{nangle} orientations,
+@enumerate
+@item Project grain onto 2D grid
+@item Take the centered FFT of this grid using FFTW
+@item Normalize this result so that it represents @math{dQ_{scat}/d\Omega}, i.e., the differential scattering cross section divided by @math{\pi a^2}.
+@item Add contribution of differential cross-section to orientational average
+@end enumerate
+
+@item Output orientationally averaged grid.
+
+@end enumerate
+
+
+@node Installation
+@chapter Installation
+
+@cindex installing
+@cindex configure
+@cindex enable-openmp
+@cindex enable-mpi
+
+@section System requirements
+GGADT should install easily on most @emph{Unix-based systems} (e.g. Linux, Mac) by following the standard GNU install procedures, described in @file{INSTALL}.
+
+@example
+./configure [--enable-openmp] @dots{}
+make
+make install
+@end example
+
+@section Package dependencies
+
+
+@itemize @bullet
+
+@item @strong{FFTW 3}. Available at @url{http://www.fftw.org/}.
+@itemize @minus
+@item @emph{Further requirements for installing @code{ggadt-openmp}}: you must have the @code{fftw3_omp} libraries installed. To do this, specify the @code{--enable-openmp} option when running @code{configure} for FFTW3.
+@item @emph{Location of the FFTW3 headers}: In order for GGADT to find the Fortran headers for FFTW3, they must be in the standard location (@code{/usr/local/include} or @code{usr/include}) or in @code{$prefix/include} where @code{$prefix} is defined by doing @code{./configure --prefix=<prefix>} at the configuration step for @code{ggadt}.
+
+@end itemize
+
+@item @strong{Suitable C and Fortran compilers}: GGADT was developed using the GNU compiler suite (version 4.9) throughout, but the @code{configure} script will try to work with most common compilers. @emph{Your Fortran compiler must be able to compile Fortran 2003 code}.
+
+@itemize @minus
+
+@item @strong{OpenMP}: @emph{Further requirements for installing @code{ggadt-openmp}}: For the OpenMP version of GGADT, you must have C and Fortran compilers that are compatible with OpenMP version 4.0. This version of GGADT was tested with the GNU C and Fortran compilers (@code{gcc}, @code{gfortran}) version 4.9. 
+
+@end itemize
+
+@item @strong{Mac users}
+@itemize @minus
+
+@item Install the latest edition of @strong{XCode command-line tools}. As of Mac OSX v10.9.1, the command-line tools are not included in XCode automatically, so you have to do this on your own.
+@item @strong{Warning} about the ``@code{gcc}" compiler included in the XCode command line tools. As I understand it, this is actually a front-end to a @code{clang} compiler, and will cause problems if you try to compile @code{ggadt-openmp}. The @code{gcc} version is also quite dated and might cause other problems. Your best bet is to either use another compiler (try the Intel compiler suite) or to download later versions of the GNU compilers. We recommend obtaining later versions of GNU compilers, which you can find here: @url{http://hpc.sourceforge.net/}.
+@item @strong{MacPorts} -- In order to avoid confusing the configuration script, we recommend you avoid using MacPorts, as they have their own directory structure and program names. It might still be possible to work with MacPorts as long as all of the MacPort program installations that you would need (i.e. @code{gcc}, @code{gfortran}) have symlinks to the locations that GNU Autoconf expects them to be. I.e., if you have a MacPort installation of @code{gcc} called @code{gcc-4.8} in some local directory, you should have a symlink to the binary @code{gcc-4.8} file in @code{/usr/bin}, with a symlink name of @code{gcc}. We haven't tried this, and thus we offer no gaurantee that this would work. 
+@end itemize
+@item (@emph{Optional}) @strong{Python 2.7} or later for some of the included scripts.
+@item (@emph{Optional} @strong{matplotlib} python library if you wish to use the included plotting scripts.
+@end itemize
+
+
+
+@node Invoking GGADT
+@chapter Invoking GGADT
+
+@cindex invoking
+@cindex options
+@cindex usage
+@cindex help
+
+To see usage and all available options for @code{ggadt}, simply use the @option{h} option:
+
+@example
+ggadt -h
+@end example
+
+@section Setting parameter values
+
+The format for running the @command{ggadt} program (either @code{ggadt-serial} or @code{ggadt-omp}) is:
+
+@example
+ggadt @var{option} @dots{}
+@end example
+
+With no options, @command{ggadt} runs calculations on a set of default grain parameters. Parameters may be specified as command-line arguments, 
+
+@example
+ggadt --parameter=value @dots{}
+@end example
+
+or in a parameter file that is specified as a command-line argument,
+
+@example
+ggadt --parameter-file-name=/path/to/parameterfile
+@end example
+
+or a combination of the two:
+
+@example
+ggadt --parameter-file-name=/path/to/parametefile --parameter=value @dots{}
+@end example
+
+If a parameter is set by a command-line argument @emph{and} by a parameter file, the command-line argument is used. 
+
+@section Parameter file syntax
+
+The syntax of parameter files is:
+
+@example
+#comment
+parameter=value
+another-parameter=another-value
+@dots{}
+@end example
+
+@section Options and parameters
+
+
+@command{ggadt} supports the following options:
+
+@cindex environment variables, help for
+
+@table @option
+@item --help
+@itemx -h
+@opindex --help
+@opindex -h
+The `help' screen--prints usage information and available options.
+
+@item --version
+@itemx -v
+@opindex --version
+@opindex -v
+Print the version number of GGADT on
+standard output and then exit successfully.
+
+@item --parameter-file-name=@var{value}
+@opindex --parameter-file-name
+Path to a correctly formatted parameter file.
+
+@item --grain-geometry=@var{value}
+@opindex --grain-geometry
+Geometry of dust grain. Must be one of @code{SPHERE}, @code{ELLIPSOID}, @code{SPHERES}. A @code{SPHERES} grain geometry means that your grain is a conglomerate of smaller spheres. If you wish to use this grain geometry, you should supply a file (hereafter called a ``@emph{cluster file}", see the next option) that defines the relative positions of the spheres that make up the grain. The sizes of these spheres will be normalized so that the effective radius of the grain is consistent with @option{aeff}.  
+
+@item --cluster-file-name=@var{value}
+@opindex --cluster-file-name
+Path to a correctly formatted cluster file. Several cluster files are included with the distribution, and if you wish to create your own, you must mimic exactly the format of these files.
+
+@item --aeff=@var{value}
+@opindex --aeff
+Effective radius of dust grain. The effective radius is defined to be the radius of a sphere with the same volume as the dust grain.
+
+@item --ephot=@var{value}
+@opindex --ephot
+Energy of the incident X-ray photons in keV.
+
+@item --RE-index-of-refraction=@var{value}
+@opindex --RE-index-of-refraction
+The real component of the complex index of refraction, minus one.
+
+@item --IM-index-of-refraction=@var{value}
+@opindex --IM-index-of-refraction
+The imaginary component of the complex index of refraction.
+
+@item --grid-width=@var{value}
+@opindex --grid-width
+The width of the 2D numerical grid on which projected images of the dust grain are resolved, in units of the effective radius of the grain. Higher values (>2) give you more angular resolution when calculating the differential scattering cross-section, at the cost of reducing the resolution of the dust grain on the grid.
+
+@item --ngrid=@var{value}
+@opindex --ngrid
+The number of grid points along one direction of the 2D numerical grid on which @emph{images of the grain} are defined. See above for how to use this value together with @option{grid-width} to give you the physical accuracy you desire.
+
+@item --nangle=@var{value}
+@opindex --nangle
+The number of grain orientations relative to the incoming X-ray photon over which to average the differential cross-section.
+
+@item --fftw-optimization=@var{value}
+@opindex --fftw-optimization
+Must be one of @code{ESTIMATE}, @code{MEASURE}, @code{PATIENT} or @code{EXHAUSTIVE}. FFTW wisdom is saved in @code{$HOME/.ggadt/plans}. For more information about what these tags mean and about FFTW wisdom, see @url{http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans}.
+
+@item --use-experimental-fft
+@itemx -s
+@opindex --use-experimental-fft
+@opindex -s 
+Currently not operational, but we are experimenting with a few alternative methods for more efficiently performing the FFT.
+
+@end table
+
+@node Example usage
+@chapter Example usage
+
+@cindex sample output
+@cindex examples
+
+
+
+@node GNU Free Documentation License
+@appendix GNU Free Documentation License
+
+@include fdl.texi
+
+
+@node Concept index
+@unnumbered Concept index
+
+@printindex cp
+
+@bye

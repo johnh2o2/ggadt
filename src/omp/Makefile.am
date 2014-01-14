@@ -4,3 +4,5 @@ ggadt_omp_SOURCES = options.f03 common.f03 fftwmod-omp.f03 sphere-omp.f03 sphere
 
 ggadt_omp_FCFLAGS = -I@fftw3_inc_dir@ @OPENMP_FCFLAGS@ 
 ggadt_omp_LDADD = @omp_lib@
+install-data-local:
+	mkdir -p @plan_dir@
