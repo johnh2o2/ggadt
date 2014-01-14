@@ -137,13 +137,13 @@ where @math{m(x,y,z)} is the refractive index at the point @math{(x,y,z)}.
 Once the shadow function is known, Huygens' principle allows the amplitude of the scattered part of the wave, in the radiation zone, to be calculated as a Fourier transform of the shadow function over the plane V: 
 
 
-@math{U_{sca}(r\hat{n}) = U_0\frac{\exp{(ikr)}}{kr}S(\hat{n})}@*
-@math{S(\hat{n}) = S(k_x, k_y) = \frac{k^2}{2\pi}\int \exp{[i(k_xx+k_yy)]}f(x,y)dxdy}@*
-@math{k_x = k(\hat{n}\cdot\hat{x})}@*
-@math{k_y = k(\hat{n}\cdot\hat{y})}@*
-The scattering properties of the grain can be obtained from @math{S(\hat{n})}, with the differential scattering cross section given by 
+@math{U_{sca}(r\vec{n}) = U_0\frac{\exp{(ikr)}}{kr}S(\vec{n})}@*
+@math{S(\vec{n}) = S(k_x, k_y) = \frac{k^2}{2\pi}\int \exp{[i(k_xx+k_yy)]}f(x,y)dxdy}@*
+@math{k_x = k(\vec{n}\cdot\vec{x})}@*
+@math{k_y = k(\vec{n}\cdot\vec{y})}@*
+The scattering properties of the grain can be obtained from @math{S(\vec{n})}, with the differential scattering cross section given by 
 
-@math{\frac{d\sigma_{sca}}{d\Omega}(\hat{n}) = \frac{|S(\hat{n})|^2}{k^2}}
+@math{\frac{d\sigma_{sca}}{d\Omega}(\vec{n}) = \frac{|S(\vec{n})|^2}{k^2}}
 
  @author Draine and Allaf-Akbari 2006
 @end quotation

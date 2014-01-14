@@ -12,6 +12,13 @@ rm -f src/Makefile
 rm -f src/Makefile.in
 rm -f src/common.f03
 
+rm -f doc/Makefile.in
+rm -f doc/Makefile
+rm -f doc/stamp-vti
+rm -f doc/version.texi
+rm -f doc/ggadt.info
+rm -f -r doc/ggadt.html
+
 rm -f src/serial/ggadt-serial
 rm -f src/serial/*o
 rm -f src/serial/*mod

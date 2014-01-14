@@ -38,6 +38,16 @@ esac],[openmp=false])
 AM_CONDITIONAL([OMP], [test x$openmp = xtrue])
 
 
+# adds -pg compiler flag for using gprof
+AC_ARG_ENABLE([profiling],
+[  --enable-profiling    Add -pg compiler flag ],
+[case "${enableval}" in
+  yes) FCFLAGS="${FCFLAGS} -pg" ;;
+  no)  ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-profiling]) ;;
+esac],[])
+
+
 AC_PROG_FC
 
 AC_CHECK_LIB([m],[cos]) #check for the math library
