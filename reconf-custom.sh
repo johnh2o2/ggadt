@@ -1,6 +1,6 @@
 #!/bin/bash
 bash cleandist-custom.sh
 
-aclocal
+aclocal -I./m4
 autoconf
 automake -a

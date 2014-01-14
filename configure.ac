@@ -1,6 +1,6 @@
 AC_INIT([ggadt], [0.17], [jah5@princeton.edu])
 AC_PREREQ([2.63]) 
-AC_CONFIG_MACRO_DIRS([m4])
+#AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/serial/ggadt-serial.f03])
 AM_INIT_AUTOMAKE([subdir-objects])
 
