@@ -1,5 +1,4 @@
 module sphere
-
 	use, intrinsic :: iso_c_binding
 	use common_mod
 	

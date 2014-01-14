@@ -29,33 +29,43 @@ use, intrinsic :: iso_c_binding
     call initialize_and_allocate_vars()
     call set_optimization_mode(fftw_optimization_mode_name)
 	
-
 	if (geometry .eq. "sphere") then
-		do i=1,size(x)
-			do j=1,size(y)
+		!$omp parallel shared(sh,x,y,zmax,k) 
+		!$omp do schedule(dynamic) private(i,j)
+		do j=1,size(y)
+			do i=1,size(x)
 				sh(i,j) = shadow_sphere(x(i),y(j),zmax, k )*(-1.0)**(i+j+1)
 			end do
 		end do
+		!$omp end do nowait
+		!$omp end parallel
 
 		ftsh = fft(sh,x,y)
 
-		do i=1,size(x)
-			do j=1,size(y)
+		!$omp parallel shared(scatter,ftsh,k,dx,dy) 
+		!$omp do schedule(dynamic) private(i,j)
+		do j=1,size(y)
+			do i=1,size(x)
 				scatter(i,j) = scatter(i,j) + abs((k*ftsh(i,j)*dx*dy))**2/(4*pi*(pi*a_eff)**2)
 			end do
 		end do
+		!$omp end do nowait
+		!$omp end parallel
 	else
 		do neul = 1,nangle
 			eul_ang = get_new_euler_angles(neul)
 			rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
 			
-
 			if (geometry .eq. 'ellipsoid') then 
-				do i=1,size(x)
-					do j=1,size(y)
+				!$omp parallel shared(sh,x,y,rm,k) 
+				!$omp do schedule(dynamic) private(i,j)
+				do j=1,size(y)
+					do i=1,size(x)
 						sh(i,j) = shadow_ellipsoid(x(i),y(j), k, rm )*(-1.0)**(i+j+1) 
 					end do
 				end do
+				!$omp end do nowait
+				!$omp end parallel
 			end if 
 
 			if (geometry .eq. 'spheres')	then
@@ -64,11 +74,15 @@ use, intrinsic :: iso_c_binding
 
 			ftsh = fft(sh,x,y)
 
-			do i=1,size(x)
-				do j=1,size(y)
+			!$omp parallel shared(scatter,ftsh,k,dx,dy) 
+			!$omp do schedule(dynamic) private(i,j)
+			do j=1,size(y)
+				do i=1,size(x)
 					scatter(i,j) = scatter(i,j) + abs((k*ftsh(i,j)*dx*dy))**2/(4*pi*(pi*a_eff)**2)
 				end do
 			end do
+			!$omp end do nowait
+			!$omp end parallel
 
 			write(0,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
 					& " percent complete: ", (real(neul)/real(nangle))*100.0, "%"
@@ -76,11 +90,15 @@ use, intrinsic :: iso_c_binding
 	end if 
  
 	if (geometry /= 'sphere') then
-		do i=1,size(x)
-			do j=1,size(y)
+		!$omp parallel shared(scatter) 
+		!$omp do schedule(dynamic) private(i,j)
+		do j=1,size(y)
+			do i=1,size(x)
 				scatter(i,j) = scatter(i,j)/real(nangle)
 			end do
 		end do
+		!$omp end do nowait
+		!$omp end parallel
 	end if 
 
 	print *, "# [thetax] [thetay] [dqscat/domega]"

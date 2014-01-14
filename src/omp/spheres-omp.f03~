@@ -78,6 +78,8 @@ module spheres
 		dxt = x(2) - x(1)
 		dyt = y(2) - y(1)
 
+		!$omp parallel shared(sh,x,y,zmax,k) 
+		!$omp do schedule(dynamic) private(i)
 		do i=1, nspheres
 			! only modify the relevant section of the phi grid
 			! indices: i = [xi,xj], j = [yi,yj]

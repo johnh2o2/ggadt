@@ -1,4 +1,5 @@
 module fftw
+    use omp_lib
     use, intrinsic :: iso_c_binding
        include '/usr/local/include/fftw3.f03'
     logical :: first_time = .true.
@@ -33,16 +34,28 @@ contains
         real, intent(in) :: x(:), y(:)
         complex(c_double_complex), intent(inout) :: f(:,:)
         complex(c_double_complex), dimension(size(x),size(y)) :: fft
-        integer :: nx, ny, i, j
+        integer :: nx, ny, i, j, threaderror, numthreads
         integer :: error
 
 
         nx = size(x)
         ny = size(y)
+	threaderror = fftw_init_threads()
+	if (threaderror == 0) then
+		write (0,*) "------------------------------"
+		write (0,*) "Error initializing multiple threads. Program will attempt to proceed"
+		write (0,*) "using 1 thread."
+		write (0,*) "------------------------------"
+		numthreads = 1
+	else
+		numthreads = omp_get_max_threads()
+	endif
+	!write(0,*) "Number of threads: ",numthreads
+	call fftw_plan_with_nthreads(numthreads)
         if (first_time) then
             write(0,*) new_line('a')//"        /"
             write(0,*) " FFTW: | Finding best fft algorithm to use..."
-            write(plan_filename,'(a,i0.4,a,i0.4,a,i0.3,a,a)') "/Users/jah5/.ggadt/plans/&
+            write(plan_filename,'(a,i0.4,a,i0.4,a,i0.3,a,a)') "/home/michael/.ggadt/plans/&
             &plan_nx",nx,"_ny",ny,"_fftw_mode",mode,".plan",char(0)
             error = fftw_import_wisdom_from_filename(trim(adjustl(plan_filename)))
             if (error == 0) then
