@@ -1,4 +1,4 @@
-AC_INIT([ggadt], [0.17], [jah5@princeton.edu])
+AC_INIT([ggadt], [0.18], [jah5@princeton.edu])
 AC_PREREQ([2.63]) 
 #AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/serial/ggadt-serial.f03])
@@ -73,6 +73,8 @@ else
 	AC_MSG_ERROR([Cannot find fftw3 fortran headers!])
 fi
 
+# Now make sure the Fortran compiler is sane.
+
 AC_LANG([Fortran])
 
 AC_MSG_CHECKING([to see if Fortran supports iso_c_binding])
@@ -96,6 +98,8 @@ AC_RUN_IFELSE([
   		AC_MSG_RESULT(no)
   	)
 
+#getpid is needed for the random number generator
+
 AC_MSG_CHECKING([to see if Fortran supports getpid ])
 AC_RUN_IFELSE([
   		AC_LANG_PROGRAM([],	[[ 
@@ -108,15 +112,19 @@ AC_RUN_IFELSE([
   		AC_MSG_RESULT(yes), 
   		AC_MSG_RESULT(no)
   	)
-mpi_dir=
-omp_dir=
 
 
+
+# Where to put the FFTW plans 
 plan_dir="${HOME}/.ggadt/plans"
 mkdir -p $plan_dir
 
 AC_MSG_NOTICE([using $plan_dir as the directory to store FFTW plans])
 
+mpi_dir=
+omp_dir=
+
+# Complain if the user wants MPI
 if test $mpi = true
 then
 	mpi_dir=[mpi]
