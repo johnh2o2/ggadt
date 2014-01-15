@@ -4,9 +4,9 @@
 cd ../src/serial
 
 #Test sphere
-./ggadt-serial --parameter-file-name=../../data/parameterfile-sphere.ini > ../../data/test_sphere.dat
-./ggadt-serial --parameter-file-name=../../data/parameterfile-spheres.ini > ../../data/test_spheres.dat
-./ggadt-serial --parameter-file-name=../../data/parameterfile-ellipsoid.ini > ../../data/test_ellipsoid.dat
+./ggadt-serial --parameter-file-name=../../data/paramfiles/parameterfile-sphere.ini > ../../data/test_sphere.dat
+./ggadt-serial --parameter-file-name=../../data/paramfiles/parameterfile-spheres.ini > ../../data/test_spheres.dat
+./ggadt-serial --parameter-file-name=../../data/paramfiles/parameterfile-ellipsoid.ini > ../../data/test_ellipsoid.dat
 
 cd ../../
 

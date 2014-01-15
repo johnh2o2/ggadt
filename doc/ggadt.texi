@@ -456,6 +456,45 @@ Produces these plots:
 
 @image{test_ellipsoid_2d,5in,5in}
 @image{test_ellipsoid_1d,5in,5in}
+
+@section Profiling with @code{gprof}
+
+Both the serial and OpenMP variants of this GGADT code have been profiled using the GNU Profiler @code{gprof} (version 2.22) on an Intel Core i5-2410M CPU@footnote{Specs for the Intel Core i5-2410M CPU
+@example
+Architecture: x86_64
+CPU op-mode(s): 32-bit, 64-bit
+Byte Order: Little Endian
+CPU(s): 4
+On-line CPU(s) list: 0-3
+Thread(s) per core: 2
+Core(s) per socket: 2
+Socket(s): 1
+NUMA node(s): 1
+Vendor ID: GenuineIntel
+CPU family: 6
+Model: 42
+Stepping: 7
+CPU MHz: 800.000
+BogoMIPS: 4585.24
+Virtualization: VT-x
+L1d cache: 32K
+L1i cache: 32K
+L2 cache: 256K
+L3 cache: 3072K
+NUMA node0 CPU(s): 0-3 
+@end example} running Ubuntu 12.04.
+
+Four different profiles were created. The @file{parameterfile-spheres.ini} and @file{parameterfile-ellipsoid.ini} parameter files (located in @file{data/paramfiles/}) were each used to profile both @file{ggadt-serial} and @file{ggadt-omp}. The results of these profiles are located in the @file{data/profiles/} directory.
+
+If you wish to profile the code using @code{gprof}, simply add the @option{--enable-profiling} option when running @file{configure}. 
+
+Then, after compiling @code{ggadt}, do:
+
+@example
+./ggadt @dots{}
+gprof ggadt
+@end example
+
 @node GNU Free Documentation License
 @appendix GNU Free Documentation License
 
