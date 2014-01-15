@@ -302,7 +302,7 @@ Geometry of dust grain. Must be one of @code{SPHERE}, @code{ELLIPSOID}, @code{SP
 
 @item --cluster-file-name=@var{value}
 @opindex --cluster-file-name
-Path to a correctly formatted cluster file. Several cluster files are included with the distribution, and if you wish to create your own, you must mimic exactly the format of these files.
+Path to a correctly formatted cluster file. Several cluster files are included with the distribution (see @file{data/clusters}), and if you wish to create your own, you must mimic exactly the format of these files.
 
 @item --aeff=@var{value}
 @opindex --aeff
@@ -360,7 +360,9 @@ Currently not operational, but we are experimenting with a few alternative metho
 @cindex sample output
 @cindex examples
 
-All of these figures should be able to be recreated by running the @file{make_sample_plots.sh} bash script.
+Example parameter files are available in the @file{data} directory.
+
+All of the following figures should be able to be recreated by running the @file{scripts/make_sample_plots.sh} bash script.
 
 @section Spherical grain
 Using @file{paramfile-sphere.ini}:

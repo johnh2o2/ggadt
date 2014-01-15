@@ -1,2 +1,2 @@
- EXTRA_DIST = configure plots test scripts src doc data
+ EXTRA_DIST = configure scripts src doc data
  SUBDIRS = src doc 
