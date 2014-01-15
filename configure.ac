@@ -68,8 +68,6 @@ fi
 
 AC_LANG([Fortran])
 
-AC_FC_IMPLICIT_NONE([], [])
-
 AC_MSG_CHECKING([to see if Fortran supports iso_c_binding])
 AC_RUN_IFELSE([
   		AC_LANG_PROGRAM([],	[[ 
