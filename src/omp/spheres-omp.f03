@@ -88,8 +88,8 @@ module spheres
 
 			m = cmplx(ior_r(i), ior_i(i)) ! ior - 1
 			
-			do j=xi,xf
-				do n=yi,yf
+			do n=yi,yf
+				do j=xi,xf
 					current_pos = (/ x(j), y(n), 0.0 /)
 					phi_spheres(j,n) = phi_spheres(j,n)+ k*m*chord_sphere(current_pos, pos_rot(i,:), radii(i))
 				end do
