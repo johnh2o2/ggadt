@@ -1,5 +1,5 @@
-GFORTRAN module version '6' created from common.f03 on Tue Jan 14 21:53:32 2014
-MD5:22bece643477ab58fca0d5d8cf2d3404 -- If you edit this, you'll get what you deserve.
+GFORTRAN module version '6' created from common.f03 on Tue Jan 14 23:57:01 2014
+MD5:252979e087c49545876b53b721e5f185 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () ()
 () () () ())
@@ -302,7 +302,7 @@ UNKNOWN-PROC UNKNOWN EXPLICIT-SAVE 0 0) (REAL 4 0 0 REAL ()) 0 0 () () 0
 () () () 0 0)
 145 'euler_angle_mode' 'common_mod' 'euler_angle_mode' 1 ((VARIABLE
 UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN EXPLICIT-SAVE 0 0) (CHARACTER 1 0 0
-CHARACTER ((CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '100'))) 0 0 () () 0 ()
+CHARACTER ((CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '50'))) 0 0 () () 0 ()
 () () 0 0)
 146 'fftw_optimization_mode_name' 'common_mod'
 'fftw_optimization_mode_name' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
@@ -310,7 +310,7 @@ UNKNOWN EXPLICIT-SAVE 0 0) (CHARACTER 1 0 0 CHARACTER ((CONSTANT (
 INTEGER 4 0 0 INTEGER ()) 0 '100'))) 0 0 () () 0 () () () 0 0)
 147 'geometry' 'common_mod' 'geometry' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN EXPLICIT-SAVE 0 0) (CHARACTER 1 0 0 CHARACTER ((
-CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '100'))) 0 0 () () 0 () () () 0 0)
+CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '50'))) 0 0 () () 0 () () () 0 0)
 148 'get_arg' 'options' 'get_arg' 1 ((PROCEDURE UNKNOWN-INTENT
 MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE IMPLICIT_PURE) (UNKNOWN 0 0 0
 UNKNOWN ()) 149 0 (150 151 152 153) () 0 () () () 0 0)
@@ -468,7 +468,7 @@ LOGICAL 4 0 0 LOGICAL ()) 0 0 () () 0 () () () 0 0)
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 CHARACTER ((
 CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '100'))) 0 0 () (CONSTANT (
 CHARACTER 1 0 0 CHARACTER (())) 0 100
-'GGADT (General Geometry Anomalous Diffraction Theory) v0.9.0                                        ')
+'GGADT (General Geometry Anomalous Diffraction Theory) v0.9.1                                        ')
 () 0 () () () 0 0)
 36 'cptr' '__iso_c_binding' 'cptr' 35 ((DERIVED IN UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0 VALUE DUMMY) (DERIVED 69 0 0 DERIVED ()) 0 0 () () 0 () () ()
@@ -642,8 +642,6 @@ DUMMY) (CHARACTER 1 0 0 CHARACTER (())) 0 0 () () 0 () () () 0 0)
 101 'help_routine' '' 'help_routine' 99 ((PROCEDURE UNKNOWN-INTENT
 UNKNOWN-PROC BODY UNKNOWN 0 0 DUMMY SUBROUTINE) (UNKNOWN 0 0 0 UNKNOWN ())
 272 0 (273) () 0 () () () 0 0)
-100 'opts' '' 'opts' 99 ((VARIABLE INOUT UNKNOWN-PROC UNKNOWN UNKNOWN 0
-0 TARGET DUMMY) (DERIVED 203 0 0 DERIVED ()) 0 0 () () 0 () () () 0 0)
 102 'group' '' 'group' 99 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
 OPTIONAL DUMMY) (CHARACTER 1 0 0 CHARACTER (())) 0 0 () () 0 () () () 0
 0)
@@ -727,6 +725,8 @@ UNKNOWN UNKNOWN 0 0 DUMMY) (CHARACTER 1 0 0 CHARACTER (())) 0 0 () () 0
 267 'len' '(intrinsic)' 'len' 269 ((PROCEDURE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 FUNCTION) (UNKNOWN 0 0 0 UNKNOWN ()) 0
 0 () () 267 () () () 0 0)
+100 'opts' '' 'opts' 99 ((VARIABLE INOUT UNKNOWN-PROC UNKNOWN UNKNOWN 0
+0 TARGET DUMMY) (DERIVED 203 0 0 DERIVED ()) 0 0 () () 0 () () () 0 0)
 )
 
 ('__iso_c_binding' 0 19 'a_eff' 0 20 'asked_for_version' 0 21 'box_width'
