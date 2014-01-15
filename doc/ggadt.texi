@@ -360,8 +360,100 @@ Currently not operational, but we are experimenting with a few alternative metho
 @cindex sample output
 @cindex examples
 
+All of these figures should be able to be recreated by running the @file{make_sample_plots.sh} bash script.
+
+@section Spherical grain
+Using @file{paramfile-sphere.ini}:
+
+@example
+aeff=0.2
+ephot=1.0
+RE-index-of-refraction=-2.079E-3
+IM-index-of-refraction=2.079E-3
+grid-width=64
+ngrid=1024
+nangle=100
+grain-geometry=sphere
+euler-angle-mode=random
+fftw-optimization=measure
+@end example
+
+Running on the command line from the @code{src/serial/} directory:
+
+@example
+./ggadt-serial --parameter-file-name=../../parameterfile-sphere.ini > ../../data/test_sphere.dat
+cd ../../
+ipython scripts/plot.py data/test_sphere.dat
+@end example
+
+Produces these plots:
+
+@image{test_sphere_2d,5in,5in}
+@image{test_sphere_1d,5in,5in}
 
 
+@section Grain that is a cluster of spheres
+Using @file{paramfile-spheres.ini}:
+
+@example
+aeff=0.2
+ephot=1.0
+RE-index-of-refraction=-2.079E-3
+IM-index-of-refraction=2.079E-3
+grid-width=64
+ngrid=1024
+nangle=100
+grain-geometry=spheres
+euler-angle-mode=random
+cluster-file-name=../../data/clusters/BAM2.1024.1.targ
+fftw-optimization=measure
+@end example
+
+Running on the command line from the @code{src/serial/} directory:
+
+@example
+./ggadt-serial --parameter-file-name=../../parameterfile-spheres.ini > ../../data/test_spheres.dat
+cd ../../
+ipython scripts/plot.py data/test_spheres.dat
+@end example
+
+Produces these plots:
+
+@image{test_spheres_2d,5in,5in}
+@image{test_spheres_1d,5in,5in}
+
+@section Ellipsoidal grain
+Using @file{paramfile-ellipsoid.ini}:
+
+@example
+aeff= 0.2
+grain-axis-x= 0.1
+grain-axis-y= 0.3
+grain-axis-z= 0.3
+ephot= 1.0
+RE-index-of-refraction= -2.079E-3
+IM-index-of-refraction= 2.079E-3
+grid-width=64
+ngrid=1024
+nangle= 100
+grain-geometry= ellipsoid
+euler-angle-mode= random
+cluster-file-name=
+fftw-optimization= measure
+@end example
+
+Running on the command line from the @code{src/serial/} directory:
+
+@example
+./ggadt-serial --parameter-file-name=../../parameterfile-ellipsoid.ini > ../../data/test_ellipsoid.dat
+cd ../../
+ipython scripts/plot.py data/test_ellipsoid.dat
+@end example
+
+Produces these plots:
+
+@image{test_ellipsoid_2d,5in,5in}
+@image{test_ellipsoid_1d,5in,5in}
 @node GNU Free Documentation License
 @appendix GNU Free Documentation License
 
