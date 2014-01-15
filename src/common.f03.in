@@ -2,6 +2,10 @@ module common_mod
   use, intrinsic :: iso_c_binding
   use options
   implicit none
+
+  public
+
+
   save
 
   type(options_t) :: opts 
@@ -16,8 +20,8 @@ module common_mod
  
   real                          ::  a_eff     
   real                          ::  ephot     
-  character(len=100)            ::  geometry  
-  character(len=100)            ::  euler_angle_mode
+  character(len=50)            ::  geometry  
+  character(len=50)            ::  euler_angle_mode
 
 
   integer                       ::  ngrid 
@@ -52,6 +56,12 @@ module common_mod
       call define_option_string(opts,"cluster-file-name","",required=.false.,&
         description="Path to file that defines a grain made up of a cluster of spheres")
       call define_option_real(opts,"aeff",0.2,required=.false.,description="Effective radius of grain")
+      call define_option_real(opts,"grain-axis-x",1.0,&
+        description="For ELLIPSOID grains: x-axis length")
+      call define_option_real(opts,"grain-axis-y",1.0,&
+        description="For ELLIPSOID grains: y-axis length")
+      call define_option_real(opts,"grain-axis-z",1.0,&
+        description="For ELLIPSOID grains: z-axis length")
       call define_option_real(opts,"ephot",0.5,required=.false.,description="Energy of X-ray photon in keV")
       call define_option_real(opts,"RE-index-of-refraction",-2.079E-3,required=.false., &
         description="Real component of the index of refraction, minus 1")
@@ -70,6 +80,7 @@ module common_mod
         description="How to choose Euler angles (sequential, random)")
      
       
+
       call define_option_string(opts,"fftw-optimization","estimate",required=.false.,&
         description="[estimate,measure,patient,exhaustive]")
       call define_flag(opts,"use-experimental-fft",abbrev='s',&
@@ -78,13 +89,28 @@ module common_mod
       ! Now process command line options and read any specified parameter file
 
       call process_command_line(opts,ierr)
-      if (ierr .ne. 0) stop
-      call check_required_options(opts,ierr)
-      if (ierr .ne. 0) stop
+      if (ierr .ne. 0) then
+        write (0,*) "ERROR in processing command line arguments." 
+        stop
+      end if 
+      
+
+    
+      ! Read parameter file if one is given (don't overwrite command-line options if already given)
+      call get_option_string(opts,"parameter-file-name",parameter_file_name)
+      if (parameter_file_name .ne. "") then
+        call process_input_file(opts,parameter_file_name,ierr,delim_char="=")
+        if (ierr .ne. 0) then
+          print *,"Cannot read ",parameter_file_name,". Quitting."
+          stop
+        end if 
+      end if
 
       ! Set values
-      call get_option_string(opts,"parameter-file-name",parameter_file_name)
       call get_option_real(opts,"aeff",a_eff)
+      call get_option_real(opts,"grain-axis-x",grain_a(1))
+      call get_option_real(opts,"grain-axis-y",grain_a(2))
+      call get_option_real(opts,"grain-axis-z",grain_a(3))
       call get_option_real(opts,"ephot",ephot)
       call get_flag(opts,"use-experimental-fft",use_experimental_fft)
       call get_option_real(opts,"RE-index-of-refraction",ior_re)
@@ -110,15 +136,6 @@ module common_mod
       euler_angle_mode = strlowcase(euler_angle_mode)
       geometry = strlowcase(geometry)
 
-
-      ! Read parameter file if one is given (don't overwrite command-line options if already given)
-      if (parameter_file_name .ne. "") then
-        call process_input_file(opts,parameter_file_name,ierr,overwrite="NO",delim_char="=")
-        if (ierr .ne. 0) then
-          print *,"Cannot read ",parameter_file_name,". Quitting."
-          stop
-        end if 
-      end if
     end subroutine set_parameter_values
 
     subroutine print_help(opts)
@@ -134,8 +151,7 @@ module common_mod
     subroutine print_parameters()
       implicit none
       call print_option_values(opts,0)
-
-
+      
     end subroutine print_parameters
 
 

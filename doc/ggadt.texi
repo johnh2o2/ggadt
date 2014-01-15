@@ -308,6 +308,16 @@ Path to a correctly formatted cluster file. Several cluster files are included w
 @opindex --aeff
 Effective radius of dust grain. The effective radius is defined to be the radius of a sphere with the same volume as the dust grain.
 
+@item --grain-axis-x=@var{value}
+@opindex --grain-axis-x
+For @code{ELLIPSOID} grains, we define the lengths of x, y and z axes.
+
+@item --grain-axis-y=@var{value}
+@opindex --grain-axis-y
+
+@item --grain-axis-z=@var{value}
+@opindex --grain-axis-z
+
 @item --ephot=@var{value}
 @opindex --ephot
 Energy of the incident X-ray photons in keV.
