@@ -1,0 +1,500 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ns/call  ns/call  name    
+ 51.87     10.68    10.68                             MAIN__
+ 22.61     15.34     4.66 104857600    44.39    44.39  __ellipsoid_MOD_chord_ellipsoid
+  7.63     16.91     1.57                             n1_64
+  6.27     18.20     1.29                             fftw_cpy2d
+  4.03     19.03     0.83                             t1_4
+  2.57     19.56     0.53 104857600     5.05    49.45  __ellipsoid_MOD_phi_ellipsoid
+  2.48     20.07     0.51                             q1_4
+  1.14     20.30     0.24 104857600     2.24    51.69  __ellipsoid_MOD_shadow_ellipsoid
+  0.34     20.37     0.07                             fftw_transpose
+  0.24     20.42     0.05                             recur
+  0.19     20.46     0.04                             dotile
+  0.15     20.49     0.03                             __spheres_MOD_read_spheres
+  0.10     20.51     0.02                             recur
+  0.05     20.52     0.01                             apply
+  0.05     20.53     0.01                             apply_dit
+  0.05     20.54     0.01                             fftw_execute_dft
+  0.05     20.55     0.01                             fftw_regsolver_ct_directwsq
+  0.05     20.56     0.01                             mkplan
+  0.05     20.57     0.01                             n1_16
+  0.05     20.58     0.01                             n1_32
+  0.05     20.59     0.01                             print
+  0.00     20.59     0.00      188     0.00     0.00  __options_MOD_is_name_char
+  0.00     20.59     0.00      153     0.00     0.00  __options_MOD_check_name
+  0.00     20.59     0.00      100     0.00     0.00  __common_mod_MOD_rot_x
+  0.00     20.59     0.00      100     0.00     0.00  __common_mod_MOD_rot_y
+  0.00     20.59     0.00      100     0.00     0.00  __common_mod_MOD_rot_z
+  0.00     20.59     0.00      100     0.00     0.00  __fftw_MOD_fft
+  0.00     20.59     0.00       71     0.00     0.00  __options_MOD_skip_chars
+  0.00     20.59     0.00       40     0.00     0.00  __options_MOD_count_leading_set
+  0.00     20.59     0.00       33     0.00     0.00  __options_MOD_find_opt
+  0.00     20.59     0.00       28     0.00     0.00  __options_MOD_peek
+  0.00     20.59     0.00       18     0.00     0.00  __options_MOD_is_name
+  0.00     20.59     0.00       18     0.00     0.00  __options_MOD_new_opt
+  0.00     20.59     0.00       15     0.00     0.00  __options_MOD_set_opt
+  0.00     20.59     0.00       14     0.00     0.00  __options_MOD_parse_opt
+  0.00     20.59     0.00       14     0.00     0.00  __options_MOD_read_until_char
+  0.00     20.59     0.00       14     0.00     0.00  __options_MOD_read_while
+  0.00     20.59     0.00       14     0.00     0.00  __options_MOD_skip_until_char
+  0.00     20.59     0.00        8     0.00     0.00  __options_MOD_define_option_real
+  0.00     20.59     0.00        8     0.00     0.00  __options_MOD_get_option_real
+  0.00     20.59     0.00        8     0.00     0.00  __options_MOD_is_real
+  0.00     20.59     0.00        8     0.00     0.00  __options_MOD_print_value_real
+  0.00     20.59     0.00        8     0.00     0.00  __options_MOD_set_value_real
+  0.00     20.59     0.00        5     0.00     0.00  __options_MOD_define_option_string
+  0.00     20.59     0.00        5     0.00     0.00  __options_MOD_get_option_string
+  0.00     20.59     0.00        5     0.00     0.00  __options_MOD_print_value_string
+  0.00     20.59     0.00        5     0.00     0.00  __options_MOD_set_value_string
+  0.00     20.59     0.00        4     0.00     0.00  __options_MOD_is_abbrev_char
+  0.00     20.59     0.00        3     0.00     0.00  __common_mod_MOD_strlowcase
+  0.00     20.59     0.00        3     0.00     0.00  __options_MOD_define_flag
+  0.00     20.59     0.00        3     0.00     0.00  __options_MOD_get_flag
+  0.00     20.59     0.00        3     0.00     0.00  __options_MOD_print_value_logical
+  0.00     20.59     0.00        2     0.00     0.00  __options_MOD_define_option_integer
+  0.00     20.59     0.00        2     0.00     0.00  __options_MOD_get_option_integer
+  0.00     20.59     0.00        2     0.00     0.00  __options_MOD_is_integer
+  0.00     20.59     0.00        2     0.00     0.00  __options_MOD_print_value_integer
+  0.00     20.59     0.00        2     0.00     0.00  __options_MOD_set_value_integer
+  0.00     20.59     0.00        2     0.00     0.00  get_k.1562
+  0.00     20.59     0.00        1     0.00     0.00  __common_mod_MOD_print_parameters
+  0.00     20.59     0.00        1     0.00     0.00  __common_mod_MOD_set_parameter_values
+  0.00     20.59     0.00        1     0.00     0.00  __fftw_MOD_set_optimization_mode
+  0.00     20.59     0.00        1     0.00     0.00  __options_MOD_define_help_flag
+  0.00     20.59     0.00        1     0.00     0.00  __options_MOD_getarg_check
+  0.00     20.59     0.00        1     0.00     0.00  __options_MOD_parse_long_option
+  0.00     20.59     0.00        1     0.00     0.00  __options_MOD_print_option_values
+  0.00     20.59     0.00        1     0.00     0.00  __options_MOD_process_command_line
+  0.00     20.59     0.00        1     0.00     0.00  __options_MOD_process_input_file
+  0.00     20.59     0.00        1     0.00     0.00  __options_MOD_unquote
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+ 
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this 
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 2 byte(s) for 0.05% of 20.59 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     78.2   10.68    5.42                 MAIN__ [1]
+                0.24    5.19 104857600/104857600     __ellipsoid_MOD_shadow_ellipsoid [2]
+                0.00    0.00     100/100         __common_mod_MOD_rot_x [1046]
+                0.00    0.00     100/100         __common_mod_MOD_rot_y [1047]
+                0.00    0.00     100/100         __common_mod_MOD_rot_z [1048]
+                0.00    0.00     100/100         __fftw_MOD_fft [1049]
+                0.00    0.00       2/2           get_k.1562 [22]
+                0.00    0.00       1/1           __common_mod_MOD_set_parameter_values [1081]
+                0.00    0.00       1/1           __fftw_MOD_set_optimization_mode [1082]
+                0.00    0.00       1/1           __options_MOD_print_option_values [1086]
+                0.00    0.00       1/1           __common_mod_MOD_print_parameters [1080]
+-----------------------------------------------
+                0.24    5.19 104857600/104857600     MAIN__ [1]
+[2]     26.3    0.24    5.19 104857600         __ellipsoid_MOD_shadow_ellipsoid [2]
+                0.53    4.66 104857600/104857600     __ellipsoid_MOD_phi_ellipsoid [3]
+-----------------------------------------------
+                0.53    4.66 104857600/104857600     __ellipsoid_MOD_shadow_ellipsoid [2]
+[3]     25.2    0.53    4.66 104857600         __ellipsoid_MOD_phi_ellipsoid [3]
+                4.66    0.00 104857600/104857600     __ellipsoid_MOD_chord_ellipsoid [4]
+-----------------------------------------------
+                4.66    0.00 104857600/104857600     __ellipsoid_MOD_phi_ellipsoid [3]
+[4]     22.6    4.66    0.00 104857600         __ellipsoid_MOD_chord_ellipsoid [4]
+-----------------------------------------------
+                                                 <spontaneous>
+[5]      7.6    1.57    0.00                 n1_64 [5]
+-----------------------------------------------
+                                                 <spontaneous>
+[6]      6.3    1.29    0.00                 fftw_cpy2d [6]
+-----------------------------------------------
+                                                 <spontaneous>
+[7]      4.0    0.83    0.00                 t1_4 [7]
+-----------------------------------------------
+                                                 <spontaneous>
+[8]      2.5    0.51    0.00                 q1_4 [8]
+-----------------------------------------------
+                                                 <spontaneous>
+[9]      0.3    0.07    0.00                 fftw_transpose [9]
+-----------------------------------------------
+                                                 <spontaneous>
+[10]     0.2    0.05    0.00                 recur [10]
+-----------------------------------------------
+                                                 <spontaneous>
+[11]     0.2    0.04    0.00                 dotile [11]
+-----------------------------------------------
+                                                 <spontaneous>
+[12]     0.1    0.03    0.00                 __spheres_MOD_read_spheres [12]
+-----------------------------------------------
+                                                 <spontaneous>
+[13]     0.1    0.02    0.00                 recur [13]
+-----------------------------------------------
+                                                 <spontaneous>
+[14]     0.0    0.01    0.00                 apply [14]
+-----------------------------------------------
+                                                 <spontaneous>
+[15]     0.0    0.01    0.00                 apply_dit [15]
+-----------------------------------------------
+                                                 <spontaneous>
+[16]     0.0    0.01    0.00                 fftw_execute_dft [16]
+-----------------------------------------------
+                                                 <spontaneous>
+[17]     0.0    0.01    0.00                 fftw_regsolver_ct_directwsq [17]
+-----------------------------------------------
+                                                 <spontaneous>
+[18]     0.0    0.01    0.00                 mkplan [18]
+-----------------------------------------------
+                                                 <spontaneous>
+[19]     0.0    0.01    0.00                 n1_16 [19]
+-----------------------------------------------
+                                                 <spontaneous>
+[20]     0.0    0.01    0.00                 n1_32 [20]
+-----------------------------------------------
+                                                 <spontaneous>
+[21]     0.0    0.01    0.00                 print [21]
+-----------------------------------------------
+                0.00    0.00       2/2           MAIN__ [1]
+[22]     0.0    0.00    0.00       2         get_k.1562 [22]
+-----------------------------------------------
+                0.00    0.00     188/188         __options_MOD_read_while [1059]
+[1044]   0.0    0.00    0.00     188         __options_MOD_is_name_char [1044]
+-----------------------------------------------
+                0.00    0.00     153/153         __options_MOD_new_opt [1055]
+[1045]   0.0    0.00    0.00     153         __options_MOD_check_name [1045]
+-----------------------------------------------
+                0.00    0.00     100/100         MAIN__ [1]
+[1046]   0.0    0.00    0.00     100         __common_mod_MOD_rot_x [1046]
+-----------------------------------------------
+                0.00    0.00     100/100         MAIN__ [1]
+[1047]   0.0    0.00    0.00     100         __common_mod_MOD_rot_y [1047]
+-----------------------------------------------
+                0.00    0.00     100/100         MAIN__ [1]
+[1048]   0.0    0.00    0.00     100         __common_mod_MOD_rot_z [1048]
+-----------------------------------------------
+                0.00    0.00     100/100         MAIN__ [1]
+[1049]   0.0    0.00    0.00     100         __fftw_MOD_fft [1049]
+-----------------------------------------------
+                0.00    0.00      15/71          __options_MOD_process_input_file [1088]
+                0.00    0.00      56/71          __options_MOD_parse_opt [1057]
+[1050]   0.0    0.00    0.00      71         __options_MOD_skip_chars [1050]
+-----------------------------------------------
+                0.00    0.00       4/40          __options_MOD_is_integer [1077]
+                0.00    0.00      36/40          __options_MOD_is_real [1063]
+[1051]   0.0    0.00    0.00      40         __options_MOD_count_leading_set [1051]
+-----------------------------------------------
+                0.00    0.00       1/33          __options_MOD_process_command_line [1087]
+                0.00    0.00       2/33          __options_MOD_get_option_integer [1076]
+                0.00    0.00       3/33          __options_MOD_get_flag [1073]
+                0.00    0.00       5/33          __options_MOD_get_option_string [1067]
+                0.00    0.00       8/33          __options_MOD_get_option_real [1062]
+                0.00    0.00      14/33          __options_MOD_process_input_file [1088]
+[1052]   0.0    0.00    0.00      33         __options_MOD_find_opt [1052]
+-----------------------------------------------
+                0.00    0.00      14/28          __options_MOD_parse_opt [1057]
+                0.00    0.00      14/28          __options_MOD_process_input_file [1088]
+[1053]   0.0    0.00    0.00      28         __options_MOD_peek [1053]
+-----------------------------------------------
+                0.00    0.00      18/18          __options_MOD_new_opt [1055]
+[1054]   0.0    0.00    0.00      18         __options_MOD_is_name [1054]
+-----------------------------------------------
+                0.00    0.00       2/18          __options_MOD_define_option_integer [1075]
+                0.00    0.00       3/18          __options_MOD_define_flag [1072]
+                0.00    0.00       5/18          __options_MOD_define_option_string [1066]
+                0.00    0.00       8/18          __options_MOD_define_option_real [1061]
+[1055]   0.0    0.00    0.00      18         __options_MOD_new_opt [1055]
+                0.00    0.00     153/153         __options_MOD_check_name [1045]
+                0.00    0.00      18/18          __options_MOD_is_name [1054]
+                0.00    0.00       3/4           __options_MOD_is_abbrev_char [1070]
+-----------------------------------------------
+                0.00    0.00       1/15          __options_MOD_process_command_line [1087]
+                0.00    0.00      14/15          __options_MOD_process_input_file [1088]
+[1056]   0.0    0.00    0.00      15         __options_MOD_set_opt [1056]
+                0.00    0.00       8/8           __options_MOD_set_value_real [1065]
+                0.00    0.00       5/5           __options_MOD_set_value_string [1069]
+                0.00    0.00       2/2           __options_MOD_set_value_integer [1079]
+-----------------------------------------------
+                0.00    0.00      14/14          __options_MOD_process_input_file [1088]
+[1057]   0.0    0.00    0.00      14         __options_MOD_parse_opt [1057]
+                0.00    0.00      56/71          __options_MOD_skip_chars [1050]
+                0.00    0.00      14/14          __options_MOD_read_while [1059]
+                0.00    0.00      14/28          __options_MOD_peek [1053]
+                0.00    0.00      14/14          __options_MOD_read_until_char [1058]
+-----------------------------------------------
+                0.00    0.00      14/14          __options_MOD_parse_opt [1057]
+[1058]   0.0    0.00    0.00      14         __options_MOD_read_until_char [1058]
+-----------------------------------------------
+                0.00    0.00      14/14          __options_MOD_parse_opt [1057]
+[1059]   0.0    0.00    0.00      14         __options_MOD_read_while [1059]
+                0.00    0.00     188/188         __options_MOD_is_name_char [1044]
+-----------------------------------------------
+                0.00    0.00      14/14          __options_MOD_process_input_file [1088]
+[1060]   0.0    0.00    0.00      14         __options_MOD_skip_until_char [1060]
+-----------------------------------------------
+                0.00    0.00       8/8           __common_mod_MOD_set_parameter_values [1081]
+[1061]   0.0    0.00    0.00       8         __options_MOD_define_option_real [1061]
+                0.00    0.00       8/18          __options_MOD_new_opt [1055]
+-----------------------------------------------
+                0.00    0.00       8/8           __common_mod_MOD_set_parameter_values [1081]
+[1062]   0.0    0.00    0.00       8         __options_MOD_get_option_real [1062]
+                0.00    0.00       8/33          __options_MOD_find_opt [1052]
+-----------------------------------------------
+                0.00    0.00       8/8           __options_MOD_set_value_real [1065]
+[1063]   0.0    0.00    0.00       8         __options_MOD_is_real [1063]
+                0.00    0.00      36/40          __options_MOD_count_leading_set [1051]
+-----------------------------------------------
+                0.00    0.00       8/8           __options_MOD_print_option_values [1086]
+[1064]   0.0    0.00    0.00       8         __options_MOD_print_value_real [1064]
+-----------------------------------------------
+                0.00    0.00       8/8           __options_MOD_set_opt [1056]
+[1065]   0.0    0.00    0.00       8         __options_MOD_set_value_real [1065]
+                0.00    0.00       8/8           __options_MOD_is_real [1063]
+-----------------------------------------------
+                0.00    0.00       5/5           __common_mod_MOD_set_parameter_values [1081]
+[1066]   0.0    0.00    0.00       5         __options_MOD_define_option_string [1066]
+                0.00    0.00       5/18          __options_MOD_new_opt [1055]
+-----------------------------------------------
+                0.00    0.00       5/5           __common_mod_MOD_set_parameter_values [1081]
+[1067]   0.0    0.00    0.00       5         __options_MOD_get_option_string [1067]
+                0.00    0.00       5/33          __options_MOD_find_opt [1052]
+-----------------------------------------------
+                0.00    0.00       5/5           __options_MOD_print_option_values [1086]
+[1068]   0.0    0.00    0.00       5         __options_MOD_print_value_string [1068]
+-----------------------------------------------
+                0.00    0.00       5/5           __options_MOD_set_opt [1056]
+[1069]   0.0    0.00    0.00       5         __options_MOD_set_value_string [1069]
+-----------------------------------------------
+                0.00    0.00       1/4           __options_MOD_process_command_line [1087]
+                0.00    0.00       3/4           __options_MOD_new_opt [1055]
+[1070]   0.0    0.00    0.00       4         __options_MOD_is_abbrev_char [1070]
+-----------------------------------------------
+                0.00    0.00       3/3           __common_mod_MOD_set_parameter_values [1081]
+[1071]   0.0    0.00    0.00       3         __common_mod_MOD_strlowcase [1071]
+-----------------------------------------------
+                0.00    0.00       1/3           __options_MOD_define_help_flag [1083]
+                0.00    0.00       2/3           __common_mod_MOD_set_parameter_values [1081]
+[1072]   0.0    0.00    0.00       3         __options_MOD_define_flag [1072]
+                0.00    0.00       3/18          __options_MOD_new_opt [1055]
+-----------------------------------------------
+                0.00    0.00       1/3           __options_MOD_process_command_line [1087]
+                0.00    0.00       2/3           __common_mod_MOD_set_parameter_values [1081]
+[1073]   0.0    0.00    0.00       3         __options_MOD_get_flag [1073]
+                0.00    0.00       3/33          __options_MOD_find_opt [1052]
+-----------------------------------------------
+                0.00    0.00       3/3           __options_MOD_print_option_values [1086]
+[1074]   0.0    0.00    0.00       3         __options_MOD_print_value_logical [1074]
+-----------------------------------------------
+                0.00    0.00       2/2           __common_mod_MOD_set_parameter_values [1081]
+[1075]   0.0    0.00    0.00       2         __options_MOD_define_option_integer [1075]
+                0.00    0.00       2/18          __options_MOD_new_opt [1055]
+-----------------------------------------------
+                0.00    0.00       2/2           __common_mod_MOD_set_parameter_values [1081]
+[1076]   0.0    0.00    0.00       2         __options_MOD_get_option_integer [1076]
+                0.00    0.00       2/33          __options_MOD_find_opt [1052]
+-----------------------------------------------
+                0.00    0.00       2/2           __options_MOD_set_value_integer [1079]
+[1077]   0.0    0.00    0.00       2         __options_MOD_is_integer [1077]
+                0.00    0.00       4/40          __options_MOD_count_leading_set [1051]
+-----------------------------------------------
+                0.00    0.00       2/2           __options_MOD_print_option_values [1086]
+[1078]   0.0    0.00    0.00       2         __options_MOD_print_value_integer [1078]
+-----------------------------------------------
+                0.00    0.00       2/2           __options_MOD_set_opt [1056]
+[1079]   0.0    0.00    0.00       2         __options_MOD_set_value_integer [1079]
+                0.00    0.00       2/2           __options_MOD_is_integer [1077]
+-----------------------------------------------
+                0.00    0.00       1/1           MAIN__ [1]
+[1080]   0.0    0.00    0.00       1         __common_mod_MOD_print_parameters [1080]
+-----------------------------------------------
+                0.00    0.00       1/1           MAIN__ [1]
+[1081]   0.0    0.00    0.00       1         __common_mod_MOD_set_parameter_values [1081]
+                0.00    0.00       8/8           __options_MOD_define_option_real [1061]
+                0.00    0.00       8/8           __options_MOD_get_option_real [1062]
+                0.00    0.00       5/5           __options_MOD_define_option_string [1066]
+                0.00    0.00       5/5           __options_MOD_get_option_string [1067]
+                0.00    0.00       3/3           __common_mod_MOD_strlowcase [1071]
+                0.00    0.00       2/3           __options_MOD_define_flag [1072]
+                0.00    0.00       2/2           __options_MOD_define_option_integer [1075]
+                0.00    0.00       2/3           __options_MOD_get_flag [1073]
+                0.00    0.00       2/2           __options_MOD_get_option_integer [1076]
+                0.00    0.00       1/1           __options_MOD_define_help_flag [1083]
+                0.00    0.00       1/1           __options_MOD_process_command_line [1087]
+                0.00    0.00       1/1           __options_MOD_process_input_file [1088]
+-----------------------------------------------
+                0.00    0.00       1/1           MAIN__ [1]
+[1082]   0.0    0.00    0.00       1         __fftw_MOD_set_optimization_mode [1082]
+-----------------------------------------------
+                0.00    0.00       1/1           __common_mod_MOD_set_parameter_values [1081]
+[1083]   0.0    0.00    0.00       1         __options_MOD_define_help_flag [1083]
+                0.00    0.00       1/3           __options_MOD_define_flag [1072]
+-----------------------------------------------
+                0.00    0.00       1/1           __options_MOD_process_command_line [1087]
+[1084]   0.0    0.00    0.00       1         __options_MOD_getarg_check [1084]
+-----------------------------------------------
+                0.00    0.00       1/1           __options_MOD_process_command_line [1087]
+[1085]   0.0    0.00    0.00       1         __options_MOD_parse_long_option [1085]
+-----------------------------------------------
+                0.00    0.00       1/1           MAIN__ [1]
+[1086]   0.0    0.00    0.00       1         __options_MOD_print_option_values [1086]
+                0.00    0.00       8/8           __options_MOD_print_value_real [1064]
+                0.00    0.00       5/5           __options_MOD_print_value_string [1068]
+                0.00    0.00       3/3           __options_MOD_print_value_logical [1074]
+                0.00    0.00       2/2           __options_MOD_print_value_integer [1078]
+-----------------------------------------------
+                0.00    0.00       1/1           __common_mod_MOD_set_parameter_values [1081]
+[1087]   0.0    0.00    0.00       1         __options_MOD_process_command_line [1087]
+                0.00    0.00       1/1           __options_MOD_getarg_check [1084]
+                0.00    0.00       1/1           __options_MOD_unquote [1089]
+                0.00    0.00       1/1           __options_MOD_parse_long_option [1085]
+                0.00    0.00       1/33          __options_MOD_find_opt [1052]
+                0.00    0.00       1/15          __options_MOD_set_opt [1056]
+                0.00    0.00       1/3           __options_MOD_get_flag [1073]
+                0.00    0.00       1/4           __options_MOD_is_abbrev_char [1070]
+-----------------------------------------------
+                0.00    0.00       1/1           __common_mod_MOD_set_parameter_values [1081]
+[1088]   0.0    0.00    0.00       1         __options_MOD_process_input_file [1088]
+                0.00    0.00      15/71          __options_MOD_skip_chars [1050]
+                0.00    0.00      14/28          __options_MOD_peek [1053]
+                0.00    0.00      14/14          __options_MOD_parse_opt [1057]
+                0.00    0.00      14/33          __options_MOD_find_opt [1052]
+                0.00    0.00      14/15          __options_MOD_set_opt [1056]
+                0.00    0.00      14/14          __options_MOD_skip_until_char [1060]
+-----------------------------------------------
+                0.00    0.00       1/1           __options_MOD_process_command_line [1087]
+[1089]   0.0    0.00    0.00       1         __options_MOD_unquote [1089]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+
+Index by function name
+
+   [1] MAIN__ (ggadt-serial.f03) [1067] __options_MOD_get_option_string [1069] __options_MOD_set_value_string
+ [1080] __common_mod_MOD_print_parameters [1084] __options_MOD_getarg_check [1050] __options_MOD_skip_chars
+ [1046] __common_mod_MOD_rot_x [1070] __options_MOD_is_abbrev_char [1060] __options_MOD_skip_until_char
+ [1047] __common_mod_MOD_rot_y [1077] __options_MOD_is_integer [1089] __options_MOD_unquote
+ [1048] __common_mod_MOD_rot_z [1054] __options_MOD_is_name [12] __spheres_MOD_read_spheres
+ [1081] __common_mod_MOD_set_parameter_values [1044] __options_MOD_is_name_char [14] apply
+ [1071] __common_mod_MOD_strlowcase [1063] __options_MOD_is_real [15] apply_dit
+   [4] __ellipsoid_MOD_chord_ellipsoid [1055] __options_MOD_new_opt [11] dotile
+   [3] __ellipsoid_MOD_phi_ellipsoid [1085] __options_MOD_parse_long_option [6] fftw_cpy2d
+   [2] __ellipsoid_MOD_shadow_ellipsoid [1057] __options_MOD_parse_opt [16] fftw_execute_dft
+ [1049] __fftw_MOD_fft      [1053] __options_MOD_peek     [17] fftw_regsolver_ct_directwsq
+ [1082] __fftw_MOD_set_optimization_mode [1086] __options_MOD_print_option_values [9] fftw_transpose
+ [1045] __options_MOD_check_name [1078] __options_MOD_print_value_integer [22] get_k.1562 (ggadt-serial.f03)
+ [1051] __options_MOD_count_leading_set [1074] __options_MOD_print_value_logical [18] mkplan
+ [1072] __options_MOD_define_flag [1064] __options_MOD_print_value_real [19] n1_16
+ [1083] __options_MOD_define_help_flag [1068] __options_MOD_print_value_string [20] n1_32
+ [1075] __options_MOD_define_option_integer [1087] __options_MOD_process_command_line [5] n1_64
+ [1061] __options_MOD_define_option_real [1088] __options_MOD_process_input_file [21] print
+ [1066] __options_MOD_define_option_string [1058] __options_MOD_read_until_char [8] q1_4
+ [1052] __options_MOD_find_opt [1059] __options_MOD_read_while [10] recur
+ [1073] __options_MOD_get_flag [1056] __options_MOD_set_opt [13] recur
+ [1076] __options_MOD_get_option_integer [1079] __options_MOD_set_value_integer [7] t1_4
+ [1062] __options_MOD_get_option_real [1065] __options_MOD_set_value_real
