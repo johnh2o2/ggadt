@@ -136,6 +136,8 @@ module common_mod
       euler_angle_mode = strlowcase(euler_angle_mode)
       geometry = strlowcase(geometry)
 
+      
+
     end subroutine set_parameter_values
 
     subroutine print_help(opts)

@@ -25,9 +25,9 @@ program ggadt
 
 
     call set_parameter_values()
-    call print_parameters()
     call initialize_and_allocate_vars()
     call set_optimization_mode(fftw_optimization_mode_name)
+    call print_parameters()
     
 
     if (geometry .eq. "sphere") then
