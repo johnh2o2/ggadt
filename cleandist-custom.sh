@@ -11,6 +11,7 @@ rm -f Makefile
 rm -f src/Makefile
 rm -f src/Makefile.in
 rm -f src/common.f03
+rm -f data/test_*
 
 rm -f doc/Makefile.in
 rm -f doc/Makefile
