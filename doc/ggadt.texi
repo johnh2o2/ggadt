@@ -191,7 +191,7 @@ make install
 
 @itemize @bullet
 
-@item @strong{Suitable C and Fortran compilers}: GGADT was developed using the GNU compiler suite (version 4.5 and higher @footnote{GCC 4.4 throws the following error at compile time:
+@item @strong{Suitable C and Fortran compilers}: GGADT was developed using the GNU compiler suite (version 4.5.4 and higher @footnote{GCC 4.4.7 throws the following error at compile time:
 
 @example
 options.f03:113.14:
@@ -199,7 +199,7 @@ options.f03:113.14:
      procedure(helpr), pointer, nopass :: help_routine => null()
               1
 Error: Fortran 2003: Procedure components at (1) are not yet implemented in gfortran
-@end example}) throughout, but the @code{configure} script will try to work with most common compilers. @emph{Your Fortran compiler must be able to compile Fortran 2003 code}.
+@end example}) throughout, but the @code{configure} script will try to work with most common compilers. Your Fortran compiler must be able to compile Fortran 2003 code.
 
 
 
@@ -208,7 +208,8 @@ Error: Fortran 2003: Procedure components at (1) are not yet implemented in gfor
 @item @strong{FFTW 3}. Available at @url{http://www.fftw.org/}.
 @itemize @minus
 @item @emph{Further requirements for installing @code{ggadt-openmp}}: you must have the @code{fftw3_threads} libraries installed. To do this, specify the @code{--enable-threads} option when running @code{configure} for FFTW3. This might be enabled by default.
-@item @emph{Location of the FFTW3 headers}: In order for GGADT to find the Fortran headers for FFTW3, they must be in the standard location (@code{/usr/local/include} or @code{usr/include}) or in @code{$prefix/include} where @code{$prefix} is defined by doing @code{./configure --prefix=<prefix>} at the configuration step for @code{ggadt}.
+
+@item @emph{Location of the FFTW3 headers}: In order for GGADT to find the Fortran headers for FFTW3, they must be in the standard location (@code{/usr/local/include} or @code{usr/include}) or in @code{$prefix/include} where @code{$prefix} is defined by doing @code{./configure --prefix=<prefix>} at the configuration step for @code{ggadt}. If you have FFTW3 installed with MacPorts, the configure script should be able to find it for you, and you don't have to specify anything extra.
 
 @end itemize
 
@@ -227,12 +228,12 @@ Error: Fortran 2003: Procedure components at (1) are not yet implemented in gfor
 @item @strong{Macports} is highly recommended. It provides a convenient, safe package manager for Mac (unofficial, of course). To set up an environment condusive to compiling and running @code{ggadt}, do the following from the terminal:
 @enumerate
 @item Download and install macports from @url{http://www.macports.org/}.
-@item Install gcc (4.7 or higher is recommended), and the FFTW3 library:
+@item Install gcc (4.5.4 or higher is recommended), and the FFTW3 library:
 @example
-sudo port install gcc47
+sudo port install gcc45
 sudo port install fftw-3
 @end example
-@item Set the gcc compiler: @code{sudo port select --set gcc mp-gcc48}
+@item Set the gcc compiler: @code{sudo port select --set gcc mp-gcc45}
 @end enumerate
 @end itemize
 @item (@emph{Optional}) @strong{Python 2.7} or later for some of the included scripts.
