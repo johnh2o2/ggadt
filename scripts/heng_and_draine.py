@@ -1,14 +1,3 @@
-#Usage: ipython plot.py <path to output file>
-#outputs: (plots) which are saved as dQscat_dOmega_1d.png and dQscat_dOmega_2d.png.
-#
-# Plots:
-# ======
-#	dQscat_dOmega_2d -- plot of the full, head-on 2D scattering surface of the grain 
-#						(averaged over nangle orientations)
-#
-#	dQscat_dOmega_1d -- Slices of the 2D scattering surface at phi=0 and phi=90 
-#						
-
 from math import *
 import sys
 import os
@@ -31,13 +20,25 @@ xmax = 2000
 ymin = xmin
 ymax = xmax
 
+global_opts = { 'grid-width': 4, 
+				'ngrid' : 2048, 
+				'nangle' : 100, 
+				'euler-angle-mode' : 'random',
+				'fftw-optimization': 'measure'}
+
+clargs = ""
+
+for opt in global_opts:
+	val = global_opts[opt]
+	clargs = clargs + " --" + opt+ "=" + `val`
+
 conv = (360*60*60)/(2*np.pi) # convert from radians to arcseconds (a more sensible unit)
 if REDO_DATA:
-	os.system(par_dir+"/src/serial/ggadt-serial --parameter-file-name=heng_and_draine_fig2a.ini > data_2a.dat")
-	os.system(par_dir+"/src/serial/ggadt-serial --parameter-file-name=heng_and_draine_fig2b.ini > data_2b.dat")
-	os.system(par_dir+"/src/serial/ggadt-serial --parameter-file-name=heng_and_draine_fig3BA.ini > data_3BA.dat")
-	os.system(par_dir+"/src/serial/ggadt-serial --parameter-file-name=heng_and_draine_fig3BAM1.ini > data_3BAM1.dat")
-	os.system(par_dir+"/src/serial/ggadt-serial --parameter-file-name=heng_and_draine_fig3BAM2.ini > data_3BAM2.dat")
+	os.system(par_dir+"/src/serial/ggadt-serial " + clargs + " --parameter-file-name=heng_and_draine_fig2a.ini > data_2a.dat")
+	os.system(par_dir+"/src/serial/ggadt-serial " + clargs + " --parameter-file-name=heng_and_draine_fig2b.ini > data_2b.dat")
+	os.system(par_dir+"/src/serial/ggadt-serial " + clargs + " --parameter-file-name=heng_and_draine_fig3BA.ini > data_3BA.dat")
+	os.system(par_dir+"/src/serial/ggadt-serial " + clargs + " --parameter-file-name=heng_and_draine_fig3BAM1.ini > data_3BAM1.dat")
+	os.system(par_dir+"/src/serial/ggadt-serial " + clargs + " --parameter-file-name=heng_and_draine_fig3BAM2.ini > data_3BAM2.dat")
 
 data_dt = np.dtype([('theta', np.float_), ('phi', np.float_), ('f', np.float_)])
 data_2a = np.loadtxt("data_2a.dat",dtype=data_dt)

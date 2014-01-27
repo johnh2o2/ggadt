@@ -1,8 +1,3 @@
-! ggadt -- general geometry anomalous diffraction theory
-!
-!      | this code takes a parameter file as input, and prints
-!      | dqscat/domega as a function of thetax and thetay
-
 program ggadt
     use, intrinsic :: iso_c_binding
     use, intrinsic :: iso_fortran_env
