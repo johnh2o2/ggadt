@@ -35,6 +35,19 @@ AC_ARG_ENABLE([openmp],
 esac],[openmp=false])
 AM_CONDITIONAL([OMP], [test x$openmp = xtrue])
 
+#test for macports
+AC_MSG_CHECKING([macports])
+MACPORTS_TEST=`port version`
+if test "${MACPORTS_TEST}" == ""
+then
+  AC_MSG_RESULT([no])
+  USING_MACPORTS="no"
+else
+  AC_MSG_RESULT([yes])
+  USING_MACPORTS="yes"
+  LDFLAGS="$LDFLAGS -L/opt/local/lib"
+fi
+
 AC_CHECK_LIB([m],[cos]) #check for the math library
 AC_CHECK_LIB(fftw3,fftw_plan_dft_1d,, AC_MSG_ERROR([Missing FFTW library])) #check for fftw3 library
 AC_CHECK_HEADERS([ fftw3.h stdlib.h stdio.h ]) #Check for necessary headers
@@ -42,10 +55,14 @@ AC_CHECK_HEADERS([ fftw3.h stdlib.h stdio.h ]) #Check for necessary headers
 #Try to find the fftw3.f03 headers
 
 fftw3_inc_dir=${ac_srcdir}
-AC_FIND_FILE("fftw3.f03", [/usr/local/include /usr/include ${ac_srcdir} ${ac_prefix}/include], fftw3_fortran_header)
+AC_FIND_FILE("fftw3.f03", [ /usr/local/include /usr/include ${ac_srcdir} ${ac_prefix}/include /opt/local/include ], fftw3_fortran_header)
 AC_FIND_FILE("fftw3-mpi.f03", [/usr/local/include /usr/include ${ac_srcdir} ${ac_prefix}/include], fftw3_mpi_fortran_header)
 
-if test -f "${fftw3_inc_dir}/fftw3.f03"
+if test -f "/opt/local/include/fftw3.f03"
+then 
+  AC_MSG_NOTICE([Found fftw3.f03 file in /opt/local/include/. Will use this directory for fortran header files.])
+  fftw3_inc_dir="/opt/local/include/"
+elif test -f "${fftw3_inc_dir}/fftw3.f03"
 then 
 	AC_MSG_NOTICE([Found fftw3.f03 file in ${fftw3_inc_dir}. Will use this directory for fortran header files.])
 elif test -f "/usr/local/include/fftw3.f03"
@@ -156,10 +173,10 @@ then
 	AC_LANG(C)
 	AC_OPENMP
 	AC_CHECK_HEADERS([omp.h])
-	AC_MSG_CHECKING([if we can use the lfftw3_omp library (in C)])
+	AC_MSG_CHECKING([if we can use the lfftw3_threads library (in C)])
 	CFLAGSOLD=$CFLAGS
 	LDFLAGSOLD=$LDFLAGS 
-	LDFLAGS="${LDFLAGSOLD} -lfftw3_omp -lfftw3"
+	LDFLAGS="${LDFLAGSOLD} -lfftw3_threads -lfftw3"
 	CFLAGS="${CFLAGSOLD} $OPENMP_CFLAGS"
 	AC_RUN_IFELSE([
   		AC_LANG_PROGRAM([[
@@ -170,8 +187,8 @@ then
   							{ fftw3_init_threads(); return 0; }
   						]]
   			)],
-  		[ AC_MSG_RESULT(yes) ; omp_lib=" -lfftw3_omp"], 
-  		[ AC_MSG_RESULT(no) ; AC_MSG_ERROR([Cannot seem to use the lfftw3_omp library (in C)! Check config.log for more details.])]
+  		[ AC_MSG_RESULT(yes) ; omp_lib=" -lfftw3_threads"], 
+  		[ AC_MSG_RESULT(no) ; AC_MSG_ERROR([Cannot seem to use the lfftw3_threads library (in C)! Check config.log for more details.])]
   	)
 	LDFLAGS=$LDFLAGSOLD
 	CFLAGS=$CFLAGSOLD
