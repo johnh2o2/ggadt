@@ -175,6 +175,7 @@ Thus, GGADT does the following:
 @cindex configure
 @cindex enable-openmp
 @cindex enable-mpi
+@cindex gcc 
 
 @section System requirements
 GGADT should install easily on most @emph{Unix-based systems} (e.g. Linux, Mac) by following the standard GNU install procedures, described in @file{INSTALL}.
@@ -190,18 +191,32 @@ make install
 
 @itemize @bullet
 
+@item @strong{Suitable C and Fortran compilers}: GGADT was developed using the GNU compiler suite (version 4.5 and higher @footnote{GCC 4.4 throws the following error at compile time:
+
+@example
+options.f03:113.14:
+
+     procedure(helpr), pointer, nopass :: help_routine => null()
+              1
+Error: Fortran 2003: Procedure components at (1) are not yet implemented in gfortran
+@end example}) throughout, but the @code{configure} script will try to work with most common compilers. @emph{Your Fortran compiler must be able to compile Fortran 2003 code}.
+
+
+
+
+
 @item @strong{FFTW 3}. Available at @url{http://www.fftw.org/}.
 @itemize @minus
-@item @emph{Further requirements for installing @code{ggadt-openmp}}: you must have the @code{fftw3_omp} libraries installed. To do this, specify the @code{--enable-openmp} option when running @code{configure} for FFTW3.
+@item @emph{Further requirements for installing @code{ggadt-openmp}}: you must have the @code{fftw3_threads} libraries installed. To do this, specify the @code{--enable-threads} option when running @code{configure} for FFTW3. This might be enabled by default.
 @item @emph{Location of the FFTW3 headers}: In order for GGADT to find the Fortran headers for FFTW3, they must be in the standard location (@code{/usr/local/include} or @code{usr/include}) or in @code{$prefix/include} where @code{$prefix} is defined by doing @code{./configure --prefix=<prefix>} at the configuration step for @code{ggadt}.
 
 @end itemize
 
-@item @strong{Suitable C and Fortran compilers}: GGADT was developed using the GNU compiler suite (version 4.9) throughout, but the @code{configure} script will try to work with most common compilers. @emph{Your Fortran compiler must be able to compile Fortran 2003 code}.
+
 
 @itemize @minus
 
-@item @strong{OpenMP}: @emph{Further requirements for installing @code{ggadt-openmp}}: For the OpenMP version of GGADT, you must have C and Fortran compilers that are compatible with OpenMP version 4.0. This version of GGADT was tested with the GNU C and Fortran compilers (@code{gcc}, @code{gfortran}) version 4.9. 
+@item @strong{OpenMP}: @emph{Further requirements for installing @code{ggadt-openmp}}: For the OpenMP version of GGADT, you must have C and Fortran compilers that are compatible with OpenMP version 4.0. 
 
 @end itemize
 
@@ -209,8 +224,16 @@ make install
 @itemize @minus
 
 @item Install the latest edition of @strong{XCode command-line tools}. As of Mac OSX v10.9.1, the command-line tools are not included in XCode automatically, so you have to do this on your own.
-@item @strong{Warning} about the ``@code{gcc}" compiler included in the XCode command line tools. As I understand it, this is actually a front-end to a @code{clang} compiler, and will cause problems if you try to compile @code{ggadt-openmp}. The @code{gcc} version is also quite dated and might cause other problems. Your best bet is to either use another compiler (try the Intel compiler suite) or to download later versions of the GNU compilers. We recommend obtaining later versions of GNU compilers, which you can find here: @url{http://hpc.sourceforge.net/}.
-@item @strong{MacPorts} -- In order to avoid confusing the configuration script, we recommend you avoid using MacPorts, as they have their own directory structure and program names. It might still be possible to work with MacPorts as long as all of the MacPort program installations that you would need (i.e. @code{gcc}, @code{gfortran}) have symlinks to the locations that GNU Autoconf expects them to be. I.e., if you have a MacPort installation of @code{gcc} called @code{gcc-4.8} in some local directory, you should have a symlink to the binary @code{gcc-4.8} file in @code{/usr/bin}, with a symlink name of @code{gcc}. We haven't tried this, and thus we offer no gaurantee that this would work. 
+@item @strong{Macports} is highly recommended. It provides a convenient, safe package manager for Mac (unofficial, of course). To set up an environment condusive to compiling and running @code{ggadt}, do the following from the terminal:
+@enumerate
+@item Download and install macports from @url{http://www.macports.org/}.
+@item Install gcc (4.7 or higher is recommended), and the FFTW3 library:
+@example
+sudo port install gcc47
+sudo port install fftw-3
+@end example
+@item Set the gcc compiler: @code{sudo port select --set gcc mp-gcc48}
+@end enumerate
 @end itemize
 @item (@emph{Optional}) @strong{Python 2.7} or later for some of the included scripts.
 @item (@emph{Optional} @strong{matplotlib} python library if you wish to use the included plotting scripts.

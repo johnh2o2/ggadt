@@ -1,7 +1,68 @@
-AC_INIT([ggadt], [0.9.2], [jah5@princeton.edu])
+AC_INIT([ggadt], [0.9.3], [jah5@princeton.edu])
 AC_PREREQ([2.63]) 
 #AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/serial/ggadt-serial.f03])
+
+AC_CANONICAL_HOST
+# Check for which host we are on and setup a few things
+# specifically based on the host
+macports_prefix=""
+case $host_os in
+  darwin* )
+        #test for macports
+        AC_MSG_NOTICE([MAC OSX specific checks:])
+        AC_MSG_NOTICE([========================])
+
+
+        AC_MSG_CHECKING([if macports is installed])
+        MACPORTS_TEST=`port version`
+        if [[ "X${MACPORTS_TEST}" == "X" ]]
+        then
+          AC_MSG_RESULT([no])
+          USING_MACPORTS="no"
+        else
+          AC_MSG_RESULT([yes])
+          USING_MACPORTS="yes"
+          AC_MSG_CHECKING([for macports install of fftw-3])
+          PORT_TEST_FFTW3=`port installed fftw-3 | awk "/fftw-3/"`
+
+          if [[ "X${PORT_TEST_FFTW3}" == "X" ]]
+          then
+            AC_MSG_RESULT([no])
+            AC_MSG_ERROR([Macports is installed, but fftw-3 is not.])
+            AC_MSG_ERROR([fix this by doing: sudo port install fftw-3])
+          else
+            AC_MSG_RESULT([yes])
+          fi
+
+          AC_MSG_CHECKING([guessing macports parent directory])
+          fftw3_header_file=`port contents fftw-3 | grep "fftw3.f03"`
+          macport_inc_dir=`dirname $fftw3_header_file`
+          PWD_OLD=$PWD
+          cd $macport_inc_dir
+          cd ../..
+          macports_prefix=$PWD
+          cd $PWD_OLD
+          AC_MSG_RESULT([$macports_prefix])
+
+          LDFLAGS="$LDFLAGS -L$macports_prefix/local/lib"
+          INC="$INC -I$macports_prefix/local/include"
+
+        fi
+        AC_MSG_NOTICE([========================])
+        ;;
+  linux*)
+        # Do something specific for linux
+        ;;
+   *BSD*)
+        # Do something specific for BSD
+        ;;
+    *)
+        #Default Case
+        AC_MSG_ERROR([Your platform is not currently supported])
+        ;;
+esac
+
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_PROG_CC
 AC_PROG_FC 
@@ -35,18 +96,6 @@ AC_ARG_ENABLE([openmp],
 esac],[openmp=false])
 AM_CONDITIONAL([OMP], [test x$openmp = xtrue])
 
-#test for macports
-AC_MSG_CHECKING([macports])
-MACPORTS_TEST=`port version`
-if test "${MACPORTS_TEST}" == ""
-then
-  AC_MSG_RESULT([no])
-  USING_MACPORTS="no"
-else
-  AC_MSG_RESULT([yes])
-  USING_MACPORTS="yes"
-  LDFLAGS="$LDFLAGS -L/opt/local/lib"
-fi
 
 AC_CHECK_LIB([m],[cos]) #check for the math library
 AC_CHECK_LIB(fftw3,fftw_plan_dft_1d,, AC_MSG_ERROR([Missing FFTW library])) #check for fftw3 library
@@ -55,13 +104,13 @@ AC_CHECK_HEADERS([ fftw3.h stdlib.h stdio.h ]) #Check for necessary headers
 #Try to find the fftw3.f03 headers
 
 fftw3_inc_dir=${ac_srcdir}
-AC_FIND_FILE("fftw3.f03", [ /usr/local/include /usr/include ${ac_srcdir} ${ac_prefix}/include /opt/local/include ], fftw3_fortran_header)
+AC_FIND_FILE("fftw3.f03", [ /usr/local/include /usr/include ${ac_srcdir} ${ac_prefix}/include ${macports_prefix}/local/include ], fftw3_fortran_header)
 AC_FIND_FILE("fftw3-mpi.f03", [/usr/local/include /usr/include ${ac_srcdir} ${ac_prefix}/include], fftw3_mpi_fortran_header)
 
-if test -f "/opt/local/include/fftw3.f03"
+if test -f "${macports_prefix}/local/include/fftw3.f03"
 then 
-  AC_MSG_NOTICE([Found fftw3.f03 file in /opt/local/include/. Will use this directory for fortran header files.])
-  fftw3_inc_dir="/opt/local/include/"
+  AC_MSG_NOTICE([Found fftw3.f03 file in ${macports_prefix}/local/include. Will use this directory for fortran header files.])
+  fftw3_inc_dir="${macports_prefix}/local/include"
 elif test -f "${fftw3_inc_dir}/fftw3.f03"
 then 
 	AC_MSG_NOTICE([Found fftw3.f03 file in ${fftw3_inc_dir}. Will use this directory for fortran header files.])
