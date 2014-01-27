@@ -26,7 +26,7 @@ module spheres
         end do 
 
         ! this section will read the entire header in the future.
-        nspheres = 1024
+        nspheres = 256
 
         ! allocate necessary memory
         allocate(pos(nspheres,3),stat = allocatestatus)
