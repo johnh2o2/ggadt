@@ -7,7 +7,8 @@ automake -a
 
 bash configure --enable-openmp --enable-profiling || exit
 make || exit
-#make html || exit
-#cp doc/*png doc/ggadt.html/
-cd scripts
-python heng_and_draine.py
+make html || exit
+cd scripts/
+bash make_sample_plots.sh || exit
+cd ..
+cp doc/*png doc/ggadt.html/ 
