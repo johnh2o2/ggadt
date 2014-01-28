@@ -8,38 +8,33 @@ from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 
 par_dir = ".."
-
+ggadt = "/src/omp/ggadt-omp"
+figs = [ "2b" ]
+ALL_FIGS =  [ "2a", "2b", "3BA", "3BAM1", "3BAM2" ]
 REDO_DATA= True
 
-nplot = 250 # dimension of plotted grid (interpolated)
-delta = 250 # distance above or below theta min/max for interpolation purposes
 
-# min/max scattering angles to deal with
-xmin = -2000
-xmax = 2000
-ymin = xmin
-ymax = xmax
 
-global_opts = { 'grid-width': 4, 
+global_opts = { 'grid-width': 16, 
 				'ngrid' : 2048, 
 				'nangle' : 100, 
 				'euler-angle-mode' : 'random',
-				'fftw-optimization': 'measure'}
+				'fftw-optimization': 'measure'
+				}
 
 clargs = ""
-
 for opt in global_opts:
 	val = global_opts[opt]
 	clargs = clargs + " --" + opt+ "=" + `val`
 
 conv = (360*60*60)/(2*np.pi) # convert from radians to arcseconds (a more sensible unit)
 if REDO_DATA:
-	os.system(par_dir+"/src/serial/ggadt-serial " + clargs + " --parameter-file-name=heng_and_draine_fig2a.ini > data_2a.dat")
-	os.system(par_dir+"/src/serial/ggadt-serial " + clargs + " --parameter-file-name=heng_and_draine_fig2b.ini > data_2b.dat")
-	os.system(par_dir+"/src/serial/ggadt-serial " + clargs + " --parameter-file-name=heng_and_draine_fig3BA.ini > data_3BA.dat")
-	os.system(par_dir+"/src/serial/ggadt-serial " + clargs + " --parameter-file-name=heng_and_draine_fig3BAM1.ini > data_3BAM1.dat")
-	os.system(par_dir+"/src/serial/ggadt-serial " + clargs + " --parameter-file-name=heng_and_draine_fig3BAM2.ini > data_3BAM2.dat")
+	for f in figs:
+		command=par_dir+ggadt+" --parameter-file-name=heng_and_draine_fig"+f+".ini " + clargs + " > data_"+f+".dat"
+		os.system(command)
+		print command 
 
+sys.exit()
 data_dt = np.dtype([('theta', np.float_), ('phi', np.float_), ('f', np.float_)])
 data_2a = np.loadtxt("data_2a.dat",dtype=data_dt)
 data_2b = np.loadtxt("data_2b.dat",dtype=data_dt)
@@ -48,10 +43,9 @@ data_3BAM1 = np.loadtxt("data_3BAM1.dat",dtype=data_dt)
 data_3BAM2 = np.loadtxt("data_3BAM2.dat",dtype=data_dt)
 
 ALL_DATA = { "2a": data_2a,"2b": data_2b, "3BA" : data_3BA, "3BAM1" : data_3BAM1, "3BAM2": data_3BAM2}
+
 TWO_D_FIGS = [ "2a", "2b"]
 ONE_D_FIGS = [ "3BA", "3BAM1", "3BAM2"]
-
-
 
 f2 = plt.figure(2)
 ax2 = f2.add_subplot(111)
@@ -61,7 +55,15 @@ axb = f.add_subplot(122)
 
 ax_f2 = { "2a" : axa, "2b" : axb}
 
-for FIG in ALL_DATA:
+for FIG in figs:
+	nplot = 250 # dimension of plotted grid (interpolated)
+	delta = 250 # distance above or below theta min/max for interpolation purposes
+
+	# min/max scattering angles to deal with
+	xmin = -2000
+	xmax = 2000
+	ymin = xmin
+	ymax = xmax
 	data = ALL_DATA[FIG]
 	x = data['theta']*conv
 	y = data['phi']*conv
@@ -170,8 +172,6 @@ for FIG in ALL_DATA:
 
 
 f.savefig("HDF_fig2.png")
-
-
 
 ax2.set_xlim(10,3000)
 ax2.set_xscale('log')

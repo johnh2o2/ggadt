@@ -5,6 +5,8 @@ module spheres
     use sphere
     save
     integer :: nspheres, nrots, ok, n
+    integer :: MIGRATE, ISEED, NS
+    real :: ALPHA(3), VTOT, A_1(3), A_2(3)
     real, allocatable :: radii(:), ior_r(:), ior_i(:)
     real, allocatable :: pos(:,:), pos_rot(:,:)
     
@@ -21,12 +23,24 @@ module spheres
 
         open(unit=1,file=sphlist_fname) ! open sphere file.
 
-        do i=1,5
-            read(1,'(a)') junk      ! ignore the header for now.
-        end do 
+        ! Read header
+        read(1,'(52X,i2,7X,i4)') MIGRATE,ISEED
+        read(1,'(i9,f12.2,3f11.6)') NS, VTOT, ALPHA(1), ALPHA(2), ALPHA(3)
+        read(1,'(3f10.6,13X)') A_1(1), A_1(2), A_1(3)
+        read(1,'(3f10.6,13X)') A_2(1), A_2(2), A_2(3)
+        read(1,'(A)') junk
+
+        !write(0,*) sphlist_fname," variables:"
+        !write(0,*) "MIGRATE",MIGRATE
+        !write(0,*) "ISEED",ISEED
+        !write(0,*) "NS",NS
+        !write(0,*) "VTOT",VTOT
+        !write(0,*) "alpha", ALPHA
+        !write(0,*) "A_1", A_1
+        !write(0,*) "A_2", A_2
 
         ! this section will read the entire header in the future.
-        nspheres = 256
+        nspheres = NS
 
         ! allocate necessary memory
         allocate(pos(nspheres,3),stat = allocatestatus)
