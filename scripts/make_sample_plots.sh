@@ -1,14 +1,14 @@
 #!/bin/bash
 
 
-cd ../src/serial
+cd ../src/
 
 #Test sphere
-./ggadt-serial --parameter-file-name=../../data/paramfiles/parameterfile-sphere.ini > ../../data/test_sphere.dat
-./ggadt-serial --parameter-file-name=../../data/paramfiles/parameterfile-spheres.ini > ../../data/test_spheres.dat
-./ggadt-serial --parameter-file-name=../../data/paramfiles/parameterfile-ellipsoid.ini > ../../data/test_ellipsoid.dat
+./ggadt --parameter-file-name=../data/paramfiles/parameterfile-sphere.ini > ../data/test_sphere.dat
+./ggadt --parameter-file-name=../data/paramfiles/parameterfile-spheres.ini > ../data/test_spheres.dat
+./ggadt --parameter-file-name=../data/paramfiles/parameterfile-ellipsoid.ini > ../data/test_ellipsoid.dat
 
-cd ../../
+cd ../
 
 ipython scripts/plot.py data/test_sphere.dat
 mv dQscat_dOmega_1d.png test_sphere_1d.png

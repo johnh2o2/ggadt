@@ -1,7 +1,7 @@
 AC_INIT([ggadt], [0.9.4], [jah5@princeton.edu])
 AC_PREREQ([2.63]) 
 #AC_CONFIG_MACRO_DIRS([m4])
-AC_CONFIG_SRCDIR([src/serial/ggadt-serial.f03])
+AC_CONFIG_SRCDIR([src/sphere.f03])
 
 AC_CANONICAL_HOST
 # Check for which host we are on and setup a few things
@@ -188,30 +188,35 @@ AC_ARG_ENABLE([profiling],
 esac],[])
 
 
-# Where to put the FFTW plans 
-plan_dir="${HOME}/.ggadt/plans"
+# Where to put the FFTW plans -- ideally we should figure out how to work
+# with the standard GNU datadir variable.
+data_dir="${HOME}/.ggadt"
+plan_dir="$data_dir/plans"
 
+mkdir -p $data_dir
+mkdir -p $plan_dir
 
 AC_MSG_NOTICE([using $plan_dir as the directory to store FFTW plans])
 
-omp_dir=
 USE_OMP_LIB=
+OMP_COMMENT=
 
 
 omp_lib=true
 if test $openmp = true
 then
-	omp_dir=[omp]
 	USE_OMP_LIB="use omp_lib"
-	
+	OMP_COMMENT="! [OMP] "
+
 	AC_LANG(C)
 	AC_OPENMP
 	AC_CHECK_HEADERS([omp.h])
 	AC_MSG_CHECKING([if we can use the lfftw3_threads library (in C)])
 	CFLAGSOLD=$CFLAGS
-	LDFLAGSOLD=$LDFLAGS 
-	LDFLAGS="${LDFLAGSOLD} -lfftw3_threads -lfftw3"
+	LIBSOLD=$LDFLAGS 
+	LIBS="${LIBS} -lfftw3_threads"
 	CFLAGS="${CFLAGSOLD} $OPENMP_CFLAGS"
+
 	AC_RUN_IFELSE([
   		AC_LANG_PROGRAM([[
   							#include<omp.h>
@@ -221,10 +226,9 @@ then
   							{ fftw3_init_threads(); return 0; }
   						]]
   			)],
-  		[ AC_MSG_RESULT(yes) ; omp_lib=" -lfftw3_threads"], 
-  		[ AC_MSG_RESULT(no) ; AC_MSG_ERROR([Cannot seem to use the lfftw3_threads library (in C)! Check config.log for more details.])]
+  		[ AC_MSG_RESULT(yes) ], 
+  		[ AC_MSG_RESULT(no) ; LIBS=$LIBSOLD ; AC_MSG_ERROR([Cannot seem to use the lfftw3_threads library (in C)! Check config.log for more details.])]
   	)
-	LDFLAGS=$LDFLAGSOLD
 	CFLAGS=$CFLAGSOLD
 	AC_LANG([Fortran])
 	AC_OPENMP
@@ -244,34 +248,23 @@ then
   	)
 	FCFLAGS=$FCFLAGSOLD
   	
-	
-	
-	AC_CONFIG_FILES([ src/omp/Makefile ])
 fi
 
 AC_PROG_INSTALL
 AC_CONFIG_FILES([ 	Makefile 
 					src/Makefile 
-          src/combined/Makefile
-					src/serial/Makefile 
 					doc/Makefile 
-					src/serial/fftwmod-serial.f03 
-					src/omp/fftwmod-omp.f03 
-          src/combined/fftwmod.f03
+					src/fftwmod.f03 
+          src/spheres.f03
+          src/ggadt.f03
 					src/common.f03
 				])
 AC_SUBST(fftw3_inc_dir)
 AC_SUBST(plan_dir)
+AC_SUBST(data_dir)
 AC_SUBST(OPENMP_FCFLAGS)
+AC_SUBST(USE_OMP_LIB)
+AC_SUBST(OMP_COMMENT)
 AC_SUBST(omp_lib)
-AC_SUBST(omp_dir)
 
 AC_OUTPUT
-
-# Move shared files to serial and open-mp code versions
-[cp src/common.f03 src/serial/]
-[cp src/options.f03 src/serial/]
-[cp src/common.f03 src/omp/]
-[cp src/options.f03 src/omp/]
-[cp src/common.f03 src/combined/]
-[cp src/options.f03 src/combined/]

@@ -1,7 +1,7 @@
 module fftw
     use omp_lib
     use, intrinsic :: iso_c_binding
-       include '@fftw3_inc_dir@/fftw3.f03'
+       include '/opt/local/include/fftw3.f03'
     logical :: first_time = .true.
     type(c_ptr) :: plan
     integer ::  mode = fftw_estimate
@@ -16,13 +16,13 @@ contains
         mode_name = mode_name_in
 
         select case (mode_name)
-        case('fftw_estimate')
+        case('estimate')
             mode = fftw_estimate
-        case('fftw_patient')
+        case('patient')
             mode = fftw_patient
-        case('fftw_exhaustive')
+        case('exhaustive')
             mode = fftw_exhaustive
-        case('fftw_measure')
+        case('measure')
             mode = fftw_measure
         case default
             mode = fftw_estimate 
@@ -34,28 +34,27 @@ contains
         real, intent(in) :: x(:), y(:)
         complex(c_double_complex), intent(inout) :: f(:,:)
         complex(c_double_complex), dimension(size(x),size(y)) :: fft
-        integer :: nx, ny, i, j, threaderror, numthreads
+        integer :: nx, ny, i, j
         integer :: error
 
 
         nx = size(x)
         ny = size(y)
-	threaderror = fftw_init_threads()
-	if (threaderror == 0) then
-		write (0,*) "------------------------------"
-		write (0,*) "Error initializing multiple threads. Program will attempt to proceed"
-		write (0,*) "using 1 thread."
-		write (0,*) "------------------------------"
-		numthreads = 1
-	else
-		numthreads = omp_get_max_threads()
-	endif
-	!write(0,*) "Number of threads: ",numthreads
-	call fftw_plan_with_nthreads(numthreads)
+        ! OMP threaderror = fftw_init_threads()
+        ! OMP if (threaderror == 0) then
+        ! OMP     write (0,*) "------------------------------"
+        ! OMP     write (0,*) "Error initializing multiple threads. Program will attempt to proceed"
+        ! OMP     write (0,*) "using 1 thread."
+        ! OMP     write (0,*) "------------------------------"
+        ! OMP     numthreads = 1
+        ! OMP else
+        ! OMP     numthreads = omp_get_max_threads()
+        ! OMP endif
+        ! OMP call fftw_plan_with_nthreads(numthreads)
         if (first_time) then
             write(0,*) new_line('a')//"        /"
             write(0,*) " FFTW: | Finding best fft algorithm to use..."
-            write(plan_filename,'(a,i0.4,a,i0.4,a,i0.3,a,a)') "@plan_dir@/&
+            write(plan_filename,'(a,i0.4,a,i0.4,a,i0.3,a,a)') "/Users/jah5/.ggadt/plans/&
             &plan_nx",nx,"_ny",ny,"_fftw_mode",mode,".plan",char(0)
             error = fftw_import_wisdom_from_filename(trim(adjustl(plan_filename)))
             if (error == 0) then

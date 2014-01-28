@@ -5,10 +5,10 @@ aclocal -I./m4
 autoconf
 automake -a
 
-bash configure --enable-openmp --enable-profiling || exit
+bash configure --enable-openmp || exit
 make || exit
 make html || exit
-cd scripts/
+cd scripts
 bash make_sample_plots.sh || exit
 cd ..
 cp doc/*png doc/ggadt.html/ 

@@ -1,4 +1,5 @@
 module fftw
+    @USE_OMP_LIB@
     use, intrinsic :: iso_c_binding
        include '@fftw3_inc_dir@/fftw3.f03'
     logical :: first_time = .true.
@@ -39,6 +40,17 @@ contains
 
         nx = size(x)
         ny = size(y)
+        @OMP_COMMENT@threaderror = fftw_init_threads()
+        @OMP_COMMENT@if (threaderror == 0) then
+        @OMP_COMMENT@    write (0,*) "------------------------------"
+        @OMP_COMMENT@    write (0,*) "Error initializing multiple threads. Program will attempt to proceed"
+        @OMP_COMMENT@    write (0,*) "using 1 thread."
+        @OMP_COMMENT@    write (0,*) "------------------------------"
+        @OMP_COMMENT@    numthreads = 1
+        @OMP_COMMENT@else
+        @OMP_COMMENT@    numthreads = omp_get_max_threads()
+        @OMP_COMMENT@endif
+        @OMP_COMMENT@call fftw_plan_with_nthreads(numthreads)
         if (first_time) then
             write(0,*) new_line('a')//"        /"
             write(0,*) " FFTW: | Finding best fft algorithm to use..."

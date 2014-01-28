@@ -3,6 +3,8 @@ module spheres
     use, intrinsic :: iso_c_binding
     use common_mod
     use sphere
+    @USE_OMP_LIB@
+    
     save
     integer :: nspheres, nrots, ok, n
     integer :: MIGRATE, ISEED, NS
@@ -127,12 +129,16 @@ module spheres
         end do
 
         phi = phi_spheres(x,y,k) ! paint phi grid
+        !$omp parallel shared(shadow_spheres,phi) 
+        !$omp do schedule(dynamic) private(i,j)
         do i=1,ngrid
             do j=1,ngrid 
                 ! convert phi grid to shadow grid*(-1)^(i+j) so the fft is centered
                 shadow_spheres(i,j) = (-1.0)**(i+j+1)*(1-exp( (0.0,1.0)*phi(i,j) ))
             end do
         end do 
+        !$omp end do nowait
+        !$omp end parallel
         
     end function shadow_spheres
 
