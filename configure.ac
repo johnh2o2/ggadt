@@ -1,4 +1,4 @@
-AC_INIT([ggadt], [0.9.3], [jah5@princeton.edu])
+AC_INIT([ggadt], [0.9.4], [jah5@princeton.edu])
 AC_PREREQ([2.63]) 
 #AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/serial/ggadt-serial.f03])
@@ -7,6 +7,7 @@ AC_CANONICAL_HOST
 # Check for which host we are on and setup a few things
 # specifically based on the host
 macports_prefix=""
+macports_include="."
 case $host_os in
   darwin* )
         #test for macports
@@ -44,9 +45,9 @@ case $host_os in
           macports_prefix=$PWD
           cd $PWD_OLD
           AC_MSG_RESULT([$macports_prefix])
-
+          macports_include=$macports_prefix/local/include
           LDFLAGS="$LDFLAGS -L$macports_prefix/local/lib"
-          INC="$INC -I$macports_prefix/local/include"
+          
 
         fi
         AC_MSG_NOTICE([========================])
@@ -76,15 +77,6 @@ fi
 AC_SUBST(ac_prefix)
 AC_DEFINE_UNQUOTED(CONFIG_PREFIX, ["$ac_prefix"], [Default installation prefix.])
 
-#MPI is not currently operational (I can't find a Fortran 2003 MPI compiler...)
-AC_ARG_ENABLE([mpi],
-[  --enable-mpi    Compile mpi version (DO NOT USE, not operational.)],
-[case "${enableval}" in
-  yes) mpi=true ;;
-  no)  mpi=false ;;
-  *) AC_MSG_ERROR([bad value ${enableval} for --enable-mpi]) ;;
-esac],[mpi=false])
-AM_CONDITIONAL([MPI], [test x$mpi = xtrue])
 
 # allows for --enable-openmp
 AC_ARG_ENABLE([openmp],
@@ -104,13 +96,12 @@ AC_CHECK_HEADERS([ fftw3.h stdlib.h stdio.h ]) #Check for necessary headers
 #Try to find the fftw3.f03 headers
 
 fftw3_inc_dir=${ac_srcdir}
-AC_FIND_FILE("fftw3.f03", [ /usr/local/include /usr/include ${ac_srcdir} ${ac_prefix}/include ${macports_prefix}/local/include ], fftw3_fortran_header)
-AC_FIND_FILE("fftw3-mpi.f03", [/usr/local/include /usr/include ${ac_srcdir} ${ac_prefix}/include], fftw3_mpi_fortran_header)
+AC_FIND_FILE("fftw3.f03", [ /usr/local/include /usr/include ${ac_srcdir} ${ac_prefix}/include $macports_include ], fftw3_fortran_header)
 
-if test -f "${macports_prefix}/local/include/fftw3.f03"
+if test -f "${macports_include}/fftw3.f03"
 then 
-  AC_MSG_NOTICE([Found fftw3.f03 file in ${macports_prefix}/local/include. Will use this directory for fortran header files.])
-  fftw3_inc_dir="${macports_prefix}/local/include"
+  AC_MSG_NOTICE([Found fftw3.f03 file in ${macports_include}. Will use this directory for fortran header files.])
+  fftw3_inc_dir="${macports_include}"
 elif test -f "${fftw3_inc_dir}/fftw3.f03"
 then 
 	AC_MSG_NOTICE([Found fftw3.f03 file in ${fftw3_inc_dir}. Will use this directory for fortran header files.])
@@ -129,6 +120,8 @@ then
 else
 	AC_MSG_ERROR([Cannot find fftw3 fortran headers!])
 fi
+
+INC="$INC -I$fftw3_inc_dir"
 
 # Now make sure the Fortran compiler is sane.
 
@@ -201,23 +194,15 @@ plan_dir="${HOME}/.ggadt/plans"
 
 AC_MSG_NOTICE([using $plan_dir as the directory to store FFTW plans])
 
-mpi_dir=
 omp_dir=
+USE_OMP_LIB=
 
-# Complain if the user wants MPI
-if test $mpi = true
-then
-	mpi_dir=[mpi]
-	AC_MSG_WARN([ |--+++++++--=========================================================== ])
-	AC_MSG_WARN([ |--WARNING-- MPI is NOT available at this time. Ignoring '--enable-mpi'])
-	AC_MSG_WARN([ |--+++++++--=========================================================== ])
-fi
 
 omp_lib=true
 if test $openmp = true
 then
 	omp_dir=[omp]
-	
+	USE_OMP_LIB="use omp_lib"
 	
 	AC_LANG(C)
 	AC_OPENMP
@@ -267,19 +252,20 @@ fi
 AC_PROG_INSTALL
 AC_CONFIG_FILES([ 	Makefile 
 					src/Makefile 
+          src/combined/Makefile
 					src/serial/Makefile 
 					doc/Makefile 
 					src/serial/fftwmod-serial.f03 
-					src/mpi/fftwmod-mpi.f03 
 					src/omp/fftwmod-omp.f03 
+          src/combined/fftwmod.f03
 					src/common.f03
 				])
 AC_SUBST(fftw3_inc_dir)
 AC_SUBST(plan_dir)
 AC_SUBST(OPENMP_FCFLAGS)
-AC_SUBST(mpi_dir)
 AC_SUBST(omp_lib)
 AC_SUBST(omp_dir)
+
 AC_OUTPUT
 
 # Move shared files to serial and open-mp code versions
@@ -287,3 +273,5 @@ AC_OUTPUT
 [cp src/options.f03 src/serial/]
 [cp src/common.f03 src/omp/]
 [cp src/options.f03 src/omp/]
+[cp src/common.f03 src/combined/]
+[cp src/options.f03 src/combined/]
