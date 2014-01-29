@@ -1,13 +1,17 @@
 program ggadt
     use, intrinsic :: iso_c_binding
     use, intrinsic :: iso_fortran_env
-    @USE_OMP_LIB@
+    
 
     use sphere
     use spheres
     use ellipsoid
     use common_mod
-    use fftw
+
+    @USE_OMP_LIB@
+    @USE_FFTW@
+    @USE_GPFA@
+
     implicit none
 
     
@@ -23,7 +27,7 @@ program ggadt
 
     call set_parameter_values()
     call initialize_and_allocate_vars()
-    call set_optimization_mode(fftw_optimization_mode_name)
+    @FFTW3_UNCOMMENT@call set_optimization_mode(fftw_optimization_mode_name)
     call print_parameters()
     
 

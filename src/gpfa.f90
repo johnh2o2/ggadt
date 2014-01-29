@@ -1,3 +1,10 @@
+! Edited by John Hoffman (01/27/2014) 
+!     + Made this into module
+!     + Removed references to DDPRECISION, instead opting for 
+!          single precision and setting INTEGER, PARAMETER :: WP=KIND(0.E0)
+!     + Changed name of function GPFA to GPFA_FFT 
+!          (to avoid naming conflicts in gpfamod.f03)
+
 !*********************************************************************
 !                                                                    *
 !     GPFAPACK - FORTRAN IMPLEMENTATION OF THE SELF-SORTING          *
@@ -35,9 +42,12 @@
 !        WRITTEN BY CLIVE TEMPERTON 1990
 
 !----------------------------------------------------------------------
+MODULE GPFA_RAW
+  INTEGER, PARAMETER :: WP=KIND(0.E0)
 
+  CONTAINS
     SUBROUTINE SETGPFA(TRIGS,N)
-      USE DDPRECISION,ONLY : WP
+     
       REAL(WP) :: ANGLE, DEL, TRIGS, TWOPI
 
       DIMENSION TRIGS(*)
@@ -145,8 +155,8 @@
 
 !----------------------------------------------------------------------
 
-    SUBROUTINE GPFA(A,B,TRIGS,INC,JUMP,N,LOT,ISIGN)
-      USE DDPRECISION,ONLY : WP
+    SUBROUTINE GPFA_FFT(A,B,TRIGS,INC,JUMP,N,LOT,ISIGN)
+      
       REAL(WP) :: TRIGS, B, A
 
       DIMENSION A(*), B(*), TRIGS(*)
@@ -217,7 +227,7 @@
       END IF
 
       RETURN
-    END SUBROUTINE GPFA
+    END SUBROUTINE GPFA_FFT
 !     fortran version of *gpfa2* -
 !     radix-2 section of self-sorting, in-place, generalized pfa
 !     central radix-2 and radix-8 passes included
@@ -226,7 +236,6 @@
 !-------------------------------------------------------------------
 
     SUBROUTINE GPFA2F(A,B,TRIGS,INC,JUMP,N,MM,LOT,ISIGN)
-      USE DDPRECISION, ONLY : WP
       REAL (WP) :: SI7, CO7, SI6, CO6, SI5, CO5, SI4, CO4, C3, C2, C1, SI3, &
         CO3, SI2, CO2, SI1, CO1, U3, U1, U2, U0, T3, T1, T2, T0, SS, S, B, A, &
         TRIGS
@@ -1054,7 +1063,6 @@
 !-------------------------------------------------------------------
 
     SUBROUTINE GPFA3F(A,B,TRIGS,INC,JUMP,N,MM,LOT,ISIGN)
-      USE DDPRECISION, ONLY : WP
       REAL (WP) :: C1, B, A, SI2, CO2, SI1, SIN60, CO1, U3, U1, U2, T3, T1, &
         T2, S, TRIGS
       DIMENSION A(*), B(*), TRIGS(*)
@@ -1423,7 +1431,6 @@
 !-------------------------------------------------------------------
 
     SUBROUTINE GPFA5F(A,B,TRIGS,INC,JUMP,N,MM,LOT,ISIGN)
-      USE DDPRECISION, ONLY : WP
       REAL (WP) :: BX, AX, U11, U10, U9, U8, U7, U6, U5, U4, T11, T10, T9, T8, &
         T7, T6, T5, T4, QRT5, SIN72, SIN36, SI4, CO4, C3, C2, C1, SI3, CO3, &
         SI2, CO2, SI1, CO1, U3, U1, U2, T3, T1, T2, S, B, A, TRIGS
@@ -2122,3 +2129,4 @@
 
       RETURN
     END SUBROUTINE GPFA5F
+END MODULE GPFA_RAW

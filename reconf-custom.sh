@@ -8,7 +8,5 @@ automake -a
 bash configure --enable-openmp || exit
 make || exit
 make html || exit
-cd scripts
-bash make_sample_plots.sh || exit
-cd ..
-cp doc/*png doc/ggadt.html/ 
+cd src
+./ggadt > ../test_output.dat || exit
