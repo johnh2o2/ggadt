@@ -112,7 +112,8 @@ program ggadt
     end do
     write(0,*) "done."
 
-    call cleanup()
+    ! call cleanup()
+
 contains
 
     function get_k(x)
@@ -294,28 +295,64 @@ contains
     end function get_new_euler_angles
 
     subroutine cleanup()
+        if (verbose_mode) write(0,*) "deallocating x"
         deallocate(x)
-        deallocate(y)
-        deallocate(z)
-        deallocate(kx)
-        deallocate(ky)
-        deallocate(thetax)
-        deallocate(thetay)
-        deallocate(sh)
-        deallocate(ftsh)
-        deallocate(scatter)
+        if (verbose_mode) write(0,*) " --> Done."
 
+        if (verbose_mode) write(0,*) "deallocating y"
+        deallocate(y)
+        if (verbose_mode) write(0,*) " --> Done."
+
+        if (verbose_mode) write(0,*) "deallocating z"
+        deallocate(z)
+        if (verbose_mode) write(0,*) " --> Done."
+
+        if (verbose_mode) write(0,*) "deallocating kx"
+        deallocate(kx)
+        if (verbose_mode) write(0,*) " --> Done."
+
+        if (verbose_mode) write(0,*) "deallocating ky"
+        deallocate(ky)
+        if (verbose_mode) write(0,*) " --> Done."
+
+        if (verbose_mode) write(0,*) "deallocating thetax"
+        deallocate(thetax)
+        if (verbose_mode) write(0,*) " --> Done."
+
+        if (verbose_mode) write(0,*) "deallocating thetay"
+        deallocate(thetay)
+        if (verbose_mode) write(0,*) " --> Done."
+
+        if (verbose_mode) write(0,*) "deallocating sh"
+        deallocate(sh)
+        if (verbose_mode) write(0,*) " --> Done."
+
+        if (verbose_mode) write(0,*) "deallocating ftsh"
+        deallocate(ftsh)
+        if (verbose_mode) write(0,*) " --> Done."
+
+        if (verbose_mode) write(0,*) "deallocating scatter"
+        deallocate(scatter)
+        if (verbose_mode) write(0,*) " --> Done."
+
+        if (verbose_mode) write(0,*) "deallocating scatter_temp"
         deallocate(scatter_temp)
+        if (verbose_mode) write(0,*) " --> Done."
+
+        if (verbose_mode) write(0,*) "deallocating chrd"
         deallocate(chrd)
-        
+        if (verbose_mode) write(0,*) " --> Done."
 
         if (geometry .eq. 'spheres')    then
+            if (verbose_mode) write(0,*) "deallocating more stuff for spheres"
             deallocate(pos)
             deallocate(pos_rot)
             deallocate(radii)
             deallocate(ior_r)
             deallocate(ior_i)
+            if (verbose_mode) write(0,*) " --> Done."
         end if
+
     end subroutine cleanup
 
 

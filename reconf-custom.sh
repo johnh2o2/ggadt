@@ -1,12 +1,14 @@
 #!/bin/bash
+
 bash cleandist-custom.sh
+git log --pretty --graph > ChangeLog
 
 aclocal -I./m4
 autoconf
 automake -a
 
-bash configure --enable-openmp || exit
+bash configure || exit
 make || exit
 make html || exit
-cd src
-./ggadt > ../test_output.dat || exit
+src/ggadt --verbose > test_output.dat || exit
+python scripts/plot.py test_output.dat || exit

@@ -1,0 +1,473 @@
+* commit c1b044eec3d6c3c696926d40334528c2c47bb5d5
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jan 28 19:20:32 2014 -0500
+| 
+|     Now conditionally uses either gpfa or fftw. You have to --enable-fftw to use it. GPFA DOES NOT currently work; segfaulting. I dont understand the meaning of the JUMP and INC parameters.
+|  
+* commit 2c912e6ef41d53645198708ae8cbd1244565fff2
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jan 28 11:39:43 2014 -0500
+| 
+|     Combined OMP and serial. Spheres module now reads in all parts of header (can't remember if I did that in this commit or last commit...). Fixed problems with command line/parameter file parsing. Autoconf now erases HOME/.ggadt on uninstall and clean. Should probably change this to work with the GNU standard datadir variable in the future.
+|  
+* commit 78d14e1df9b511b1de7891929224f2223e69245e
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jan 28 00:59:48 2014 -0500
+| 
+|     progress on merging omp and serial versions
+|    
+*   commit a900c4983de91510b6d34d8416e566f1da33c9d4
+|\  Merge: 6053d0c 56da91d
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Mon Jan 27 21:10:34 2014 -0500
+| | 
+| |     Merging gpfa
+| |   
+| * commit 56da91d3cde43d12cf9e91f789def97db60438ad
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Mon Jan 27 03:20:43 2014 -0500
+| | 
+| |     Added gpfa.f90 and a serial module file. The beginning...
+| |   
+* | commit 6053d0c5d7a749944994e3cb8c96f4ae5ba36dc1
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Mon Jan 27 20:50:25 2014 -0500
+| | 
+| |     Fixed problem with command-line/parameter file mixtures -- it appears you must quote strings in the parameter files. ALSO: Spheres module (both omp and serial) now read in the header information. Before, we hardcoded nspheres into the program and never changed it
+| |   
+* | commit 6b876cb65b2ae5aafc562b0048c6c7c3c1efca11
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Mon Jan 27 16:14:51 2014 -0500
+| | 
+| |     Trying to use combo of command line args and parameter file defined args, having problems...
+| |   
+* | commit 2ff25fa6b872d92757e65114f399c375f00a831c
+|/  Author: John Hoffman <jah5@princeton.edu>
+|   Date:   Mon Jan 27 13:54:09 2014 -0500
+|   
+|       You have to fix the spheres module..., but F2 and F3 from Heng and Draine are reproduced somewhat successfully.
+|  
+* commit 051b803cca09e00247d52715e0395489f1d451ad
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Jan 27 02:41:10 2014 -0500
+| 
+|     Minor documentation changes
+|  
+* commit d0e47b4c79c094d9a70479991148f667cb3d1fae
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Jan 27 02:31:38 2014 -0500
+| 
+|     More macports usability. Now independently checks for macports installs and gleans the parent directory from the path of fftw3.f03. Tested with GCC 44,45,47. Recreated problem with 44, but 45 and higher seem to be OK.
+|  
+* commit 09dae509f2ad785408a7217888c8d58da0a45b34
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Jan 27 00:59:22 2014 -0500
+| 
+|     Added macports usability. Need to reliably test that, when macports is installed, the fftw-3 library is also installed. Also, is there a difference between fftw_omp and fftw_threads? OMP is NOT installed by default with macports and I cannot find a way to do --enable-openmp yet
+|  
+* commit edf0c72362c3d2a848bbd2898f7b7e48c2a56edb
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Wed Jan 15 16:38:47 2014 -0600
+| 
+|     Updating origin master
+|  
+* commit ebc206eb6348c0de83d5baa83e08c5d40c6c60d6
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Wed Jan 15 01:20:30 2014 -0600
+| 
+|     Final commit for 0.9.2, reorganized data folder, added profile.txt files into the data/profiles directory, updated documentation to include profiling information
+|    
+*   commit 18ccb2362c71d4d237393f8c77da7e0051f4635a
+|\  Merge: af1e31b 16ee48e
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Wed Jan 15 00:08:17 2014 -0600
+| | 
+| |     Profile information added
+| |   
+| * commit 16ee48efb52fd89e20f45197eb7dbb04a1ff6435
+| | Author: Michael <michael@Mic.(none)>
+| | Date:   Wed Jan 15 00:40:27 2014 -0500
+| | 
+| |     Added profiling
+| |   
+| * commit 57ad226b83468727544fdf0b66f1e72574c613b5
+| | Author: Michael <michael@Mic.(none)>
+| | Date:   Tue Jan 14 23:51:26 2014 -0500
+| | 
+| |     deleted test files
+| |     
+| *   commit 891378b04fe502a6f296c5c0ce717bff97036118
+| |\  Merge: cd5e4b6 06f91b2
+| | | Author: Michael <michael@Mic.(none)>
+| | | Date:   Tue Jan 14 23:43:27 2014 -0500
+| | | 
+| | |     Merge branch 'master' of /home/michael/Dropbox/GGADT into tarczon
+| | |    
+| * | commit cd5e4b6d9ea5ff9c191cac31da5cb4ca359dee06
+| | | Author: Michael <michael@Mic.(none)>
+| | | Date:   Tue Jan 14 23:29:35 2014 -0500
+| | | 
+| | |     final parallelization changes made
+| | |    
+* | | commit af1e31b239401540cb9b145bcada42b2d1351c49
+| |/  Author: John Hoffman <jah5@princeton.edu>
+|/|   Date:   Tue Jan 14 22:59:13 2014 -0600
+| |   
+| |       Committing mysterious changes in dropbox--should contain profiling info
+| |   
+* | commit 06f91b28273177772d6f448934dbf4434ef3e7da
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Tue Jan 14 22:33:02 2014 -0600
+| | 
+| |     More final edits: documentation, deleting frivolous files
+| |   
+* | commit 0655f165f961661264f7a497e366b9968ca0b1c3
+|/  Author: John Hoffman <jah5@princeton.edu>
+|   Date:   Tue Jan 14 22:19:35 2014 -0600
+|   
+|       Final commits, final documentation
+|  
+* commit 2162ed4dbdb83f36b8617ab62861d417a5d27919
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jan 14 21:41:34 2014 -0600
+| 
+|     deleted test files
+|  
+* commit 7444bf0556623f59f50b6e2f60855139e1cf44e0
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jan 14 21:40:26 2014 -0600
+| 
+|     FIXED problems with reading parameter file... and also added a bash script to produce some sample plots: make_sample_plot.sh.
+|  
+* commit beee2448942f775f9bdb0de43be5f640e4d5363f
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jan 14 20:17:46 2014 -0600
+| 
+|     Removed AC_FC_IMPLICIT_NONE([],[]) since tarczon's Ubuntu distro complained
+|  
+* commit 8aee1087ad4bf91b17f77295b130e14d019af7f3
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jan 14 19:54:14 2014 -0600
+| 
+|     Command line arguments work. Deleting parameterfile.ini and renaming paramfile2.ini as parameterfile.ini
+|  
+* commit bb91c10ee2eca937621b4e43234ab54f86c0cc98
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jan 14 19:48:14 2014 -0600
+| 
+|     changing before branching off
+|  
+* commit d024a5b320ab14e4ff9261854937cff9dc7ac053
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jan 14 16:43:22 2014 -0600
+| 
+|     README should be good enough (references other files), configure.ac now checks for 'implicit none' FCFLAGS and only adds the -pg flag if your fortran compiler knows what it means
+|  
+* commit 76fcba200f7ca080ba068f58bf14375b1eadb69a
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jan 14 15:55:35 2014 -0600
+| 
+|     Added --enable-profiling option to autoconf, changed 'hat' to 'vec' in the texinfo, added more files to clean in cleandist-custom.sh
+|  
+* commit 988bce95d791eb4b5313aa66ed1037a372b74d72
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jan 14 15:29:34 2014 -0600
+| 
+|     small doc changes
+|  
+* commit c2495bac70770419a800eaf3ea3c867bd0327161
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jan 14 14:59:43 2014 -0600
+| 
+|     Replaced symlinks (doc/mdate-sh and doc/texinfo.tex) with the actual files.
+|  
+* commit 10b0ef5a0e1119f9139d9e065779ed17517119eb
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jan 14 14:57:52 2014 -0600
+| 
+|     No meaningful changes...
+|    
+*   commit 4476c3f9433d93ecb87d015e3d7bde8d2673f2a8
+|\  Merge: a94866f 46aef40
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Tue Jan 14 14:49:20 2014 -0600
+| | 
+| |     Merge branch 'hoffman'
+| |     
+| |     Adding both my changes and tarczon's changes to the master branch
+| |   
+| * commit 46aef4048c0006fecf1fb2c9a2574659c65b4a1b
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Tue Jan 14 14:46:36 2014 -0600
+| | 
+| |     Added more documentation, added version option in common.f03, made common.f03 --> common.f03.in so we can automatically update the version in the source code, switched around the help output to make it more readable.
+| |   
+| * commit 344fc30ab557c1b623c877216ff972f4c2d87f3f
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Tue Jan 14 10:55:59 2014 -0600
+| | 
+| |     FFTW plan directory is now set in the makefiles. We should alert the user that they will have to remove HOME/.ggadt manually, since I cant find a way to add that to the make uninstall option.
+| |   
+| * commit fcf6207f47b1335946e7a21687e239b0047c1a70
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Tue Jan 14 00:57:46 2014 -0600
+| | 
+| |     More progress on documentation
+| |   
+| * commit 3d31496a63cbf71dc5bb99a66721ad977be6c353
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Mon Jan 13 21:57:38 2014 -0600
+| | 
+| |     Made some progress on documentation
+| |     
+* |   commit a94866f07a352ad5d14cda9c201242c4529e2766
+|\ \  Merge: 52c36aa eed8c01
+| | | Author: Michael <michael@Mic.(none)>
+| | | Date:   Tue Jan 14 15:39:04 2014 -0500
+| | | 
+| | |     Merge branch 'tarczon' of /home/michael/Dropbox/GGADT into tarczon
+| | |    
+| * | commit eed8c01b48b78a07ba6926d6e10cc02af55dd6b6
+| | | Author: Michael <michael@Mic.(none)>
+| | | Date:   Sun Jan 12 22:16:45 2014 -0500
+| | | 
+| | |     testin new branch
+| | |    
+* | | commit 52c36aa335d7e1ebb5ac0fc07268a0fa2425e54f
+| |/  Author: Michael <michael@Mic.(none)>
+|/|   Date:   Tue Jan 14 15:33:17 2014 -0500
+| |   
+| |       Added parallelization code
+| |     
+* |   commit 4c47ec24638e3eed532d7dcd1a0921fc8920f588
+|\ \  Merge: 9f4a915 649b069
+| | | Author: John Hoffman <jah5@princeton.edu>
+| | | Date:   Mon Jan 13 20:23:54 2014 -0600
+| | | 
+| | |     Merge branch 'hoffman'
+| | |     
+| | |     Screwed up last merge?
+| | |    
+| * | commit 649b0691d29825f76d4856359010ce6f175050a5
+| | | Author: John Hoffman <jah5@princeton.edu>
+| | | Date:   Mon Jan 13 20:23:10 2014 -0600
+| | | 
+| | |     Ooops--forgot to clean the distro.
+| | |      
+* | |   commit 9f4a9153196efa657af0b541edd9c6ede2d581cb
+|\ \ \  Merge: b078749 4a51ac7
+| |/ /  Author: John Hoffman <jah5@princeton.edu>
+| | |   Date:   Mon Jan 13 20:23:49 2014 -0600
+| | |   
+| | |       Nothing to see here...
+| | |    
+| * | commit 4a51ac71c3cd672a02f9dbdab51853c7eb926634
+| | | Author: John Hoffman <jah5@princeton.edu>
+| | | Date:   Mon Jan 13 20:21:52 2014 -0600
+| | | 
+| | |     Shortened one of the lines in fftw-mod (both omp and serial). Why do I have to do this if we are using F2003??
+| | |    
+* | | commit b07874920973457e18197f9485fdfd2f65386707
+|/ /  Author: John Hoffman <jah5@princeton.edu>
+| |   Date:   Mon Jan 13 20:11:48 2014 -0600
+| |   
+| |       Hopefully fixed autoconf problems with finding the m4 directory
+| |   
+* | commit a3e9cfde897ccb7fc8323c7ad6b077335560babc
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Mon Jan 13 20:01:11 2014 -0600
+| | 
+| |     Made autoconf require 2.63 instead of 2.68, and added more tests for fortran and changed the plan directory to HOME/.ggadt/plans
+| |   
+* | commit 39f3fa0fb8ccb53e56f349ff27739c5e558bd013
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Mon Jan 13 17:16:38 2014 -0600
+| | 
+| |     Just added a couple of lines to the clean-dist script
+| |   
+* | commit 6b64532dc72b89c094ae677c80d4a1ec61cb2c22
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Mon Jan 13 17:10:31 2014 -0600
+| | 
+| |     Fixed problems with OpenMP support. Autoconf should recognize openmp and fftw3_omp operability and compile accordingly. Tarczon might have problems if we installed fftw3 with --enable-single or --enable-float.
+| |   
+* | commit 3e6cc66f7952565f765ee1eda4878ed71b493890
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Mon Jan 13 14:08:35 2014 -0600
+| | 
+| |     Added functionality of command-line arguments to serial code
+| |   
+* | commit 426b214788225133c204d6b05f2decae470acd37
+|/  Author: John Hoffman <jah5@princeton.edu>
+|   Date:   Mon Jan 13 00:42:04 2014 -0600
+|   
+|       Fixed problem with fftwmod not finding plans directory (added autoconf variable)
+|    
+*   commit 57c0e70e0ae2244f20f672b21bef3b70490e534d
+|\  Merge: 68ee82d 206abec
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Sun Jan 12 21:02:13 2014 -0600
+| | 
+| |     Merged john-macbook
+| |   
+| * commit 206abec3b4df2e9946819792a05e0f637a8e3c8a
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Sun Jan 12 20:46:14 2014 -0600
+| | 
+| |     Started making documentation
+| |   
+| * commit aa63afe482cfa5331b4f0b017f0770d808ce1bfc
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Sun Jan 12 18:19:25 2014 -0600
+| | 
+| |     Some more changes to directory structure, but now autoconf allows you to turn on/off openmp. IGNORE MPI for now. It appears there are no viable MPI compilers that will work with Fortran 2003. Strange.
+| |   
+| * commit cb5f90be062d3febcaad8479dd78a3cde0b13922
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Sun Jan 12 15:33:08 2014 -0600
+| | 
+| |     Autoconf now seems to work OK. Set up directory and file structure to make openmp and mpi versions of the program. I still need to add the correct library linking flags to the two parallel versions of the program.
+| |   
+| * commit 7b289a8989594e10a978ad47c7fe54164cc968e7
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Sat Jan 11 11:18:26 2014 -0600
+| | 
+| |     Changed README
+| |   
+| * commit d71dfb55fbc2ffd4499d6d274c70fae4255eb20e
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Sat Jan 11 10:44:11 2014 -0600
+| | 
+| |     converted symlinks into their actual files, so this should be a portable distribution now...
+| |   
+| * commit 8bfbb862fa1e6671d93afc5c91b7193676022565
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Sat Jan 11 00:37:04 2014 -0600
+| | 
+| |     OK I'm trying again.
+| |   
+| * commit 057829f3ae5eaa125e8145a697cf5726740910cf
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Sat Jan 11 00:26:53 2014 -0600
+| | 
+| |     OK adding symlinked files here
+| |   
+| * commit df308b3cdefe9e957d15d242b156dedfa287896d
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Sat Jan 11 00:14:43 2014 -0600
+| | 
+| |     adding install files (maybe?)
+| |   
+| * commit b020d7db665dff561972a6ceb9c136186e7a0c26
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Fri Jan 10 21:53:57 2014 -0600
+| | 
+| |     Updated the README file.
+| |   
+| * commit 4b4dc8dd9cab497ad83b2e9f424c3ad641f0d15d
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Fri Jan 10 21:42:39 2014 -0600
+| | 
+| |     Working version of autoconf
+| |   
+* | commit 68ee82dc62f5182cb12e6027cb2f50ba45b9bea6
+|/  Author: John Hoffman <jah5@princeton.edu>
+|   Date:   Thu Jan 9 11:52:34 2014 -0600
+|   
+|       Miscellaneous commit - havent been here in awhile and git says several files have been modified
+|  
+* commit 8a2a8dd7f33afa8845cbe913d191a86802ed971f
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Thu Dec 12 13:28:20 2013 -0500
+| 
+|     convergence.py now produces reasonable plots...
+|  
+* commit 7d8ec64a24ca761cf844245c9e0e449662209cf2
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Wed Dec 11 15:40:11 2013 -0500
+| 
+|     playing with autoconf
+|  
+* commit b49e7d7440dac80fe03744c19db6a4b4a41044a8
+| Author: John Hoffman (metis) <jah5@princeton.edu>
+| Date:   Tue Dec 10 23:10:20 2013 -0500
+| 
+|     Cleaned up code somewhat--simplified the Euler angle stepping, also added a parameter that sets the FFTW_* mode.
+|  
+* commit 8bdb84065c39a6af9581ab7373884505c9dff28f
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Dec 10 01:07:59 2013 -0500
+| 
+|     Now takes parameter file as input. No option to manually specify values on the command line yet.
+|  
+* commit 9af6cd751de05067f900c1828ffb3fa10f3e40a9
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Dec 9 19:38:20 2013 -0500
+| 
+|     fftw uses saved wisdom to get fastest fft algo.
+|  
+* commit 160238e274a25bc6239bc5b713176c91bc67089b
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Thu Dec 5 17:09:53 2013 -0500
+| 
+|     Merged and changed version to 0.14
+|  
+* commit 1e03b72daacd4ad9ccf2eadfdb61fa19518aabd4
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Thu Dec 5 17:05:32 2013 -0500
+| 
+|     Does orientation averaging. Rotation matrix should be changed to avoid doing the product of three matrices. ROT_MATRIX does not give correct results, must be double checked. Tested with ellipsoids.
+|  
+* commit c4013f964d6ccd026d875c689b54a52ae06c2531
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Wed Dec 4 12:28:21 2013 -0500
+| 
+|     Trying to get matplotlib to plot output from ggadt, having trouble with interp2d. Using macports to reinstall everything and make sure its up to date
+|  
+* commit ad951245241642285ec5a06c7701609aebaaefc7
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Dec 2 16:49:07 2013 -0500
+| 
+|     Spheres module works, quick visulization of 1 centered sphere seems consistent with D&A 2006, no euler rotation/averaging yet.
+|  
+* commit 2431b41b07daa74dde48fe3e719225cb8c9d108f
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Dec 2 12:15:01 2013 -0500
+| 
+|     Can read input file for list of spheres
+|  
+* commit 0109fcbba8c859a047398fd83616a19d95aa15b6
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Dec 2 10:41:33 2013 -0500
+| 
+|     Working ellipsoid module, does not do angular averages yet...
+|  
+* commit b1d72992783a86a9845de1192c58936e529c0b62
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Wed Nov 27 15:07:03 2013 -0600
+| 
+|     Additional commit--still only the spherical module that works.
+|  
+* commit 3e7e46b4ec76a147b006fb93e038b112b5657054
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Sat Nov 23 19:33:26 2013 -0500
+| 
+|     Divided into modules, spherical module generates results consistent with D&AA2006. For now, params.f03 contains relevant parameters which are hardcoded into GGADT at compile time. This should be changed to allow for a user to select between parameter files or specify parameters as command line arguments.
+|  
+* commit bc7e00441c600350057ffcd77200920a947f608c
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Fri Nov 22 19:59:39 2013 -0500
+| 
+|     Produces dQscat/dOmega with the correct shape, however there appears to be a missing factor of 2pi or so...(Magnitude is ~9 times lower than it should be)
+|  
+* commit 83827d66f02d3a2ab652fda7780627e86bfdc170
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Wed Nov 20 18:40:31 2013 -0500
+| 
+|     Produces dscat/domega for spheres, but the results are strongly dependent upon the grid boundaries. [ make --> ./spheres > testdat.dat --> ipython plot.py ] will plot the results if you have the matplotlib/numpy python libraries installed.
+|  
+* commit 4efb2d2c87235a5c6beeb811beeb0c7913f457e1
+  Author: John Hoffman <jah5@princeton.edu>
+  Date:   Mon Nov 11 13:54:36 2013 -0500
+  
+      Complilable 'program' that does nothing.

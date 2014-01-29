@@ -9,13 +9,14 @@ rm  -f configure
 rm  -f Makefile.in
 rm -f Makefile
 rm -f *png
-
+rm -f testdat.dat
 rm -f doc/Makefile.in
 rm -f doc/Makefile
 rm -f doc/stamp-vti
 rm -f doc/version.texi
 rm -f doc/ggadt.info
 rm -f -r doc/ggadt.html
+rm -f test_output.dat
 
 rm -f src/ggadt
 rm -f src/*o

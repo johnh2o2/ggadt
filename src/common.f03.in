@@ -34,6 +34,7 @@ module common_mod
   real, dimension(3)            ::  grain_a 
   logical                       ::  use_experimental_fft
   logical                       ::  asked_for_version
+  logical                       ::  verbose_mode
   character(len=200)            ::  parameter_file_name
   character(len=100)            ::  fftw_optimization_mode_name
   character(len=100)            ::  sphlist_fname
@@ -46,6 +47,8 @@ module common_mod
       call define_help_flag(opts,print_help)
       call define_flag(opts, "version",abbrev='v',&
         description="Print version information")
+      call define_flag(opts, "verbose",abbrev='d',&
+        description="Verbose output (use for debugging)")
       call define_option_string(opts,"parameter-file-name","",required=.false.,&
         description="Path to parameter file")
 
@@ -113,6 +116,7 @@ module common_mod
       call get_option_real(opts,"grain-axis-z",grain_a(3))
       call get_option_real(opts,"ephot",ephot)
       call get_flag(opts,"use-experimental-fft",use_experimental_fft)
+      call get_flag(opts,"verbose",verbose_mode)
       call get_option_real(opts,"RE-index-of-refraction",ior_re)
       call get_option_real(opts,"IM-index-of-refraction",ior_im)
       delm = cmplx(ior_re,ior_im)
