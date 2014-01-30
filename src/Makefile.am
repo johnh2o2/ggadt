@@ -1,6 +1,6 @@
 bin_PROGRAMS = ggadt
 
-ggadt_SOURCES = options.f03
+ggadt_SOURCES = options.f03 common.f03
 
 if USING_FFTW
 ggadt_SOURCES += fftwmod.f03
@@ -8,7 +8,7 @@ else
 ggadt_SOURCES += gpfa.f90 gpfamod.f03
 endif
 
-ggadt_SOURCES += common.f03 sphere.f03 spheres.f03 ellipsoid.f03 ggadt.f03 
+ggadt_SOURCES += sphere.f03 spheres.f03 ellipsoid.f03 ggadt.f03 
 
 install-data-local:
 	mkdir -p @data_dir@

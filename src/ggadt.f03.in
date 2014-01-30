@@ -22,7 +22,7 @@ program ggadt
     real :: xmin, xmax, ymin, ymax, zmin, zmax, dx, dy, dz, k, l
     real, dimension(3) :: eul_ang
     real, dimension(3,3) :: rm 
-    integer :: i, j, neul, allocatestatus, num_args, nangle_new
+    integer :: i, j, neul, allocatestatus, deallocatestatus, num_args, nangle_new
 
 
     call set_parameter_values()
@@ -42,7 +42,7 @@ program ggadt
         !$omp end do nowait
         !$omp end parallel
         ftsh = fft(sh,x,y)
-
+        !stop
         !$omp parallel shared(scatter,ftsh,k,dx,dy) 
         !$omp do schedule(dynamic) private(i,j)
         do i=1,size(x)
@@ -112,7 +112,7 @@ program ggadt
     end do
     write(0,*) "done."
 
-    ! call cleanup()
+    call cleanup()
 
 contains
 
@@ -296,52 +296,53 @@ contains
 
     subroutine cleanup()
         if (verbose_mode) write(0,*) "deallocating x"
-        deallocate(x)
-        if (verbose_mode) write(0,*) " --> Done."
+        deallocate(x,stat=deallocatestatus)
+        if (verbose_mode) write(0,*) " --> Done. status: ", deallocatestatus
 
         if (verbose_mode) write(0,*) "deallocating y"
-        deallocate(y)
-        if (verbose_mode) write(0,*) " --> Done."
+        deallocate(y,stat=deallocatestatus)
+        if (verbose_mode) write(0,*) " --> Done. status: ", deallocatestatus
 
         if (verbose_mode) write(0,*) "deallocating z"
-        deallocate(z)
-        if (verbose_mode) write(0,*) " --> Done."
+        deallocate(z,stat=deallocatestatus)
+        if (verbose_mode) write(0,*) " --> Done. status: ", deallocatestatus
 
         if (verbose_mode) write(0,*) "deallocating kx"
-        deallocate(kx)
-        if (verbose_mode) write(0,*) " --> Done."
+        deallocate(kx,stat=deallocatestatus)
+        if (verbose_mode) write(0,*) " --> Done. status: ", deallocatestatus
 
         if (verbose_mode) write(0,*) "deallocating ky"
-        deallocate(ky)
-        if (verbose_mode) write(0,*) " --> Done."
+        deallocate(ky,stat=deallocatestatus)
+        if (verbose_mode) write(0,*) " --> Done. status: ", deallocatestatus
 
         if (verbose_mode) write(0,*) "deallocating thetax"
-        deallocate(thetax)
-        if (verbose_mode) write(0,*) " --> Done."
+        deallocate(thetax,stat=deallocatestatus)
+        if (verbose_mode) write(0,*) " --> Done. status: ", deallocatestatus
 
         if (verbose_mode) write(0,*) "deallocating thetay"
-        deallocate(thetay)
-        if (verbose_mode) write(0,*) " --> Done."
+        deallocate(thetay,stat=deallocatestatus)
+        if (verbose_mode) write(0,*) " --> Done. status: ", deallocatestatus
 
         if (verbose_mode) write(0,*) "deallocating sh"
-        deallocate(sh)
-        if (verbose_mode) write(0,*) " --> Done."
+        deallocate(sh,stat=deallocatestatus)
+        if (verbose_mode) write(0,*) " --> Done. status: ", deallocatestatus
 
         if (verbose_mode) write(0,*) "deallocating ftsh"
-        deallocate(ftsh)
-        if (verbose_mode) write(0,*) " --> Done."
+        deallocate(ftsh,stat=deallocatestatus)
+        if (verbose_mode) write(0,*) " --> Done. status: ", deallocatestatus
 
         if (verbose_mode) write(0,*) "deallocating scatter"
-        deallocate(scatter)
-        if (verbose_mode) write(0,*) " --> Done."
+        deallocate(scatter,stat=deallocatestatus)
+        if (verbose_mode) write(0,*) " --> Done. status: ", deallocatestatus
 
         if (verbose_mode) write(0,*) "deallocating scatter_temp"
-        deallocate(scatter_temp)
-        if (verbose_mode) write(0,*) " --> Done."
+        deallocate(scatter_temp,stat=deallocatestatus)
+        if (verbose_mode) write(0,*) " --> Done. status: ", deallocatestatus
 
         if (verbose_mode) write(0,*) "deallocating chrd"
-        deallocate(chrd)
-        if (verbose_mode) write(0,*) " --> Done."
+        deallocate(chrd,stat=deallocatestatus)
+        if (verbose_mode) write(0,*) " --> Done. status: ", deallocatestatus
+
 
         if (geometry .eq. 'spheres')    then
             if (verbose_mode) write(0,*) "deallocating more stuff for spheres"

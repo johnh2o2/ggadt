@@ -17,6 +17,8 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 
+
+
 nplot = 250 # dimension of plotted grid (interpolated)
 delta = 250 # distance above or below theta min/max for interpolation purposes
 
@@ -29,6 +31,8 @@ ymax = xmax
 conv = (360*60*60)/(2*np.pi) # convert from radians to arcseconds (a more sensible unit)
 
 fname = sys.argv[1]
+
+print "Plotting file '%s'"%(fname)
 data_dt = np.dtype([('theta', np.float_), ('phi', np.float_), ('f', np.float_)])
 data = np.loadtxt(fname,dtype=data_dt)
 
@@ -49,12 +53,6 @@ if ALL_ZERO:
 	print "ALL ZERO!"
 	sys.exit()
 
-
-# Get grid spacing
-dx = x[1] - x[0]
-dy = y[1] - y[0]
-
-print "dx = %e; dy = %e"%(dx,dy)
 
 # Now filter out data at high scattering angles (otherwise it takes too long to interpolate)
 x_new = []
