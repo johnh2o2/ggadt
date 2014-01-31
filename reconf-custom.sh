@@ -10,5 +10,5 @@ automake -a
 bash configure || exit
 make || exit
 make html || exit
-src/ggadt --verbose > test_output.dat || exit
+src/ggadt > test_output.dat || exit
 python scripts/plot.py test_output.dat || exit

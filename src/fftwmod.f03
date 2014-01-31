@@ -29,6 +29,8 @@ contains
         end select
     end subroutine set_optimization_mode
 
+
+
     function fft(f,x,y)
         
         real, intent(in) :: x(:), y(:)
@@ -40,43 +42,25 @@ contains
 
         nx = size(x)
         ny = size(y)
-        threaderror = fftw_init_threads()
-        if (threaderror == 0) then
-            write (0,*) "------------------------------"
-            write (0,*) "Error initializing multiple threads. Program will attempt to proceed"
-            write (0,*) "using 1 thread."
-            write (0,*) "------------------------------"
-            numthreads = 1
-        else
-            numthreads = omp_get_max_threads()
-        endif
-        call fftw_plan_with_nthreads(numthreads)
+        ! OMP threaderror = fftw_init_threads()
+        ! OMP if (threaderror == 0) then
+        ! OMP     write (0,*) "------------------------------"
+        ! OMP     write (0,*) "Error initializing multiple threads. Program will attempt to proceed"
+        ! OMP     write (0,*) "using 1 thread."
+        ! OMP     write (0,*) "------------------------------"
+        ! OMP     numthreads = 1
+        ! OMP else
+        ! OMP     numthreads = omp_get_max_threads()
+        ! OMP endif
+        ! OMP call fftw_plan_with_nthreads(numthreads)
         if (first_time) then
-            write(0,*) new_line('a')//"        /"
-            write(0,*) " FFTW: | Finding best fft algorithm to use..."
-            write(plan_filename,'(a,i0.4,a,i0.4,a,i0.3,a,a)') "/&
-            &plan_nx",nx,"_ny",ny,"_fftw_mode",mode,".plan",char(0)
             error = fftw_import_wisdom_from_filename(trim(adjustl(plan_filename)))
             if (error == 0) then
-                write (0,*) "   --> | No previous wisdom detected:"
-                write (0,*) "       |"
-                write (0,*) "       |  FFTW will search for fastest FFT algorithm (using",trim(adjustl(mode_name)),")."
-                write (0,*) "       |  this may take several minutes, depending on your grid size."
-                write (0,*) "       |"
-
                 plan = fftw_plan_dft_2d(ny, nx, f ,fft, fftw_backward,mode)
                 error = fftw_export_wisdom_to_filename(plan_filename)
-                if (error == 0) then
-                    write (0,*) "  ***FFTW ERROR: couldn't save plan to ",trim(adjustl(plan_filename))
-                else
-                    write (0,*) "       |+ Successfully saved plan to ",trim(adjustl(plan_filename))
-                endif
             else
-                write (0,*) "       | + Found and loaded previous wisdom from '",trim(adjustl(plan_filename)),"'"
                 plan = fftw_plan_dft_2d(ny, nx, f ,fft, fftw_backward,mode)
             end if
-            write (0,*) "       | Done."
-            write (0,*) "       \"
             first_time = .false.
         end if
         !write (0,*) "about to do fft"
