@@ -1,3 +1,9 @@
+* commit 5b861ca9a425c75e9cd60451a5b5534e05639e0f
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Thu Jan 30 22:40:54 2014 -0500
+| 
+|     Rudimentary timing script made and timing results in doc/ dir. These figures need to be put into the documentation. FFTW3 is approx. 20-30% better than GPFA for large grid sizes. Added --timing flag to suppress output from ggadt, and deleted the output from FFTW (why would users care? They can modify fftwmod.f03 to output things as they see fit).
+|  
 * commit 4912479ee3ee464fc850a07c89822ff66cefb402
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Thu Jan 30 15:35:45 2014 -0500

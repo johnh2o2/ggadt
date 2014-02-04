@@ -60,6 +60,7 @@ medium by using anomalous diffraction theory (ADT).
 * Installation::	How to install @command{ggadt} on your system.
 * Invoking GGADT::	Giving @command{ggadt} your input.	
 * Example usage::	Quick examples to get you started.
+* FFT comparison::		Comparison between GGADT and FFTW3 timing.
 * GNU Free Documentation License:: Copying and sharing this documentation.
 * Concept index::	Index of concepts.
 @end menu
@@ -518,6 +519,19 @@ Then, after compiling @code{ggadt}, do:
 ./ggadt @dots{}
 gprof ggadt
 @end example
+
+@node FFT comparison
+@chapter FFT comparison
+Currently, GGADT allows you to choose between two FFT algorithms: FFTW 3 (@url{http://fftw.org/}), which requires you install the FFTW3 library, and GPFA (Generalized Prime Factor Algorithm)@footnote{Temperton, C. (1992). A Generalized Prime Factor FFT Algorithm for any N=2^p3^q5^r. SIAM Journal on Scientific and Statistical Computing, 13(3), 676-686.}, which is self-contained and included with the GGADT package. GPFA is used by default, and, as shown below, is only slightly slower than FFTW. 
+
+If you wish to take advantage of the speed increase that FFTW provides, you will need to install FFTW 3.3.x (we have only tested 3.3.3, but GGADT should in principal be compatible with all 3.x.x versions). GPFA will not currently work with FFTW 2.x, as the two interfaces are different, but plans to include FFTW 2.x support are in the works. 
+
+If you have a particular FFT library that you would like to see implemented, please send an e-mail to jah5 (at) princeton.edu.
+
+
+@section Timing
+@image{timing_actual_time,5in,5in}
+@image{timing_relative_to_gpfa,5in,5in}
 
 @node GNU Free Documentation License
 @appendix GNU Free Documentation License

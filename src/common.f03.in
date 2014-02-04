@@ -37,6 +37,7 @@ module common_mod
   logical                       ::  verbose_mode
   logical                       ::  timing_mode
   character(len=200)            ::  parameter_file_name
+  character(len=200)            ::  euler_angle_file
   character(len=100)            ::  fftw_optimization_mode_name
   character(len=100)            ::  sphlist_fname
 
@@ -44,6 +45,8 @@ module common_mod
 
     subroutine set_parameter_values()
       implicit none
+      
+     
       ! define help flag
       call define_help_flag(opts,print_help)
       call define_flag(opts, "version",abbrev='v',&
@@ -83,8 +86,9 @@ module common_mod
       call define_option_integer(opts,"nangle",100,required=.false.,&
         description="Number of orientations to average over")
       call define_option_string(opts,"euler-angle-mode","random",required=.false.,&
-        description="How to choose Euler angles (sequential, random)")
-     
+        description="How to choose Euler angles (sequential, random, file)")
+      call define_option_string(opts,"euler-angle-file","",required=.false.,&
+        description="Path to a text file containing a list of orientations")
       
 
       call define_option_string(opts,"fftw-optimization","estimate",required=.false.,&
@@ -126,6 +130,7 @@ module common_mod
       delm = cmplx(ior_re,ior_im)
       call get_option_string(opts,"grain-geometry",geometry)
       call get_option_string(opts,"euler-angle-mode",euler_angle_mode)
+      call get_option_string(opts,"euler-angle-file",euler_angle_file)
       call get_option_integer(opts,"ngrid",ngrid)
       call get_option_integer(opts,"nangle",nangle)
       call get_option_real(opts,"grid-width",box_width)
@@ -145,7 +150,6 @@ module common_mod
       geometry = strlowcase(geometry)
 
       
-
     end subroutine set_parameter_values
 
     subroutine print_help(opts)
