@@ -1,3 +1,9 @@
+* commit a9fa2db66751ad928bca795738199b0ca458d3cb
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Feb 4 10:46:52 2014 -0500
+| 
+|     Progress on experimental fft (only fftw3). Cannot currently get fftw_plan_many_dft to do what I want it to do. Also ggadt can now accept a list of orientations in a file (euler-angle-mode=file euler-angle-file=/file/path). Started DA06.py for reproducing DA06 plots. Need to start another python script that compares accuracy of different ngrid, nangle and boxwidth combos.
+|  
 * commit 5b861ca9a425c75e9cd60451a5b5534e05639e0f
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Thu Jan 30 22:40:54 2014 -0500
