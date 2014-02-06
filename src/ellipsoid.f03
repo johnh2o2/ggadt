@@ -1,17 +1,17 @@
 module ellipsoid
 
     use, intrinsic :: iso_c_binding
-    use common_mod
 
     implicit none
     
     contains
 
-    function chord_ellipsoid(x,y,r)
+    function chord_ellipsoid(x,y,r,grain_a)
         implicit none
         real :: chord_ellipsoid
         real :: d, temp
         real, dimension(3) :: c
+        real, dimension(3), intent(in) :: grain_a
         real, dimension(2) :: pos
         real, intent(in), dimension(3,3) :: r
         real, intent(in) :: x, y
@@ -44,21 +44,29 @@ module ellipsoid
         end if
     end function chord_ellipsoid
 
-    function phi_ellipsoid(x,y,k,r)
+    function phi_ellipsoid(x,y,k,r,delm,grain_a)
         implicit none
         real, intent(in) :: x,y,k
+        complex(c_double_complex), intent(in) :: delm
+        real, dimension(3), intent(in) :: grain_a
         real, dimension(3,3), intent(in) :: r
+        
+        
         complex(c_double_complex) :: phi_ellipsoid
-        phi_ellipsoid = k*delm*chord_ellipsoid(x,y,r)
+
+        phi_ellipsoid = k*delm*chord_ellipsoid(x,y,r,grain_a)
         
     end function phi_ellipsoid
 
-    function shadow_ellipsoid(x,y,k,r)
+    function shadow_ellipsoid(x,y,k,grain_a,delm,r)
         implicit none
         real, intent(in) :: x,y,k
         real, dimension(3,3), intent(in) :: r
+        complex(c_double_complex), intent(in) :: delm
+        real, dimension(3), intent(in) :: grain_a
         complex(c_double_complex) :: shadow_ellipsoid
-        shadow_ellipsoid = 1.0-exp( (0.0,1.0)*phi_ellipsoid(x,y,k,r) )
+
+        shadow_ellipsoid = 1.0-exp( (0.0,1.0)*phi_ellipsoid(x,y,k,r,delm,grain_a) )
         
     end function shadow_ellipsoid
 

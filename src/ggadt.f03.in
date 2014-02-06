@@ -15,11 +15,11 @@ program ggadt
     implicit none
 
     
-    real, allocatable :: x(:), y(:), z(:), kx(:), ky(:), thetax(:), thetay(:)
+    real, allocatable :: x(:), y(:), kx(:), ky(:), thetax(:), thetay(:)
     complex(c_double_complex), allocatable :: sh(:,:), ftsh(:,:), ftsh_firstK(:,:)
     real, allocatable :: chrd(:,:), scatter(:,:), scatter_temp(:,:)
 
-    real :: xmin, xmax, ymin, ymax, zmin, zmax, dx, dy, dz, k, l
+    real :: xmin, xmax, ymin, ymax, dx, dy, k, l
     real, dimension(3) :: eul_ang
     real, dimension(3,3) :: rm 
     integer :: i, j, neul, allocatestatus, deallocatestatus, num_args, nangle_new, klen
@@ -40,7 +40,7 @@ program ggadt
         !$omp do schedule(dynamic) private(i,j)
         do i=1,size(x)
             do j=1,size(y)
-                sh(i,j) = shadow_sphere(x(i),y(j),zmax, k )*(-1.0)**(i+j+1)
+                sh(i,j) = shadow_sphere(x(i),y(j),k,a_eff,delm)*(-1.0)**(i+j+1)
             end do
         end do
         !$omp end do nowait
@@ -80,7 +80,7 @@ program ggadt
                 !$omp do schedule(dynamic) private(i,j)
                 do i=1,size(x)
                     do j=1,size(y)
-                        sh(i,j) = shadow_ellipsoid(x(i),y(j), k, rm )*(-1.0)**(i+j+1) 
+                        sh(i,j) = shadow_ellipsoid(x(i),y(j), k,grain_a,delm,rm )*(-1.0)**(i+j+1) 
                     end do
                 end do
                 !$omp parallel shared(sh,x,y,rm,k) 
@@ -161,8 +161,6 @@ contains
         if (allocatestatus /= 0) stop "*** not enough memory (x) ***"
         allocate(y(ngrid),stat = allocatestatus)
         if (allocatestatus /= 0) stop "*** not enough memory (y) ***"
-        allocate(z(ngrid),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (z) ***"
         allocate(kx(ngrid),stat = allocatestatus)
         if (allocatestatus /= 0) stop "*** not enough memory (kx) ***"
         allocate(ky(ngrid),stat = allocatestatus)
@@ -229,7 +227,10 @@ contains
 
         if ((geometry == 'sphere') .or. (geometry == 'spheres')) then 
             if (geometry == 'spheres') then
-                call read_spheres()
+                default_ior_i = ior_im
+                default_ior_r = ior_re
+                call read_spheres(cluster_file_name, a_eff)
+                
             end if 
             grain_a(1) = a_eff 
             grain_a(2) = a_eff
@@ -242,23 +243,20 @@ contains
             grain_a(2) = grain_a(2)*l
             grain_a(3) = grain_a(3)*l
         else
-            print *,"cannot understand ", geometry
+            write(0,*) "ERROR: cannot understand ", geometry
             stop
         end if 
         
 
         k = (2*pi/1.239842)*1000*ephot
 
-        xmin = -box_width*a_eff/2.0
-        ymin = -box_width*a_eff/2.0
-        zmin = -2*a_eff
-        xmax = box_width*a_eff/2.0
-        ymax = box_width*a_eff/2.0
-        zmax = 2*a_eff
+        xmin = -grid_width*a_eff/2.0
+        ymin = -grid_width*a_eff/2.0
+        xmax = grid_width*a_eff/2.0
+        ymax = grid_width*a_eff/2.0
 
         dx = (xmax-xmin)/(size(x)-1)
         dy = (ymax-ymin)/(size(y)-1)
-        dz = (zmax-zmin)/(size(z)-1)
 
         
 
@@ -267,9 +265,6 @@ contains
         end do
         do i=1,size(y)
             y(i) = ymin + (i-1)*dy
-        end do
-        do i=1,size(z)
-            z(i) = zmin + (i-1)*dz
         end do
         kx = get_k(x)
         ky = get_k(y)
@@ -368,7 +363,6 @@ contains
     subroutine cleanup()
         deallocate(x,stat=deallocatestatus)
         deallocate(y,stat=deallocatestatus)
-        deallocate(z,stat=deallocatestatus)
         deallocate(kx,stat=deallocatestatus)
         deallocate(ky,stat=deallocatestatus)
         deallocate(thetax,stat=deallocatestatus)
@@ -389,6 +383,32 @@ contains
         end if
 
     end subroutine cleanup
+
+    subroutine print_parameters()
+        write(0,*) "Parameter values:"
+        write(0,*) "-----------------------------------"
+        write(0,*) "delm:",delm
+        write(0,*) "ephot:",ephot
+        write(0,*) "geometry:", geometry
+        write(0,*) "euler_angle_mode:",euler_angle_mode
+        if (euler_angle_mode == "file") write(0,*) "euler_angle_file:", euler_angle_file
+
+        write(0,*) "ngrid:",ngrid
+        write(0,*) "nangle:",nangle
+        write(0,*) "grid-width:",grid_width
+        write(0,*) "ior_re:",ior_re
+        write(0,*) "ior_im",ior_im
+        write(0,*) "grain_axes:",grain_a
+        write(0,*) "use_experimental_fft:",use_experimental_fft
+        if (verbose_mode) write(0,*) "(verbose mode)"
+        if (timing_mode) write(0,*) "(timing mode)"
+
+        write(0,*) "parameter_file_name:",parameter_file_name
+        write(0,*) "fftw_optimization_mode_name:",fftw_optimization_mode_name
+        if (geometry == "spheres") write(0,*) "cluster_file_name:",cluster_file_name
+        write(0,*) "-----------------------------------"
+
+    end subroutine print_parameters
 
 
 end program ggadt

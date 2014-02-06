@@ -27,3 +27,7 @@ rm -f src/fftwmod-serial.f03
 rm -f src/ggadt.f03
 rm -f src/spheres.f03
 rm -f src/common.f03
+
+rm -f scripts/*pyc
+rm -f scripts/installation_vars.py
+

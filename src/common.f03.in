@@ -20,15 +20,15 @@ module common_mod
  
   real                          ::  a_eff     
   real                          ::  ephot     
-  character(len=50)            ::  geometry  
-  character(len=50)            ::  euler_angle_mode
+  character(len=50)             ::  geometry  
+  character(len=50)             ::  euler_angle_mode
 
 
   integer                       ::  ngrid 
   integer                       ::  nangle 
   integer                       ::  ierr
 
-  real                          ::  box_width  
+  real                          ::  grid_width  
   real                          ::  ior_im        
   real                          ::  ior_re     
   real, dimension(3)            ::  grain_a 
@@ -39,7 +39,7 @@ module common_mod
   character(len=200)            ::  parameter_file_name
   character(len=200)            ::  euler_angle_file
   character(len=100)            ::  fftw_optimization_mode_name
-  character(len=100)            ::  sphlist_fname
+  character(len=200)            ::  cluster_file_name
 
   contains
 
@@ -72,9 +72,9 @@ module common_mod
       call define_option_real(opts,"grain-axis-z",1.0,&
         description="For ELLIPSOID grains: z-axis length")
       call define_option_real(opts,"ephot",0.5,required=.false.,description="Energy of X-ray photon in keV")
-      call define_option_real(opts,"RE-index-of-refraction",-2.079E-3,required=.false., &
+      call define_option_real(opts,"ior-re",-2.079E-3,required=.false., &
         description="Real component of the index of refraction, minus 1")
-      call define_option_real(opts,"IM-index-of-refraction",3.201E-3,required=.false., &
+      call define_option_real(opts,"ior-im",3.201E-3,required=.false., &
         description="Imaginary component of the index of refraction")
       call define_option_real(opts,"grid-width",64.0,required=.false.,&
         description="Width of numerical grid as a fraction of a_eff.&
@@ -125,16 +125,16 @@ module common_mod
       call get_flag(opts,"use-experimental-fft",use_experimental_fft)
       call get_flag(opts,"verbose",verbose_mode)
       call get_flag(opts,"timing",timing_mode)
-      call get_option_real(opts,"RE-index-of-refraction",ior_re)
-      call get_option_real(opts,"IM-index-of-refraction",ior_im)
+      call get_option_real(opts,"ior-re",ior_re)
+      call get_option_real(opts,"ior-im",ior_im)
       delm = cmplx(ior_re,ior_im)
       call get_option_string(opts,"grain-geometry",geometry)
       call get_option_string(opts,"euler-angle-mode",euler_angle_mode)
       call get_option_string(opts,"euler-angle-file",euler_angle_file)
       call get_option_integer(opts,"ngrid",ngrid)
       call get_option_integer(opts,"nangle",nangle)
-      call get_option_real(opts,"grid-width",box_width)
-      call get_option_string(opts,"cluster-file-name",sphlist_fname)
+      call get_option_real(opts,"grid-width",grid_width)
+      call get_option_string(opts,"cluster-file-name",cluster_file_name)
       call get_option_string(opts,"fftw-optimization",fftw_optimization_mode_name)
       call get_flag(opts,"version",asked_for_version)
 
@@ -161,12 +161,6 @@ module common_mod
       write (*,'(a)') "Options:"
       call print_options(opts)
     end subroutine print_help
-
-    subroutine print_parameters()
-      implicit none
-      call print_option_values(opts,0)
-      
-    end subroutine print_parameters
 
 
     function rot_matrix(eul_ang)

@@ -192,15 +192,7 @@ make install
 
 @itemize @bullet
 
-@item @strong{Suitable C and Fortran compilers}: GGADT was developed using the GNU compiler suite (version 4.5.4 and higher @footnote{GCC 4.4.7 throws the following error at compile time:
-
-@example
-options.f03:113.14:
-
-     procedure(helpr), pointer, nopass :: help_routine => null()
-              1
-Error: Fortran 2003: Procedure components at (1) are not yet implemented in gfortran
-@end example}) throughout, but the @code{configure} script will try to work with most common compilers. Your Fortran compiler must be able to compile Fortran 2003 code.
+@item @strong{Suitable C and Fortran compilers}: GGADT was developed using the GNU compiler suite (version 4.5.4 and higher) throughout, but the @code{configure} script will try to work with most common compilers. Your Fortran compiler must be able to compile Fortran 2003 code.
 
 
 
@@ -484,7 +476,9 @@ Produces these plots:
 
 @section Profiling with @code{gprof}
 
-Both the serial and OpenMP variants of this GGADT code have been profiled using the GNU Profiler @code{gprof} (version 2.22) on an Intel Core i5-2410M CPU@footnote{Specs for the Intel Core i5-2410M CPU
+Both the serial and OpenMP variants of this GGADT code have been profiled using the GNU Profiler @code{gprof} (version 2.22) on an Intel Core i5-2410M CPU.
+
+Specs for the Intel Core i5-2410M CPU
 @example
 Architecture: x86_64
 CPU op-mode(s): 32-bit, 64-bit
@@ -507,7 +501,9 @@ L1i cache: 32K
 L2 cache: 256K
 L3 cache: 3072K
 NUMA node0 CPU(s): 0-3 
-@end example} running Ubuntu 12.04.
+@end example
+
+[running Ubuntu 12.04.]
 
 Four different profiles were created. The @file{parameterfile-spheres.ini} and @file{parameterfile-ellipsoid.ini} parameter files (located in @file{data/paramfiles/}) were each used to profile both @file{ggadt-serial} and @file{ggadt-omp}. The results of these profiles are located in the @file{data/profiles/} directory.
 

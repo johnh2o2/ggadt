@@ -19,7 +19,8 @@ bash configure --enable-fftw3
 make || exit
 cp doc/*png doc/ggadt.html
 make html || exit
-python scripts/DA06.py
+#python scripts/make_sample_plots.py
+python scripts/HD09.py
 #src/ggadt --grain-geometry=spheres --cluster-file-name=data/clusters/BA.256.1.targ --euler-angle-mode=file --euler-angle-file=eul_angle_file.dat > test_output_gpfa.dat || exit
 #python scripts/plot.py test_output_gpfa.dat || exit
 

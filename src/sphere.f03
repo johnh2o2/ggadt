@@ -1,7 +1,6 @@
 module sphere
 
     use, intrinsic :: iso_c_binding
-    use common_mod
     
 
     contains
@@ -20,32 +19,28 @@ module sphere
         end if 
     end function chord_sphere
 
-    function phi_sphere(x,y,z,k)
+    function phi_sphere(x,y,k,gr_a,delta_m)
         implicit none
-        real, intent(in) :: x,y,z,k
-        real :: r, l, gr_a
+        real, intent(in) :: x,y,k,gr_a
+        complex(c_double_complex), intent(in) :: delta_m
+        real :: r, l
         complex(c_double_complex) :: phi_sphere
-        gr_a = sqrt(sum(grain_a*grain_a))
+        !gr_a = sqrt(sum(grain_a*grain_a))
         r = sqrt(x*x + y*y)
         l = sqrt(gr_a*gr_a - r*r)
         phi_sphere = (0,0)
 
         if (r < gr_a) then 
-            if (z < l .and. z > -l) then 
-                phi_sphere = k*delm*(z+l)
-            else if (z > l) then
-                phi_sphere = k*delm*(2*l)
-            else
-                phi_sphere = (0,0)
-            end if
+                phi_sphere = k*delta_m*(2*l)
         end if
     end function phi_sphere
 
-    function shadow_sphere(x,y,z,k)
+    function shadow_sphere(x,y,k,gr_a,delta_m)
         implicit none
-        real, intent(in) :: x,y,z,k
+        real, intent(in) :: x,y,k,gr_a
+        complex(c_double_complex), intent(in) :: delta_m
         complex(c_double_complex) :: shadow_sphere
-        shadow_sphere = 1-exp( (0.0,1.0)*phi_sphere(x,y,z,k) )
+        shadow_sphere = 1-exp( (0.0,1.0)*phi_sphere(x,y,k,gr_a,delta_m) )
         
     end function shadow_sphere
 

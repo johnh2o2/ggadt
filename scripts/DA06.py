@@ -8,13 +8,8 @@ from scipy.interpolate import RectBivariateSpline
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
-
-parent_dir = "/Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT"
-
-binary = parent_dir+"/src/ggadt"
-
-nplot = 250 # dimension of plotted grid (interpolated)
-delta = 250 # distance above or below theta min/max for interpolation purposes
+from installation_vars import *
+import plot_utilities as pu
 
 # min/max scattering angles to deal with
 xmin = -4000
@@ -22,172 +17,186 @@ xmax = 4000
 ymin = xmin
 ymax = xmax
 
-conv = (360*60*60)/(2*np.pi) # convert from radians to arcseconds (a more sensible unit)
-
-def add_plot(fname, ax, mode='one-d', phis = [ 0.0, np.pi/2.0 ]):
-
-	print "Plotting file '%s'"%(fname)
-	data_dt = np.dtype([('theta', np.float_), ('phi', np.float_), ('f', np.float_)])
-	data = np.loadtxt(fname,dtype=data_dt)
-
-	x = data['theta']*conv
-	y = data['phi']*conv
-	z = data['f']
-
-	'''
-	#Tests if data file contains only zeros.
-	ALL_ZERO = True 
-	for Z in z:
-		if Z != 0:
-			#print "Not all zero :)"
-			ALL_ZERO = False
-			break
-
-	if ALL_ZERO:
-		print "ALL ZERO!"
-		sys.exit()
-	'''
-
-	# Now filter out data at high scattering angles (otherwise it takes too long to interpolate)
-	x_new = []
-	y_new = []
-	z_new = []
-
-	npoints_inbounds = 0
-	for i in range(0,len(x)):
-		if x[i] >= (xmin-delta) and x[i] <= (xmax+delta) and y[i] >= (ymin-delta) and y[i] <= (ymax+delta):
-			x_new.append(x[i])
-			y_new.append(y[i])
-			z_new.append(z[i])
-			npoints_inbounds+=1
-	if npoints_inbounds > 0: npoints_inbounds = sqrt(npoints_inbounds)
-	print npoints_inbounds, " points are within boundary per dimension"
-	x = np.array(x_new)
-	y = np.array(y_new)
-	z = np.array(z_new)
-
-	# Figure out dimension and reshape x,y and z
-	n = 0
-	while x[n] == x[0]: n+=1
-
-	x = np.reshape(x,(n,n))
-	y = np.reshape(y,(n,n))
-	z = np.reshape(z,(n,n))
-
-	# Interpolate
-	BSPL = RectBivariateSpline(x[:,0],y[0,:],np.log10(z))
-	zinterp = lambda xi,yi : BSPL.ev(xi,yi)
-
-
-	# Interpolate original grid onto a high-density grid for plotting purposes.
-	zplot = np.zeros((nplot,nplot))
-	xplot,yplot = np.meshgrid(np.linspace(xmin,xmax,nplot),np.linspace(ymin,ymax,nplot))
-	for i in range(0,nplot):
-		for j in range(0,nplot):
-			zplot[i][j] = zinterp(xplot[i][j],yplot[i][j])
-
-	if mode == "two-d":
-		# Set up color plot
-		levels = MaxNLocator(nbins=40).tick_values(zplot.min(), zplot.max())
-		cmap = plt.get_cmap('coolwarm')
-		norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
-
-		# Make 2d plot of dQscat/dOmega
-		
-		colorplot = ax.pcolormesh(xplot,yplot,zplot,cmap=cmap, norm=norm)
-		ax.set_ylabel("$\\theta_Y$ [arcseconds]")
-		ax.set_xlabel("$\\theta_X$ [arcseconds]")
-		ax.axis([xplot.min(),xplot.max(),xplot.min(),xplot.max()])
-		
-	elif mode == "one-d":
-		# Plot (1) radial average of dQscat/dOmega, 
-		#      (2) variance about this average, 
-		#      (3) max/min deviations from this average
-		#      (4) & (5) slice of dQscat/dOmega through x-axis & y-axis
-		
-		theta_arr = np.linspace(xmin,xmax,1000)
-		z_phiavg = np.zeros(len(theta_arr))
-		z_phivar = np.zeros(len(theta_arr))
-		z_max = np.zeros(len(theta_arr))
-		z_min = np.zeros(len(theta_arr))
-		phi_ints = np.linspace(0,2*np.pi,100)
-
-
-		for i,phi in enumerate(phi_ints):
-			for j, th in enumerate(theta_arr):
-				z_phi = pow(10,zinterp(th*cos(phi),th*sin(phi)))
-				if i==0:
-					z_max[j] = z_phi
-					z_min[j] = z_phi
-
-				if z_max[j] < z_phi: z_max[j] = z_phi
-				if z_min[j] > z_phi: z_min[j] = z_phi
-
-				z_phiavg[j]+=z_phi/len(phi_ints)
-		for i,phi in enumerate(phi_ints):
-			for j, th in enumerate(theta_arr):
-				z_phi = pow(10,zinterp(th*cos(phi),th*sin(phi)))
-				z_phivar[j]+=pow(z_phi-z_phiavg[j],2)/len(phi_ints)
-
-
-		z_phivar = np.power(z_phivar,0.5)
-
-		
-		colors = [ 'b', 'r', 'c', 'g' ]
-		linestyles = [ '--', '-.', '..']
-		#ax.fill_between(theta_arr, z_min, z_phiavg-0.5*z_phivar, facecolor='k',alpha=0.25, interpolate=True)
-		#ax.fill_between(theta_arr, z_phiavg-0.5*z_phivar, z_phiavg+0.5*z_phivar, facecolor='g', alpha=0.5, interpolate=True)
-		#ax.fill_between(theta_arr, z_phiavg+0.5*z_phivar,z_max, facecolor='k',alpha=0.25, interpolate=True)
-		#ax.plot(theta_arr,z_phiavg,color='k',lw=2,label="Avg.")
-		for i,phi in enumerate(phis):
-			z_plot = np.array([ pow(10,zinterp(th*cos(phi),th*sin(phi))) for th in theta_arr ])
-			ax.plot(theta_arr, z_plot , label="$\\phi=%.2f\\pi$"%(phi/np.pi), color=colors[i], ls=linestyles[i%len(linestyles)], lw=1.5)
-
-		ax.set_ylabel("$dQ_{scat.}/d\\Omega$")
-		ax.set_xlabel("$\\theta$ [arcseconds]")
-		ax.set_xlim(0,4000)
-		ax.set_yscale('log')
-		ax.legend(loc='best')
-	else:
-		print "I don't understand mode" + mode
-
 
 def make_data(params,fname):
 	clargs = " -d "
 	for p in params:
 		clargs = clargs + " --"+p+"="+`params[p]`
 
-	command = binary+clargs+" > "+fname
-	print command
+	command = ggadt+clargs+" > "+fname
+	#print command
 	os.system(command)
 
 ba = 0.707106781
 
-
-params_r1c1 = {'grain-geometry' 		: "sphere",
+#FIGURE 1 PARAMS
+params_f1r1c1 = {'grain-geometry' 		: "sphere",
 			   #'cluster-file-name' 		: None,
 			   'aeff' 					: 0.1,
 			   #'grain-axis-x' 			: 1.0,
 			   #'grain-axis-y' 			: 1.0,
 			   #'grain-axis-z' 			: 1.0,
 			   'ephot' 					: 0.5,
-			   'RE-index-of-refraction' : -2.079*pow(10.0,-3.0),
-			   'IM-index-of-refraction' : 3.201*pow(10.0,-3.0),
-			   'grid-width' 			: 64.0,
+			   'ior-re' 				: -2.079*pow(10.0,-3.0),
+			   'ior-im' 				: 3.201*pow(10.0,-3.0),
+			   'grid-width' 			: 8.0,
 			   'ngrid' 					: 1024,
 			   'nangle' 				: 1,
 			   'euler-angle-mode' 		: 'random',
 			   #'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
 			   }
-params_r1c2 = { 'grain-geometry' 		: "sphere",
+params_f1r1c2 = { 'grain-geometry' 		: "sphere",
+			   'cluster-file-name' 		: None,
+			   'aeff' 					: 0.1,
+			   'ephot' 					: 1.0,
+			   'ior-re' 				: -7.152*pow(10.0,-4.0),
+			   'ior-im' 				: 1.887*pow(10.0,-4.0),
+			   'grid-width' 			: 8.0,
+			   'ngrid' 					: 1024,
+			   'nangle' 				: 1,
+			   'euler-angle-mode' 		: 'file',
+			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
+			  }
+params_f1r1c3 = { 'grain-geometry' 		: "sphere",
+			   'cluster-file-name' 		: None,
+			   'aeff' 					: 0.1,
+			   'ephot' 					: 2.0,
+			   'ior-re' 				: -1.920*pow(10.0,-4.0),
+			   'ior-im' 				: 2.807*pow(10.0,-5.0),
+			   'grid-width' 			: 8.0,
+			   'ngrid' 					: 1024,
+			   'nangle' 				: 1,
+			   'euler-angle-mode' 		: 'file',
+			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
+			   }
+params_f1r2c1 = {'grain-geometry' 		: "sphere",
+			   #'cluster-file-name' 		: None,
+			   'aeff' 					: 0.2,
+			   #'grain-axis-x' 			: 1.0,
+			   #'grain-axis-y' 			: 1.0,
+			   #'grain-axis-z' 			: 1.0,
+			   'ephot' 					: 0.5,
+			   'ior-re' 				: -2.079*pow(10.0,-3.0),
+			   'ior-im' 				: 3.201*pow(10.0,-3.0),
+			   'grid-width' 			: 8.0,
+			   'ngrid' 					: 1024,
+			   'nangle' 				: 1,
+			   'euler-angle-mode' 		: 'random',
+			   #'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
+			   }
+params_f1r2c2 = { 'grain-geometry' 		: "sphere",
 			   'cluster-file-name' 		: None,
 			   'aeff' 					: 0.2,
-			   'grain-axis-x' 			: 0.8,
+			   'ephot' 					: 1.0,
+			   'ior-re' 				: -7.152*pow(10.0,-4.0),
+			   'ior-im' 				: 1.887*pow(10.0,-4.0),
+			   'grid-width' 			: 8.0,
+			   'ngrid' 					: 1024,
+			   'nangle' 				: 1,
+			   'euler-angle-mode' 		: 'file',
+			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
+			  }
+params_f1r2c3 = { 'grain-geometry' 		: "sphere",
+			   'cluster-file-name' 		: None,
+			   'aeff' 					: 0.2,
+			   'ephot' 					: 2.0,
+			   'ior-re' 				: -1.920*pow(10.0,-4.0),
+			   'ior-im' 				: 2.807*pow(10.0,-5.0),
+			   'grid-width' 			: 8.0,
+			   'ngrid' 					: 1024,
+			   'nangle' 				: 1,
+			   'euler-angle-mode' 		: 'file',
+			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
+			   }
+
+#FIGURE 2 PARAMS
+params_f2r1c1 = {'grain-geometry' 		: "ellipsoid",
+			   #'cluster-file-name' 		: None,
+			   'aeff' 					: 0.1,
+			   'grain-axis-x' 			: ba,
+			   'grain-axis-y' 			: 1.0,
+			   'grain-axis-z' 			: 1.0,
+			   'ephot' 					: 0.5,
+			   'ior-re' 				: -2.079*pow(10.0,-3.0),
+			   'ior-im' 				: 3.201*pow(10.0,-3.0),
+			   'grid-width' 			: 8.0,
+			   'ngrid' 					: 1024,
+			   'nangle' 				: 1,
+			   'euler-angle-mode' 		: 'file',
+			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
+			   }
+params_f2r1c2 = { 'grain-geometry' 		: "ellipsoid",
+			   'cluster-file-name' 		: None,
+			   'grain-axis-x' 			: ba,
+			   'grain-axis-y' 			: 1.0,
+			   'grain-axis-z' 			: 1.0,
+			   'aeff' 					: 0.1,
+			   'ephot' 					: 1.0,
+			   'ior-re' 				: -7.152*pow(10.0,-4.0),
+			   'ior-im' 				: 1.887*pow(10.0,-4.0),
+			   'grid-width' 			: 8.0,
+			   'ngrid' 					: 1024,
+			   'nangle' 				: 1,
+			   'euler-angle-mode' 		: 'file',
+			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
+			  }
+params_f2r1c3 = { 'grain-geometry' 		: "ellipsoid",
+			   'cluster-file-name' 		: None,
+			   'aeff' 					: 0.1,
+			   'grain-axis-x' 			: ba,
 			   'grain-axis-y' 			: 1.0,
 			   'grain-axis-z' 			: 1.0,
 			   'ephot' 					: 2.0,
-			   'RE-index-of-refraction' : -2.079*pow(10.0,-4.0),
-			   'IM-index-of-refraction' : 3.201*pow(10.0,-3.0),
+			   'ior-re' 				: -1.920*pow(10.0,-4.0),
+			   'ior-im' 				: 2.807*pow(10.0,-5.0),
+			   'grid-width' 			: 8.0,
+			   'ngrid' 					: 1024,
+			   'nangle' 				: 1,
+			   'euler-angle-mode' 		: 'file',
+			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
+			   }
+params_f2r2c1 = {'grain-geometry' 		: "ellipsoid",
+			   #'cluster-file-name' 		: None,
+			   'aeff' 					: 0.2,
+			   'grain-axis-x' 			: ba,
+			   'grain-axis-y' 			: 1.0,
+			   'grain-axis-z' 			: 1.0,
+			   #'grain-axis-x' 			: 1.0,
+			   #'grain-axis-y' 			: 1.0,
+			   #'grain-axis-z' 			: 1.0,
+			   'ephot' 					: 0.5,
+			   'ior-re' 				: -2.079*pow(10.0,-3.0),
+			   'ior-im' 				: 3.201*pow(10.0,-3.0),
+			   'grid-width' 			: 8.0,
+			   'ngrid' 					: 1024,
+			   'nangle' 				: 1,
+			   'euler-angle-mode' 		: 'file',
+			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
+			   }
+params_f2r2c2 = { 'grain-geometry' 		: "ellipsoid",
+			   'cluster-file-name' 		: None,
+			   'aeff' 					: 0.2,
+			   'grain-axis-x' 			: ba,
+			   'grain-axis-y' 			: 1.0,
+			   'grain-axis-z' 			: 1.0,
+			   'ephot' 					: 1.0,
+			   'ior-re' 				: -7.152*pow(10.0,-4.0),
+			   'ior-im' 				: 1.887*pow(10.0,-4.0),
+			   'grid-width' 			: 8.0,
+			   'ngrid' 					: 1024,
+			   'nangle' 				: 1,
+			   'euler-angle-mode' 		: 'file',
+			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
+			  }
+params_f2r2c3 = { 'grain-geometry' 		: "ellipsoid",
+			   'cluster-file-name' 		: None,
+			   'aeff' 					: 0.2,
+			   'grain-axis-x' 			: ba,
+			   'grain-axis-y' 			: 1.0,
+			   'grain-axis-z' 			: 1.0,
+			   'ephot' 					: 2.0,
+			   'ior-re' 				: -1.920*pow(10.0,-4.0),
+			   'ior-im' 				: 2.807*pow(10.0,-5.0),
 			   'grid-width' 			: 8.0,
 			   'ngrid' 					: 1024,
 			   'nangle' 				: 1,
@@ -196,14 +205,91 @@ params_r1c2 = { 'grain-geometry' 		: "sphere",
 			   }
 
 f1 = plt.figure(1)
-ax1 = f1.add_subplot(111)
+f1.suptitle("Figure 1 (Draine & Allaf-Akbari 2006): Spherical grains")
+ax111 = f1.add_subplot(231)
+ax112 = f1.add_subplot(232,sharex=ax111,sharey=ax111)
+ax113 = f1.add_subplot(233,sharex=ax111,sharey=ax111)
+ax121 = f1.add_subplot(234,sharex=ax111,sharey=ax111)
+ax122 = f1.add_subplot(235,sharex=ax111,sharey=ax111)
+ax123 = f1.add_subplot(236,sharex=ax111,sharey=ax111)
+f1.subplots_adjust(hspace=0,wspace=0)
 
-params = params_r1c1
-fname =parent_dir+"/data/output_r1c1.dat"
-
-make_data(params, fname)
-add_plot(fname,ax1,mode='one-d',phis=[ 0.0 ] )
-ax1.set_title("E=%.1f keV, a=%.2f $\\mu$m"%(params['ephot'],params['aeff']))
+boundaries = [ xmin, xmax, ymin, ymax]
 
 
-plt.show()
+paramlists = [ params_f1r1c1, params_f1r1c2, params_f1r1c3, params_f1r2c1, params_f1r2c2, params_f1r2c3]
+axes = [ ax111, ax112, ax113, ax121, ax122, ax123 ]
+fnames = [ 'f1r1c1.dat', 'f1r1c2.dat', 'f1r1c3.dat', 'f1r2c1.dat', 'f1r2c2.dat','f1r2c3.dat']
+for i in range(0,len(paramlists)):
+	plt.locator_params(axis='x', nbins=4)
+	fname =parent_dir+"/data/da06_"+fnames[i]
+	ax = axes[i]
+	ax.set_ylim(0.1,2*pow(10,5))
+	params = paramlists[i]
+	make_data(params, fname)
+	data = pu.load_data(fname)
+	if pu.all_zeros(data):
+		print "Data set is all zeros :("
+		sys.exit()
+	data = pu.convert_to_arcseconds(data)
+	data = pu.filter_data(data,boundaries=boundaries)
+	func = pu.make_data_function(data)
+	pu.add_1d_slice(ax,func,PlotMinMax=False,PlotOneSigma=False,PlotAvg=False,boundaries=boundaries,AddLegend=False,AddLabels=False,phis=[0.0],colors=['k'],linestyles=['-'])
+	ax.set_xlim(0,xmax)
+	if fnames[i] in ['f1r1c1.dat','f1r1c2.dat','f1r1c3.dat']: plt.setp(ax.get_xticklabels(), visible=False)
+	else:
+		plt.setp(ax.get_xticklabels(), visible=True)
+		#ax.set_xticklabels([0,1000,2000,3000])
+		ax.set_xlabel("$\\Theta$ [arcsec]")
+	if fnames[i] in ['f1r1c1.dat', 'f1r2c1.dat']: 
+		plt.setp(ax.get_xticklabels(), visible=True)
+		ax.set_ylabel("$dQ_{sca}/d\\Omega$ [sr$^{-1}$]")
+	else: plt.setp(ax.get_yticklabels(), visible=False)
+	ax.text(0.2,0.9,"E=%.1f keV, a=%.2f $\\mu$m"%(params['ephot'],params['aeff']),horizontalalignment='left',transform=ax.transAxes,fontsize=9)
+
+f1.savefig(data_dir+"/DA06_f1_spheres.png")
+
+f2 = plt.figure(2)
+f2.suptitle("Figure 2 (Draine & Allaf-Akbari 2006): Ellipsoidal grains")
+ax211 = f2.add_subplot(231)
+ax212 = f2.add_subplot(232,sharex=ax211,sharey=ax211)
+ax213 = f2.add_subplot(233,sharex=ax211,sharey=ax211)
+ax221 = f2.add_subplot(234,sharex=ax211,sharey=ax211)
+ax222 = f2.add_subplot(235,sharex=ax211,sharey=ax211)
+ax223 = f2.add_subplot(236,sharex=ax211,sharey=ax211)
+f2.subplots_adjust(hspace=0,wspace=0)
+
+
+paramlists = [ params_f2r1c1, params_f2r1c2, params_f2r1c3, params_f2r2c1, params_f2r2c2, params_f2r2c3]
+axes = [ ax211, ax212, ax213, ax221, ax222, ax223 ]
+fnames = [ 'f2r1c1.dat', 'f2r1c2.dat', 'f2r1c3.dat', 'f2r2c1.dat', 'f2r2c2.dat','f2r2c3.dat']
+for i in range(0,len(paramlists)):
+	plt.locator_params(axis='x', nbins=4)
+	fname =parent_dir+"/data/da06_"+fnames[i]
+	ax = axes[i]
+	ax.set_ylim(0.1,2*pow(10,5))
+	params = paramlists[i]
+	make_data(params, fname)
+	data = pu.load_data(fname)
+	if pu.all_zeros(data):
+		print "Data set is all zeros :("
+		sys.exit()
+	data = pu.convert_to_arcseconds(data)
+	data = pu.filter_data(data,boundaries=boundaries)
+	func = pu.make_data_function(data)
+	pu.add_1d_slice(ax,func,PlotMinMax=False,PlotOneSigma=False,PlotAvg=False,boundaries=boundaries,AddLegend=False,AddLabels=False,phis=[0.0,np.pi/2.0],colors=['k'],linestyles=['-',':'])
+	ax.set_xlim(0,xmax)
+	if fnames[i] in ['f2r1c1.dat','f2r1c2.dat','f2r1c3.dat']: plt.setp(ax.get_xticklabels(), visible=False)
+	else:
+		plt.setp(ax.get_xticklabels(), visible=True)
+		#ax.set_xticklabels([0,1000,2000,3000])
+		ax.set_xlabel("$\\Theta$ [arcsec]")
+	if fnames[i] in ['f2r1c1.dat', 'f2r2c1.dat']: 
+		plt.setp(ax.get_xticklabels(), visible=True)
+		ax.set_ylabel("$dQ_{sca}/d\\Omega$ [sr$^{-1}$]")
+	else: plt.setp(ax.get_yticklabels(), visible=False)
+	ax.text(0.2,0.9,"E=%.1f keV, a=%.2f $\\mu$m"%(params['ephot'],params['aeff']),horizontalalignment='left',transform=ax.transAxes,fontsize=9)
+
+f2.savefig(data_dir+"/DA06_f2_ellipsoids.png")
+
+#plt.show()

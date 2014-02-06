@@ -6,11 +6,10 @@ import matplotlib.pyplot as plt
 import os
 import sys
 import time
+from installation_vars import *
+
 REDO_TIMING = False
 
-parent_dir = "/Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/GGADT"
-
-binary = parent_dir+"/src/ggadt"
 algorithms_to_compare = [ 'fftw3.patient', 'fftw3.measure', 'fftw3.estimate', 'gpfa' ]
 as_a_function_of = [ 'ngrid' ]
 
@@ -36,12 +35,12 @@ variables = 	{ 	'ngrid' : np.sort(arr) }
 defaults = 		{	'--grid-width' : 8,
 					'--aeff' : 0.2,
 					'--ephot' : 1.0,
-					'--RE-index-of-refraction': -2.079E-3,
-					'--IM-index-of-refraction': 2.079E-3,
+					'--ior-re': -2.079E-3,
+					'--ior-im': 2.079E-3,
 					'--nangle' : 50,
 					'--grain-geometry' : 'spheres',
 					'--euler-angle-mode' : 'random',
-					'--cluster-file-name' : parent_dir+'/data/clusters/'+'BAM2.256.1.targ',
+					'--cluster-file-name' : cluster_dir+'BAM2.256.1.targ',
 					}
 
 clargs = ""
@@ -95,8 +94,8 @@ if REDO_TIMING:
 		os.system("make")
 		#'''
 
-		if not os.path.exists(binary):
-			print "Cannot find ",binary
+		if not os.path.exists(ggadt):
+			print "Cannot find ",ggadt
 			sys.exit(0)
 		for depvar in as_a_function_of:
 			avg_times = []
@@ -114,7 +113,7 @@ if REDO_TIMING:
 				for n in range(0,Nrealizations+extra):
 					timer()
 
-					command = binary+clargs+" --"+depvar+"="+`val`+" > /dev/null"
+					command = ggadt+clargs+" --"+depvar+"="+`val`+" > /dev/null"
 					print
 					print `depvar`+"="+`val`+" : "+`n`#+" | "+`command`
 					os.system(command)

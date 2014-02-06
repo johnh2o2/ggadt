@@ -1,3 +1,9 @@
+* commit efc9e4f8af3070c87ab81a38c2310b6f6bea1bf2
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Feb 4 13:59:03 2014 -0500
+| 
+|     Bug discovered when trying to reproduce figure 1 of DA06. E=0.5, a=0.1. The central peak is too high by over an order of magnitude, and the location of the minima are at roughly half the angle they should be. More progress on DA06.py
+|  
 * commit a9fa2db66751ad928bca795738199b0ca458d3cb
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Tue Feb 4 10:46:52 2014 -0500

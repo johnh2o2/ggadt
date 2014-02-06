@@ -307,6 +307,10 @@ AC_CONFIG_FILES([ 	Makefile
           src/spheres.f03
           src/ggadt.f03
 					src/common.f03
+
+          
+
+          scripts/installation_vars.py
 				])
 AC_SUBST(fftw3_inc_dir)
 AC_SUBST(plan_dir)
@@ -322,6 +326,7 @@ AC_SUBST(GPFA_UNCOMMENT)
 AC_SUBST(GPFA_COMMENT)
 AC_SUBST(USE_GPFA)
 AC_SUBST(omp_lib)
+AC_SUBST(abs_builddir)
 
 
 

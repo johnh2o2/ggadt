@@ -9,6 +9,7 @@ module spheres
     integer :: nspheres, nrots, ok, n
     integer :: MIGRATE, ISEED, NS
     real :: ALPHA(3), VTOT, A_1(3), A_2(3)
+    real :: default_ior_r, default_ior_i
     real, allocatable :: radii(:), ior_r(:), ior_i(:)
     real, allocatable :: pos(:,:), pos_rot(:,:)
     
@@ -18,12 +19,14 @@ module spheres
     
     contains
 
-    subroutine read_spheres()
+    subroutine read_spheres(cluster_file_name,a_eff)
         implicit none
         real :: v = 0.0
         integer  :: i, allocatestatus
+        character(len=200), intent(in) :: cluster_file_name
+        real, intent(in) :: a_eff
 
-        open(unit=1,file=sphlist_fname) ! open sphere file.
+        open(unit=1,file=cluster_file_name) ! open sphere file.
 
         ! Read header
         read(1,'(52X,i2,7X,i4)') MIGRATE,ISEED
@@ -32,7 +35,7 @@ module spheres
         read(1,'(3f10.6,13X)') A_2(1), A_2(2), A_2(3)
         read(1,'(A)') junk
 
-        !write(0,*) sphlist_fname," variables:"
+        !write(0,*) cluster_file_name," variables:"
         !write(0,*) "MIGRATE",MIGRATE
         !write(0,*) "ISEED",ISEED
         !write(0,*) "NS",NS
@@ -59,10 +62,12 @@ module spheres
         ! read in spheres
         do i=1,nspheres
             read(1, *) n, pos(i,1), pos(i,2), pos(i,3), radii(i) 
-            ior_r(i) = ior_re
-            ior_i(i) = ior_im
-            radii(i) = radii(i)/2
+            ior_r(i) = default_ior_r
+            ior_i(i) = default_ior_i
+            radii(i) = radii(i)
             v = v+ (4.0*pi/3.0)*(radii(i))**3
+
+            !write(0,*) n, pos(i,1), pos(i,2), pos(i,3), radii(i) 
         end do 
 
         close(1)
