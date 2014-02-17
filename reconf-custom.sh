@@ -17,7 +17,8 @@ automake -a
 rm test_output_expfft.dat
 bash configure --enable-fftw3 
 make || exit
-src/ggadt --use-experimental-fft --ngrid=1024 --grid-width=2 > test_output_expfft.dat
+time src/ggadt --use-experimental-fft --ngrid=512 --grid-width=2.0 > test_output_expfft.dat
+time src/ggadt --ngrid=2048 --grid-width=8.0 > test_output_expfft_reg.dat
 #cp doc/*png doc/ggadt.html
 #make html || exit
 #python scripts/make_sample_plots.py

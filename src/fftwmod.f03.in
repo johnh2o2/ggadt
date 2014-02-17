@@ -181,14 +181,14 @@ contains
     function kspace_shift(f,shiftx,shifty)
         real, intent(in) :: shiftx,shifty
         complex(c_double_complex), intent(in) :: f(:,:)
-        complex(c_double_complex), dimension(size(f(:,1)),size(f(:,1))) :: kspace_shift
+        complex(c_double_complex), dimension(size(f(:,1)),size(f(1,:))) :: kspace_shift
         integer :: i, j, n
 
         n = size(f(:,1))
 
         do i=1,n
             do j=1,n
-                kspace_shift(i,j) = f(i,j)*exp(ISIGN*TWOpi_fft*(shiftx*(i-1)+shifty*(j-1))/n)
+                kspace_shift(i,j) = f(i,j)*exp(ISIGN*CMPLX(0,1)*TWOpi_fft*(shiftx*(i-1)+shifty*(j-1))/real(n))
             end do
         end do
     end function kspace_shift
@@ -200,7 +200,11 @@ contains
         integer :: i, j, n
 
         n = size(f(:,1))
-        fft_center = kspace_shift(f,real(1-n)/real(2), real(1-n)/2)
+        do i=1,n
+            do j=1,n
+                fft_center(i,j) = f(i,j)*(-1)**(i+j+1)
+            end do
+        end do 
     end function fft_center
 
     function experimental_fft(f,kmin,kmax,enhancement)
@@ -215,12 +219,12 @@ contains
         real :: deltax, deltay
 
         f = kspace_shift(f,real(kmin),real(kmin))
-        norig = kmax - kmin + 1
+        norig = kmax - kmin 
 
         write (0,*) "norig=",norig,"kmin=",kmin,"kmax=",kmax,"enhancement=",enhancement
 
         allocate(working_fft(norig,norig))
-        allocate(experimental_fft(norig*enhancement, norig*enhancement))
+        allocate(experimental_fft(norig*enhancement+1, norig*enhancement+1))
         
        
         do i=1,enhancement
@@ -228,13 +232,14 @@ contains
          
             do j=1,enhancement
                 deltay = real(j-1)/real(enhancement)
-                write(0,*) "i,j = ",i,j
+                !write(0,*) "i,j = ",i,j
                 new_grid = kspace_shift(f,deltax,deltay)
                 working_fft = fft_firstk(new_grid,norig)
-                write(0,*) " (fft done)"
+                !write(0,*) " (fft done)"
                 do a=1,norig
                     do b=1,norig
-                        if ((i + (a-1)*enhancement .le. norig*enhancement) .and. (j+(b-1)*enhancement .le. norig*enhancement)) then
+                        if ((i + (a-1)*enhancement < size(experimental_fft(:,1))) .and. &
+                            & (j + (b-1)*enhancement < size(experimental_fft(1,:)))) then
                             experimental_fft(i + (a-1)*enhancement,j + (b-1)*enhancement) = working_fft(a,b)
                         end if 
                     end do

@@ -1,3 +1,9 @@
+* commit c39af6f88a876b9a742026170da0bf2c8de3c3bc
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Feb 17 10:39:19 2014 -0500
+| 
+|     Making progress on experimental FFT. Compiles, but does not work at the moment.
+|  
 * commit 79e197026d9c336ed08a54d5b41c918c042161cb
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Thu Feb 6 00:58:18 2014 -0500

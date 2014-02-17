@@ -26,7 +26,7 @@ program ggadt
 
 
     
-    klen = 32
+    klen = 25
     
 
     call set_parameter_values()
@@ -83,7 +83,7 @@ program ggadt
             !end do 
             !stop
         else
-            ftsh = fft_center(ftsh)
+            sh = fft_center(sh)
             ftsh = fft(sh,x,y)
             
         endif
@@ -148,11 +148,7 @@ program ggadt
     if (timing_mode) stop 
 
     print *, "# [thetax] [thetay] [dqscat/domega]"
-    if (allocated(thetax)) then 
-        write(0,*) "thetax allocated, size = ",size(thetax)
-    else 
-        write(0,*) "thetax NOT allocated, size = ", size(thetay)
-    end if 
+    
     do i=1,size(thetax)
         do j=1,size(thetay)
             print *,thetax(i),thetay(j),scatter(i,j)
@@ -422,7 +418,7 @@ contains
         integer, intent(out) :: kmin,kmax,enhancement, Kout
 
 
-        write (0,*) "thetamin, thetamax, Kask",thetamin,thetamax, Kask  
+        !write (0,*) "thetamin, thetamax, Kask",thetamin,thetamax, Kask  
 
         enhancement = 1
 
@@ -431,15 +427,15 @@ contains
         kmin = int(floor(k*sin(thetamin)*(L/TWOPI)))
         kmax = int(ceiling(k*sin(thetamax)*(L/TWOPI)))
 
-        Kout = kmax - kmin + 1
+        Kout = kmax - kmin
 
-        do while (enhancement*Kout < Kask) 
+        do while (enhancement*Kout + 1 < Kask) 
             enhancement = enhancement+1
         end do 
 
-        Kout = enhancement*Kout
+        Kout = enhancement*Kout + 1
 
-        write(0,*) "kmin,kmax,kout",kmin,kmax,kout 
+        !write(0,*) "kmin,kmax,kout",kmin,kmax,kout 
 
     end subroutine get_fft_vals
 
