@@ -13,7 +13,7 @@ module sphere
         real :: chord_sphere
         l = r*r - (pos(1)-pos_o(1))**2  - (pos(2)-pos_o(2))**2
         if ((l .lt. 0) .or. (l .eq. 0)) then
-            chord_sphere = 0
+            chord_sphere = 0.0
         else
             chord_sphere = 2*sqrt(l)
         end if 

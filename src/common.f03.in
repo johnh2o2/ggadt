@@ -15,9 +15,10 @@ module common_mod
     & and Michael Tarczon (mtarczon@princeton.edu)"
 
   
-  real, parameter               ::  pi          = 3.14159
+  real, parameter               ::  pi          = 4.*atan(1.)
+  real, parameter               ::  twopi       = 8.*atan(1.)
   complex(c_double_complex)     ::  delm 
- 
+  integer, parameter            ::  ISIGN       = 1
   real                          ::  a_eff     
   real                          ::  ephot     
   character(len=50)             ::  geometry  
@@ -76,7 +77,7 @@ module common_mod
         description="Real component of the index of refraction, minus 1")
       call define_option_real(opts,"ior-im",3.201E-3,required=.false., &
         description="Imaginary component of the index of refraction")
-      call define_option_real(opts,"grid-width",64.0,required=.false.,&
+      call define_option_real(opts,"grid-width",8.0,required=.false.,&
         description="Width of numerical grid as a fraction of a_eff.&
           & Higher values (>2) give you more angular resolution when calculating the scattering cross section,&
           & at the cost of reducing the angular resolution of the grain on the grid.")

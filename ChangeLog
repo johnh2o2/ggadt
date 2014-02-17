@@ -1,3 +1,9 @@
+* commit 79e197026d9c336ed08a54d5b41c918c042161cb
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Thu Feb 6 00:58:18 2014 -0500
+| 
+|     Several changes: spheres, ellipsoid and sphere module no longer include common_mod, and the functions in these modules (phi, shadow, etc) require more arguments. The spheres module divided radii by 2 (not sure why), and that's now been changed. I have only been compiling the serial version, with fftw3. The openmp version should be tested, and the pragma calls will likely need to be adjusted. GGADT now reproduces Draine and Allaf-Akbari 2006 (spheres and ellipsoids), and this commit contains a complete rewrite of all scripts. DA06.py reproduces figures 1 and 2 in DA06. HD09.py at the moment tries to reproduce figure 3 in Heng and Draine 2009, but UNSUCCESSFULLY (see HD09_f3.png in the data dir). ALSO: change in command line arguments: RE-index-of-refraction is now ior_re (same for IM-index-of-refraction --> ior_im). And some other changes in the variable names to be more consistent throughout the code. paramfiles directory is now parameter-files directory. TODO: clean up, fix HD09 bugs with the spheres module(?), add fast FFT for both fftw3 and gpfa modules, revert everything back to F90/95, etc
+|  
 * commit efc9e4f8af3070c87ab81a38c2310b6f6bea1bf2
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Tue Feb 4 13:59:03 2014 -0500

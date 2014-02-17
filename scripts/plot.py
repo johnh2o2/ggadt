@@ -23,14 +23,15 @@ nplot = 250 # dimension of plotted grid (interpolated)
 delta = 250 # distance above or below theta min/max for interpolation purposes
 
 # min/max scattering angles to deal with
-xmin = -2000
-xmax = 2000
+xmin = -3000
+xmax = 3000
 ymin = xmin
 ymax = xmax
 
 conv = (360*60*60)/(2*np.pi) # convert from radians to arcseconds (a more sensible unit)
 
 fname = sys.argv[1]
+huge = pow(10,20)
 
 print "Plotting file '%s'"%(fname)
 data_dt = np.dtype([('theta', np.float_), ('phi', np.float_), ('f', np.float_)])
@@ -49,6 +50,11 @@ for Z in z:
 		ALL_ZERO = False
 		break
 
+
+
+for i in range(0,len(z)):
+	if np.isinf(z[i]):
+		z[i] = huge
 if ALL_ZERO:
 	print "ALL ZERO!"
 	sys.exit()
@@ -72,7 +78,7 @@ z = np.array(z_new)
 # Figure out dimension and reshape x,y and z
 n = 0
 while x[n] == x[0]: n+=1
-
+print n
 x = np.reshape(x,(n,n))
 y = np.reshape(y,(n,n))
 z = np.reshape(z,(n,n))

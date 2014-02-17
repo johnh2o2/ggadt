@@ -7,6 +7,9 @@ module fftw
     integer ::  mode = fftw_estimate
     character(len=100) :: mode_name
     character(len=100) :: plan_filename
+    real, parameter :: TWOpi_fft = 8.*atan(1.)
+    real, parameter :: pi_fft = 4.*atan(1.)
+    integer, parameter :: ISIGN = 1
 
 contains
 
@@ -68,98 +71,179 @@ contains
         call fftw_execute_dft(plan, f, fft)
     end function fft
 
-    function fft_firstk(f,x,y,K)
+    function fft_firstk(f,K)
+        ! How this calculation works:
+        !   Say I have 15 data points, in one dimension, for which I only care about the first 5 values of its FFT.
+        !
+        !   We can calculate these first five k values by doing 15/5 = 3 FFT's of length 5.
+        !
+        !       Original data: dddddddddddddddd
+        !
+        !       FFT1 = FFT( d--d--d--d--d--d )
+        !       FFT2 = FFT( -d--d--d--d--d-- )
+        !       FFT3 = FFT( --d--d--d--d--d- )
+        !
+        !       FFT(orig)(k) = sum_i(FFTi(k))*twid_factor(k)
+        ! 
+
         integer, intent(in) :: K
-        integer, target :: kval
-        integer :: ISIGN, lentwids
-        type(c_ptr) ::  kptr,localplan 
-        integer, dimension(1) :: kval_arr, null_vec
-        integer, dimension(2) :: n_vec 
-        real, intent(in) :: x(:), y(:)
+        integer :: lentwids, keff, allocation_status
+        type(c_ptr) :: localplan
         complex(c_double_complex), intent(inout) :: f(:,:)
-        complex(c_double_complex), dimension(size(x),size(y)) :: working_fft
-        complex(c_double_complex), dimension(K,K) :: fft_firstk
-        complex(c_double_complex), allocatable :: twids(:,:)
-        real :: TWOPI
+        complex(c_double_complex), dimension(K,K) :: fft_firstk 
+        complex(c_double_complex), allocatable :: small_fft(:,:), twids(:,:), fft_firstk_working(:,:)
+
         integer  :: N, NFFT, i,j,l,m 
 
-        
-        write (0, *) "Declared variables"
-        do i=1,K
-            do j=1,K
-                fft_firstk(i,j) = 0.0
-            end do 
-        end do 
-        write (0, *) "initialized fft_firstk"
-        TWOPI = 8.*atan(1.)
-        ISIGN = 1
-        N = size(x)
-        NFFT = N/K 
-        lentwids = N - NFFT + 1
-        kval = K**2
-        kptr = c_loc(kval)
-        kval_arr(1) = kval
-        n_vec(1) = K
-        n_vec(2) = K 
-        write (0, *) "set variables"
-        allocate(twids(lentwids, lentwids))
+        keff = k
+        N = size(f(:,1))
+        NFFT = N/Keff
 
-        write (0, *) "allocated twids."
-        if (K*NFFT .ne. N) then
+        ! Make sure N is divisible by K.
+        !    if not, we take the first K+n values of the FFT 
+        !    and throw away n of them (n is the smallest integer such that K+n | N)
+        do while ((.not. keff*NFFT .eq. N) .and. keff < N )
+            keff = keff + 1
+            NFFT = N/Keff 
+        end do 
+
+        lentwids = N
+
+        ! allocate twids, small_fft and fft_firstk_working arrays
+        !   twids               -- contain twiddle factors needed to combine the different fft calculations
+        !   small_fft           -- the array in which each fft is temporarily stored
+        !   fft_firstk_working  --
+        allocate(twids(lentwids, lentwids), stat = allocation_status)
+        if (allocation_status/=0) then
+            write (0,*) " **ERROR! Cannot allocate twids array (fftwmod)"
+            stop
+        end if 
+        allocate(small_fft(keff, keff), stat = allocation_status)
+        if (allocation_status/=0) then
+            write (0,*) " **ERROR! Cannot allocate small_fft array (fftwmod)"
+            stop
+        end if 
+        allocate(fft_firstk_working(keff, keff), stat = allocation_status)
+        if (allocation_status/=0) then
+            write (0,*) " **ERROR! Cannot allocate fft_firstk_working array (fftwmod)"
+            stop
+        end if 
+
+        if (Keff*NFFT .ne. N) then
             write(0,*) "ERROR: NFFT = ",NFFT," and K = ",K,", but NFFT*K = ",NFFT*K," != ",N
             stop 
         endif
-        write(0,*) "going to make plan..."
 
+        
 
-        localplan = fftw_plan_many_dft(2, n_vec , NFFT*NFFT, & 
-                                    f, null_vec, NFFT,  &
-                                    1, working_fft, null_vec, 1, K*K, &
-                                    fftw_backward, fftw_estimate)
-        write (0, *) "made plan"
-        do i=0,(NFFT-1)
-            do j=0,(K-1)
+        ! Calculate twiddle factors
+
+        do i=0,(keff-1)
+            do j=0,(keff-1)
                 do l=0,(NFFT-1)
-                    do m=0,(K-1)
-                        twids(i*(K-1) + j + 1, &
-                              l*(K-1) + m + 1) &
-                        = exp(CMPLX(0,1)*ISIGN*TWOPI*(i*j/size(x) + l*m/size(y)))
+                    do m=0,(NFFT-1)
+                        twids(1 + i + l*Keff, j + m*Keff ) &
+                            & = exp(CMPLX(0,1)*ISIGN*TWOpi_fft*(real(i*l+j*m))/real(N))
                     end do 
                 end do 
             end do 
         end do
-        write (0, *) "set twids."
-        call fftw_execute_dft(localplan, f, working_fft)
-        write (0, *) "executed plan"
-        do i=0,(NFFT-1)
-            do j=0,(K-1)
-                do l=0,(NFFT-1)
-                    do m=0,(K-1)
-                        fft_firstk(j+1,m+1) = fft_firstk(j+1,m+1) + working_fft(j+i*K+1,m+l*K+1)*twids(j*(K-1)+i+1, l*(K-1)+m+1)
+
+        do l=1,NFFT
+            do m=1,NFFT
+                ! plan
+                localplan = fftw_plan_dft_2d(Keff, Keff, f(l:N:NFFT,m:N:NFFT) ,small_fft, fftw_backward,mode)
+
+
+                ! execute plan
+                call fftw_execute_dft(localplan, f(l:N:NFFT,m:N:NFFT), small_fft)
+
+                ! transfer results to master array
+                do i=1,Keff
+                    do j=1,Keff 
+                        fft_firstk_working(i,j) = fft_firstk_working(i,j) + small_fft(i,j)*twids( i+(l-1)*Keff , j+(m-1)*Keff )
                     end do 
                 end do 
+
+                ! clean up
+                call fftw_destroy_plan(localplan)
             end do 
         end do
-        write (0, *) "set fft_firstk"
-        call fftw_destroy_plan(localplan)
-        write (0, *) "destroyed plan "
+        
+        ! only get the K values that we care about
+        fft_firstk = fft_firstk_working(:K,:K)
 
-
-
+        deallocate(twids)
+        deallocate(small_fft)
+        deallocate(fft_firstk_working)
     end function fft_firstk
 
-    !function experimental_fft(f,x,y,K):
-    !    
-    !    real, intent(in) :: x(:), y(:)
-    !    integer, intent(in) :: K 
-    !    complex(c_double_complex), intent(inout) :: f(:,:)
-    !    complex(c_double_complex), dimension(size(x),size(y)) :: new_grid(:,:)
-    !    complex(c_double_complex), dimension(size(x),size(y)) :: fft
-    !    integer :: nx, ny, i, j
+    function kspace_shift(f,shiftx,shifty)
+        real, intent(in) :: shiftx,shifty
+        complex(c_double_complex), intent(in) :: f(:,:)
+        complex(c_double_complex), dimension(size(f(:,1)),size(f(:,1))) :: kspace_shift
+        integer :: i, j, n
+
+        n = size(f(:,1))
+
+        do i=1,n
+            do j=1,n
+                kspace_shift(i,j) = f(i,j)*exp(ISIGN*TWOpi_fft*(shiftx*(i-1)+shifty*(j-1))/n)
+            end do
+        end do
+    end function kspace_shift
 
 
-    !    K = 
-    !    ngrid_grain = 256
-    !end function experimental_fft
+    function fft_center(f)
+        complex(c_double_complex), intent(in) :: f(:,:)
+        complex(c_double_complex), dimension(size(f(:,1)),size(f(:,1))) :: fft_center
+        integer :: i, j, n
+
+        n = size(f(:,1))
+        fft_center = kspace_shift(f,real(1-n)/real(2), real(1-n)/2)
+    end function fft_center
+
+    function experimental_fft(f,kmin,kmax,enhancement)
+        
+        integer, intent(in) :: kmin, kmax, enhancement
+        
+        complex(c_double_complex), intent(inout) :: f(:,:)
+        complex(c_double_complex), allocatable :: experimental_fft(:,:)
+        complex(c_double_complex), allocatable :: working_fft(:,:)
+        complex(c_double_complex), dimension(size(f(:,1)), size(f(1,:))) :: new_grid
+        integer :: i,j,a,b,norig
+        real :: deltax, deltay
+
+        f = kspace_shift(f,real(kmin),real(kmin))
+        norig = kmax - kmin + 1
+
+        write (0,*) "norig=",norig,"kmin=",kmin,"kmax=",kmax,"enhancement=",enhancement
+
+        allocate(working_fft(norig,norig))
+        allocate(experimental_fft(norig*enhancement, norig*enhancement))
+        
+       
+        do i=1,enhancement
+            deltax = real(i-1)/real(enhancement)
+         
+            do j=1,enhancement
+                deltay = real(j-1)/real(enhancement)
+                write(0,*) "i,j = ",i,j
+                new_grid = kspace_shift(f,deltax,deltay)
+                working_fft = fft_firstk(new_grid,norig)
+                write(0,*) " (fft done)"
+                do a=1,norig
+                    do b=1,norig
+                        if ((i + (a-1)*enhancement .le. norig*enhancement) .and. (j+(b-1)*enhancement .le. norig*enhancement)) then
+                            experimental_fft(i + (a-1)*enhancement,j + (b-1)*enhancement) = working_fft(a,b)
+                        end if 
+                    end do
+                end do 
+
+            end do
+        end do 
+        f = kspace_shift(f,real(-kmin),real(-kmin))
+        
+    end function experimental_fft
 
 end module fftw

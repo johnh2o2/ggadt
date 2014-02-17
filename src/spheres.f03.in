@@ -35,16 +35,6 @@ module spheres
         read(1,'(3f10.6,13X)') A_2(1), A_2(2), A_2(3)
         read(1,'(A)') junk
 
-        !write(0,*) cluster_file_name," variables:"
-        !write(0,*) "MIGRATE",MIGRATE
-        !write(0,*) "ISEED",ISEED
-        !write(0,*) "NS",NS
-        !write(0,*) "VTOT",VTOT
-        !write(0,*) "alpha", ALPHA
-        !write(0,*) "A_1", A_1
-        !write(0,*) "A_2", A_2
-
-        ! this section will read the entire header in the future.
         nspheres = NS
 
         ! allocate necessary memory
@@ -64,7 +54,7 @@ module spheres
             read(1, *) n, pos(i,1), pos(i,2), pos(i,3), radii(i) 
             ior_r(i) = default_ior_r
             ior_i(i) = default_ior_i
-            radii(i) = radii(i)
+            radii(i) = radii(i)/2.0
             v = v+ (4.0*pi/3.0)*(radii(i))**3
 
             !write(0,*) n, pos(i,1), pos(i,2), pos(i,3), radii(i) 
@@ -138,8 +128,7 @@ module spheres
         !$omp do schedule(dynamic) private(i,j)
         do i=1,ngrid
             do j=1,ngrid 
-                ! convert phi grid to shadow grid*(-1)^(i+j) so the fft is centered
-                shadow_spheres(i,j) = (-1.0)**(i+j+1)*(1-exp( (0.0,1.0)*phi(i,j) ))
+                shadow_spheres(i,j) = 1-exp( (0.0,1.0)*phi(i,j) )
             end do
         end do 
         !$omp end do nowait

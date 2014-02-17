@@ -19,13 +19,15 @@ program ggadt
     complex(c_double_complex), allocatable :: sh(:,:), ftsh(:,:), ftsh_firstK(:,:)
     real, allocatable :: chrd(:,:), scatter(:,:), scatter_temp(:,:)
 
-    real :: xmin, xmax, ymin, ymax, dx, dy, k, l
+    real :: xmin, xmax, ymin, ymax, dx, dy, k, l, thetamax, convang, dk
     real, dimension(3) :: eul_ang
     real, dimension(3,3) :: rm 
-    integer :: i, j, neul, allocatestatus, deallocatestatus, num_args, nangle_new, klen
+    integer :: i, j, q, neul, allocatestatus, deallocatestatus, num_args, nangle_new, klen, kactual, kmin, kmax, enhancement
 
-    klen = 4
 
+    
+    klen = 32
+    
 
     call set_parameter_values()
     call initialize_and_allocate_vars()
@@ -33,37 +35,63 @@ program ggadt
     if ( verbose_mode ) call print_parameters()
 
 
-    
+    if (use_experimental_fft) then
+        thetamax = 3000.
+        convang = (360.*60.*60.)/(2*pi)
 
+
+        call get_fft_vals(-thetamax/convang,thetamax/convang,klen,kmin,kmax,enhancement,kactual)
+
+
+        allocate(kx(kactual),stat = allocatestatus)
+        if (allocatestatus /= 0) stop "*** not enough memory (kx) ***"
+        allocate(ky(kactual),stat = allocatestatus)
+        if (allocatestatus /= 0) stop "*** not enough memory (ky) ***"
+        allocate(thetax(kactual),stat = allocatestatus)
+        if (allocatestatus /= 0) stop "*** not enough memory (thetax) ***"
+        allocate(thetay(kactual),stat = allocatestatus)
+        if (allocatestatus /= 0) stop "*** not enough memory (thetay) ***"
+
+        dk = real(kmax-kmin)/real(size(kx) - 1)
+        do i=1,size(kx)
+            kx(i) = ((i-1)*dk + kmin)*(TWOPI/L)
+            ky(i) = kx(i)
+
+            thetax(i) = asin(kx(i)/k)
+            thetay(i) = asin(ky(i)/k)
+        end do
+    end if 
     if (geometry .eq. "sphere") then
         !$omp parallel shared(sh,x,y,zmax,k) 
         !$omp do schedule(dynamic) private(i,j)
         do i=1,size(x)
             do j=1,size(y)
-                sh(i,j) = shadow_sphere(x(i),y(j),k,a_eff,delm)*(-1.0)**(i+j+1)
+                sh(i,j) = shadow_sphere(x(i),y(j),k,a_eff,delm)
             end do
         end do
         !$omp end do nowait
         !$omp end parallel
         if (use_experimental_fft) then
-            !TEST ftsh = experimental_fft(sh,x,y) 
-            ftsh = fft(sh,x,y)
-            @FFTW3_UNCOMMENT@ftsh_firstK = fft_firstK(sh,x,y,klen)
-            write (0,*) "TESTING FIRST K"
-            do i=1,klen
-                do j=1,klen
-                    write (0,*) "(",i,",",j,") fft_firstK = ",ftsh_firstK(i,j),"| ftsh = ",ftsh(i,j)
-                end do 
-            end do 
-            stop
+
+            !ftsh = fft_center(ftsh)
+            ftsh = experimental_fft(sh,kmin,kmax,enhancement)
+            !write (0,*) "TESTING FIRST K"
+            !do i=1,klen
+            !    do j=1,klen
+            !        write (0,*) "(",i,",",j,") fft_firstK = ",ftsh_firstK(i,j),"| ftsh = ",ftsh(i,j)
+            !    end do 
+            !end do 
+            !stop
         else
+            ftsh = fft_center(ftsh)
             ftsh = fft(sh,x,y)
+            
         endif
         !stop
         !$omp parallel shared(scatter,ftsh,k,dx,dy) 
         !$omp do schedule(dynamic) private(i,j)
-        do i=1,size(x)
-            do j=1,size(y)
+        do i=1,size(thetax)
+            do j=1,size(thetay)
                 scatter(i,j) = scatter(i,j) + abs((k*ftsh(i,j)*dx*dy))**2/(4*pi*(pi*a_eff)**2)
             end do
         end do
@@ -80,7 +108,7 @@ program ggadt
                 !$omp do schedule(dynamic) private(i,j)
                 do i=1,size(x)
                     do j=1,size(y)
-                        sh(i,j) = shadow_ellipsoid(x(i),y(j), k,grain_a,delm,rm )*(-1.0)**(i+j+1) 
+                        sh(i,j) = shadow_ellipsoid(x(i),y(j), k,grain_a,delm,rm )
                     end do
                 end do
                 !$omp parallel shared(sh,x,y,rm,k) 
@@ -94,15 +122,17 @@ program ggadt
             if (use_experimental_fft) then
                 !TEST ftsh = experimental_fft(sh,x,y) 
                 ftsh = fft(sh,x,y)
+                ftsh = fft_center(ftsh)
             else
                 ftsh = fft(sh,x,y)
+                ftsh = fft_center(ftsh)
             endif
 
             !$omp parallel shared(scatter,ftsh,k,dx,dy) 
             !$omp do schedule(dynamic) private(i,j)
             do i=1,size(x)
                 do j=1,size(y)
-                    scatter(i,j) = scatter(i,j) + abs((k*ftsh(i,j)*dx*dy))**2/(4*pi*(pi*a_eff)**2)
+                    scatter(i,j) = scatter(i,j) + abs((k*ftsh(i,j)*dx*dy))**2/(4*pi*(pi*a_eff)**2)/real(nangle)
                 end do
             end do
             !$omp end do nowait
@@ -114,23 +144,17 @@ program ggadt
         end do
     end if 
  
-    if (geometry /= 'sphere') then
-        !$omp parallel shared(scatter) 
-        !$omp do schedule(dynamic) private(i,j)
-        do i=1,size(x)
-            do j=1,size(y)
-                scatter(i,j) = scatter(i,j)/real(nangle)
-            end do
-        end do
-        !$omp end do nowait
-        !$omp end parallel
-    end if 
 
     if (timing_mode) stop 
 
     print *, "# [thetax] [thetay] [dqscat/domega]"
-    do i=1,size(x)
-        do j=1,size(y)
+    if (allocated(thetax)) then 
+        write(0,*) "thetax allocated, size = ",size(thetax)
+    else 
+        write(0,*) "thetax NOT allocated, size = ", size(thetay)
+    end if 
+    do i=1,size(thetax)
+        do j=1,size(thetay)
             print *,thetax(i),thetay(j),scatter(i,j)
         end do
     end do
@@ -149,7 +173,7 @@ contains
         n = size(x)
         l = x(n) - x(1)
         do i=1,n
-            get_k(i) = (2*pi/l)*(i-0.5*(n+1)-0.5)
+            get_k(i) = (2*pi/l)*(real(i-1)/real(n) - 0.5)
         end do
     end function get_k
 
@@ -161,14 +185,16 @@ contains
         if (allocatestatus /= 0) stop "*** not enough memory (x) ***"
         allocate(y(ngrid),stat = allocatestatus)
         if (allocatestatus /= 0) stop "*** not enough memory (y) ***"
-        allocate(kx(ngrid),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (kx) ***"
-        allocate(ky(ngrid),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (ky) ***"
-        allocate(thetax(ngrid),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (thetax) ***"
-        allocate(thetay(ngrid),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (thetay) ***"
+        if (.not. use_experimental_fft) then
+            allocate(kx(ngrid),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "*** not enough memory (kx) ***"
+            allocate(ky(ngrid),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "*** not enough memory (ky) ***"
+            allocate(thetax(ngrid),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "*** not enough memory (thetax) ***"
+            allocate(thetay(ngrid),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "*** not enough memory (thetay) ***"
+        end if
         allocate(sh(ngrid,ngrid),stat = allocatestatus)
         if (allocatestatus /= 0) stop "*** not enough memory (sh) ***"
         allocate(ftsh(ngrid,ngrid),stat = allocatestatus)
@@ -250,6 +276,8 @@ contains
 
         k = (2*pi/1.239842)*1000*ephot
 
+
+
         xmin = -grid_width*a_eff/2.0
         ymin = -grid_width*a_eff/2.0
         xmax = grid_width*a_eff/2.0
@@ -266,12 +294,16 @@ contains
         do i=1,size(y)
             y(i) = ymin + (i-1)*dy
         end do
-        kx = get_k(x)
-        ky = get_k(y)
-        do i=1,size(kx)
-            thetax(i) = asin(kx(i)/k)
-            thetay(i) = asin(ky(i)/k)
-        end do      
+
+        L = x(size(x)) - x(1)
+        if (.not. use_experimental_fft) then
+            kx = get_k(x)
+            ky = get_k(y)
+            do i=1,size(kx)
+                thetax(i) = asin(kx(i)/k)
+                thetay(i) = asin(ky(i)/k)
+            end do      
+        end if 
     end subroutine initialize_and_allocate_vars
 
     subroutine init_random_seed()
@@ -384,6 +416,33 @@ contains
 
     end subroutine cleanup
 
+    subroutine get_fft_vals(thetamin,thetamax,Kask,kmin,kmax,enhancement,Kout)
+        real, intent(in) :: thetamin, thetamax
+        integer, intent(in) :: Kask
+        integer, intent(out) :: kmin,kmax,enhancement, Kout
+
+
+        write (0,*) "thetamin, thetamax, Kask",thetamin,thetamax, Kask  
+
+        enhancement = 1
+
+        write(0,*) "K,l = ",k,l
+
+        kmin = int(floor(k*sin(thetamin)*(L/TWOPI)))
+        kmax = int(ceiling(k*sin(thetamax)*(L/TWOPI)))
+
+        Kout = kmax - kmin + 1
+
+        do while (enhancement*Kout < Kask) 
+            enhancement = enhancement+1
+        end do 
+
+        Kout = enhancement*Kout
+
+        write(0,*) "kmin,kmax,kout",kmin,kmax,kout 
+
+    end subroutine get_fft_vals
+
     subroutine print_parameters()
         write(0,*) "Parameter values:"
         write(0,*) "-----------------------------------"
@@ -410,6 +469,7 @@ contains
 
     end subroutine print_parameters
 
+    
 
 end program ggadt
 
