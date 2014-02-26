@@ -7,6 +7,7 @@ program ggadt
     use spheres
     use ellipsoid
     use common_mod
+    use constants
 
     @USE_OMP_LIB@
     @USE_FFTW@
@@ -16,133 +17,75 @@ program ggadt
 
     
     real, allocatable :: x(:), y(:), kx(:), ky(:), thetax(:), thetay(:)
-    complex(c_double_complex), allocatable :: sh(:,:), ftsh(:,:), ftsh_firstK(:,:)
-    real, allocatable :: chrd(:,:), scatter(:,:), scatter_temp(:,:)
+
+    complex(c_double_complex), allocatable :: sh(:,:), ftsh(:,:)
+
+    real, allocatable :: scatter(:,:)
 
     real :: xmin, xmax, ymin, ymax, dx, dy, k, l, thetamax, convang, dk
     real, dimension(3) :: eul_ang
     real, dimension(3,3) :: rm 
-    integer :: i, j, q, neul, allocatestatus, deallocatestatus, num_args, nangle_new, klen, kactual, kmin, kmax, enhancement
+    integer :: i, j, q, neul, allocatestatus, deallocatestatus, num_args, norientations_new, kactual, kmin, kmax, enhancement
 
-
-    
-    klen = 25
-    
 
     call set_parameter_values()
     call initialize_and_allocate_vars()
     @FFTW3_UNCOMMENT@call set_optimization_mode(fftw_optimization_mode_name)
     if ( verbose_mode ) call print_parameters()
 
+    
+    ! loop over orientations
+    do neul = 1,norientations
 
-    if (use_experimental_fft) then
-        thetamax = 3000.
-        convang = (360.*60.*60.)/(2*pi)
+        ! fetch Euler angles
+        eul_ang = get_new_euler_angles(neul)
 
-
-        call get_fft_vals(-thetamax/convang,thetamax/convang,klen,kmin,kmax,enhancement,kactual)
-
-
-        allocate(kx(kactual),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (kx) ***"
-        allocate(ky(kactual),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (ky) ***"
-        allocate(thetax(kactual),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (thetax) ***"
-        allocate(thetay(kactual),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (thetay) ***"
-
-        dk = real(kmax-kmin)/real(size(kx) - 1)
-        do i=1,size(kx)
-            kx(i) = ((i-1)*dk + kmin)*(TWOPI/L)
-            ky(i) = kx(i)
-
-            thetax(i) = asin(kx(i)/k)
-            thetay(i) = asin(ky(i)/k)
-        end do
-    end if 
-    if (geometry .eq. "sphere") then
-        !$omp parallel shared(sh,x,y,zmax,k) 
-        !$omp do schedule(dynamic) private(i,j)
-        do i=1,size(x)
-            do j=1,size(y)
-                sh(i,j) = shadow_sphere(x(i),y(j),k,a_eff,delm)
-            end do
-        end do
-        !$omp end do nowait
-        !$omp end parallel
-        if (use_experimental_fft) then
-
-            !ftsh = fft_center(ftsh)
-            ftsh = experimental_fft(sh,kmin,kmax,enhancement)
-            !write (0,*) "TESTING FIRST K"
-            !do i=1,klen
-            !    do j=1,klen
-            !        write (0,*) "(",i,",",j,") fft_firstK = ",ftsh_firstK(i,j),"| ftsh = ",ftsh(i,j)
-            !    end do 
-            !end do 
-            !stop
-        else
-            sh = fft_center(sh)
-            ftsh = fft(sh,x,y)
-            
-        endif
-        !stop
-        !$omp parallel shared(scatter,ftsh,k,dx,dy) 
-        !$omp do schedule(dynamic) private(i,j)
-        do i=1,size(thetax)
-            do j=1,size(thetay)
-                scatter(i,j) = scatter(i,j) + abs((k*ftsh(i,j)*dx*dy))**2/(4*pi*(pi*a_eff)**2)
-            end do
-        end do
-        !$omp end do nowait
-        !$omp end parallel
-    else
-        do neul = 1,nangle
-            eul_ang = get_new_euler_angles(neul)
-            rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
-            
-
-            if (geometry .eq. 'ellipsoid') then 
-                !$omp parallel shared(sh,x,y,rm,k) 
-                !$omp do schedule(dynamic) private(i,j)
-                do i=1,size(x)
-                    do j=1,size(y)
-                        sh(i,j) = shadow_ellipsoid(x(i),y(j), k,grain_a,delm,rm )
-                    end do
-                end do
-                !$omp parallel shared(sh,x,y,rm,k) 
-                !$omp do schedule(dynamic) private(i,j)
-            end if 
-
-            if (geometry .eq. 'spheres')    then
-                sh = shadow_spheres(x,y,k,rm)
-            end if 
-
-            if (use_experimental_fft) then
-                !TEST ftsh = experimental_fft(sh,x,y) 
-                ftsh = fft(sh,x,y)
-                ftsh = fft_center(ftsh)
-            else
-                ftsh = fft(sh,x,y)
-                ftsh = fft_center(ftsh)
-            endif
-
-            !$omp parallel shared(scatter,ftsh,k,dx,dy) 
+        ! calculate rotation matrix corresponding to euler angles
+        rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
+        
+        if (geometry .eq. 'ellipsoid') then 
+            !$omp parallel shared(sh,x,y,rm,k) 
             !$omp do schedule(dynamic) private(i,j)
             do i=1,size(x)
                 do j=1,size(y)
-                    scatter(i,j) = scatter(i,j) + abs((k*ftsh(i,j)*dx*dy))**2/(4*pi*(pi*a_eff)**2)/real(nangle)
+                    sh(i,j) = shadow_ellipsoid(x(i),y(j),k,grain_a,delm,rm)
                 end do
             end do
-            !$omp end do nowait
-            !$omp end parallel
+            !$omp parallel shared(sh,x,y,rm,k) 
+            !$omp do schedule(dynamic) private(i,j)
+        elseif  (geometry .eq. 'sphere') then 
+            !$omp parallel shared(sh,x,y,rm,k) 
+            !$omp do schedule(dynamic) private(i,j)
+            do i=1,size(x)
+                do j=1,size(y)
+                    sh(i,j) = shadow_sphere(x(i),y(j), k, a_eff, delm)
+                end do
+            end do
+            !$omp parallel shared(sh,x,y,rm,k) 
+            !$omp do schedule(dynamic) private(i,j)
+        elseif (geometry .eq. 'spheres')    then
+            sh = shadow_spheres(x,y,k,rm)
+        else
+            write(0,*) "***ERROR*** Cannot understand geometry", geometry
+        end if 
+        !sh = fft_center(sh)
+        ftsh = experimental_fft(sh,kmin,kmax,enhancement)
 
-
-            write(0,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
-                    & " percent complete: ", (real(neul)/real(nangle))*100.0, "%"
+        !$omp parallel shared(scatter,ftsh,k,dx,dy) 
+        !$omp do schedule(dynamic) private(i,j)
+        do i=1,size(kx)
+            do j=1,size(ky)
+                scatter(i,j) = scatter(i,j) + (abs(ftsh(i,j))**2)*(k*dx*dy/(twopi))**2/real(norientations)
+            end do
         end do
-    end if 
+        !$omp end do nowait
+        !$omp end parallel
+
+
+        write(0,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
+                & " percent complete: ", (real(neul)/real(norientations))*100.0, "%"
+    end do
+  
  
 
     if (timing_mode) stop 
@@ -160,56 +103,21 @@ program ggadt
 
 contains
 
-    function get_k(x)
-        implicit none
-        real, intent(in) :: x(:)
-        integer :: n, i, j 
-        real :: l
-        real, dimension(size(x)) :: get_k
-        n = size(x)
-        l = x(n) - x(1)
-        do i=1,n
-            get_k(i) = (2*pi/l)*(real(i-1)/real(n) - 0.5)
-        end do
-    end function get_k
 
     subroutine initialize_and_allocate_vars()
-        implicit none 
-     integer :: line, status
+      implicit none 
+      integer :: line, status, next, ng, n
+      real  :: ds, max_dist, scale
       character(len=100) :: junk
-        allocate(x(ngrid),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (x) ***"
-        allocate(y(ngrid),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (y) ***"
-        if (.not. use_experimental_fft) then
-            allocate(kx(ngrid),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "*** not enough memory (kx) ***"
-            allocate(ky(ngrid),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "*** not enough memory (ky) ***"
-            allocate(thetax(ngrid),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "*** not enough memory (thetax) ***"
-            allocate(thetay(ngrid),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "*** not enough memory (thetay) ***"
-        end if
-        allocate(sh(ngrid,ngrid),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (sh) ***"
-        allocate(ftsh(ngrid,ngrid),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (ftsh) ***"
-        allocate(ftsh_firstK(klen,klen),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (ftsh_firstK) ***"
-        allocate(chrd(ngrid,ngrid),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (chrd) ***"
-        allocate(scatter(ngrid,ngrid),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (scatter) ***"
-        allocate(scatter_temp(ngrid,ngrid),stat = allocatestatus)
-        if (allocatestatus /= 0) stop "*** not enough memory (scatter_temp) ***"
+
+        
 
         if (euler_angle_mode == 'sequential') then
-            nangle_new = int(real(nangle)**(1.0/3.0))**3
-            if (nangle /= nangle_new) then
+            norientations_new = int(real(norientations)**(1.0/3.0))**3
+            if (norientations /= norientations_new) then
                 write (error_unit,*) ""
-                write (error_unit,*) "   + nangle: ",nangle,"-->",nangle_new
-                nangle = nangle_new
+                write (error_unit,*) "   + norientations: ",norientations,"-->",norientations_new
+                norientations = norientations_new
             endif
         else if (euler_angle_mode == 'random') then
             call init_random_seed()
@@ -229,14 +137,14 @@ contains
                 read(10,'(A)',iostat=status) junk
                 if (status == 0) line = line+1
               end do 
-              if (line .ne. nangle) then
+              if (line .ne. norientations) then
                 if (line == 0) then
                     write(0,*) "ERROR: No orientations found in ", euler_angle_file,"!"
                     stop
                 end if 
-                write(0,*) "WARNING: nangle set to ",nangle," but there are ",line," orientations in ",&
-                  euler_angle_file,". nangle -> ",line
-                nangle = line 
+                write(0,*) "WARNING: norientations set to ",norientations," but there are ",line," orientations in ",&
+                  euler_angle_file,". norientations -> ",line
+                norientations = line 
               end if
 
               end if
@@ -251,29 +159,94 @@ contains
             if (geometry == 'spheres') then
                 default_ior_i = ior_im
                 default_ior_r = ior_re
-                call read_spheres(cluster_file_name, a_eff)
-                
+                call read_spheres(cluster_file_name, a_eff, max_dist)
+            else
+                max_dist = a_eff
+                norientations = 1
             end if 
             grain_a(1) = a_eff 
             grain_a(2) = a_eff
             grain_a(3) = a_eff
+
+            ! make the grid a little larger to accomodate furthest part of grain
+            grid_width = 2.05*max_dist/a_eff
+
         else if (geometry == 'ellipsoid') then
-            l = a_eff/((grain_a(1)*grain_a(2)*grain_a(3))**(1.0/3.0))
+            scale = a_eff/((grain_a(1)*grain_a(2)*grain_a(3))**(1.0/3.0))
             ! normalize so that grain_a(1), (2), (3) produce an ellipse with an effective
             ! radius of a_eff
-            grain_a(1) = grain_a(1)*l
-            grain_a(2) = grain_a(2)*l
-            grain_a(3) = grain_a(3)*l
+            grain_a(1) = grain_a(1)*scale
+            grain_a(2) = grain_a(2)*scale
+            grain_a(3) = grain_a(3)*scale
+
+            ! make the grid a little larger than the longest principal axis
+            grid_width = 2.05*max(grain_a(1), grain_a(2), grain_a(3))/a_eff
         else
             write(0,*) "ERROR: cannot understand ", geometry
             stop
         end if 
+
+
         
-
+        
+        max_angle = max_angle/arcseconds_per_radian ! convert max_angle from arcseconds to radians
         k = (2*pi/1.239842)*1000*ephot
+        
+        ngrid = ngrain ! Start with no padding (experimental fft doesn't need it)
 
+       !write (0,*) "MAX_ANGLE",max_angle*arcseconds_per_radian
+       !write (0,*) "NSCATTER",nscatter
+       !write (0,*) "GRID_WIDTH",grid_width
+       !write (0,*) "NGRID",ngrid
 
+    ! Add padding  (if we're not using the experimental fft)
+        if (.not. use_experimental_fft) then  
+            ds = grid_width*a_eff/real(ngrain - 1)
+            next = 0
+            ng = ngrid
+            L = (ng-1)*ds 
+            n = int(ceiling(asin(max_angle)*L*k/(2*pi)))
+            do while(n < nscatter .and. ng < max_ngrid)
+                next = next + 1
+                ng = ngrid + next
+                L = (ng-1)*ds 
+                n = int(ceiling(asin(max_angle)*L*k/(2*pi)))
+            end do
+            grid_width = ng*ds/a_eff
+            ngrid = ng 
+            if (n < nscatter) then
+                write(0,*) "Warning: your request for an nscatter of ",&
+                    nscatter," required too large a grid. Changing nscatter to ",n 
+            else if (n > nscatter) then
+                write(0,*) "Warning: your request for an nscatter of ",&
+                    nscatter," is already exceeded by a non-padded grid. Changing nscatter to",n
+            end if 
 
+            !write(0,*) "GRID_WIDTH set to ",grid_width
+            !write(0,*) "NGRID set to ",ngrid
+            !write(0,*) "NSCATTER set to ",n
+
+            nscatter = n 
+        end if 
+    ! ---------------------------------------------------
+   
+    ! allocate arrays that depend on ngrid
+
+        ! x , y
+        allocate(x(ngrid),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "*** not enough memory (x) ***"
+        allocate(y(ngrid),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "*** not enough memory (y) ***"
+        ! sh
+        allocate(sh(ngrid,ngrid),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "*** not enough memory (sh) ***"
+        
+    ! ----------------------------------------------------
+        !write(0,*) "SIZE_X" ,size(x)
+        !write(0,*) "NGRID" ,ngrid
+        !write(0,*) "NGRAIN" ,ngrain
+
+    ! set grid boundaries and spacing in physical coords
         xmin = -grid_width*a_eff/2.0
         ymin = -grid_width*a_eff/2.0
         xmax = grid_width*a_eff/2.0
@@ -281,26 +254,90 @@ contains
 
         dx = (xmax-xmin)/(size(x)-1)
         dy = (ymax-ymin)/(size(y)-1)
-
+    ! -------------------------
         
-
+    ! set x and y arrays
         do i=1,size(x)
             x(i) = xmin + (i-1)*dx
         end do
         do i=1,size(y)
             y(i) = ymin + (i-1)*dy
         end do
+    ! -------------------
+      
+        L = x(size(x)) - x(1)  ! length of grid in physical coords
+        !write (0,*) "LENGTH: ",L
 
-        L = x(size(x)) - x(1)
-        if (.not. use_experimental_fft) then
-            kx = get_k(x)
-            ky = get_k(y)
-            do i=1,size(kx)
-                thetax(i) = asin(kx(i)/k)
-                thetay(i) = asin(ky(i)/k)
-            end do      
-        end if 
+    ! figures out what kmin, kmax, enhancement and kactual are.
+        call get_fft_vals(-max_angle,max_angle,nscatter,kmin,kmax,enhancement,kactual)   
+      
+    ! allocate arrays that depend on kactual
+
+        ! kx
+        allocate(kx(kactual),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "*** not enough memory (kx) ***"
+        ! ky
+        allocate(ky(kactual),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "*** not enough memory (ky) ***"
+        ! thetax
+        allocate(thetax(kactual),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "*** not enough memory (thetax) ***"
+        ! thetay
+        allocate(thetay(kactual),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "*** not enough memory (thetay) ***"
+        ! ftsh
+        allocate(ftsh(kactual,kactual),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "*** not enough memory (thetay) ***"
+        ! scatter
+        allocate(scatter(kactual,kactual),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "*** not enough memory (scatter) ***"
+    ! ----------------------------------
+
+        dk = real(kmax-kmin)/real(size(kx) - 1)
+
+    ! set kx, ky, thetax and thetay arrays
+    !   + make scatter array all zero
+        do i=1,size(kx)
+            kx(i) = ((i-1)*dk + kmin)*(TWOPI/L)
+            ky(i) = kx(i)
+
+            thetax(i) = asin(kx(i)/k)
+            thetay(i) = asin(ky(i)/k)
+            scatter(i,j) = 0.0
+        end do
+    ! -----------------------------------
+
+
+        !write (0, *) "L set to : ", l, L 
+
     end subroutine initialize_and_allocate_vars
+    subroutine get_fft_vals(thetamin,thetamax,Kask,kmin,kmax,enhancement,Kout)
+        real, intent(in) :: thetamin, thetamax
+        integer, intent(in) :: Kask
+        integer, intent(out) :: kmin,kmax,enhancement, Kout
+
+
+        !write (0,*) "thetamin, thetamax, Kask",thetamin,thetamax, Kask  
+
+        enhancement = 1
+
+        !write(0,*) "K,l = ",k,l
+
+        kmin = int(floor(k*sin(thetamin)*(L/TWOPI)))
+        kmax = int(ceiling(k*sin(thetamax)*(L/TWOPI)))
+
+        Kout = kmax - kmin
+
+        do while (enhancement*Kout + 1 < Kask) 
+            enhancement = enhancement+1
+        end do 
+
+        Kout = enhancement*Kout + 1
+
+        !write(0,*) "kmin,kmax,kout,enhancement",kmin,kmax,kout,enhancement
+
+    end subroutine get_fft_vals
+
 
     subroutine init_random_seed()
         use, intrinsic :: iso_fortran_env
@@ -360,17 +397,17 @@ contains
         integer, intent(in) :: i
         integer                :: j 
         character(len=50)    :: junk
-        integer :: cbrt_nangle, nx, ny, nz
+        integer :: cbrt_norientations, nx, ny, nz
 
 
         if (euler_angle_mode .eq. 'sequential') then 
-            cbrt_nangle = int(nangle**(1.0/3.0))
-            nx = mod(i/(cbrt_nangle*cbrt_nangle),   cbrt_nangle)
-            ny = mod(i/(cbrt_nangle),               cbrt_nangle)
-            nz = mod(i,                             cbrt_nangle) 
-            get_new_euler_angles(1) = 2*pi*(nx-1)/cbrt_nangle
-            get_new_euler_angles(2) = 2*pi*(ny-1)/cbrt_nangle
-            get_new_euler_angles(3) = 2*pi*(nz-1)/cbrt_nangle
+            cbrt_norientations = int(norientations**(1.0/3.0))
+            nx = mod(i/(cbrt_norientations*cbrt_norientations),   cbrt_norientations)
+            ny = mod(i/(cbrt_norientations),               cbrt_norientations)
+            nz = mod(i,                             cbrt_norientations) 
+            get_new_euler_angles(1) = 2*pi*(nx-1)/cbrt_norientations
+            get_new_euler_angles(2) = 2*pi*(ny-1)/cbrt_norientations
+            get_new_euler_angles(3) = 2*pi*(nz-1)/cbrt_norientations
         else if ( euler_angle_mode .eq. 'file' ) then
             open(unit=1,file=euler_angle_file)
             if (i > 1) then 
@@ -398,8 +435,7 @@ contains
         deallocate(sh,stat=deallocatestatus)
         deallocate(ftsh,stat=deallocatestatus)
         deallocate(scatter,stat=deallocatestatus)
-        deallocate(scatter_temp,stat=deallocatestatus)
-        deallocate(chrd,stat=deallocatestatus)
+        
 
 
         if (geometry .eq. 'spheres')    then
@@ -412,33 +448,7 @@ contains
 
     end subroutine cleanup
 
-    subroutine get_fft_vals(thetamin,thetamax,Kask,kmin,kmax,enhancement,Kout)
-        real, intent(in) :: thetamin, thetamax
-        integer, intent(in) :: Kask
-        integer, intent(out) :: kmin,kmax,enhancement, Kout
-
-
-        !write (0,*) "thetamin, thetamax, Kask",thetamin,thetamax, Kask  
-
-        enhancement = 1
-
-        write(0,*) "K,l = ",k,l
-
-        kmin = int(floor(k*sin(thetamin)*(L/TWOPI)))
-        kmax = int(ceiling(k*sin(thetamax)*(L/TWOPI)))
-
-        Kout = kmax - kmin
-
-        do while (enhancement*Kout + 1 < Kask) 
-            enhancement = enhancement+1
-        end do 
-
-        Kout = enhancement*Kout + 1
-
-        !write(0,*) "kmin,kmax,kout",kmin,kmax,kout 
-
-    end subroutine get_fft_vals
-
+    
     subroutine print_parameters()
         write(0,*) "Parameter values:"
         write(0,*) "-----------------------------------"
@@ -449,7 +459,7 @@ contains
         if (euler_angle_mode == "file") write(0,*) "euler_angle_file:", euler_angle_file
 
         write(0,*) "ngrid:",ngrid
-        write(0,*) "nangle:",nangle
+        write(0,*) "norientations:",norientations
         write(0,*) "grid-width:",grid_width
         write(0,*) "ior_re:",ior_re
         write(0,*) "ior_im",ior_im

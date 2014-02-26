@@ -1,6 +1,7 @@
 module common_mod
   use, intrinsic :: iso_c_binding
   use options
+  use constants
   implicit none
 
   public
@@ -14,25 +15,28 @@ module common_mod
   character(len=100), parameter ::  INFO = "Written by John Hoffman (jah5@princeton.edu)&
     & and Michael Tarczon (mtarczon@princeton.edu)"
 
-  
-  real, parameter               ::  pi          = 4.*atan(1.)
-  real, parameter               ::  twopi       = 8.*atan(1.)
   complex(c_double_complex)     ::  delm 
-  integer, parameter            ::  ISIGN       = 1
+  
   real                          ::  a_eff     
   real                          ::  ephot     
   character(len=50)             ::  geometry  
   character(len=50)             ::  euler_angle_mode
 
 
-  integer                       ::  ngrid 
-  integer                       ::  nangle 
+  integer                       ::  ngrain
+  integer                       ::  nscatter_min 
+  integer                       ::  ngrid
+  integer                       ::  nscatter
+  integer                       ::  norientations 
   integer                       ::  ierr
+
 
   real                          ::  grid_width  
   real                          ::  ior_im        
   real                          ::  ior_re     
   real, dimension(3)            ::  grain_a 
+  real                          ::  max_angle
+
   logical                       ::  use_experimental_fft
   logical                       ::  asked_for_version
   logical                       ::  verbose_mode
@@ -73,19 +77,25 @@ module common_mod
       call define_option_real(opts,"grain-axis-z",1.0,&
         description="For ELLIPSOID grains: z-axis length")
       call define_option_real(opts,"ephot",0.5,required=.false.,description="Energy of X-ray photon in keV")
+      call define_option_real(opts,"max-angle",3000.,required=.false.,description="Maximum scattering angle in arcseconds")
+        ! working
+
       call define_option_real(opts,"ior-re",-2.079E-3,required=.false., &
         description="Real component of the index of refraction, minus 1")
       call define_option_real(opts,"ior-im",3.201E-3,required=.false., &
         description="Imaginary component of the index of refraction")
-      call define_option_real(opts,"grid-width",8.0,required=.false.,&
-        description="Width of numerical grid as a fraction of a_eff.&
-          & Higher values (>2) give you more angular resolution when calculating the scattering cross section,&
-          & at the cost of reducing the angular resolution of the grain on the grid.")
+      
+      call define_option_integer(opts,"ngrain",256,required=.false.,&
+        description="Number of grid points along 1 dimension with which we should resolve the grain")
+        ! working
+      call define_option_integer(opts,"nscatter",16,required=.false.,&
+        description="Number of angles along 1 dimension with which we should calculate the scattering cross section")
+        ! working
 
-      call define_option_integer(opts,"ngrid",512,required=.false.,&
-        description="Number of grid points along 1 dimension")
-      call define_option_integer(opts,"nangle",100,required=.false.,&
+      call define_option_integer(opts,"norientations",100,required=.false.,&
         description="Number of orientations to average over")
+        ! working
+
       call define_option_string(opts,"euler-angle-mode","random",required=.false.,&
         description="How to choose Euler angles (sequential, random, file)")
       call define_option_string(opts,"euler-angle-file","",required=.false.,&
@@ -132,9 +142,16 @@ module common_mod
       call get_option_string(opts,"grain-geometry",geometry)
       call get_option_string(opts,"euler-angle-mode",euler_angle_mode)
       call get_option_string(opts,"euler-angle-file",euler_angle_file)
-      call get_option_integer(opts,"ngrid",ngrid)
-      call get_option_integer(opts,"nangle",nangle)
-      call get_option_real(opts,"grid-width",grid_width)
+
+      call get_option_integer(opts,"ngrain",ngrain)
+        ! working
+      call get_option_integer(opts,"norientations",norientations)
+        ! working
+      call get_option_integer(opts,"nscatter",nscatter)
+        ! working
+      call get_option_real(opts,"max-angle",max_angle)
+        ! working
+      ! working call get_option_real(opts,"grid-width",grid_width)
       call get_option_string(opts,"cluster-file-name",cluster_file_name)
       call get_option_string(opts,"fftw-optimization",fftw_optimization_mode_name)
       call get_flag(opts,"version",asked_for_version)
@@ -149,6 +166,10 @@ module common_mod
       fftw_optimization_mode_name = strlowcase(fftw_optimization_mode_name)
       euler_angle_mode = strlowcase(euler_angle_mode)
       geometry = strlowcase(geometry)
+
+
+
+
 
       
     end subroutine set_parameter_values

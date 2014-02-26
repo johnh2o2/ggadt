@@ -1,6 +1,6 @@
 bin_PROGRAMS = ggadt
 
-ggadt_SOURCES = options.f03 common.f03
+ggadt_SOURCES = constants.f03 options.f03 common.f03
 
 if USING_FFTW
 ggadt_SOURCES += fftwmod.f03

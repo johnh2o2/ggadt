@@ -1,3 +1,9 @@
+* commit c2f03c65e8f5766789ec020a1e20ef0d8497b641
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Feb 17 17:26:14 2014 -0500
+| 
+|     OK, experimental fft 'works,' but in some cases produces very high power at the bottom left corner of the plot. Also, the 'center' function appears not to work (or the theta values are off) for the regular fft.
+|  
 * commit c39af6f88a876b9a742026170da0bf2c8de3c3bc
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Mon Feb 17 10:39:19 2014 -0500

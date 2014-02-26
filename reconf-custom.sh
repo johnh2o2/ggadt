@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 bash cleandist-custom.sh
 git log --pretty --graph > ChangeLog
 
@@ -17,8 +19,17 @@ automake -a
 rm test_output_expfft.dat
 bash configure --enable-fftw3 
 make || exit
-time src/ggadt --use-experimental-fft --ngrid=512 --grid-width=2.0 > test_output_expfft.dat
-time src/ggadt --ngrid=2048 --grid-width=8.0 > test_output_expfft_reg.dat
+args="--ngrain=256 --nscatter=20"
+args="${args} --grain-geometry=spheres --cluster-file-name=$HOME/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/data/clusters/BAM1.256.1.targ"
+echo "======EXPERIMENTAL MODE======="
+time src/ggadt --use-experimental-fft $args > test_changes_exp.dat || exit
+echo "======NON EXP. MODE    ======="
+time src/ggadt $args > test_changes_reg.dat || exit
+
+python scripts/plot.py test_changes_exp.dat
+python scripts/plot.py test_changes_reg.dat
+#time src/ggadt --use-experimental-fft --ngrid=512 --grid-width=2.0 > test_output_expfft.dat
+#time src/ggadt --ngrid=2048 --grid-width=8.0 > test_output_expfft_reg.dat
 #cp doc/*png doc/ggadt.html
 #make html || exit
 #python scripts/make_sample_plots.py

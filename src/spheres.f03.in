@@ -1,7 +1,7 @@
 module spheres
 
     use, intrinsic :: iso_c_binding
-    use common_mod
+    use constants
     use sphere
     @USE_OMP_LIB@
     
@@ -12,19 +12,19 @@ module spheres
     real :: default_ior_r, default_ior_i
     real, allocatable :: radii(:), ior_r(:), ior_i(:)
     real, allocatable :: pos(:,:), pos_rot(:,:)
-    
     real :: dxt, dyt, a_eff_temp, conv 
     
     character(len=1000) :: junk
     
     contains
 
-    subroutine read_spheres(cluster_file_name,a_eff)
+    subroutine read_spheres(cluster_file_name,a_eff,max_dist)
         implicit none
-        real :: v = 0.0
+        real :: v = 0.0, dist
         integer  :: i, allocatestatus
         character(len=200), intent(in) :: cluster_file_name
         real, intent(in) :: a_eff
+        real, intent(out) :: max_dist
 
         open(unit=1,file=cluster_file_name) ! open sphere file.
 
@@ -50,12 +50,14 @@ module spheres
         if (allocatestatus /= 0) stop "*** not enough memory (ior_i) ***"
 
         ! read in spheres
+       
         do i=1,nspheres
             read(1, *) n, pos(i,1), pos(i,2), pos(i,3), radii(i) 
             ior_r(i) = default_ior_r
             ior_i(i) = default_ior_i
             radii(i) = radii(i)/2.0
-            v = v+ (4.0*pi/3.0)*(radii(i))**3
+            v = v+ (4.0*pi/3.0)*(radii(i)**3)  
+
 
             !write(0,*) n, pos(i,1), pos(i,2), pos(i,3), radii(i) 
         end do 
@@ -66,30 +68,45 @@ module spheres
         a_eff_temp = ((3*v)/(4*pi))**(1.0/3.0)
         conv = a_eff/a_eff_temp
 
+        write (0,*) "SPHERES (read_spheres) a_eff/a_eff_temp = ", conv
+
+        v=0.0
+
+        
+        max_dist = 0.0
         do i=1,nspheres
             pos(i,1) = pos(i,1)*conv
             pos(i,2) = pos(i,2)*conv 
             pos(i,3) = pos(i,3)*conv
+            radii(i) = radii(i)*conv   
+
+            dist = sqrt(pos(i,1)*pos(i,1) + pos(i,2)*pos(i,2) + pos(i,3)*pos(i,3) ) + radii(i)
+            if (dist > max_dist) max_dist = dist
+
             pos_rot(i,1) = pos(i,1)
             pos_rot(i,2) = pos(i,2)
             pos_rot(i,3) = pos(i,3)
-            radii(i) = radii(i)*conv        
+            
+            v = v+ (4.0*pi/3.0)*(radii(i)**3) 
         end do
+        write(0,*) "DEBUG SPHERES: a_eff = ",a_eff," check == ", ((3*v)/(4*pi))**(1.0/3.0) ! (Spheres are correcting a_eff OK. 2/25)
+        ! working
     end subroutine read_spheres
 
     function phi_spheres(x,y,k)
         implicit none
-        real, dimension(ngrid), intent(in) :: x,y
+        real, intent(in) :: x(:),y(:)
         real, dimension(3) :: current_pos
         real, intent(in) :: k
         real :: r, l, m
-        complex(c_double_complex), dimension(ngrid,ngrid) :: phi_spheres
+        complex(c_double_complex), dimension(size(x),size(y)) :: phi_spheres
         integer :: i, j, n ,xi, xf, yi,yf
 
         dxt = x(2) - x(1)
         dyt = y(2) - y(1)
 
         do i=1, nspheres
+            ! write (0,*) " | SPHERES (phi_spheres) : doing sphere", i, " of ", nspheres
             ! only modify the relevant section of the phi grid
             ! indices: i = [xi,xj], j = [yi,yj]
             xi = int((pos_rot(i,1) - radii(i) - x(1))/dxt) + 1
@@ -98,7 +115,17 @@ module spheres
             yf = int((pos_rot(i,2) + radii(i) - x(1))/dyt) + 1
 
             m = cmplx(ior_r(i), ior_i(i)) ! ior - 1
-            
+
+            ! write (0,*) " | ---SPHERES (phi_spheres) : xi,xf, yi,yf=",xi,xf,yi,yf
+            if (yf < 0 .or. yf > size(y)) then
+                write (0,*) " ***ERROR*** (spheres module, phi_spheres function) yf = ",yf," but size(y)=",size(y)
+            else if (yi < 0 .or. yi > size(y)) then
+                write (0,*) " ***ERROR*** (spheres module, phi_spheres function) yi = ",yi," but size(y)=",size(y)
+            else if (xi < 0 .or. xi > size(x)) then
+                write (0,*) " ***ERROR*** (spheres module, phi_spheres function) xi = ",xi," but size(x)=",size(x)
+            else if (xf < 0 .or. xf > size(x)) then
+                write (0,*) " ***ERROR*** (spheres module, phi_spheres function) xf = ",xf," but size(x)=",size(x)
+            end if 
             do j=xi,xf
                 do n=yi,yf
                     current_pos = (/ x(j), y(n), 0.0 /)
@@ -111,23 +138,27 @@ module spheres
 
     function shadow_spheres(x,y,k,rm)
         implicit none
-        real, dimension(ngrid), intent(in) :: x,y 
+        real, intent(in) :: x(:),y(:)
         real, dimension(3,3), intent(in) :: rm
         real, intent(in) :: k 
-        complex(c_double_complex), dimension(ngrid,ngrid) :: shadow_spheres, phi
+        complex(c_double_complex), dimension(size(x),size(y)) :: shadow_spheres, phi
         integer :: i, j
 
-
+        ! write (0,*) "SPHERES (shadow_spheres) : in shadow_spheres" 
         ! rotate sphere positions by the specified euler angles
         do i=1,nspheres
             pos_rot(i,:) = matmul(rm, pos(i,:))
         end do
+        
+        ! write (0,*) "SPHERES (shadow_spheres) : rotated positions" 
 
         phi = phi_spheres(x,y,k) ! paint phi grid
         !$omp parallel shared(shadow_spheres,phi) 
         !$omp do schedule(dynamic) private(i,j)
-        do i=1,ngrid
-            do j=1,ngrid 
+
+        ! write (0,*) "SPHERES (shadow_spheres) : painted phi grid" 
+        do i=1,size(x)
+            do j=1,size(y) 
                 shadow_spheres(i,j) = 1-exp( (0.0,1.0)*phi(i,j) )
             end do
         end do 

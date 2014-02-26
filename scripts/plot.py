@@ -17,14 +17,15 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 
-
+LOGPLOT = False
+max_angle = 4500
 
 nplot = 250 # dimension of plotted grid (interpolated)
 delta = 250 # distance above or below theta min/max for interpolation purposes
 
 # min/max scattering angles to deal with
-xmin = -3000
-xmax = 3000
+xmin = -max_angle
+xmax = max_angle
 ymin = xmin
 ymax = xmax
 
@@ -51,13 +52,24 @@ for Z in z:
 		break
 
 
+num_infs = 0
 
 for i in range(0,len(z)):
 	if np.isinf(z[i]):
-		z[i] = huge
+		if i == 0:
+			z[i] = 2*z[i+1] - z[i+2]
+		elif i == len(z) - 1:
+			z[i] = 2*z[i-1] - z[i-2]
+		else:
+			q = i+1
+			while q < len(z) and np.isinf(z[q]):
+				q += 1
+			z[i] = pow(q - i,-1)*(z[i-1] + z[q])
+		num_infs += 1
 if ALL_ZERO:
 	print "ALL ZERO!"
 	sys.exit()
+print num_infs," infinities found in the data. Replaced them with linearly interpolated values."
 
 
 # Now filter out data at high scattering angles (otherwise it takes too long to interpolate)
@@ -84,7 +96,10 @@ y = np.reshape(y,(n,n))
 z = np.reshape(z,(n,n))
 
 # Interpolate
-BSPL = RectBivariateSpline(x[:,0],y[0,:],np.log10(z))
+if LOGPLOT:
+	BSPL = RectBivariateSpline(x[:,0],y[0,:],np.log10(z))
+else:
+	BSPL = RectBivariateSpline(x[:,0],y[0,:],z)
 zinterp = lambda xi,yi : BSPL.ev(xi,yi)
 
 
@@ -127,7 +142,10 @@ phi_ints = np.linspace(0,2*np.pi,100)
 
 for i,phi in enumerate(phi_ints):
 	for j, th in enumerate(theta_arr):
-		z_phi = pow(10,zinterp(th*cos(phi),th*sin(phi)))
+		if LOGPLOT:
+			z_phi = pow(10,zinterp(th*cos(phi),th*sin(phi)))
+		else:
+			z_phi = zinterp(th*cos(phi),th*sin(phi))
 		if i==0:
 			z_max[j] = z_phi
 			z_min[j] = z_phi
@@ -138,7 +156,10 @@ for i,phi in enumerate(phi_ints):
 		z_phiavg[j]+=z_phi/len(phi_ints)
 for i,phi in enumerate(phi_ints):
 	for j, th in enumerate(theta_arr):
-		z_phi = pow(10,zinterp(th*cos(phi),th*sin(phi)))
+		if LOGPLOT:
+			z_phi = pow(10,zinterp(th*cos(phi),th*sin(phi)))
+		else:
+			z_phi = zinterp(th*cos(phi),th*sin(phi))
 		z_phivar[j]+=pow(z_phi-z_phiavg[j],2)/len(phi_ints)
 
 
@@ -152,7 +173,10 @@ ax2.fill_between(theta_arr, z_phiavg-0.5*z_phivar, z_phiavg+0.5*z_phivar, faceco
 ax2.fill_between(theta_arr, z_phiavg+0.5*z_phivar,z_max, facecolor='k',alpha=0.25, interpolate=True)
 ax2.plot(theta_arr,z_phiavg,color='k',lw=2,label="Avg.")
 for i,phi in enumerate(phis):
-	z_plot = np.array([ pow(10,zinterp(th*cos(phi),th*sin(phi))) for th in theta_arr ])
+	if LOGPLOT:
+		z_plot = np.array([ pow(10,zinterp(th*cos(phi),th*sin(phi))) for th in theta_arr ])
+	else:
+		z_plot = np.array([ zinterp(th*cos(phi),th*sin(phi)) for th in theta_arr ])
 	ax2.plot(theta_arr, z_plot , label="$\\phi=%.2f\\pi$"%(phi/np.pi), color=colors[i], ls=linestyles[i%len(linestyles)], lw=1.5)
 
 ax2.set_ylabel("$dQ_{scat.}/d\\Omega$")
