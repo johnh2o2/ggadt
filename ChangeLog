@@ -1,3 +1,9 @@
+* commit dec9746fa1deec5bd865b683648541f69480807a
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Thu Mar 6 14:15:34 2014 -0500
+| 
+|     Edited plot_utilities to give correct shape for get_1d_slice function. Tested that the indexing shortcut in phi_spheres works correctly. Tested results for spheres module doing single sphere (by eye). HD09 is still not consistent with what we're getting at large angles, even after using a very fine grid for nscatter and ngrid.
+|  
 * commit cee6238b4d0492065e0f2f9dc6bd03fcb6aa3682
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Wed Mar 5 22:41:29 2014 -0500

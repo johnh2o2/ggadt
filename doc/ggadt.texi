@@ -182,7 +182,7 @@ Thus, GGADT does the following:
 GGADT should install easily on most @emph{Unix-based systems} (e.g. Linux, Mac) by following the standard GNU install procedures, described in @file{INSTALL}.
 
 @example
-./configure [--enable-openmp] @dots{}
+./configure [--enable-openmp] [--enable-fftw3] @dots{}
 make
 make install
 @end example
@@ -339,24 +339,25 @@ For @code{ELLIPSOID} grains, we define the lengths of x, y and z axes.
 @opindex --ephot
 Energy of the incident X-ray photons in keV.
 
-@item --RE-index-of-refraction=@var{value}
-@opindex --RE-index-of-refraction
+@item --ior-re=@var{value}
+@opindex --ior-re
 The real component of the complex index of refraction, minus one.
 
-@item --IM-index-of-refraction=@var{value}
-@opindex --IM-index-of-refraction
+@item --ior-im=@var{value}
+@opindex --ior-im
 The imaginary component of the complex index of refraction.
 
-@item --grid-width=@var{value}
-@opindex --grid-width
-The width of the 2D numerical grid on which projected images of the dust grain are resolved, in units of the effective radius of the grain. Higher values (>2) give you more angular resolution when calculating the differential scattering cross-section, at the cost of reducing the resolution of the dust grain on the grid.
 
-@item --ngrid=@var{value}
-@opindex --ngrid
-The number of grid points along one direction of the 2D numerical grid on which @emph{images of the grain} are defined. See above for how to use this value together with @option{grid-width} to give you the physical accuracy you desire.
+@item --ngrain=@var{value}
+@opindex --ngrain
+The (square root) of the number of grid elements with which you would like to resolve your grain. To get accurate results out to about 4000 arcseconds, we've found that a value of 64 is good enough.
 
-@item --nangle=@var{value}
-@opindex --nangle
+@item --nscatter=@var{value}
+@opindex --nscatter
+The (square root) of the number of grid elements with which you would like to resolve the scattering cross section.
+
+@item --norientations=@var{value}
+@opindex --norientations
 The number of grain orientations relative to the incoming X-ray photon over which to average the differential cross-section.
 
 @item --fftw-optimization=@var{value}
@@ -367,7 +368,7 @@ Must be one of @code{ESTIMATE}, @code{MEASURE}, @code{PATIENT} or @code{EXHAUSTI
 @itemx -s
 @opindex --use-experimental-fft
 @opindex -s 
-Currently not operational, but we are experimenting with a few alternative methods for more efficiently performing the FFT.
+This method has been tested and this option will be deprecated in the future. Use for faster FFT results. This also allows for virtually arbitrary values of nscatter and ngrid, whereas older versions of the code require a prohibitive amount of memory for larger values of nscatter.
 
 @end table
 

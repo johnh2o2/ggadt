@@ -2,7 +2,7 @@ module fftw
     
     use constants
     use, intrinsic :: iso_c_binding
-       include '/opt/local/include/fftw3.f03'
+       include '/fftw3.f03'
     logical :: first_time = .true.
     type(c_ptr) :: plan
     integer ::  mode = fftw_estimate

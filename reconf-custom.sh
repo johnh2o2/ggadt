@@ -9,7 +9,7 @@ aclocal -I./m4
 autoconf
 automake -a
 
-bash configure --enable-fftw3 FCFLAGS="-O2 -fimplicit-none -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=f2003 -pedantic -fbacktrace" || exit
+bash configure #FCFLAGS="-O2 -fimplicit-none -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=f2003 -pedantic -fbacktrace" || exit
 #make || exit
 #cp doc/*png doc/ggadt.html
 #make html || exit
