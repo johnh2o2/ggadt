@@ -1,3 +1,9 @@
+* commit cee6238b4d0492065e0f2f9dc6bd03fcb6aa3682
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Wed Mar 5 22:41:29 2014 -0500
+| 
+|     All modules are stable and can do arbitrary Nscatter. The instabilities before were a result of not initializing arrays to 0. Heng and Draine status: The peak and low angle behavior is fine. However, there is no large angle theta-squared falloff. The origin of this needs to be found! HD09.py and DA06.py are both compatible with current changes.
+|  
 * commit b7c8907be51eeac933198eeaa93725b37d020bd2
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Wed Feb 26 10:45:56 2014 -0500

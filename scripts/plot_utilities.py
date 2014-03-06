@@ -147,7 +147,9 @@ def get_1d_slice(data_function,phi=0.0,boundaries=[-2000,2000,-2000,2000]):
 
 	theta_arr = np.linspace(xmin,xmax,1000)
 	
-	z_plot = np.array([ data_function(th*cos(phi),th*sin(phi)) for th in theta_arr ])
+	z_plot = np.zeros(len(theta_arr))
+	for i in range(0,len(theta_arr)):
+		z_plot[i] = data_function(theta_arr[i]*cos(phi),theta_arr[i]*sin(phi))
 
 	return theta_arr,z_plot
 

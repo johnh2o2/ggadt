@@ -25,8 +25,8 @@ defaults = {
 			    'ephot' 				: 2.0,
 			    'ior-re' 				: -1.920*pow(10.0,-4.0),
 			    'ior-im' 				: 2.807*pow(10.0,-5.0),
-			    'ngrain' 				: 1024,
-			    'nscatter'				: 512,
+			    'ngrain' 				: 128,
+			    'nscatter'				: 64,
 			    'norientations'			: 1,
 			    'euler-angle-mode'		: 'random',
 			    'euler-angle-file'		: None,
@@ -118,6 +118,11 @@ theta_3BA,avg_3BA,var_3BA = pu.get_1d_avg(func_3BA)
 theta_3BAM1,avg_3BAM1,var_3BAM1 = pu.get_1d_avg(func_3BAM1)
 theta_3BAM2,avg_3BAM2,var_3BAM2 = pu.get_1d_avg(func_3BAM2)
 
+#theta_3BA,avg_3BA = pu.get_1d_slice(func_3BA)
+#theta_3BAM1,avg_3BAM1 = pu.get_1d_slice(func_3BAM1)
+#theta_3BAM2,avg_3BAM2 = pu.get_1d_slice(func_3BAM2)
+
+#print theta_3BA.shape, avg_3BA.shape
 
 Figure3 = plt.figure(1)
 ax3 = Figure3.add_subplot(111)
@@ -129,6 +134,7 @@ ax3.text(600,pow(10,-2),"$a_{eff}=%.3f$\n$N_s=%d$\n$N_{grain}=%d$\n$N_{scatter}=
 
 ax3.set_xlabel("$\\Theta$ [arcsec]")
 ax3.set_ylabel("$\\Theta^2\\left<dQ_{sca}/d\\Omega\\right>$")
+#ax3.plot(theta_3BA,np.multiply(np.power(theta_3BA/pu.conv,2),avg_3BA),label='BA',color='blue',lw=2)
 ax3.plot(theta_3BA,np.multiply(np.power(theta_3BA/pu.conv,2),avg_3BA),label='BA',color='blue',lw=2)
 #ax3.fill_between(theta_3BA,np.multiply(np.power(theta_3BA/pu.conv,2),avg_3BA-var_3BA),np.multiply(np.power(theta_3BA/pu.conv,2),avg_3BA+var_3BA),facecolor='blue',alpha=0.3)
 

@@ -24,7 +24,7 @@ make || exit
 rm -f test_changes_exp.dat
 rm -f test_changes_reg.dat
 args="--ngrain=64 --nscatter=64"
-args="${args} --norientations=1000 --grain-geometry=spheres --cluster-file-name=$HOME/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/data/clusters/BAM2.256.1.targ"
+args="${args} --norientations=1 --grain-geometry=spheres --cluster-file-name=$HOME/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/data/clusters/BAM2.256.1.targ"
 #args="${args} --grain-geometry=sphere"
 echo "======EXPERIMENTAL MODE======="
 time src/ggadt --use-experimental-fft $args > test_changes_exp.dat || exit

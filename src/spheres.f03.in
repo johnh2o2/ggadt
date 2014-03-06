@@ -123,13 +123,15 @@ module spheres
             ! write (0,*) " | SPHERES (phi_spheres) : doing sphere", i, " of ", nspheres
             ! only modify the relevant section of the phi grid
             ! indices: i = [xi,xj], j = [yi,yj]
+            m = cmplx(ior_r(i), ior_i(i)) ! ior - 1
+            !goto 99
             xi = int((pos_rot(i,1) - radii(i) - x(1))/dxt) + 1
             xf = int((pos_rot(i,1) + radii(i) - x(1))/dxt) + 1
             yi = int((pos_rot(i,2) - radii(i) - y(1))/dyt) + 1
             yf = int((pos_rot(i,2) + radii(i) - y(1))/dyt) + 1
 
-            m = cmplx(ior_r(i), ior_i(i)) ! ior - 1
-
+            
+            !write(0,*) "doing shortcut"
             ! write (0,*) " | ---SPHERES (phi_spheres) : xi,xf, yi,yf=",xi,xf,yi,yf
             if (yf < 0 .or. yf > size(y)) then
                 write (0,*) " ***ERROR*** (spheres module, phi_spheres function) yf = ",yf," but size(y)=",size(y)
@@ -146,6 +148,14 @@ module spheres
                     phi_spheres(j,n) = phi_spheres(j,n)+ k*m*chord_sphere(current_pos, pos_rot(i,:), radii(i))
                 end do
             end do 
+            !99 do j=1,size(x)
+                !if (j == 1) write (0,*) "doing whole grid!"
+            !    do n=1,size(y)
+            !        current_pos = (/ x(j), y(n), real(0.0,kind=dp_real) /)
+            !        phi_spheres(j,n) = phi_spheres(j,n)+ k*m*chord_sphere(current_pos, pos_rot(i,:), radii(i))
+            !    end do 
+            !end do
+
         end do 
         
     end function phi_spheres
