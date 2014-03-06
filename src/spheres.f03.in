@@ -8,11 +8,11 @@ module spheres
     save
     integer :: nspheres, nrots, ok, n
     integer :: MIGRATE, ISEED, NS
-    real :: ALPHA(3), VTOT, A_1(3), A_2(3)
-    real :: default_ior_r, default_ior_i
-    real, allocatable :: radii(:), ior_r(:), ior_i(:)
-    real, allocatable :: pos(:,:), pos_rot(:,:)
-    real :: dxt, dyt, a_eff_temp, conv 
+    real(kind=dp_real) :: ALPHA(3), VTOT, A_1(3), A_2(3)
+    real(kind=dp_real) :: default_ior_r, default_ior_i
+    real(kind=dp_real), allocatable :: radii(:), ior_r(:), ior_i(:)
+    real(kind=dp_real), allocatable :: pos(:,:), pos_rot(:,:)
+    real(kind=dp_real) :: dxt, dyt, a_eff_temp, conv 
     
     character(len=1000) :: junk
     
@@ -20,11 +20,11 @@ module spheres
 
     subroutine read_spheres(cluster_file_name,a_eff,max_dist)
         implicit none
-        real :: v = 0.0, dist
+        real(kind=dp_real) :: v = 0.0, dist
         integer  :: i, allocatestatus
         character(len=200), intent(in) :: cluster_file_name
-        real, intent(in) :: a_eff
-        real, intent(out) :: max_dist
+        real(kind=dp_real), intent(in) :: a_eff
+        real(kind=dp_real), intent(out) :: max_dist
 
         open(unit=1,file=cluster_file_name) ! open sphere file.
 
@@ -34,6 +34,15 @@ module spheres
         read(1,'(3f10.6,13X)') A_1(1), A_1(2), A_1(3)
         read(1,'(3f10.6,13X)') A_2(1), A_2(2), A_2(3)
         read(1,'(A)') junk
+
+        !DEBUGGING -- print header information
+        !write(0,*) "DEBUG: SPHERES HEADER"
+        !write(0,*) MIGRATE, ISEED
+        !write(0,*) NS, VTOT, ALPHA(1), ALPHA(2), ALPHA(3)
+        !write(0,*) A_1(1), A_1(2), A_1(3)
+        !write(0,*) A_2(1), A_2(2), A_2(3)
+        !write(0,*) "DEBUG (END)"
+        !END DEBUGGING
 
         nspheres = NS
 
@@ -68,7 +77,7 @@ module spheres
         a_eff_temp = ((3*v)/(4*pi))**(1.0/3.0)
         conv = a_eff/a_eff_temp
 
-        write (0,*) "SPHERES (read_spheres) a_eff/a_eff_temp = ", conv
+        !write (0,*) "SPHERES (read_spheres) a_eff/a_eff_temp = ", conv
 
         v=0.0
 
@@ -89,30 +98,35 @@ module spheres
             
             v = v+ (4.0*pi/3.0)*(radii(i)**3) 
         end do
-        write(0,*) "DEBUG SPHERES: a_eff = ",a_eff," check == ", ((3*v)/(4*pi))**(1.0/3.0) ! (Spheres are correcting a_eff OK. 2/25)
+        !write(0,*) "DEBUG SPHERES: a_eff = ",a_eff," check == ", ((3*v)/(4*pi))**(1.0/3.0) ! (Spheres are correcting a_eff OK. 2/25)
         ! working
     end subroutine read_spheres
 
     function phi_spheres(x,y,k)
         implicit none
-        real, intent(in) :: x(:),y(:)
-        real, dimension(3) :: current_pos
-        real, intent(in) :: k
-        real :: r, l, m
+        real(kind=dp_real), intent(in) :: x(:),y(:)
+        real(kind=dp_real), dimension(3) :: current_pos
+        real(kind=dp_real), intent(in) :: k
+        complex(c_double_complex) :: m 
         complex(c_double_complex), dimension(size(x),size(y)) :: phi_spheres
         integer :: i, j, n ,xi, xf, yi,yf
 
         dxt = x(2) - x(1)
         dyt = y(2) - y(1)
 
+        do i=1,size(x)
+            do j=1,size(y)
+                phi_spheres(i,j) = (0.0d0, 0.0d0)
+            end do
+        end do
         do i=1, nspheres
             ! write (0,*) " | SPHERES (phi_spheres) : doing sphere", i, " of ", nspheres
             ! only modify the relevant section of the phi grid
             ! indices: i = [xi,xj], j = [yi,yj]
             xi = int((pos_rot(i,1) - radii(i) - x(1))/dxt) + 1
             xf = int((pos_rot(i,1) + radii(i) - x(1))/dxt) + 1
-            yi = int((pos_rot(i,2) - radii(i) - x(1))/dyt) + 1
-            yf = int((pos_rot(i,2) + radii(i) - x(1))/dyt) + 1
+            yi = int((pos_rot(i,2) - radii(i) - y(1))/dyt) + 1
+            yf = int((pos_rot(i,2) + radii(i) - y(1))/dyt) + 1
 
             m = cmplx(ior_r(i), ior_i(i)) ! ior - 1
 
@@ -128,7 +142,7 @@ module spheres
             end if 
             do j=xi,xf
                 do n=yi,yf
-                    current_pos = (/ x(j), y(n), 0.0 /)
+                    current_pos = (/ x(j), y(n), real(0.0,kind=dp_real) /)
                     phi_spheres(j,n) = phi_spheres(j,n)+ k*m*chord_sphere(current_pos, pos_rot(i,:), radii(i))
                 end do
             end do 
@@ -138,9 +152,9 @@ module spheres
 
     function shadow_spheres(x,y,k,rm)
         implicit none
-        real, intent(in) :: x(:),y(:)
-        real, dimension(3,3), intent(in) :: rm
-        real, intent(in) :: k 
+        real(kind=dp_real), intent(in) :: x(:),y(:)
+        real(kind=dp_real), dimension(3,3), intent(in) :: rm
+        real(kind=dp_real), intent(in) :: k 
         complex(c_double_complex), dimension(size(x),size(y)) :: shadow_spheres, phi
         integer :: i, j
 

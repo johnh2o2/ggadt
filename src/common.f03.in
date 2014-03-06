@@ -17,8 +17,8 @@ module common_mod
 
   complex(c_double_complex)     ::  delm 
   
-  real                          ::  a_eff     
-  real                          ::  ephot     
+  real(kind=dp_real)                          ::  a_eff     
+  real(kind=dp_real)                          ::  ephot     
   character(len=50)             ::  geometry  
   character(len=50)             ::  euler_angle_mode
 
@@ -31,11 +31,11 @@ module common_mod
   integer                       ::  ierr
 
 
-  real                          ::  grid_width  
-  real                          ::  ior_im        
-  real                          ::  ior_re     
-  real, dimension(3)            ::  grain_a 
-  real                          ::  max_angle
+  real(kind=dp_real)                          ::  grid_width  
+  real(kind=dp_real)                          ::  ior_im        
+  real(kind=dp_real)                          ::  ior_re     
+  real(kind=dp_real), dimension(3)            ::  grain_a 
+  real(kind=dp_real)                          ::  max_angle
 
   logical                       ::  use_experimental_fft
   logical                       ::  asked_for_version
@@ -69,26 +69,27 @@ module common_mod
         description="SPHERES, ELLIPSOID, SPHERE")
       call define_option_string(opts,"cluster-file-name","",required=.false.,&
         description="Path to file that defines a grain made up of a cluster of spheres")
-      call define_option_real(opts,"aeff",0.2,required=.false.,description="Effective radius of grain")
-      call define_option_real(opts,"grain-axis-x",1.0,&
+      call define_option_real(opts,"aeff",real(0.2,kind=dp_real),required=.false.,description="Effective radius of grain")
+      call define_option_real(opts,"grain-axis-x",real(1.0,kind=dp_real),&
         description="For ELLIPSOID grains: x-axis length")
-      call define_option_real(opts,"grain-axis-y",1.0,&
+      call define_option_real(opts,"grain-axis-y",real(1.0,kind=dp_real),&
         description="For ELLIPSOID grains: y-axis length")
-      call define_option_real(opts,"grain-axis-z",1.0,&
+      call define_option_real(opts,"grain-axis-z",real(1.0,kind=dp_real),&
         description="For ELLIPSOID grains: z-axis length")
-      call define_option_real(opts,"ephot",0.5,required=.false.,description="Energy of X-ray photon in keV")
-      call define_option_real(opts,"max-angle",3000.,required=.false.,description="Maximum scattering angle in arcseconds")
+      call define_option_real(opts,"ephot",real(0.5,kind=dp_real),required=.false.,description="Energy of X-ray photon in keV")
+      call define_option_real(opts,"max-angle",real(6000.,kind=dp_real),&
+        required=.false.,description="Maximum scattering angle in arcseconds")
         ! working
 
-      call define_option_real(opts,"ior-re",-2.079E-3,required=.false., &
-        description="Real component of the index of refraction, minus 1")
-      call define_option_real(opts,"ior-im",3.201E-3,required=.false., &
+      call define_option_real(opts,"ior-re",real(-2.079E-3,kind=dp_real),required=.false., &
+        description="real(kind=dp_real) component of the index of refraction, minus 1")
+      call define_option_real(opts,"ior-im",real(3.201E-3,kind=dp_real),required=.false., &
         description="Imaginary component of the index of refraction")
       
-      call define_option_integer(opts,"ngrain",256,required=.false.,&
+      call define_option_integer(opts,"ngrain",64,required=.false.,&
         description="Number of grid points along 1 dimension with which we should resolve the grain")
         ! working
-      call define_option_integer(opts,"nscatter",16,required=.false.,&
+      call define_option_integer(opts,"nscatter",64,required=.false.,&
         description="Number of angles along 1 dimension with which we should calculate the scattering cross section")
         ! working
 
@@ -187,8 +188,8 @@ module common_mod
 
     function rot_matrix(eul_ang)
       implicit none
-      real, dimension(3), intent(in) :: eul_ang
-      real, dimension(3,3) :: rot_matrix
+      real(kind=dp_real), dimension(3), intent(in) :: eul_ang
+      real(kind=dp_real), dimension(3,3) :: rot_matrix
       rot_matrix(1,1) =  cos(eul_ang(2))*cos(eul_ang(3))
       rot_matrix(1,2) = -cos(eul_ang(1))*sin(eul_ang(3))-sin(eul_ang(1))*sin(eul_ang(2))*cos(eul_ang(3))
       rot_matrix(1,3) =  sin(eul_ang(1))*sin(eul_ang(3))-cos(eul_ang(1))*sin(eul_ang(2))*sin(eul_ang(3))
@@ -204,8 +205,8 @@ module common_mod
 
     function rot_x(eul_ang)
       implicit none
-      real, intent(in) :: eul_ang
-      real, dimension(3,3) :: rot_x
+      real(kind=dp_real), intent(in) :: eul_ang
+      real(kind=dp_real), dimension(3,3) :: rot_x
       rot_x(1,1) = 1.0
       rot_x(1,2) = 0.0
       rot_x(1,3) = 0.0
@@ -221,8 +222,8 @@ module common_mod
 
     function rot_y(eul_ang)
       implicit none
-      real, intent(in) :: eul_ang
-      real, dimension(3,3) :: rot_y
+      real(kind=dp_real), intent(in) :: eul_ang
+      real(kind=dp_real), dimension(3,3) :: rot_y
       rot_y(1,1) = cos(eul_ang)
       rot_y(1,2) = 0.0
       rot_y(1,3) = sin(eul_ang)
@@ -238,8 +239,8 @@ module common_mod
 
     function rot_z(eul_ang)
       implicit none
-      real, intent(in) :: eul_ang
-      real, dimension(3,3) :: rot_z
+      real(kind=dp_real), intent(in) :: eul_ang
+      real(kind=dp_real), dimension(3,3) :: rot_z
       rot_z(1,1) = cos(eul_ang)
       rot_z(1,2) = sin(eul_ang)
       rot_z(1,3) = 0.0

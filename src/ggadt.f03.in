@@ -15,25 +15,25 @@ program ggadt
 
     implicit none
 
-    
-    real, allocatable :: x(:), y(:), kx(:), ky(:), thetax(:), thetay(:)
+    real(kind=dp_real), allocatable :: x(:), y(:), kx(:), ky(:), thetax(:), thetay(:)
 
     complex(c_double_complex), allocatable :: sh(:,:), ftsh(:,:)
 
-    real, allocatable :: scatter(:,:)
+    real(kind=dp_real), allocatable :: scatter(:,:)
 
-    real :: xmin, xmax, ymin, ymax, dx, dy, k, l, thetamax, convang, dk
-    real, dimension(3) :: eul_ang
-    real, dimension(3,3) :: rm 
-    integer :: i, j, q, neul, allocatestatus, deallocatestatus, num_args, norientations_new, kactual, kmin, kmax, enhancement
+    real(kind=dp_real) :: xmin, xmax, ymin, ymax, dx, dy, k, l, dk!, extra, min_sh, max_sh, min_ftsh, max_ftsh
+    real(kind=dp_real), dimension(3) :: eul_ang
+    real(kind=dp_real), dimension(3,3) :: rm 
+    integer :: i, j, neul, allocatestatus, deallocatestatus, norientations_new, kactual, kmin, kmax, enhancement
 
 
     call set_parameter_values()
     call initialize_and_allocate_vars()
     @FFTW3_UNCOMMENT@call set_optimization_mode(fftw_optimization_mode_name)
     if ( verbose_mode ) call print_parameters()
-
-    
+ 
+    !extra =  2*(dlog10(k) + dlog10(dx) + dlog10(dy) - dlog10(twopi)) - dlog10(real(norientations,kind=dp_real))
+    !write(0,*) k,dx,dy,twopi,real(norientations,kind=dp_real),extra
     ! loop over orientations
     do neul = 1,norientations
 
@@ -65,17 +65,40 @@ program ggadt
             !$omp do schedule(dynamic) private(i,j)
         elseif (geometry .eq. 'spheres')    then
             sh = shadow_spheres(x,y,k,rm)
+
+            !min_sh = aimag(sh(1,1))
+            !max_sh = aimag(sh(1,1))
+            !do i=1,size(x)
+            !    do j=1,size(y)
+            !        if (aimag(sh(i,j)) < min_sh) min_sh = aimag(sh(i,j))
+            !        if (aimag(sh(i,j)) > max_sh) max_sh = aimag(sh(i,j))
+            !    end do
+            !end do
+
         else
             write(0,*) "***ERROR*** Cannot understand geometry", geometry
         end if 
         !sh = fft_center(sh)
         ftsh = experimental_fft(sh,kmin,kmax,enhancement)
-
+        !min_ftsh = abs(ftsh(1,1))
+        !max_ftsh = abs(ftsh(1,1))
+        !do i=1,size(kx)
+        !    do j=1,size(ky)
+        !        if (abs(ftsh(i,j)) < min_ftsh) min_ftsh = abs(ftsh(i,j))
+        !        if (abs(ftsh(i,j)) > max_ftsh) max_ftsh = abs(ftsh(i,j))
+        !    end do
+        !end do
         !$omp parallel shared(scatter,ftsh,k,dx,dy) 
         !$omp do schedule(dynamic) private(i,j)
+        !write(0,*) "FTSH: ",real(ftsh(1,1)),aimag(ftsh(1,1)),abs(ftsh(1,1))
+        !write(0,*) "-----------------------"
+        !write(0,*) "eul angles",eul_ang
+        !write(0,*) "min_sh, max_sh = ",min_sh, max_sh
+        !write(0,*) "min_ftsh, max_ftsh = ",min_ftsh, max_ftsh
+        !write(0,*) "-----------------------"
         do i=1,size(kx)
             do j=1,size(ky)
-                scatter(i,j) = scatter(i,j) + (abs(ftsh(i,j))**2)*(k*dx*dy/(twopi))**2/real(norientations)
+                scatter(i,j) = scatter(i,j) + ((k*dx*dy*abs(ftsh(i,j))/twopi)**2)/real(norientations,kind=dp_real)
             end do
         end do
         !$omp end do nowait
@@ -94,7 +117,7 @@ program ggadt
     
     do i=1,size(thetax)
         do j=1,size(thetay)
-            print *,thetax(i),thetay(j),scatter(i,j)
+            print *,thetax(i),thetay(j),scatter(i,j)/(pi*a_eff*a_eff)
         end do
     end do
     if (verbose_mode) write(0,*) "done."
@@ -107,7 +130,7 @@ contains
     subroutine initialize_and_allocate_vars()
       implicit none 
       integer :: line, status, next, ng, n
-      real  :: ds, max_dist, scale
+      real(kind=dp_real) :: ds, max_dist, scale
       character(len=100) :: junk
 
         
@@ -270,6 +293,12 @@ contains
 
     ! figures out what kmin, kmax, enhancement and kactual are.
         call get_fft_vals(-max_angle,max_angle,nscatter,kmin,kmax,enhancement,kactual)   
+    !write(0,*) "DEBUG: GET_FFT_VALS"
+    !write(0,*) "max_angle = ",max_angle
+    !write(0,*) "kmin", kmin
+    !write(0,*) "kmax", kmax
+    !write(0,*) "enhancement", enhancement
+    !write(0,*) "kactual", kactual
       
     ! allocate arrays that depend on kactual
 
@@ -303,7 +332,9 @@ contains
 
             thetax(i) = asin(kx(i)/k)
             thetay(i) = asin(ky(i)/k)
-            scatter(i,j) = 0.0
+            do j=1,size(ky)
+                scatter(i,j) = 0.0
+            end do 
         end do
     ! -----------------------------------
 
@@ -312,7 +343,7 @@ contains
 
     end subroutine initialize_and_allocate_vars
     subroutine get_fft_vals(thetamin,thetamax,Kask,kmin,kmax,enhancement,Kout)
-        real, intent(in) :: thetamin, thetamax
+        real(kind=dp_real), intent(in) :: thetamin, thetamax
         integer, intent(in) :: Kask
         integer, intent(out) :: kmin,kmax,enhancement, Kout
 
@@ -345,7 +376,7 @@ contains
 
         integer, allocatable :: seed(:)
         integer(4) :: i, n, un, istat, dt(8), pid, t(2), s
-        integer(kind=1) :: getpid
+        !integer(kind=1) :: getpid
         integer(8) :: count, tms
 
         call random_seed(size = n)
@@ -393,7 +424,7 @@ contains
     end subroutine init_random_seed
 
     function get_new_euler_angles(i)
-        real, dimension(3) :: get_new_euler_angles
+        real(kind=dp_real), dimension(3) :: get_new_euler_angles
         integer, intent(in) :: i
         integer                :: j 
         character(len=50)    :: junk
@@ -458,9 +489,9 @@ contains
         write(0,*) "euler_angle_mode:",euler_angle_mode
         if (euler_angle_mode == "file") write(0,*) "euler_angle_file:", euler_angle_file
 
-        write(0,*) "ngrid:",ngrid
+        write(0,*) "ngrain:",ngrain
         write(0,*) "norientations:",norientations
-        write(0,*) "grid-width:",grid_width
+        write(0,*) "nscatter:",nscatter
         write(0,*) "ior_re:",ior_re
         write(0,*) "ior_im",ior_im
         write(0,*) "grain_axes:",grain_a

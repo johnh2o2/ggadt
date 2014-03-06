@@ -1,21 +1,21 @@
 module ellipsoid
 
     use, intrinsic :: iso_c_binding
-
+    use constants
     implicit none
     
     contains
 
     function chord_ellipsoid(x,y,r,grain_a)
         implicit none
-        real :: chord_ellipsoid
-        real :: d, temp
-        real, dimension(3) :: c
-        real, dimension(3), intent(in) :: grain_a
-        real, dimension(2) :: pos
-        real, intent(in), dimension(3,3) :: r
-        real, intent(in) :: x, y
-        integer :: i,j,k,m
+        real(kind=dp_real) :: chord_ellipsoid
+        real(kind=dp_real) :: d, temp
+        real(kind=dp_real),  dimension(3) :: c
+        real(kind=dp_real),  dimension(3), intent(in) :: grain_a
+        real(kind=dp_real),  dimension(2) :: pos
+        real(kind=dp_real),  intent(in), dimension(3,3) :: r
+        real(kind=dp_real),  intent(in) :: x, y
+        integer :: i,j,k
         pos(1) = x
         pos(2) = y
         c(1) = 0
@@ -46,10 +46,10 @@ module ellipsoid
 
     function phi_ellipsoid(x,y,k,r,delm,grain_a)
         implicit none
-        real, intent(in) :: x,y,k
+        real(kind=dp_real),  intent(in) :: x,y,k
         complex(c_double_complex), intent(in) :: delm
-        real, dimension(3), intent(in) :: grain_a
-        real, dimension(3,3), intent(in) :: r
+        real(kind=dp_real),  dimension(3), intent(in) :: grain_a
+        real(kind=dp_real),  dimension(3,3), intent(in) :: r
         
         
         complex(c_double_complex) :: phi_ellipsoid
@@ -60,10 +60,10 @@ module ellipsoid
 
     function shadow_ellipsoid(x,y,k,grain_a,delm,r)
         implicit none
-        real, intent(in) :: x,y,k
-        real, dimension(3,3), intent(in) :: r
+        real(kind=dp_real),  intent(in) :: x,y,k
+        real(kind=dp_real),  dimension(3,3), intent(in) :: r
         complex(c_double_complex), intent(in) :: delm
-        real, dimension(3), intent(in) :: grain_a
+        real(kind=dp_real),  dimension(3), intent(in) :: grain_a
         complex(c_double_complex) :: shadow_ellipsoid
 
         shadow_ellipsoid = 1.0-exp( (0.0,1.0)*phi_ellipsoid(x,y,k,r,delm,grain_a) )

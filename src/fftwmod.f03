@@ -34,7 +34,7 @@ contains
 
     function fft(f,x,y)
         
-        real, intent(in) :: x(:), y(:)
+        real(kind=dp_real),  intent(in) :: x(:), y(:)
         complex(c_double_complex), intent(inout) :: f(:,:)
         complex(c_double_complex), dimension(size(x),size(y)) :: fft
         integer :: nx, ny
@@ -128,6 +128,12 @@ contains
             stop
         end if 
 
+        do i=1,keff
+            do j=1,keff
+                fft_firstk_working(i,j) = 0.0D0
+            end do 
+        end do 
+
         if (Keff*NFFT .ne. N) then
             write(0,*) "ERROR: NFFT = ",NFFT," and K = ",K,", but NFFT*K = ",NFFT*K," != ",N
             stop 
@@ -141,7 +147,7 @@ contains
             do j=0,(keff-1)
                 do l=0,(NFFT-1)
                     do m=0,(NFFT-1)
-                        twids(1 + i + l*Keff, j + m*Keff ) &
+                        twids(1 + i + l*Keff, 1 + j + m*Keff ) &
                             & = exp(CMPLX(0,1)*ISIGN*twopi*(real(i*l+j*m))/real(N))
                     end do 
                 end do 
@@ -178,7 +184,7 @@ contains
     end function fft_firstk
 
     function kspace_shift(f,shiftx,shifty)
-        real, intent(in) :: shiftx,shifty
+        real(kind=dp_real),  intent(in) :: shiftx,shifty
         complex(c_double_complex), intent(in) :: f(:,:)
         complex(c_double_complex), dimension(size(f(:,1)),size(f(1,:))) :: kspace_shift
         integer :: i, j, n
@@ -217,9 +223,9 @@ contains
         complex(c_double_complex), allocatable :: working_fft(:,:)
         complex(c_double_complex), dimension(size(f(:,1)), size(f(1,:))) :: new_grid
         integer :: i,j,a,b,norig
-        real :: deltax, deltay
+        real(kind=dp_real) :: deltax, deltay
 
-        f = kspace_shift(f,real(kmin),real(kmin)) ! shift the input function so that the k-space origin is at (kmin,kmin)
+        f = kspace_shift(f,real(kmin,kind=dp_real),real(kmin,kind=dp_real)) ! shift the input function so that the k-space origin is at (kmin,kmin)
         norig = kmax - kmin 
 
         !write (0,*) "norig=",norig,"kmin=",kmin,"kmax=",kmax,"enhancement=",enhancement
@@ -229,19 +235,25 @@ contains
         allocate(experimental_fft(norig*enhancement+1, norig*enhancement+1))
         
 
-        do i=1,enhancement
+        do i=1,enhancement+1
             deltax = real(i-1)/real(enhancement)
          
-            do j=1,enhancement
+            do j=1,enhancement+1
                 deltay = real(j-1)/real(enhancement)
     
                 new_grid = kspace_shift(f,deltax,deltay)
                 working_fft = fft_firstk(new_grid,norig)
-                
+                !do a=1,norig
+                !    do b=1,norig
+                !        if (abs(working_fft(a,b)) > HUGE_NUMBER) then
+                !            write(0,*) "IN FFT -- working_fft = ",working_fft(a,b)
+                !        end if 
+                !    end do
+                !end do 
                 do a=1,norig
                     do b=1,norig
-                        if ((i + (a-1)*enhancement < size(experimental_fft(:,1))) .and. &
-                            & (j + (b-1)*enhancement < size(experimental_fft(1,:)))) then
+                        if ((i + (a-1)*enhancement <= size(experimental_fft(:,1))) .and. &
+                            & (j + (b-1)*enhancement <= size(experimental_fft(1,:)))) then
                             experimental_fft(i + (a-1)*enhancement,j + (b-1)*enhancement) = working_fft(a,b)
                         end if 
                     end do
@@ -249,7 +261,7 @@ contains
 
             end do
         end do 
-        f = kspace_shift(f,real(-kmin),real(-kmin)) ! shift the input function back.
+        f = kspace_shift(f,real(-kmin,kind=dp_real),real(-kmin,kind=dp_real)) ! shift the input function back.
         
     end function experimental_fft
 

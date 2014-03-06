@@ -17,22 +17,19 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 
-LOGPLOT = False
+LOGPLOT = True
 max_angle = 4500
 
 nplot = 250 # dimension of plotted grid (interpolated)
 delta = 250 # distance above or below theta min/max for interpolation purposes
 
-# min/max scattering angles to deal with
-xmin = -max_angle
-xmax = max_angle
-ymin = xmin
-ymax = xmax
+
 
 conv = (360*60*60)/(2*np.pi) # convert from radians to arcseconds (a more sensible unit)
 
 fname = sys.argv[1]
-huge = pow(10,20)
+huge = pow(10,10)
+tiny = pow(10,-10)
 
 print "Plotting file '%s'"%(fname)
 data_dt = np.dtype([('theta', np.float_), ('phi', np.float_), ('f', np.float_)])
@@ -44,16 +41,12 @@ z = data['f']
 
 
 #Tests if data file contains only zeros.
-ALL_ZERO = True 
-for Z in z:
-	if Z != 0:
-		#print "Not all zero :)"
-		ALL_ZERO = False
-		break
+
 
 
 num_infs = 0
-
+num_zeros = 0
+th_max_data = 0.0
 for i in range(0,len(z)):
 	if np.isinf(z[i]):
 		if i == 0:
@@ -66,7 +59,23 @@ for i in range(0,len(z)):
 				q += 1
 			z[i] = pow(q - i,-1)*(z[i-1] + z[q])
 		num_infs += 1
-if ALL_ZERO:
+	elif abs(z[i]) < tiny:
+		num_zeros += 1
+		z[i] = tiny
+	if x[i] > th_max_data:
+		th_max_data = x[i]
+
+if th_max_data < max_angle: 
+	max_angle = th_max_data
+print "max_angle = ",max_angle
+
+# min/max scattering angles to deal with
+xmin = -max_angle
+xmax = max_angle
+ymin = xmin
+ymax = xmax
+
+if num_zeros == len(z):
 	print "ALL ZERO!"
 	sys.exit()
 print num_infs," infinities found in the data. Replaced them with linearly interpolated values."

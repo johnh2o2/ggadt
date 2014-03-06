@@ -23,7 +23,7 @@ def make_data(params,fname):
 	for p in params:
 		clargs = clargs + " --"+p+"="+`params[p]`
 
-	command = ggadt+clargs+" > "+fname
+	command = ggadt+clargs+" --use-experimental-fft > "+fname
 	#print command
 	os.system(command)
 
@@ -39,9 +39,9 @@ params_f1r1c1 = {'grain-geometry' 		: "sphere",
 			   'ephot' 					: 0.5,
 			   'ior-re' 				: -2.079*pow(10.0,-3.0),
 			   'ior-im' 				: 3.201*pow(10.0,-3.0),
-			   'grid-width' 			: 8.0,
-			   'ngrid' 					: 1024,
-			   'nangle' 				: 1,
+			   'ngrain' 					: 256,
+			   'nscatter'					: 128,
+			   'norientations' 				: 1,
 			   'euler-angle-mode' 		: 'random',
 			   #'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
 			   }
@@ -51,9 +51,9 @@ params_f1r1c2 = { 'grain-geometry' 		: "sphere",
 			   'ephot' 					: 1.0,
 			   'ior-re' 				: -7.152*pow(10.0,-4.0),
 			   'ior-im' 				: 1.887*pow(10.0,-4.0),
-			   'grid-width' 			: 8.0,
-			   'ngrid' 					: 1024,
-			   'nangle' 				: 1,
+			   'ngrain' 					: 256,
+			   'nscatter'					: 128,
+			   'norientations' 				: 1,
 			   'euler-angle-mode' 		: 'file',
 			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
 			  }
@@ -63,9 +63,9 @@ params_f1r1c3 = { 'grain-geometry' 		: "sphere",
 			   'ephot' 					: 2.0,
 			   'ior-re' 				: -1.920*pow(10.0,-4.0),
 			   'ior-im' 				: 2.807*pow(10.0,-5.0),
-			   'grid-width' 			: 8.0,
-			   'ngrid' 					: 1024,
-			   'nangle' 				: 1,
+			   'ngrain' 					: 256,
+			   'nscatter'					: 128,
+			   'norientations' 				: 1,
 			   'euler-angle-mode' 		: 'file',
 			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
 			   }
@@ -78,9 +78,9 @@ params_f1r2c1 = {'grain-geometry' 		: "sphere",
 			   'ephot' 					: 0.5,
 			   'ior-re' 				: -2.079*pow(10.0,-3.0),
 			   'ior-im' 				: 3.201*pow(10.0,-3.0),
-			   'grid-width' 			: 8.0,
-			   'ngrid' 					: 1024,
-			   'nangle' 				: 1,
+			   'ngrain' 					: 256,
+			   'nscatter'					: 128,
+			   'norientations' 				: 1,
 			   'euler-angle-mode' 		: 'random',
 			   #'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
 			   }
@@ -90,9 +90,9 @@ params_f1r2c2 = { 'grain-geometry' 		: "sphere",
 			   'ephot' 					: 1.0,
 			   'ior-re' 				: -7.152*pow(10.0,-4.0),
 			   'ior-im' 				: 1.887*pow(10.0,-4.0),
-			   'grid-width' 			: 8.0,
-			   'ngrid' 					: 1024,
-			   'nangle' 				: 1,
+			   'ngrain' 					: 256,
+			   'nscatter'					: 128,
+			   'norientations' 				: 1,
 			   'euler-angle-mode' 		: 'file',
 			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
 			  }
@@ -102,9 +102,9 @@ params_f1r2c3 = { 'grain-geometry' 		: "sphere",
 			   'ephot' 					: 2.0,
 			   'ior-re' 				: -1.920*pow(10.0,-4.0),
 			   'ior-im' 				: 2.807*pow(10.0,-5.0),
-			   'grid-width' 			: 8.0,
-			   'ngrid' 					: 1024,
-			   'nangle' 				: 1,
+			   'ngrain' 					: 256,
+			   'nscatter'					: 128,
+			   'norientations' 				: 1,
 			   'euler-angle-mode' 		: 'file',
 			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
 			   }
@@ -119,9 +119,9 @@ params_f2r1c1 = {'grain-geometry' 		: "ellipsoid",
 			   'ephot' 					: 0.5,
 			   'ior-re' 				: -2.079*pow(10.0,-3.0),
 			   'ior-im' 				: 3.201*pow(10.0,-3.0),
-			   'grid-width' 			: 8.0,
-			   'ngrid' 					: 1024,
-			   'nangle' 				: 1,
+			   'ngrain' 					: 256,
+			   'nscatter'					: 128,
+			   'norientations' 				: 1,
 			   'euler-angle-mode' 		: 'file',
 			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
 			   }
@@ -134,9 +134,9 @@ params_f2r1c2 = { 'grain-geometry' 		: "ellipsoid",
 			   'ephot' 					: 1.0,
 			   'ior-re' 				: -7.152*pow(10.0,-4.0),
 			   'ior-im' 				: 1.887*pow(10.0,-4.0),
-			   'grid-width' 			: 8.0,
-			   'ngrid' 					: 1024,
-			   'nangle' 				: 1,
+			   'ngrain' 					: 256,
+			   'nscatter'					: 128,
+			   'norientations' 				: 1,
 			   'euler-angle-mode' 		: 'file',
 			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
 			  }
@@ -149,9 +149,9 @@ params_f2r1c3 = { 'grain-geometry' 		: "ellipsoid",
 			   'ephot' 					: 2.0,
 			   'ior-re' 				: -1.920*pow(10.0,-4.0),
 			   'ior-im' 				: 2.807*pow(10.0,-5.0),
-			   'grid-width' 			: 8.0,
-			   'ngrid' 					: 1024,
-			   'nangle' 				: 1,
+			   'ngrain' 					: 256,
+			   'nscatter'					: 128,
+			   'norientations' 				: 1,
 			   'euler-angle-mode' 		: 'file',
 			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
 			   }
@@ -167,9 +167,9 @@ params_f2r2c1 = {'grain-geometry' 		: "ellipsoid",
 			   'ephot' 					: 0.5,
 			   'ior-re' 				: -2.079*pow(10.0,-3.0),
 			   'ior-im' 				: 3.201*pow(10.0,-3.0),
-			   'grid-width' 			: 8.0,
-			   'ngrid' 					: 1024,
-			   'nangle' 				: 1,
+			   'ngrain' 					: 256,
+			   'nscatter'					: 128,
+			   'norientations' 				: 1,
 			   'euler-angle-mode' 		: 'file',
 			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
 			   }
@@ -182,9 +182,9 @@ params_f2r2c2 = { 'grain-geometry' 		: "ellipsoid",
 			   'ephot' 					: 1.0,
 			   'ior-re' 				: -7.152*pow(10.0,-4.0),
 			   'ior-im' 				: 1.887*pow(10.0,-4.0),
-			   'grid-width' 			: 8.0,
-			   'ngrid' 					: 1024,
-			   'nangle' 				: 1,
+			   'ngrain' 					: 256,
+			   'nscatter'					: 128,
+			   'norientations' 				: 1,
 			   'euler-angle-mode' 		: 'file',
 			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
 			  }
@@ -197,9 +197,9 @@ params_f2r2c3 = { 'grain-geometry' 		: "ellipsoid",
 			   'ephot' 					: 2.0,
 			   'ior-re' 				: -1.920*pow(10.0,-4.0),
 			   'ior-im' 				: 2.807*pow(10.0,-5.0),
-			   'grid-width' 			: 8.0,
-			   'ngrid' 					: 1024,
-			   'nangle' 				: 1,
+			   'ngrain' 					: 256,
+			   'nscatter'					: 128,
+			   'norientations' 				: 1,
 			   'euler-angle-mode' 		: 'file',
 			   'euler-angle-file' 		: parent_dir+'/eul_angle_file.dat'
 			   }

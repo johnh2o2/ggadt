@@ -1,3 +1,9 @@
+* commit b7c8907be51eeac933198eeaa93725b37d020bd2
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Wed Feb 26 10:45:56 2014 -0500
+| 
+|     Now integrated a more efficient way to do the FFT. Still investigating the costs in accuracy. The new FFT only works with FFTW at the moment. Input options have changed: -nangle is now -norientations, -ngrid has split into -ngrain and -nscatter. I've written test-changes.sh which should run cases for spheres, sphere, ellipsoid for both experimental fft and the old fft with padding. I also added an additional module called 'constants.f03' which should contain things like pi, twopi, etc. SPHERES MODULE IS CURRENTLY INOPERABLE (outputs mostly NaN values)
+|  
 * commit c2f03c65e8f5766789ec020a1e20ef0d8497b641
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Mon Feb 17 17:26:14 2014 -0500

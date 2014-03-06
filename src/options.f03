@@ -24,6 +24,7 @@
 
 module options
   use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
+  use constants
   implicit none
   private
 
@@ -37,9 +38,9 @@ module options
   integer, parameter :: descr_column = 30
   integer, parameter :: max_column   = 90
   ! Kind for real options
-  integer, parameter :: rk = 4 !selected_real_kind(p=15)
+  integer, parameter :: rk = dp_real !selected_real_kind(p=15)
   ! Kind for integer options
-  integer, parameter :: ik = 4 !kind(1)
+  integer, parameter :: ik = ip !kind(1)
   ! String lengths
   integer, parameter :: opt_len = 256
   integer, parameter :: descr_len = 2048
