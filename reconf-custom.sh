@@ -9,7 +9,9 @@ aclocal -I./m4
 autoconf
 automake -a
 
-bash configure #FCFLAGS="-O2 -fimplicit-none -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=f2003 -pedantic -fbacktrace" || exit
+std="f2003"
+
+bash configure #FCFLAGS="-O2 -fimplicit-none -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=${std} -pedantic -fbacktrace" || exit
 #make || exit
 #cp doc/*png doc/ggadt.html
 #make html || exit
@@ -20,14 +22,23 @@ bash configure #FCFLAGS="-O2 -fimplicit-none -Wall -Wline-truncation -Wcharacter
 #bash configure --enable-fftw3 
 make || exit
 
+cluster_dir="$HOME/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/data/clusters/"
 
 rm -f test_changes_exp.dat
 rm -f test_changes_reg.dat
-args="--ngrain=64 --nscatter=64"
-args="${args} --norientations=1 --grain-geometry=spheres --cluster-file-name=$HOME/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/data/clusters/BAM2.256.1.targ"
+args="--ngrain=32" 
+args="${args} --nscatter=128" 
+args="${args} --max-angle=3000."
+args="${args} --norientations=100"
+args="${args} --grain-geometry=sphere"
+#args="${args} --cluster-file-name=${cluster_dir}/BAM1.256.1.targ"
+args="${args} --ephot=2.0"
+args="${args} --aeff=0.2"
+args="${args} --ior-re=-1.0E-4"
+args="${args} --ior-im=1.0E-4"
 #args="${args} --grain-geometry=sphere"
 echo "======EXPERIMENTAL MODE======="
-time src/ggadt --use-experimental-fft $args > test_changes_exp.dat || exit
+time src/ggadt $args > test_changes_exp.dat || exit
 #echo "======NON EXP. MODE    ======="
 #time src/ggadt $args > test_changes_reg.dat || exit
 

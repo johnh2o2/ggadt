@@ -1,5 +1,5 @@
 module common_mod
-  use, intrinsic :: iso_c_binding
+  ! use, intrinsic :: iso_c_binding
   use options
   use constants
   implicit none
@@ -11,40 +11,41 @@ module common_mod
 
   type(options_t) :: opts 
 
-  character(len=100), parameter ::  VERSION="GGADT (General Geometry Anomalous Diffraction Theory) v@PACKAGE_VERSION@"
+  character(len=100), parameter ::  VERSION="GGADT (General Geometry Anomalous Diffraction Theory) v0.9.7"
   character(len=100), parameter ::  INFO = "Written by John Hoffman (jah5@princeton.edu)&
     & and Michael Tarczon (mtarczon@princeton.edu)"
 
-  complex(c_double_complex)     ::  delm 
+  complex(kind=dp_complex)                    ::  delm 
   
   real(kind=dp_real)                          ::  a_eff     
   real(kind=dp_real)                          ::  ephot     
-  character(len=50)             ::  geometry  
-  character(len=50)             ::  euler_angle_mode
+  character(len=50)                           ::  geometry  
+  character(len=50)                           ::  euler_angle_mode
 
 
-  integer                       ::  ngrain
-  integer                       ::  nscatter_min 
-  integer                       ::  ngrid
-  integer                       ::  nscatter
-  integer                       ::  norientations 
-  integer                       ::  ierr
+  integer                                     ::  ngrain
+  integer                                     ::  nscatter_min 
+  integer                                     ::  ngrid
+  integer                                     ::  nscatter
+  integer                                     ::  norientations 
+  integer                                     ::  ierr
 
 
   real(kind=dp_real)                          ::  grid_width  
+  real(kind=dp_real)                          ::  dtheta
   real(kind=dp_real)                          ::  ior_im        
   real(kind=dp_real)                          ::  ior_re     
   real(kind=dp_real), dimension(3)            ::  grain_a 
   real(kind=dp_real)                          ::  max_angle
 
-  logical                       ::  use_experimental_fft
-  logical                       ::  asked_for_version
-  logical                       ::  verbose_mode
-  logical                       ::  timing_mode
-  character(len=200)            ::  parameter_file_name
-  character(len=200)            ::  euler_angle_file
-  character(len=100)            ::  fftw_optimization_mode_name
-  character(len=200)            ::  cluster_file_name
+  logical                                     ::  use_padded_fft
+  logical                                     ::  asked_for_version
+  logical                                     ::  verbose_mode
+  logical                                     ::  timing_mode
+  character(len=200)                          ::  parameter_file_name
+  character(len=200)                          ::  euler_angle_file
+  character(len=100)                          ::  fftw_optimization_mode_name
+  character(len=200)                          ::  cluster_file_name
 
   contains
 
@@ -53,60 +54,79 @@ module common_mod
       
      
       ! define help flag
+
       call define_help_flag(opts,print_help)
-      call define_flag(opts, "version",abbrev='v',&
+      call define_flag(opts, &
+        "version",abbrev='v',&
         description="Print version information")
-      call define_flag(opts, "verbose",abbrev='d',&
+      call define_flag(opts, &
+        "verbose",abbrev='d',&
         description="prints variable values and other status messages")
-      call define_flag(opts, "timing",abbrev='t',&
+      call define_flag(opts, &
+        "timing",abbrev='t',&
         description="suppresses output for timing purposes")
-      call define_option_string(opts,"parameter-file-name","",required=.false.,&
+      call define_option_string(opts,&
+        "parameter-file-name","",&
         description="Path to parameter file")
 
       ! Define command line options
 
-      call define_option_string(opts,"grain-geometry","sphere",required=.false.,&
+      call define_option_string(opts,&
+        "grain-geometry","sphere",&
         description="SPHERES, ELLIPSOID, SPHERE")
-      call define_option_string(opts,"cluster-file-name","",required=.false.,&
+      call define_option_string(opts,&
+        "cluster-file-name","",&
         description="Path to file that defines a grain made up of a cluster of spheres")
-      call define_option_real(opts,"aeff",real(0.2,kind=dp_real),required=.false.,description="Effective radius of grain")
-      call define_option_real(opts,"grain-axis-x",real(1.0,kind=dp_real),&
+      call define_option_real(opts,&
+        "aeff",real(0.2,kind=dp_real),&
+        description="Effective radius of grain")
+      call define_option_real(opts,&
+        "grain-axis-x",real(1.0,kind=dp_real),&
         description="For ELLIPSOID grains: x-axis length")
-      call define_option_real(opts,"grain-axis-y",real(1.0,kind=dp_real),&
+      call define_option_real(opts,&
+        "grain-axis-y",real(1.0,kind=dp_real),&
         description="For ELLIPSOID grains: y-axis length")
-      call define_option_real(opts,"grain-axis-z",real(1.0,kind=dp_real),&
+      call define_option_real(opts,&
+        "grain-axis-z",real(1.0,kind=dp_real),&
         description="For ELLIPSOID grains: z-axis length")
-      call define_option_real(opts,"ephot",real(0.5,kind=dp_real),required=.false.,description="Energy of X-ray photon in keV")
-      call define_option_real(opts,"max-angle",real(6000.,kind=dp_real),&
-        required=.false.,description="Maximum scattering angle in arcseconds")
-        ! working
-
-      call define_option_real(opts,"ior-re",real(-2.079E-3,kind=dp_real),required=.false., &
+      call define_option_real(opts,&
+        "ephot",real(0.5,kind=dp_real),&
+        description="Energy of X-ray photon in keV")
+      call define_option_real(opts,&
+        "max-angle",real(6000.,kind=dp_real),&
+        description="Maximum scattering angle in arcseconds")
+      call define_option_real(opts,&
+        "ior-re",real(-2.079E-3,kind=dp_real),&
         description="real(kind=dp_real) component of the index of refraction, minus 1")
-      call define_option_real(opts,"ior-im",real(3.201E-3,kind=dp_real),required=.false., &
+      call define_option_real(opts,&
+        "ior-im",real(3.201E-3,kind=dp_real),&
         description="Imaginary component of the index of refraction")
-      
-      call define_option_integer(opts,"ngrain",64,required=.false.,&
+      call define_option_real(opts,&
+        "dtheta",real(10.0,kind=dp_real), &
+        description="Angular resolution for dQscatter/dOmega calculation")
+      call define_option_integer(opts,&
+        "ngrain",64,&
         description="Number of grid points along 1 dimension with which we should resolve the grain")
-        ! working
-      call define_option_integer(opts,"nscatter",64,required=.false.,&
+      call define_option_integer(opts,&
+        "nscatter",64,&
         description="Number of angles along 1 dimension with which we should calculate the scattering cross section")
-        ! working
-
-      call define_option_integer(opts,"norientations",100,required=.false.,&
+      call define_option_integer(opts,&
+        "norientations",100,&
         description="Number of orientations to average over")
-        ! working
-
-      call define_option_string(opts,"euler-angle-mode","random",required=.false.,&
+      call define_option_string(opts,&
+        "euler-angle-mode","random",&
         description="How to choose Euler angles (sequential, random, file)")
-      call define_option_string(opts,"euler-angle-file","",required=.false.,&
+      call define_option_string(opts,&
+        "euler-angle-file","",&
         description="Path to a text file containing a list of orientations")
       
 
       call define_option_string(opts,"fftw-optimization","estimate",required=.false.,&
         description="[estimate,measure,patient,exhaustive]")
-      call define_flag(opts,"use-experimental-fft",abbrev='s',&
-        description="Possible speedup? Experimental!")
+      call define_flag(opts,"use-padded-fft",&
+        description="Use a slower FFT method that pads a &
+        &2d grid to obtain more points in the desired range of scattering angles. &
+        &This should only be used for consistency tests.")
 
       ! Now process command line options and read any specified parameter file
 
@@ -134,25 +154,19 @@ module common_mod
       call get_option_real(opts,"grain-axis-y",grain_a(2))
       call get_option_real(opts,"grain-axis-z",grain_a(3))
       call get_option_real(opts,"ephot",ephot)
-      call get_flag(opts,"use-experimental-fft",use_experimental_fft)
+      call get_flag(opts,"use-padded-fft",use_padded_fft)
       call get_flag(opts,"verbose",verbose_mode)
       call get_flag(opts,"timing",timing_mode)
       call get_option_real(opts,"ior-re",ior_re)
       call get_option_real(opts,"ior-im",ior_im)
-      delm = cmplx(ior_re,ior_im)
       call get_option_string(opts,"grain-geometry",geometry)
       call get_option_string(opts,"euler-angle-mode",euler_angle_mode)
       call get_option_string(opts,"euler-angle-file",euler_angle_file)
-
       call get_option_integer(opts,"ngrain",ngrain)
-        ! working
-      call get_option_integer(opts,"norientations",norientations)
-        ! working
       call get_option_integer(opts,"nscatter",nscatter)
-        ! working
+      call get_option_integer(opts,"norientations",norientations)
+      call get_option_real(opts, "dtheta", dtheta)
       call get_option_real(opts,"max-angle",max_angle)
-        ! working
-      ! working call get_option_real(opts,"grid-width",grid_width)
       call get_option_string(opts,"cluster-file-name",cluster_file_name)
       call get_option_string(opts,"fftw-optimization",fftw_optimization_mode_name)
       call get_flag(opts,"version",asked_for_version)
@@ -163,6 +177,8 @@ module common_mod
         stop
       end if 
 
+      delm = cmplx(ior_re,ior_im)
+
       ! Set to lower case
       fftw_optimization_mode_name = strlowcase(fftw_optimization_mode_name)
       euler_angle_mode = strlowcase(euler_angle_mode)
@@ -170,9 +186,18 @@ module common_mod
 
 
 
+      if (option_found(opts,"nscatter") .and. option_found(opts, "dtheta")) then
+          write(0,*) "Warning: You have specified BOTH the 'nscatter' and 'dtheta' options."
+          write(0,*) "We will use your specified value of nscatter:", nscatter
+      else if (option_found(opts,"dtheta")) then
+          write(0,*) "Specified dtheta = ",dtheta
+          nscatter = int(ceiling(real(2*max_angle,kind=dp_real)/dtheta))
+          write(0,*) "Nscatter --> ", nscatter
+      else if (option_found(opts,"nscatter")) then
+          write(0,*) "nscatter specified", nscatter
+      end if 
 
-
-      
+      write(0,*) "Nscatter = ", nscatter
     end subroutine set_parameter_values
 
     subroutine print_help(opts)

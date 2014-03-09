@@ -1,5 +1,6 @@
 from math import *
 import sys
+import os
 import numpy as np 
 from scipy.interpolate import RectBivariateSpline
 import matplotlib.pyplot as plt
@@ -11,6 +12,15 @@ from installation_vars import *
 data_dt = np.dtype([('theta', np.float_), ('phi', np.float_), ('f', np.float_)])
 conv = (360*60*60)/(2*np.pi) # convert from radians to arcseconds (a more sensible unit)
 
+
+def make_data(params,fname,use_experimental=True):
+	clargs = " "
+	add = ""
+	for p in params:
+		clargs = clargs + " --"+p+"="+`params[p]`
+	command = ggadt+clargs+add+" > "+fname
+	print command
+	os.system(command)
 
 def quick_plots(fname,scale='log'):
 	data = load_data(fname)
@@ -162,7 +172,7 @@ def get_1d_avg(data_function,boundaries=[-2000,2000,-2000,2000]):
 	z_phivar = np.zeros(len(theta_arr))
 	z_max = np.zeros(len(theta_arr))
 	z_min = np.zeros(len(theta_arr))
-	phi_ints = np.linspace(0,2*np.pi,100)
+	phi_ints = np.linspace(0,2*np.pi,1000)
 
 
 	for i,phi in enumerate(phi_ints):

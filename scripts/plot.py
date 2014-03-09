@@ -18,7 +18,7 @@ from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 
 LOGPLOT = True
-max_angle = 4500
+max_angle = 10000
 
 nplot = 250 # dimension of plotted grid (interpolated)
 delta = 250 # distance above or below theta min/max for interpolation purposes

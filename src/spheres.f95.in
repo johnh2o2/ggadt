@@ -1,6 +1,6 @@
 module spheres
 
-    use, intrinsic :: iso_c_binding
+    @FFTW3_UNCOMMENT@ use, intrinsic :: iso_c_binding
     use constants
     use sphere
     @USE_OMP_LIB@
@@ -107,8 +107,8 @@ module spheres
         real(kind=dp_real), intent(in) :: x(:),y(:)
         real(kind=dp_real), dimension(3) :: current_pos
         real(kind=dp_real), intent(in) :: k
-        complex(c_double_complex) :: m 
-        complex(c_double_complex), dimension(size(x),size(y)) :: phi_spheres
+        complex(kind=dp_complex) :: m 
+        complex(kind=dp_complex), dimension(size(x),size(y)) :: phi_spheres
         integer :: i, j, n ,xi, xf, yi,yf
 
         dxt = x(2) - x(1)
@@ -134,13 +134,13 @@ module spheres
             !write(0,*) "doing shortcut"
             ! write (0,*) " | ---SPHERES (phi_spheres) : xi,xf, yi,yf=",xi,xf,yi,yf
             if (yf < 0 .or. yf > size(y)) then
-                write (0,*) " ***ERROR*** (spheres module, phi_spheres function) yf = ",yf," but size(y)=",size(y)
+                write (0,*) "ERROR (spheres module, phi_spheres function) yf = ",yf," but size(y)=",size(y)
             else if (yi < 0 .or. yi > size(y)) then
-                write (0,*) " ***ERROR*** (spheres module, phi_spheres function) yi = ",yi," but size(y)=",size(y)
+                write (0,*) "ERROR (spheres module, phi_spheres function) yi = ",yi," but size(y)=",size(y)
             else if (xi < 0 .or. xi > size(x)) then
-                write (0,*) " ***ERROR*** (spheres module, phi_spheres function) xi = ",xi," but size(x)=",size(x)
+                write (0,*) "ERROR (spheres module, phi_spheres function) xi = ",xi," but size(x)=",size(x)
             else if (xf < 0 .or. xf > size(x)) then
-                write (0,*) " ***ERROR*** (spheres module, phi_spheres function) xf = ",xf," but size(x)=",size(x)
+                write (0,*) "ERROR (spheres module, phi_spheres function) xf = ",xf," but size(x)=",size(x)
             end if 
             do j=xi,xf
                 do n=yi,yf
@@ -165,7 +165,7 @@ module spheres
         real(kind=dp_real), intent(in) :: x(:),y(:)
         real(kind=dp_real), dimension(3,3), intent(in) :: rm
         real(kind=dp_real), intent(in) :: k 
-        complex(c_double_complex), dimension(size(x),size(y)) :: shadow_spheres, phi
+        complex(kind=dp_complex), dimension(size(x),size(y)) :: shadow_spheres, phi
         integer :: i, j
 
         ! write (0,*) "SPHERES (shadow_spheres) : in shadow_spheres" 

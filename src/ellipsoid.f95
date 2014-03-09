@@ -1,6 +1,6 @@
 module ellipsoid
 
-    use, intrinsic :: iso_c_binding
+    !use, intrinsic :: iso_c_binding
     use constants
     implicit none
     
@@ -47,12 +47,12 @@ module ellipsoid
     function phi_ellipsoid(x,y,k,r,delm,grain_a)
         implicit none
         real(kind=dp_real),  intent(in) :: x,y,k
-        complex(c_double_complex), intent(in) :: delm
+        complex(kind=dp_complex), intent(in) :: delm
         real(kind=dp_real),  dimension(3), intent(in) :: grain_a
         real(kind=dp_real),  dimension(3,3), intent(in) :: r
         
         
-        complex(c_double_complex) :: phi_ellipsoid
+        complex(kind=dp_complex) :: phi_ellipsoid
 
         phi_ellipsoid = k*delm*chord_ellipsoid(x,y,r,grain_a)
         
@@ -62,9 +62,9 @@ module ellipsoid
         implicit none
         real(kind=dp_real),  intent(in) :: x,y,k
         real(kind=dp_real),  dimension(3,3), intent(in) :: r
-        complex(c_double_complex), intent(in) :: delm
+        complex(kind=dp_complex), intent(in) :: delm
         real(kind=dp_real),  dimension(3), intent(in) :: grain_a
-        complex(c_double_complex) :: shadow_ellipsoid
+        complex(kind=dp_complex) :: shadow_ellipsoid
 
         shadow_ellipsoid = 1.0-exp( (0.0,1.0)*phi_ellipsoid(x,y,k,r,delm,grain_a) )
         

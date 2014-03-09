@@ -214,55 +214,55 @@ contains
 
 
 
-    function experimental_fft(f,kmin,kmax,enhancement)
+
+    function fft_faster(f,kmin,kmax,enhancement)
         
         integer, intent(in) :: kmin, kmax, enhancement
         
-        complex(c_double_complex), intent(inout) :: f(:,:)
-        complex(c_double_complex), allocatable :: experimental_fft(:,:)
-        complex(c_double_complex), allocatable :: working_fft(:,:)
-        complex(c_double_complex), dimension(size(f(:,1)), size(f(1,:))) :: new_grid
-        integer :: i,j,a,b,norig
+        complex(kind=dp_complex), intent(inout) :: f(:,:)
+        complex(kind=dp_complex), allocatable :: fft_faster(:,:)
+        complex(kind=dp_complex), allocatable :: working_fft(:,:)
+        complex(kind=dp_complex), dimension(size(f(:,1)), size(f(1,:))) :: new_grid
+        integer :: i,j,a,b,norig, fsize, fftsize, ix, iy
         real(kind=dp_real) :: deltax, deltay
 
         f = kspace_shift(f,real(kmin,kind=dp_real),real(kmin,kind=dp_real)) ! shift the input function so that the k-space origin is at (kmin,kmin)
         norig = kmax - kmin 
-
-        !write (0,*) "norig=",norig,"kmin=",kmin,"kmax=",kmax,"enhancement=",enhancement
-
+        fsize = size(f(:,1))
+        fftsize = norig*enhancement + 1
+        
+        if (fsize < norig) then
+            write(0,*) "ERROR"
+            write(0,*) "Your chosen value for ngrain is too low to obtain &
+                    &high resolution features within the scattering region &
+                    &that you've specified. &
+                    &Choose an ngrain value of at least",norig
+            stop
+        end if 
         ! allocate memory
-        allocate(working_fft(norig,norig))
-        allocate(experimental_fft(norig*enhancement+1, norig*enhancement+1))
+        allocate( working_fft(  norig   ,   norig   ))
+        allocate( fft_faster(   fftsize ,   fftsize ))
         
 
         do i=1,enhancement+1
             deltax = real(i-1)/real(enhancement)
-         
             do j=1,enhancement+1
                 deltay = real(j-1)/real(enhancement)
-    
                 new_grid = kspace_shift(f,deltax,deltay)
                 working_fft = fft_firstk(new_grid,norig)
-                !do a=1,norig
-                !    do b=1,norig
-                !        if (abs(working_fft(a,b)) > HUGE_NUMBER) then
-                !            write(0,*) "IN FFT -- working_fft = ",working_fft(a,b)
-                !        end if 
-                !    end do
-                !end do 
                 do a=1,norig
                     do b=1,norig
-                        if ((i + (a-1)*enhancement <= size(experimental_fft(:,1))) .and. &
-                            & (j + (b-1)*enhancement <= size(experimental_fft(1,:)))) then
-                            experimental_fft(i + (a-1)*enhancement,j + (b-1)*enhancement) = working_fft(a,b)
+                        ix = i + (a-1)*enhancement
+                        iy = j + (b-1)*enhancement
+                        if ((ix <= fftsize) .and. (iy <= fftsize)) then
+                            fft_faster(ix, iy) = working_fft(a,b)
                         end if 
                     end do
                 end do 
-
             end do
         end do 
+          
         f = kspace_shift(f,real(-kmin,kind=dp_real),real(-kmin,kind=dp_real)) ! shift the input function back.
-        
-    end function experimental_fft
+    end function fft_faster
 
 end module fftw

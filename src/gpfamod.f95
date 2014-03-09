@@ -1,6 +1,6 @@
 module gpfa
-	use, intrinsic :: iso_c_binding
-    use, intrinsic :: iso_fortran_env
+	!use, intrinsic :: iso_c_binding
+    !use, intrinsic :: iso_fortran_env
 
     use gpfa_raw
     use common_mod
@@ -10,23 +10,20 @@ module gpfa
 contains
 
     function fft(f)
-        complex(c_double_complex), intent(in) :: f(:,:)
-        complex(c_double_complex), dimension(size(f(:,1)),size(f(1,:))) :: fft
-        integer :: i, j, Nx, Ny, JUMP, LOT, INC
+        complex(kind=dp_complex), intent(in)                            :: f(:,:)
+        complex(kind=dp_complex), dimension(size(f(:,1)),size(f(1,:)))  :: fft
+        integer                                                         :: i, j, Nx, Ny, JUMP, LOT, INC
         !parameter (ntrig = 16384)
-        integer :: npoints
-        real, dimension(2*size(f(:,1))) :: trigs_x
-        real, dimension(2*size(f(1,:))) :: trigs_y
-        real :: f_gpfa(2*size(f(:,1))*size(f(1,:)))
+        integer                                                         :: npoints
+        real, dimension(2*size(f(:,1)))                                 :: trigs_x
+        real, dimension(2*size(f(1,:)))                                 :: trigs_y
+        real                                                            :: f_gpfa(2*size(f(:,1))*size(f(1,:)))
       
         Nx = size(f(:,1))
         Ny = size(f(1,:))
 
-
         call SETGPFA(trigs_x, Nx)
         call SETGPFA(trigs_y, Ny)
-
-        !stop
 
         do i=1,Nx
         	do j=1,Ny
@@ -35,15 +32,13 @@ contains
         	end do 
         end do
 
-        !write(0,*) "GPFA: About to do rows"
         ! Do rows
         INC=2
         JUMP=2*Nx
         LOT=Ny
 
         call GPFA_FFT(f_gpfa(1),f_gpfa(2),trigs_y,INC,JUMP,Ny,LOT,ISIGN)
-        
-        !write(0,*) "GPFA: About to do columns"
+ 
         ! Do columns
         INC=2*Nx
         JUMP=2
@@ -51,18 +46,14 @@ contains
 
         call GPFA_FFT(f_gpfa(1),f_gpfa(2),trigs_x,INC,JUMP,Nx,LOT,ISIGN)
 
-        !write(0,*) "GPFA: About to output the data"
         ! write results to output vector.
         
         !npoints = 0
         do i=1,Nx
         	do j=1,Ny
         		fft(i,j) = CMPLX(f_gpfa(1+2*((i-1)+(j-1)*Ny)),f_gpfa(2+2*((i-1)+(j-1)*Ny)))
-                !if (abs(fft(i,j)) > 0) npoints = 1 + npoints
         	end do
         end do
-
-        !write(0,*) "All done here. (npoints = ",npoints," of ",Nx*Ny,")"
 
     end function fft 
     function fft_firstk(f,K)
@@ -80,17 +71,17 @@ contains
         !       FFT(orig)(k) = sum_i(FFTi(k))*twid_factor(k)
         ! 
 
-        integer, intent(in) :: K
-        integer :: lentwids, keff, allocation_status
-        complex(c_double_complex), intent(inout) :: f(:,:)
-        complex(c_double_complex), dimension(K,K) :: fft_firstk 
-        complex(c_double_complex), allocatable :: small_fft(:,:), twids(:,:), fft_firstk_working(:,:)
+        integer, intent(in)                                 :: K
+        integer                                             :: lentwids, keff, allocation_status
+        complex(kind=dp_complex), intent(inout)             :: f(:,:)
+        complex(kind=dp_complex), dimension(K,K)            :: fft_firstk 
+        complex(kind=dp_complex), allocatable               :: small_fft(:,:), twids(:,:), fft_firstk_working(:,:)
 
-        integer  :: N, NFFT, i,j,l,m 
+        integer                                             :: N, NFFT, i,j,l,m 
 
-        keff = k
-        N = size(f(:,1))
-        NFFT = N/Keff
+        keff    = k
+        N       = size(f(:,1))
+        NFFT    = N/Keff
 
         ! Make sure N is divisible by K.
         !    if not, we take the first K+n values of the FFT 
@@ -109,17 +100,17 @@ contains
 
         allocate(twids(lentwids, lentwids), stat = allocation_status)
         if (allocation_status/=0) then
-            write (0,*) " **ERROR! Cannot allocate twids array (fftwmod)"
+            write (0,*) "ERROR: Cannot allocate twids array (fftwmod)"
             stop
         end if 
         allocate(small_fft(keff, keff), stat = allocation_status)
         if (allocation_status/=0) then
-            write (0,*) " **ERROR! Cannot allocate small_fft array (fftwmod)"
+            write (0,*) "ERROR: Cannot allocate small_fft array (fftwmod)"
             stop
         end if 
         allocate(fft_firstk_working(keff, keff), stat = allocation_status)
         if (allocation_status/=0) then
-            write (0,*) " **ERROR! Cannot allocate fft_firstk_working array (fftwmod)"
+            write (0,*) "ERROR: Cannot allocate fft_firstk_working array (fftwmod)"
             stop
         end if 
 
@@ -176,8 +167,8 @@ contains
 
     function kspace_shift(f,shiftx,shifty)
         real(kind=dp_real),  intent(in) :: shiftx,shifty
-        complex(c_double_complex), intent(in) :: f(:,:)
-        complex(c_double_complex), dimension(size(f(:,1)),size(f(1,:))) :: kspace_shift
+        complex(kind=dp_complex), intent(in) :: f(:,:)
+        complex(kind=dp_complex), dimension(size(f(:,1)),size(f(1,:))) :: kspace_shift
         integer :: i, j, n
 
         n = size(f(:,1))
@@ -191,8 +182,8 @@ contains
 
 
     function fft_center(f)
-        complex(c_double_complex), intent(in) :: f(:,:)
-        complex(c_double_complex), dimension(size(f(:,1)),size(f(1,:))) :: fft_center
+        complex(kind=dp_complex), intent(in) :: f(:,:)
+        complex(kind=dp_complex), dimension(size(f(:,1)),size(f(1,:))) :: fft_center
         integer :: i, j, n
 
         n = size(f(:,1))
@@ -204,55 +195,53 @@ contains
     end function fft_center
 
 
-
-    function experimental_fft(f,kmin,kmax,enhancement)
+    function fft_faster(f,kmin,kmax,enhancement)
         
         integer, intent(in) :: kmin, kmax, enhancement
         
-        complex(c_double_complex), intent(inout) :: f(:,:)
-        complex(c_double_complex), allocatable :: experimental_fft(:,:)
-        complex(c_double_complex), allocatable :: working_fft(:,:)
-        complex(c_double_complex), dimension(size(f(:,1)), size(f(1,:))) :: new_grid
-        integer :: i,j,a,b,norig
+        complex(kind=dp_complex), intent(inout) :: f(:,:)
+        complex(kind=dp_complex), allocatable :: fft_faster(:,:)
+        complex(kind=dp_complex), allocatable :: working_fft(:,:)
+        complex(kind=dp_complex), dimension(size(f(:,1)), size(f(1,:))) :: new_grid
+        integer :: i,j,a,b,norig, fsize, fftsize, ix, iy
         real(kind=dp_real) :: deltax, deltay
 
         f = kspace_shift(f,real(kmin,kind=dp_real),real(kmin,kind=dp_real)) ! shift the input function so that the k-space origin is at (kmin,kmin)
         norig = kmax - kmin 
-
-        !write (0,*) "norig=",norig,"kmin=",kmin,"kmax=",kmax,"enhancement=",enhancement
-
+        fsize = size(f(:,1))
+        fftsize = norig*enhancement + 1
+        
+        if (fsize < norig) then
+            write(0,*) "ERROR"
+            write(0,*) "Your chosen value for ngrain is too low to obtain &
+                    &high resolution features within the scattering region &
+                    &that you've specified. &
+                    &Choose an ngrain value of at least",norig
+            stop
+        end if 
         ! allocate memory
-        allocate(working_fft(norig,norig))
-        allocate(experimental_fft(norig*enhancement+1, norig*enhancement+1))
+        allocate( working_fft(  norig   ,   norig   ))
+        allocate( fft_faster(   fftsize ,   fftsize ))
         
 
         do i=1,enhancement+1
             deltax = real(i-1)/real(enhancement)
-         
             do j=1,enhancement+1
                 deltay = real(j-1)/real(enhancement)
-    
                 new_grid = kspace_shift(f,deltax,deltay)
                 working_fft = fft_firstk(new_grid,norig)
-                !do a=1,norig
-                !    do b=1,norig
-                !        if (abs(working_fft(a,b)) > HUGE_NUMBER) then
-                !            write(0,*) "IN FFT -- working_fft = ",working_fft(a,b)
-                !        end if 
-                !    end do
-                !end do 
                 do a=1,norig
                     do b=1,norig
-                        if ((i + (a-1)*enhancement <= size(experimental_fft(:,1))) .and. &
-                            & (j + (b-1)*enhancement <= size(experimental_fft(1,:)))) then
-                            experimental_fft(i + (a-1)*enhancement,j + (b-1)*enhancement) = working_fft(a,b)
+                        ix = i + (a-1)*enhancement
+                        iy = j + (b-1)*enhancement
+                        if ((ix <= fftsize) .and. (iy <= fftsize)) then
+                            fft_faster(ix, iy) = working_fft(a,b)
                         end if 
                     end do
                 end do 
-
             end do
         end do 
+          
         f = kspace_shift(f,real(-kmin,kind=dp_real),real(-kmin,kind=dp_real)) ! shift the input function back.
-        
-    end function experimental_fft
+    end function fft_faster
 end module gpfa

@@ -1,6 +1,6 @@
 program ggadt
-    use, intrinsic :: iso_c_binding
-    use, intrinsic :: iso_fortran_env
+    !use, intrinsic :: iso_c_binding
+    !use, intrinsic :: iso_fortran_env
     
 
     use sphere
@@ -9,19 +9,19 @@ program ggadt
     use common_mod
     use constants
 
-    @USE_OMP_LIB@
-    @USE_FFTW@
-    @USE_GPFA@
+    
+    
+    use gpfa
 
     implicit none
 
     real(kind=dp_real), allocatable :: x(:), y(:), kx(:), ky(:), thetax(:), thetay(:)
 
-    complex(c_double_complex), allocatable :: sh(:,:), ftsh(:,:)
+    complex(kind=dp_complex), allocatable :: sh(:,:), ftsh(:,:)
 
     real(kind=dp_real), allocatable :: scatter(:,:)
 
-    real(kind=dp_real) :: xmin, xmax, ymin, ymax, dx, dy, k, l, dk!, extra, min_sh, max_sh, min_ftsh, max_ftsh
+    real(kind=dp_real) :: xmin, xmax, ymin, ymax, dx, dy, k, l, dk
     real(kind=dp_real), dimension(3) :: eul_ang
     real(kind=dp_real), dimension(3,3) :: rm 
     integer :: i, j, neul, allocatestatus, deallocatestatus, norientations_new, kactual, kmin, kmax, enhancement
@@ -29,11 +29,10 @@ program ggadt
 
     call set_parameter_values()
     call initialize_and_allocate_vars()
-    @FFTW3_UNCOMMENT@call set_optimization_mode(fftw_optimization_mode_name)
+    !call set_optimization_mode(fftw_optimization_mode_name)
     if ( verbose_mode ) call print_parameters()
  
-    !extra =  2*(dlog10(k) + dlog10(dx) + dlog10(dy) - dlog10(twopi)) - dlog10(real(norientations,kind=dp_real))
-    !write(0,*) k,dx,dy,twopi,real(norientations,kind=dp_real),extra
+
     ! loop over orientations
     do neul = 1,norientations
 
@@ -65,37 +64,14 @@ program ggadt
             !$omp do schedule(dynamic) private(i,j)
         elseif (geometry .eq. 'spheres')    then
             sh = shadow_spheres(x,y,k,rm)
-
-            !min_sh = aimag(sh(1,1))
-            !max_sh = aimag(sh(1,1))
-            !do i=1,size(x)
-            !    do j=1,size(y)
-            !        if (aimag(sh(i,j)) < min_sh) min_sh = aimag(sh(i,j))
-            !        if (aimag(sh(i,j)) > max_sh) max_sh = aimag(sh(i,j))
-            !    end do
-            !end do
-
         else
             write(0,*) "***ERROR*** Cannot understand geometry", geometry
         end if 
-        !sh = fft_center(sh)
-        ftsh = experimental_fft(sh,kmin,kmax,enhancement)
-        !min_ftsh = abs(ftsh(1,1))
-        !max_ftsh = abs(ftsh(1,1))
-        !do i=1,size(kx)
-        !    do j=1,size(ky)
-        !        if (abs(ftsh(i,j)) < min_ftsh) min_ftsh = abs(ftsh(i,j))
-        !        if (abs(ftsh(i,j)) > max_ftsh) max_ftsh = abs(ftsh(i,j))
-        !    end do
-        !end do
+       
+        ftsh = fft_faster(sh,kmin,kmax,enhancement)
+
         !$omp parallel shared(scatter,ftsh,k,dx,dy) 
         !$omp do schedule(dynamic) private(i,j)
-        !write(0,*) "FTSH: ",real(ftsh(1,1)),aimag(ftsh(1,1)),abs(ftsh(1,1))
-        !write(0,*) "-----------------------"
-        !write(0,*) "eul angles",eul_ang
-        !write(0,*) "min_sh, max_sh = ",min_sh, max_sh
-        !write(0,*) "min_ftsh, max_ftsh = ",min_ftsh, max_ftsh
-        !write(0,*) "-----------------------"
         do i=1,size(kx)
             do j=1,size(ky)
                 scatter(i,j) = scatter(i,j) + ((k*dx*dy*abs(ftsh(i,j))/twopi)**2)/real(norientations,kind=dp_real)
@@ -138,8 +114,8 @@ contains
         if (euler_angle_mode == 'sequential') then
             norientations_new = int(real(norientations)**(1.0/3.0))**3
             if (norientations /= norientations_new) then
-                write (error_unit,*) ""
-                write (error_unit,*) "   + norientations: ",norientations,"-->",norientations_new
+                write (0,*) ""
+                write (0,*) "   + norientations: ",norientations,"-->",norientations_new
                 norientations = norientations_new
             endif
         else if (euler_angle_mode == 'random') then
@@ -174,7 +150,7 @@ contains
               close(10) 
             end if 
         else 
-            write(error_unit,*) " ***error: do not understand euler_angle_mode=",euler_angle_mode
+            write(0,*) " ERROR: do not understand euler_angle_mode=",euler_angle_mode
             stop
         end if 
 
@@ -215,15 +191,10 @@ contains
         max_angle = max_angle/arcseconds_per_radian ! convert max_angle from arcseconds to radians
         k = (2*pi/1.239842)*1000*ephot
         
-        ngrid = ngrain ! Start with no padding (experimental fft doesn't need it)
+        ngrid = ngrain ! Start with no padding 
 
-       !write (0,*) "MAX_ANGLE",max_angle*arcseconds_per_radian
-       !write (0,*) "NSCATTER",nscatter
-       !write (0,*) "GRID_WIDTH",grid_width
-       !write (0,*) "NGRID",ngrid
-
-    ! Add padding  (if we're not using the experimental fft)
-        if (.not. use_experimental_fft) then  
+        ! Add padding if use_padded_fft is asked for.
+        if (use_padded_fft) then  
             ds = grid_width*a_eff/real(ngrain - 1)
             next = 0
             ng = ngrid
@@ -245,10 +216,6 @@ contains
                     nscatter," is already exceeded by a non-padded grid. Changing nscatter to",n
             end if 
 
-            !write(0,*) "GRID_WIDTH set to ",grid_width
-            !write(0,*) "NGRID set to ",ngrid
-            !write(0,*) "NSCATTER set to ",n
-
             nscatter = n 
         end if 
     ! ---------------------------------------------------
@@ -257,18 +224,15 @@ contains
 
         ! x , y
         allocate(x(ngrid),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "*** not enough memory (x) ***"
+            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (x) array ***"
         allocate(y(ngrid),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "*** not enough memory (y) ***"
+            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (y) array ***"
         ! sh
         allocate(sh(ngrid,ngrid),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "*** not enough memory (sh) ***"
+            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (sh) array ***"
         
     ! ----------------------------------------------------
-        !write(0,*) "SIZE_X" ,size(x)
-        !write(0,*) "NGRID" ,ngrid
-        !write(0,*) "NGRAIN" ,ngrain
-
+      
     ! set grid boundaries and spacing in physical coords
         xmin = -grid_width*a_eff/2.0
         ymin = -grid_width*a_eff/2.0
@@ -304,22 +268,22 @@ contains
 
         ! kx
         allocate(kx(kactual),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "*** not enough memory (kx) ***"
+            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (kx) array ***"
         ! ky
         allocate(ky(kactual),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "*** not enough memory (ky) ***"
+            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ky) array ***"
         ! thetax
         allocate(thetax(kactual),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "*** not enough memory (thetax) ***"
+            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (thetax) array ***"
         ! thetay
         allocate(thetay(kactual),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "*** not enough memory (thetay) ***"
+            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (thetay) array ***"
         ! ftsh
         allocate(ftsh(kactual,kactual),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "*** not enough memory (thetay) ***"
+            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (thetay) array ***"
         ! scatter
         allocate(scatter(kactual,kactual),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "*** not enough memory (scatter) ***"
+            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (scatter) array ***"
     ! ----------------------------------
 
         dk = real(kmax-kmin)/real(size(kx) - 1)
@@ -339,20 +303,13 @@ contains
     ! -----------------------------------
 
 
-        !write (0, *) "L set to : ", l, L 
-
     end subroutine initialize_and_allocate_vars
     subroutine get_fft_vals(thetamin,thetamax,Kask,kmin,kmax,enhancement,Kout)
         real(kind=dp_real), intent(in) :: thetamin, thetamax
         integer, intent(in) :: Kask
         integer, intent(out) :: kmin,kmax,enhancement, Kout
 
-
-        !write (0,*) "thetamin, thetamax, Kask",thetamin,thetamax, Kask  
-
         enhancement = 1
-
-        !write(0,*) "K,l = ",k,l
 
         kmin = int(floor(k*sin(thetamin)*(L/TWOPI)))
         kmax = int(ceiling(k*sin(thetamax)*(L/TWOPI)))
@@ -364,8 +321,6 @@ contains
         end do 
 
         Kout = enhancement*Kout + 1
-
-        !write(0,*) "kmin,kmax,kout,enhancement",kmin,kmax,kout,enhancement
 
     end subroutine get_fft_vals
 
@@ -467,8 +422,6 @@ contains
         deallocate(ftsh,stat=deallocatestatus)
         deallocate(scatter,stat=deallocatestatus)
         
-
-
         if (geometry .eq. 'spheres')    then
             deallocate(pos)
             deallocate(pos_rot)
@@ -481,28 +434,28 @@ contains
 
     
     subroutine print_parameters()
-        write(0,*) "Parameter values:"
-        write(0,*) "-----------------------------------"
-        write(0,*) "delm:",delm
-        write(0,*) "ephot:",ephot
-        write(0,*) "geometry:", geometry
-        write(0,*) "euler_angle_mode:",euler_angle_mode
-        if (euler_angle_mode == "file") write(0,*) "euler_angle_file:", euler_angle_file
+        do i=0,1
+            write(i,*) "# Parameter values:"
+            write(i,*) "# -----------------------------------"
+            write(i,*) "# delm:",delm
+            write(i,*) "# ephot:",ephot
+            write(i,*) "# geometry:", geometry
+            write(i,*) "# euler_angle_mode:",euler_angle_mode
+            if (euler_angle_mode == "file") write(i,*) "# euler_angle_file:", euler_angle_file
 
-        write(0,*) "ngrain:",ngrain
-        write(0,*) "norientations:",norientations
-        write(0,*) "nscatter:",nscatter
-        write(0,*) "ior_re:",ior_re
-        write(0,*) "ior_im",ior_im
-        write(0,*) "grain_axes:",grain_a
-        write(0,*) "use_experimental_fft:",use_experimental_fft
-        if (verbose_mode) write(0,*) "(verbose mode)"
-        if (timing_mode) write(0,*) "(timing mode)"
+            write(i,*) "# ngrain:",ngrain
+            write(i,*) "# norientations:",norientations
+            write(i,*) "# nscatter:",nscatter
+            write(i,*) "# ior_re:",ior_re
+            write(i,*) "# ior_im",ior_im
+            write(i,*) "# grain_axes:",grain_a
+            write(i,*) "# use_padded_fft:",use_padded_fft
 
-        write(0,*) "parameter_file_name:",parameter_file_name
-        write(0,*) "fftw_optimization_mode_name:",fftw_optimization_mode_name
-        if (geometry == "spheres") write(0,*) "cluster_file_name:",cluster_file_name
-        write(0,*) "-----------------------------------"
+            write(i,*) "# parameter_file_name:",parameter_file_name
+            write(i,*) "# fftw_optimization_mode_name:",fftw_optimization_mode_name
+            if (geometry == "spheres") write(0,*) "# cluster_file_name:",cluster_file_name
+            write(i,*) "# -----------------------------------"
+        end do
 
     end subroutine print_parameters
 

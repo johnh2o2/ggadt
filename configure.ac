@@ -1,7 +1,7 @@
 AC_INIT([ggadt], [0.9.7], [jah5@princeton.edu])
 AC_PREREQ([2.63]) 
 #AC_CONFIG_MACRO_DIRS([m4])
-AC_CONFIG_SRCDIR([src/sphere.f03])
+AC_CONFIG_SRCDIR([src/sphere.f95])
 
 AC_CANONICAL_HOST
 # Check for which host we are on and setup a few things
@@ -303,10 +303,11 @@ AC_PROG_INSTALL
 AC_CONFIG_FILES([ 	Makefile 
 					src/Makefile 
 					doc/Makefile 
-					src/fftwmod.f03 
-          src/spheres.f03
-          src/ggadt.f03
-					src/common.f03
+					src/fftwmod.f95 
+          src/spheres.f95
+          src/ggadt.f95
+					src/common.f95
+          src/constants.f95
 
           
 

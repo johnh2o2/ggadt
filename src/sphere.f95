@@ -1,6 +1,6 @@
 module sphere
 
-    use, intrinsic :: iso_c_binding
+    !use, intrinsic :: iso_c_binding
     use constants
 
     contains
@@ -22,9 +22,9 @@ module sphere
     function phi_sphere(x,y,k,gr_a,delta_m)
         implicit none
         real(kind=dp_real), intent(in) :: x,y,k,gr_a
-        complex(c_double_complex), intent(in) :: delta_m
+        complex(kind=dp_complex), intent(in) :: delta_m
         real(kind=dp_real) :: r, l
-        complex(c_double_complex) :: phi_sphere
+        complex(kind=dp_complex) :: phi_sphere
         !gr_a = sqrt(sum(grain_a*grain_a))
         r = sqrt(x*x + y*y)
         l = sqrt(gr_a*gr_a - r*r)
@@ -38,8 +38,8 @@ module sphere
     function shadow_sphere(x,y,k,gr_a,delta_m)
         implicit none
         real(kind=dp_real), intent(in) :: x,y,k,gr_a
-        complex(c_double_complex), intent(in) :: delta_m
-        complex(c_double_complex) :: shadow_sphere
+        complex(kind=dp_complex), intent(in) :: delta_m
+        complex(kind=dp_complex) :: shadow_sphere
         shadow_sphere = 1-exp( (0.0,1.0)*phi_sphere(x,y,k,gr_a,delta_m) )
         
     end function shadow_sphere

@@ -1,3 +1,9 @@
+* commit 5bd19422edc9cde6fee7401370591436acb2eddd
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Thu Mar 6 14:42:36 2014 -0500
+| 
+|     GPFA now compatible with experimental fft. Edited documentation to reflect new command line arguments. Documentation still needs extensive revision and additional information. Sample scripts need to be consistent with what's in the current directory.
+|  
 * commit dec9746fa1deec5bd865b683648541f69480807a
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Thu Mar 6 14:15:34 2014 -0500
