@@ -23,10 +23,12 @@ rm -f src/*o
 rm -f src/*mod
 rm -f src/Makefile.in
 rm -f src/Makefile
-rm -f src/fftwmod-serial.f03
-rm -f src/ggadt.f03
-rm -f src/spheres.f03
-rm -f src/common.f03
+
+rm -f src/ggadt.f95
+rm -f src/spheres.f95
+rm -f src/common.f95
+rm -f src/constants.f95
+rm -f src/fftwmod.f95
 
 rm -f scripts/*pyc
 rm -f scripts/installation_vars.py
