@@ -11,7 +11,7 @@ automake -a
 
 std="f2003"
 
-bash configure --enable-fftw3 #FCFLAGS="-O2 -fimplicit-none -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=${std} -pedantic -fbacktrace" || exit
+bash configure --enable-openmp #FCFLAGS="-O2 -fimplicit-none -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=${std} -pedantic -fbacktrace" || exit
 #make || exit
 #cp doc/*png doc/ggadt.html
 #make html || exit
@@ -22,7 +22,6 @@ bash configure --enable-fftw3 #FCFLAGS="-O2 -fimplicit-none -Wall -Wline-truncat
 make 
 make html
 cp doc/*png doc/ggadt.html
-exit
 
 cluster_dir="$HOME/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/data/clusters/"
 

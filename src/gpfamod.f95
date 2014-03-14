@@ -3,7 +3,6 @@ module gpfa
     !use, intrinsic :: iso_fortran_env
 
     use gpfa_raw
-    use common_mod
     use constants
 
 

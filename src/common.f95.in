@@ -366,8 +366,8 @@ module common_mod
     end function fft_faster
 
     function fft_center(f)
-        complex(c_double_complex), intent(in) :: f(:,:)
-        complex(c_double_complex), dimension(size(f(:,1)),size(f(1,:))) :: fft_center
+        complex(kind=dp_complex), intent(in) :: f(:,:)
+        complex(kind=dp_complex), dimension(size(f(:,1)),size(f(1,:))) :: fft_center
         integer :: i, j, n
 
         n = size(f(:,1))
@@ -380,8 +380,8 @@ module common_mod
 
     function kspace_shift(f,shiftx,shifty)
         real(kind=dp_real),  intent(in) :: shiftx,shifty
-        complex(c_double_complex), intent(in) :: f(:,:)
-        complex(c_double_complex), dimension(size(f(:,1)),size(f(1,:))) :: kspace_shift
+        complex(kind=dp_complex), intent(in) :: f(:,:)
+        complex(kind=dp_complex), dimension(size(f(:,1)),size(f(1,:))) :: kspace_shift
         integer :: i, j, n
 
         n = size(f(:,1))
