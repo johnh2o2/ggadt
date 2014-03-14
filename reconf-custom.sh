@@ -27,12 +27,12 @@ cluster_dir="$HOME/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/data/clusters/"
 
 rm -f test_changes_exp.dat
 rm -f test_changes_reg.dat
-args="--ngrain=32" 
+args="--ngrain=128" 
 args="${args} --nscatter=128" 
 args="${args} --max-angle=3000."
 args="${args} --norientations=100"
-args="${args} --grain-geometry=sphere"
-#args="${args} --cluster-file-name=${cluster_dir}/BAM1.256.1.targ"
+args="${args} --grain-geometry=spheres"
+args="${args} --cluster-file-name=${cluster_dir}/BAM1.256.1.targ"
 args="${args} --ephot=2.0"
 args="${args} --aeff=0.2"
 args="${args} --ior-re=-1.0E-4"
@@ -44,7 +44,7 @@ time src/ggadt $args > test_changes_exp.dat || exit
 #time src/ggadt $args > test_changes_reg.dat || exit
 
 
-python scripts/plot.py test_changes_exp.dat
+#python scripts/plot.py test_changes_exp.dat
 #python scripts/plot.py test_changes_reg.dat
 #time src/ggadt --use-experimental-fft --ngrid=512 --grid-width=2.0 > test_output_expfft.dat
 #time src/ggadt --ngrid=2048 --grid-width=8.0 > test_output_expfft_reg.dat

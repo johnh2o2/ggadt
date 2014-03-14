@@ -1,3 +1,9 @@
+* commit 10a6c1d742953493408f3a28cef61993e5a28b2d
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Fri Mar 14 01:57:27 2014 -0400
+| 
+|     Fixed compile-time bugs in gpfamod/common stemming from 'use common' in gpfa (which then uses gpfa), and using c_double_complex where kind=dp_complex should have been used.
+|  
 * commit 0f9053075c12d87fb8e709de9ab842e349025092
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Fri Mar 14 01:38:22 2014 -0400

@@ -61,7 +61,7 @@ medium by using anomalous diffraction theory (ADT).
 * Invoking GGADT::	Giving @command{ggadt} your input.	
 * Example usage::	Quick examples to get you started.
 * Testing against previous results::  Comparing GGADT to literature
-* FFT comparison::		Comparison between GGADT and FFTW3 timing.
+* FFT comparison::		Comparison between GPFA and FFTW3 timing.
 * GNU Free Documentation License:: Copying and sharing this documentation.
 * Concept index::	Index of concepts.
 @end menu
@@ -105,7 +105,7 @@ and popular suite for performing FFT's.
 
 @subsection Dust in the interstellar medium (ISM)
 
-The interstellar medium (ISM) refers to everything that occupies the space between stars in our Milky Way galaxy. The ISM contains rich physics and is an active area of astrophysical research. Dust, molecules, gas, radiation, cosmic rays -- all of these are important constituents of the ISM, and all of these constituents play roles of varying dyanmical importance, depending on the local ISM environment in question. Several resources are available for delving deeper into the fascinating world of the ISM@footnote{Draine, Bruce T., Physics of the Interstellar and Intergalactic Medium, 2011, Princeton University Press, NJ.}.
+The interstellar medium (ISM) refers to everything that occupies the space between stars in a galaxy. The ISM of the Milky Way contains rich physics and is an active area of astrophysical research. Dust, molecules, gas, radiation, cosmic rays -- all of these are important constituents of the ISM, and all of these constituents play roles of varying dyanmical importance, depending on the local ISM environment in question.@footnote{Draine, Bruce T., Physics of the Interstellar and Intergalactic Medium, 2011, Princeton University Press, NJ.}.
 
 One area of active research in ISM physics is determining the size distribution and composition of interstellar dust. One way to probe the size distributions and dust composition is by measuring how ISM dust interacts with x-ray radiation.@footnote{Overbeck, J.W. 1965, ApJ, 141, 864}@footnote{Hayakawa, S. 1970, Prog. Theor. Phys., 43, 1224}@footnote{Martin, P.G. 1970, MNRAS, 149, 221} When looking at an x-ray source through interstellar dust, the scattering properties of the intermediate dust create an x-ray ``halo'' around the source.@footnote{Draine, B.T. 2003, ApJ, 598, 1026}.
 
@@ -186,10 +186,6 @@ make install
 @itemize @bullet
 
 @item @strong{Suitable C and Fortran compilers}: GGADT was developed using the GNU compiler suite (version 4.5.4 and higher) throughout, but the @code{configure} script will try to work with most common compilers. Your Fortran compiler must be able to compile Fortran 2003 code.
-
-
-
-
 
 @item @strong{FFTW 3}. Available at @url{http://www.fftw.org/}.
 @itemize @minus

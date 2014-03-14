@@ -285,6 +285,7 @@ then
   		[ AC_MSG_RESULT(no) ; AC_MSG_ERROR([Cannot seem to use openmp in fortran! Check config.log for more details.])]
   	)
 	FCFLAGS=$FCFLAGSOLD
+  FCFLAGS="${FCFLAGS} $OPENMP_FCFLAGS"
   	
 fi
 AC_LANG([Fortran])
