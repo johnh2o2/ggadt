@@ -11,16 +11,18 @@ automake -a
 
 std="f2003"
 
-bash configure #FCFLAGS="-O2 -fimplicit-none -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=${std} -pedantic -fbacktrace" || exit
+bash configure --enable-fftw3 #FCFLAGS="-O2 -fimplicit-none -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=${std} -pedantic -fbacktrace" || exit
 #make || exit
 #cp doc/*png doc/ggadt.html
 #make html || exit
 #src/ggadt > test_output_fftw3.dat || exit
 #python scripts/plot.py test_output_fftw3.dat || exit
 
-
 #bash configure --enable-fftw3 
-make || exit
+make 
+make html
+cp doc/*png doc/ggadt.html
+exit
 
 cluster_dir="$HOME/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/data/clusters/"
 
@@ -47,7 +49,6 @@ python scripts/plot.py test_changes_exp.dat
 #python scripts/plot.py test_changes_reg.dat
 #time src/ggadt --use-experimental-fft --ngrid=512 --grid-width=2.0 > test_output_expfft.dat
 #time src/ggadt --ngrid=2048 --grid-width=8.0 > test_output_expfft_reg.dat
-#cp doc/*png doc/ggadt.html
 #make html || exit
 #python scripts/make_sample_plots.py
 #python scripts/HD09.py

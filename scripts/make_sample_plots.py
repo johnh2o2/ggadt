@@ -15,13 +15,16 @@ def make_clargs(params):
 	
 spheres_file = 'BAM2.256.1.targ'
 
-defaults = 		{	'grid-width' : 8,
+defaults = 		{
 					'aeff' : 0.2,
-					'ephot' : 1.0,
-					'ior-re': -2.079E-3,
-					'ior-im': 2.079E-3,
+					'ephot' : 2.0,
+					'ior-re': -1.920E-4,
+					'ior-im': 2.807E-5,
 					#'nangle' : 1,
-					'nangle' : 100,
+					'norientations' : 100,
+					'ngrain'	: 256,
+					'max-angle' : 3000.,
+					'nscatter' 	: 100,
 					'grain-axis-x' : 1.0,
 					'grain-axis-y' : 1.0,
 					'grain-axis-z' : 1.0,
@@ -38,22 +41,23 @@ tests = ["sphere", "spheres", "ellipsoid"]
 
 for test in tests:
 	print "Testing ",test 
-	ofile = data_dir+"/test-"+test+".output"
+	ofile = data_dir+"/"+test+"-test.output"
 	params = copy.deepcopy(defaults)
+	footnote='$a_{eff}=%.2f$ $\\mu$m\n\n$E_{\\gamma}=%.2f~$ keV\nRe[$m-1$]=%.3e\nIm[$m-1$]=%.3e'%(params['aeff'],params['ephot'],params['ior-re'],params['ior-im'])
+
 	if test == "sphere":
 		params['grain-geometry'] = 'sphere'
 		plot_title = 'Single sphere' 
-		footnote='$a=%.2f$,$E_{\\gamma}=%.2f$, $m=1+(%.3e)+(%.3e)i$'%(params['aeff'],params['ephot'],params['ior-re'],params['ior-im'])
 	elif test == "ellipsoid":
 		params['grain-geometry'] = 'ellipsoid'
 		params['grain-axis-y'] = (1./sqrt(2))
 		plot_title = 'Ellipsoid'
-		footnote='$a=%.2f$,$E_{\\gamma}=%.2f$, $m=1+(%.3e)+(%.3e)i$'%(params['aeff'],params['ephot'],params['ior-re'],params['ior-im'])
+		footnote += "\nSpheroid $(a,b,c) = (%.3f, %.3f, %.3f)$\nnorientations=%d"%(params['grain-axis-x'],params['grain-axis-y'],params['grain-axis-z'],params['norientations'])
 	elif test == "spheres":
 		params['grain-geometry'] = 'spheres'
 		plot_title = 'Spheres: '+spheres_file
-		footnote='$a=%.2f$,$E_{\\gamma}=%.2f$, $m=1+(%.3e)+(%.3e)i$'%(params['aeff'],params['ephot'],params['ior-re'],params['ior-im'])
-
+		footnote += "\nCluster file: %s\nnorientations=%d"%(spheres_file,params['norientations'])
+	footnote+="\nngrain=%d\nnscatter=%d"%(params['ngrain'],params['nscatter'])
 	clargs = make_clargs(params)
 	command = ggadt+clargs+" > "+ofile
 	#print command
@@ -68,7 +72,7 @@ for test in tests:
 	data = pu.convert_to_arcseconds(data)
 	data = pu.filter_data(data)
 	func = pu.make_data_function(data)
-
+	figname = parent_dir+"/doc/sample-"+test+".png"
 	f = plt.figure()
 	ax = f.add_subplot(111)
 	subbox = [0.05,0.65,0.3,0.3]
@@ -78,7 +82,8 @@ for test in tests:
 	ax_sub.set_xticklabels([])
 	ax_sub.set_yticklabels([])
 	ax.set_title(plot_title)
-
+	ax.text(0.4,0.25,footnote,fontsize=10,horizontalalignment='left',verticalalignment='center',transform=ax.transAxes)
+	f.savefig(figname)
 	plt.show()
 	print "  done."
 

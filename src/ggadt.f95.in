@@ -1,7 +1,6 @@
 program ggadt
     @FFTW3_UNCOMMENT@use, intrinsic :: iso_c_binding
     @FFTW3_UNCOMMENT@use, intrinsic :: iso_fortran_env
-    
 
     use sphere
     use spheres
@@ -10,8 +9,6 @@ program ggadt
     use constants
 
     @USE_OMP_LIB@
-    @USE_FFTW@
-    @USE_GPFA@
 
     implicit none
 
@@ -20,10 +17,12 @@ program ggadt
     complex(kind=dp_complex), allocatable :: sh(:,:), ftsh(:,:)
 
     real(kind=dp_real), allocatable :: scatter(:,:)
+    real(kind=dp_real), allocatable :: energies(:), ior_res(:), ior_ims(:) ! NEW variables (for doing sed of extinction)
 
     real(kind=dp_real) :: xmin, xmax, ymin, ymax, dx, dy, k, l, dk
     real(kind=dp_real), dimension(3) :: eul_ang
     real(kind=dp_real), dimension(3,3) :: rm 
+
     integer :: i, j, neul, allocatestatus, deallocatestatus, norientations_new, kactual, kmin, kmax, enhancement
 
 
@@ -31,7 +30,7 @@ program ggadt
     call initialize_and_allocate_vars()
     @FFTW3_UNCOMMENT@call set_optimization_mode(fftw_optimization_mode_name)
     if ( verbose_mode ) call print_parameters()
- 
+    !write(0,*) "Allocated and initialized all variables"
 
     ! loop over orientations
     do neul = 1,norientations
@@ -84,8 +83,6 @@ program ggadt
         write(0,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
                 & " percent complete: ", (real(neul)/real(norientations))*100.0, "%"
     end do
-  
- 
 
     if (timing_mode) stop 
 
@@ -97,6 +94,7 @@ program ggadt
         end do
     end do
     if (verbose_mode) write(0,*) "done."
+
 
     call cleanup()
 
@@ -110,7 +108,7 @@ contains
       character(len=100) :: junk
 
         
-
+      ! Set Euler angles -------------------------------
         if (euler_angle_mode == 'sequential') then
             norientations_new = int(real(norientations)**(1.0/3.0))**3
             if (norientations /= norientations_new) then
@@ -121,7 +119,7 @@ contains
         else if (euler_angle_mode == 'random') then
             call init_random_seed()
 
-        else if (euler_angle_mode == 'file') then 
+        else if (euler_angle_mode == 'file') then !check the contents of the euler angle file
             if (euler_angle_file == "") then
               write(0,*) "ERROR: euler_angle_mode of 'file', but specified file is empty"
               stop
@@ -153,6 +151,8 @@ contains
             write(0,*) " ERROR: do not understand euler_angle_mode=",euler_angle_mode
             stop
         end if 
+
+    ! ---------------------------------------------------
 
         if ((geometry == 'sphere') .or. (geometry == 'spheres')) then 
             if (geometry == 'spheres') then
@@ -257,12 +257,7 @@ contains
 
     ! figures out what kmin, kmax, enhancement and kactual are.
         call get_fft_vals(-max_angle,max_angle,nscatter,kmin,kmax,enhancement,kactual)   
-    !write(0,*) "DEBUG: GET_FFT_VALS"
-    !write(0,*) "max_angle = ",max_angle
-    !write(0,*) "kmin", kmin
-    !write(0,*) "kmax", kmax
-    !write(0,*) "enhancement", enhancement
-    !write(0,*) "kactual", kactual
+
       
     ! allocate arrays that depend on kactual
 
@@ -304,6 +299,9 @@ contains
 
 
     end subroutine initialize_and_allocate_vars
+
+! -- given thetamin and thetamax and desired resolution in scattering angle, 
+!    sets the relevant FFT parameters (kmin, kmax, enhancement, Kout)
     subroutine get_fft_vals(thetamin,thetamax,Kask,kmin,kmax,enhancement,Kout)
         real(kind=dp_real), intent(in) :: thetamin, thetamax
         integer, intent(in) :: Kask

@@ -18,7 +18,6 @@ from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 
 LOGPLOT = True
-max_angle = 10000
 
 nplot = 250 # dimension of plotted grid (interpolated)
 delta = 250 # distance above or below theta min/max for interpolation purposes
@@ -65,8 +64,7 @@ for i in range(0,len(z)):
 	if x[i] > th_max_data:
 		th_max_data = x[i]
 
-if th_max_data < max_angle: 
-	max_angle = th_max_data
+max_angle = th_max_data
 print "max_angle = ",max_angle
 
 # min/max scattering angles to deal with

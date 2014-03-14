@@ -60,6 +60,7 @@ medium by using anomalous diffraction theory (ADT).
 * Installation::	How to install @command{ggadt} on your system.
 * Invoking GGADT::	Giving @command{ggadt} your input.	
 * Example usage::	Quick examples to get you started.
+* Testing against previous results::  Comparing GGADT to literature
 * FFT comparison::		Comparison between GGADT and FFTW3 timing.
 * GNU Free Documentation License:: Copying and sharing this documentation.
 * Concept index::	Index of concepts.
@@ -83,28 +84,20 @@ cross-section in the plane perpendicular to the incident photons.
 @cindex Tarczon, Michael
 GGADT was written by John Hoffman and Michael Tarczon.
 
-@menu
-* Language::				Comment about the usage of Fortran 2003
-* Background::				What astrophysical problems GGADT may help investigate
-@end menu
 
-
-
-@node Language
 @section Language
 @cindex Fortran 2003
 
 GGADT is written in Fortran, using the Fortran 2003 standard. In the future, 
 GGADT may be changed to comply with earlier Fortran standards (90 or 95) for
-compatibility reasons. Most importantly, this will allow for easier implementation
-of an MPI version of GGADT. 
+compatibility reasons.
 
 Fortran 2003 provides an easy way to interface Fortran programs with C 
 libraries. In this case, Fortran 2003 made the FFTW3 library (@url{http://www.fftw.org/})
 easy to implement for performing fast Fourier transforms. FFTW3 is a well-tested, optimized, 
 and popular suite for performing FFT's.
 
-@node Background
+
 @section Background
 @cindex background
 @cindex interstellar medium
@@ -200,7 +193,6 @@ make install
 
 @item @strong{FFTW 3}. Available at @url{http://www.fftw.org/}.
 @itemize @minus
-@item @emph{Further requirements for installing @code{ggadt-openmp}}: you must have the @code{fftw3_threads} libraries installed. To do this, specify the @code{--enable-threads} option when running @code{configure} for FFTW3. This might be enabled by default.
 
 @item @emph{Location of the FFTW3 headers}: In order for GGADT to find the Fortran headers for FFTW3, they must be in the standard location (@code{/usr/local/include} or @code{usr/include}) or in @code{$prefix/include} where @code{$prefix} is defined by doing @code{./configure --prefix=<prefix>} at the configuration step for @code{ggadt}. If you have FFTW3 installed with MacPorts, the configure script should be able to find it for you, and you don't have to specify anything extra.
 
@@ -210,7 +202,7 @@ make install
 
 @itemize @minus
 
-@item @strong{OpenMP}: @emph{Further requirements for installing @code{ggadt-openmp}}: For the OpenMP version of GGADT, you must have C and Fortran compilers that are compatible with OpenMP version 4.0. 
+@item @strong{OpenMP}: For the OpenMP version of GGADT, you must have C and Fortran compilers that are compatible with OpenMP version 4.0. 
 
 @end itemize
 
@@ -230,7 +222,7 @@ sudo port install fftw-3
 @end enumerate
 @end itemize
 @item (@emph{Optional}) @strong{Python 2.7} or later for some of the included scripts.
-@item (@emph{Optional} @strong{matplotlib} python library if you wish to use the included plotting scripts.
+@item (@emph{Optional} @strong{matplotlib},@strong{numpy}, @strong{scipy} python librarys if you wish to use the included plotting scripts. More information can be found at @url{http://scipy.org/getting-started.html}.
 @end itemize
 
 
@@ -251,7 +243,7 @@ ggadt -h
 
 @section Setting parameter values
 
-The format for running the @command{ggadt} program (either @code{ggadt-serial} or @code{ggadt-omp}) is:
+The format for running the @command{ggadt} program is:
 
 @example
 ggadt @var{option} @dots{}
@@ -287,6 +279,34 @@ parameter=value
 another-parameter=another-value
 @dots{}
 @end example
+
+@strong{Note --} The @code{cluster-file-name} and @code{euler-file-name} options must be specified with quotes surrounding their values. In order to make the parameter file portable, you should specify an absolute file path, not a relative one.
+
+E.g.:
+
+@example
+cluster-file-name='/absolute/path/to/parameter-file.ini'
+@end example 
+
+NOT
+
+@example
+cluster-file-name=/absolute/path/to/parameter-file.ini
+@end example 
+
+or
+
+@example
+cluster-file-name='../../parameter-file.ini'
+@end example 
+
+Specifying a relative file-path (as in the last example) will work, as long as you always invoke GGADT from the location where the relative file-path is valid. For example, if I am in the parent directory, and my parameter file is in the @code{data/parameter-files} directory, 
+
+@example
+cluster-file-name='data/parameter-files/parameter-file.ini'
+@end example 
+
+will work, as long as I @strong{always} run @code{ggadt} from the parent directory.
 
 @section Options and parameters
 
@@ -364,167 +384,127 @@ The number of grain orientations relative to the incoming X-ray photon over whic
 @opindex --fftw-optimization
 Must be one of @code{ESTIMATE}, @code{MEASURE}, @code{PATIENT} or @code{EXHAUSTIVE}. FFTW wisdom is saved in @code{$HOME/.ggadt/plans}. For more information about what these tags mean and about FFTW wisdom, see @url{http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans}.
 
-@item --use-experimental-fft
+@item --use-padded-fft
 @itemx -s
-@opindex --use-experimental-fft
+@opindex --use-padded-fft
 @opindex -s 
-This method has been tested and this option will be deprecated in the future. Use for faster FFT results. This also allows for virtually arbitrary values of nscatter and ngrid, whereas older versions of the code require a prohibitive amount of memory for larger values of nscatter.
+This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by @code{nscatter}), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.
 
 @end table
+
+
+
+@section Getting the accuracy you want
+
+GGADT solves for the differential scattering cross section as a function of scattering angle, and must do so on a numerical grid. The accuracy of the solution provided by GGADT depends on the resolution of these grids. In the case where the grain is non-spherical, the accuracy also depends on the number of orientations over which the calculation is averaged.
+
+The input parameters that determine accuracy are:
+
+@itemize
+@item @code{ngrain} -- The number of grid elements (along one dimension) for which the grain is defined.
+@item @code{nscatter} (or equivalently @code{dtheta}) -- The number of grid points - along one dimension - over which the differential cross section is defined, or, if using @code{dtheta}, the width of the grid elements (in arcseconds).
+@item @code{norientations} -- The number of grain orientations over which to average the calculation.
+@end itemize
+
+We've done some sample runs for a spherical grain,
+
+@image{RMS_ngrain_nscatter,5in,5in}
+
+
 
 @node Example usage
 @chapter Example usage
 
 @cindex sample output
 @cindex examples
+@section Default case
 
-Example parameter files are available in the @file{data} directory.
-
-All of the following figures should be able to be recreated by running the @file{scripts/make_sample_plots.sh} bash script.
-
-@section Spherical grain
-Using @file{paramfile-sphere.ini}:
+If you simply want to test that @code{ggadt} is running properly, you can simply do
 
 @example
-aeff=0.2
-ephot=1.0
-RE-index-of-refraction=-2.079E-3
-IM-index-of-refraction=2.079E-3
-grid-width=64
-ngrid=1024
-nangle=100
-grain-geometry=sphere
-euler-angle-mode=random
-fftw-optimization=measure
+src/ggadt
 @end example
 
-Running on the command line from the @code{src/serial/} directory:
+From the parent directory. This will solve a test case, which is defined by the following hard-coded default parameters:
 
 @example
-./ggadt-serial --parameter-file-name=../../parameterfile-sphere.ini > ../../data/test_sphere.dat
-cd ../../
-ipython scripts/plot.py data/test_sphere.dat
+aeff           = 0.2
+ephot          = 2.0
+grain-axis-x   = 1.0
+grain-axis-y   = 1.0
+grain-axis-z   = 1.0
+ior-re         = -1.920E-4
+ior-im         = 2.807E-5
+grain-geometry = 'sphere'
+euler-angle-mode = 'random'
+euler-angle-file = ''
+ngrain         = 256
+nscatter       = 100
+norientations  = 100
+dtheta         = 10.0
+max-angle      = 3000.
+cluster-file-name = ''
+fftw-optimization = 'estimate'
 @end example
 
-Produces these plots:
-
-@image{test_sphere_2d,5in,5in}
-@image{test_sphere_1d,5in,5in}
-
-
-@section Grain that is a cluster of spheres
-Using @file{paramfile-spheres.ini}:
+If you would like to plot the output of this code, pipe the standard output of @code{ggadt} to a file of your choice. Then run the python plotting scripts:
 
 @example
-aeff=0.2
-ephot=1.0
-RE-index-of-refraction=-2.079E-3
-IM-index-of-refraction=2.079E-3
-grid-width=64
-ngrid=1024
-nangle=100
-grain-geometry=spheres
-euler-angle-mode=random
-cluster-file-name=../../data/clusters/BAM2.1024.1.targ
-fftw-optimization=measure
+
+src/ggadt > output.dat
+python scripts/plot.py output.dat
+
 @end example
 
-Running on the command line from the @code{src/serial/} directory:
+This will display two plots. One plot shows the full 2D cross-scattering efficiency. The other shows: (1) a phi-averaged plot of the differential cross-section efficiency (2) a slice of the full 2D grid at phi=0.0 and phi = pi/2 (3) the one-sigma RMS fluctuations over phi (in light green) and the max/min values over phi (in light grey).
 
-@example
-./ggadt-serial --parameter-file-name=../../parameterfile-spheres.ini > ../../data/test_spheres.dat
-cd ../../
-ipython scripts/plot.py data/test_spheres.dat
-@end example
+@section Using @code{make_sample_plots.py}
+We have made a small python script (@code{scripts/make_sample_plots.py}) that runs example cases for different grain geometries. You will need the matplotlib, numpy and scipy libraries in order to run this script. More information about these libaries is available at @url{http://scipy.org/getting-started.html}.
 
-Produces these plots:
+The python script runs GGADT for a grain with an effective radius of 0.2 microns, composed of MgFeSiO_4 silicate, with an incident photon energy of 2.0 keV, and with @code{ngrain} of 256 and a @code{nscatter} of 100. 
 
-@image{test_spheres_2d,5in,5in}
-@image{test_spheres_1d,5in,5in}
+The inset within the plot, on the upper left corner, shows the full 2d grid of the scattering cross section efficiency.
 
-@section Ellipsoidal grain
-Using @file{paramfile-ellipsoid.ini}:
+@image{sample-sphere,5in,5in}
 
-@example
-aeff= 0.2
-grain-axis-x= 0.1
-grain-axis-y= 0.3
-grain-axis-z= 0.3
-ephot= 1.0
-RE-index-of-refraction= -2.079E-3
-IM-index-of-refraction= 2.079E-3
-grid-width=64
-ngrid=1024
-nangle= 100
-grain-geometry= ellipsoid
-euler-angle-mode= random
-cluster-file-name=
-fftw-optimization= measure
-@end example
+@image{sample-ellipsoid,5in,5in}
 
-Running on the command line from the @code{src/serial/} directory:
+@image{sample-spheres,5in,5in}
 
-@example
-./ggadt-serial --parameter-file-name=../../parameterfile-ellipsoid.ini > ../../data/test_ellipsoid.dat
-cd ../../
-ipython scripts/plot.py data/test_ellipsoid.dat
-@end example
 
-Produces these plots:
+@node Testing against previous results
+@chapter Testing against previous results
 
-@image{test_ellipsoid_2d,5in,5in}
-@image{test_ellipsoid_1d,5in,5in}
+@section Spherical case (ADT/Mie theory)
+@subsection GGADT
+@image{DA06_f1_spheres,4in,4in}
+@subsection Actual (Figure 1) from Draine & Allaf-Akbari 2006
+@image{da06_spheres_actual,3in,3in}
 
-@section Profiling with @code{gprof}
+@section Ellipsoidal case (Draine and Allaf-Akbari 2006)
 
-Both the serial and OpenMP variants of this GGADT code have been profiled using the GNU Profiler @code{gprof} (version 2.22) on an Intel Core i5-2410M CPU.
+@subsection GGADT
+@image{DA06_f2_ellipsoids,3in,3in}
 
-Specs for the Intel Core i5-2410M CPU
-@example
-Architecture: x86_64
-CPU op-mode(s): 32-bit, 64-bit
-Byte Order: Little Endian
-CPU(s): 4
-On-line CPU(s) list: 0-3
-Thread(s) per core: 2
-Core(s) per socket: 2
-Socket(s): 1
-NUMA node(s): 1
-Vendor ID: GenuineIntel
-CPU family: 6
-Model: 42
-Stepping: 7
-CPU MHz: 800.000
-BogoMIPS: 4585.24
-Virtualization: VT-x
-L1d cache: 32K
-L1i cache: 32K
-L2 cache: 256K
-L3 cache: 3072K
-NUMA node0 CPU(s): 0-3 
-@end example
+@subsection Actual (Figure 2) from Draine & Allaf-Akbari 2006
+@image{da06_ellipsoids_actual,4in,4in}
 
-[running Ubuntu 12.04.]
+@section Agglomeration of spheres (Heng & Draine 2009)
 
-Four different profiles were created. The @file{parameterfile-spheres.ini} and @file{parameterfile-ellipsoid.ini} parameter files (located in @file{data/paramfiles/}) were each used to profile both @file{ggadt-serial} and @file{ggadt-omp}. The results of these profiles are located in the @file{data/profiles/} directory.
-
-If you wish to profile the code using @code{gprof}, simply add the @option{--enable-profiling} option when running @file{configure}. 
-
-Then, after compiling @code{ggadt}, do:
-
-@example
-./ggadt @dots{}
-gprof ggadt
-@end example
-
+@image{HD09_f3,5in,5in}
 @node FFT comparison
 @chapter FFT comparison
-Currently, GGADT allows you to choose between two FFT algorithms: FFTW 3 (@url{http://fftw.org/}), which requires you install the FFTW3 library, and GPFA (Generalized Prime Factor Algorithm)@footnote{Temperton, C. (1992). A Generalized Prime Factor FFT Algorithm for any N=2^p3^q5^r. SIAM Journal on Scientific and Statistical Computing, 13(3), 676-686.}, which is self-contained and included with the GGADT package. GPFA is used by default, and, as shown below, is only slightly slower than FFTW. 
+Currently, GGADT allows you to choose between two FFT algorithms: FFTW 3 (@url{http://fftw.org/}), which requires you install the FFTW3 library, and GPFA (Generalized Prime Factor Algorithm)@footnote{Temperton, C. (1992). A Generalized Prime Factor FFT Algorithm for any N=2^p3^q5^r. SIAM Journal on Scientific and Statistical Computing, 13(3), 676-686.}, which is self-contained and included with the GGADT package. GPFA is used by default, and, as shown below, is slightly faster than FFTW in the current version of GGADT. This will change in later versions, since at the moment, we do not take advantage of saving and loading FFTW "wisdom". 
 
-If you wish to take advantage of the speed increase that FFTW provides, you will need to install FFTW 3.3.x (we have only tested 3.3.3, but GGADT should in principal be compatible with all 3.x.x versions). GPFA will not currently work with FFTW 2.x, as the two interfaces are different, but plans to include FFTW 2.x support are in the works. 
+Earlier versions of GGADT, which did FFT's in a different way (only did padded FFT's, but utilized FFTW wisdom), had FFTW being about 20 percent faster than GPFA.
 
-If you have a particular FFT library that you would like to see implemented, please send an e-mail to jah5 (at) princeton.edu.
+If you wish to use the FFTW3 version of GGADT, you will need to install FFTW 3.3.x (we have only tested 3.3.3, but GGADT should in principal be compatible with all 3.x.x versions). GPFA will not currently work with FFTW 2.x, as the two interfaces are different, but plans to include FFTW 2.x support are in the works. 
 
+If you have a particular FFT library that you would like to see implemented, please send an e-mail to jah5 (at) princeton.edu. It will likely be faster if you simply write your own module to attach to GGADT. This module must provide the function @code{fft_firstk(arr,K)} where @code{arr} is an N by N array, and @code{K} is an integer less than N. The function must return a @code{K} by @code{K} array, containing the first @code{K} values of the FFT of @code{arr}. The complexity of this algorithm should scale as (N*N)log(@code{K}*@code{K}), instead of the (N*N)log(N*N) complexity of the standard two-dimensional FFT.
+
+For information about how to construct this algorithm, see the instructions for FFTW at @url{http://www.fftw.org/pruned.html}.
+
+If you are successful at porting your FFT algorithm, let us know, and we will do our best to test it and include it with future releases.
 
 @section Timing
 @image{timing_actual_time,5in,5in}

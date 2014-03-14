@@ -246,28 +246,28 @@ then
 	AC_LANG(C)
 	AC_OPENMP
 	AC_CHECK_HEADERS([omp.h])
-  if test $using_fftw3 = true
-  then
-  	AC_MSG_CHECKING([if we can use the lfftw3_threads library (in C)])
-  	CFLAGSOLD=$CFLAGS
-  	LIBSOLD=$LDFLAGS 
-  	LIBS="${LIBS} -lfftw3_threads"
-  	CFLAGS="${CFLAGSOLD} $OPENMP_CFLAGS"
-
-  	AC_RUN_IFELSE([
-    		AC_LANG_PROGRAM([[
-    							#include<omp.h>
-    							#include<fftw3.h>
-    						]], 
-    						[[int main() 
-    							{ fftw3_init_threads(); return 0; }
-    						]]
-    			)],
-    		[ AC_MSG_RESULT(yes) ], 
-    		[ AC_MSG_RESULT(no) ; LIBS=$LIBSOLD ; AC_MSG_ERROR([Cannot seem to use the lfftw3_threads library (in C)! Check config.log for more details.])]
-    	)
-  	CFLAGS=$CFLAGSOLD
-  fi
+#  if test $using_fftw3 = true
+#  then
+#  	AC_MSG_CHECKING([if we can use the lfftw3_threads library (in C)])
+#  	CFLAGSOLD=$CFLAGS
+#  	LIBSOLD=$LDFLAGS 
+#  	LIBS="${LIBS} -lfftw3_threads"
+#  	CFLAGS="${CFLAGSOLD} $OPENMP_CFLAGS"
+#
+#  	AC_RUN_IFELSE([
+#    		AC_LANG_PROGRAM([[
+#    							#include<omp.h>
+#    							#include<fftw3.h>
+#    						]], 
+#    						[[int main() 
+#    							{ fftw3_init_threads(); return 0; }
+#    						]]
+#    			)],
+#    		[ AC_MSG_RESULT(yes) ], 
+#    		[ AC_MSG_RESULT(no) ; LIBS=$LIBSOLD ; AC_MSG_ERROR([Cannot seem to use the lfftw3_threads library (in C)! Check config.log for more details.])]
+#    	)
+#  	CFLAGS=$CFLAGSOLD
+#  fi
 	AC_LANG([Fortran])
 	AC_OPENMP
 	AC_MSG_CHECKING([that we can utilize openmp in fortran])

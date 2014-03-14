@@ -1,3 +1,21 @@
+* commit 30a88787c688995b3960d874b5dcfcd3c2d7eac1
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Sun Mar 9 19:56:08 2014 -0400
+| 
+|     More cleanup...
+|  
+* commit 331daeea80fb21b470db376c79017b0682976054
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Sun Mar 9 19:55:31 2014 -0400
+| 
+|     Additional cleanup and edited cleandist-custom.sh
+|  
+* commit 8924d76c9eada96cb03d5c5d6738b1753c9e834a
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Sun Mar 9 19:53:33 2014 -0400
+| 
+|     Tried to revert to f95, and it seems the only problem (except fftw3 problems) is the options module. We might have to replace that if we want to increase compatibility, but that will be annoying. The buggy behavior that occured when ngrain was too small to provide k out to kmax (i.e. when max-scattering-angle was too large compared to ngrain) has been addressed. GGADT prints an error, and the minimum ngrain value needed.
+|  
 * commit 5bd19422edc9cde6fee7401370591436acb2eddd
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Thu Mar 6 14:42:36 2014 -0500

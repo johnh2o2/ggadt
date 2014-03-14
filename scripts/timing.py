@@ -9,38 +9,45 @@ import time
 from installation_vars import *
 
 REDO_TIMING = False
-
-algorithms_to_compare = [ 'fftw3.patient', 'fftw3.measure', 'fftw3.estimate', 'gpfa' ]
-as_a_function_of = [ 'ngrid' ]
+nscatter = 64
+algorithms_to_compare = [ 'fftw3.padded','fftw3', 'gpfa.padded','gpfa' ]
+as_a_function_of = [ 'ngrain' ]
 
 fftw3_opt = " --enable fftw3"
-config_opts = {		'fftw3.patient' : fftw3_opt,
-				    'fftw3.measure' : fftw3_opt,
-				    'fftw3.estimate' : fftw3_opt,
+flags = {		'fftw3.padded' : "--use-padded-fft",
+				'fftw3' : "",
+				'gpfa.padded' : "--use-padded-fft",
+				'gpfa' : ""
+}
+config_opts = {		'fftw3.padded' : fftw3_opt,
+				    'fftw3' : fftw3_opt,
+				    'gpfa.padded' : "",
 				    'gpfa' : ""
 }
 
 
-fftw3_algs = ['fftw3.patient', 'fftw3.measure', 'fftw3.estimate', 'fftw3']
+fftw3_algs = ['fftw3.patient', 'fftw3.measure', 'fftw3.estimate', 'fftw3', 'fftw3.padded']
 
-max_var_val = 1024
+max_var_val = 256
+min_var_val = 20
 arr = []
 for i in range(1,20):
 	for j in range(0,20):
 		for k in range(0,20):
 			n = int(pow(2,i)*pow(3,j)*pow(5,k))
-			if n <= max_var_val: arr.append(n)
+			if n <= max_var_val and n >= min_var_val: arr.append(n)
 
-variables = 	{ 	'ngrid' : np.sort(arr) }
-defaults = 		{	'--grid-width' : 8,
+variables = 	{ 	'ngrain' : np.sort(arr) }
+defaults = 		{	
 					'--aeff' : 0.2,
 					'--ephot' : 1.0,
 					'--ior-re': -2.079E-3,
 					'--ior-im': 2.079E-3,
-					'--nangle' : 50,
+					'--norientations' : 10,
+					'--nscatter' : nscatter,
 					'--grain-geometry' : 'spheres',
 					'--euler-angle-mode' : 'random',
-					'--cluster-file-name' : cluster_dir+'BAM2.256.1.targ',
+					'--cluster-file-name' : cluster_dir+'/BAM2.256.1.targ',
 					}
 
 clargs = ""
@@ -65,7 +72,7 @@ def timer():
 times = {}
 xvals = {}
 scatters = {}
-Nrealizations = 10
+Nrealizations = 5
 
 if REDO_TIMING:
 	for algorithm in algorithms_to_compare:
@@ -113,7 +120,7 @@ if REDO_TIMING:
 				for n in range(0,Nrealizations+extra):
 					timer()
 
-					command = ggadt+clargs+" --"+depvar+"="+`val`+" > /dev/null"
+					command = ggadt+clargs+" --"+depvar+"="+`val`+" " + flags[algorithm] + " > /dev/null"
 					print
 					print `depvar`+"="+`val`+" : "+`n`#+" | "+`command`
 					os.system(command)
@@ -137,8 +144,8 @@ if REDO_TIMING:
 			print "|**  OK -- Done with timing of "+depvar+" for "+algorithm+"."
 			print "|**"
 
-			times[fname] = np.array(avg_times)/defaults['--nangle']
-			scatters[fname] = np.array(scatter)/defaults['--nangle']
+			times[fname] = np.array(avg_times)/defaults['--norientations']
+			scatters[fname] = np.array(scatter)/defaults['--norientations']
 			xvals[fname] = variables[depvar]
 			f = open(fname,'w')
 			for i in range(0,len(times[fname])):
@@ -159,8 +166,6 @@ else:
 			scatters[fname] = data[:,2]
 			
 		
-
-
 
 print "Plotting now..."
 
@@ -184,16 +189,17 @@ for i,depvar in enumerate(as_a_function_of):
 	ax.legend(loc='best')
 
 
-depvar = 'ngrid'
-fname_gpfa = "timing.gpfa."+depvar+".dat"
+
+depvar = 'ngrain'
+fname_gpfa = "timing.gpfa.padded."+depvar+".dat"
 
 f = plt.figure()
 ax = f.add_subplot(111)
 ax.set_xlabel(depvar)
-ax.set_ylabel("Speed relative to GPFA")
+ax.set_ylabel("Speed relative to Padded GPFA")
 #ax.set_yscale('log')
 for algorithm in algorithms_to_compare:
-	if algorithm == 'gpfa' : continue
+	if algorithm == 'gpfa.padded' : continue
 	fname = "timing."+algorithm+"."+depvar+".dat"
 	xarr = xvals[fname]
 	#yarr = np.array([ 1.0/T for T in times[fname] ])
