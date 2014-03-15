@@ -47,13 +47,22 @@ contains
     subroutine calculate_sed_of_cross_sections()
         implicit none
         print *,"# [ephot] [sigma_scat] [sigma_abs]"
+        call get_ior()
+
         do i=1,nephots
             print *,ephots(i), sigma_scat(energies(i)), sigma_abs(energies(i))
         end do
 
     end subroutine calculate_sed_of_cross_sections
+    
+    ! TODO: add ability to read in a custom material file and interpolate it.
+
+    subroutine get_ior()
+        implicit none
 
 
+
+    end subroutine get_ior
     function sigma_scat(energy)
         implicit none
         real(kind=dp_real), intent(in) :: energy
