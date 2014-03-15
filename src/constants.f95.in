@@ -38,7 +38,9 @@ module constants
   integer, parameter                            ::  default_nenergies              = real(100,kind=dp_real)
   real(kind=dp_real), parameter                 ::  default_ephot_min              = real(0.1,kind=dp_real)
   real(kind=dp_real), parameter                 ::  default_ephot_max              = real(5.0,kind=dp_real)
-
+  character(len=200), parameter                 ::  default_material               = "olivine"
+  character(len=200), parameter                 ::  default_material_file          = ""
+  real(kind=dp_real), parameter                 ::  default_de                     = 0.1
      
 
 

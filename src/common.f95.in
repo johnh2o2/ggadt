@@ -49,7 +49,7 @@ module common_mod
 
 
 ! new variables
-  integer                                     ::  nenergies
+  integer                                     ::  nephots
   real(kind=dp_real)                          ::  ephot_min
   real(kind=dp_real)                          ::  ephot_max 
   character(len=200)                          ::  material          ! name of predefined material
@@ -82,6 +82,9 @@ module common_mod
       call define_flag(opts, &
         "timing",abbrev='t',&
         description="suppresses output for timing purposes")
+      call define_flag(opts, &
+        "sed",&
+        description="Generates an SED of the scattering, absorption and extinction cross sections.")
       call define_option_string(opts,&
         "parameter-file-name","",&
         description="Path to parameter file")
@@ -137,6 +140,25 @@ module common_mod
         "euler-angle-file",default_euler_angle_file,&
         description="Path to a text file containing a list of orientations")
       
+      call define_option_real(opts,&
+        "ephot-min", default_ephot_min,&
+        description="Minimum photon energy for which to calculate the cross sections")
+      call define_option_real(opts,&
+        "ephot-max", default_ephot_max,&
+        description="Maximum photon energy for which to calculate the cross sections")
+      call define_option_integer(opts,&
+        "nephots", default_nephot,&
+        description="Number of photon energies to calculate SED")
+      call define_option_integer(opts,&
+        "dephot", default_nenergies,&
+        description="Spading between photon energies")
+      
+      call define_option_sting(opts,&
+        "material", default_material,&
+        description="Maximum photon energy for which to calculate the cross sections")
+      call define_option_sting(opts,&
+        "material-file", default_material_file,&
+        description="Maximum photon energy for which to calculate the cross sections")
 
       call define_option_string(opts,"fftw-optimization",default_fftw_optimization_mode_name,required=.false.,&
         description="[estimate,measure,patient,exhaustive]")

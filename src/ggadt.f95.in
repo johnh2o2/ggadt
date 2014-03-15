@@ -29,77 +29,112 @@ program ggadt
     call set_parameter_values()
     call initialize_and_allocate_vars()
     @FFTW3_UNCOMMENT@call set_optimization_mode(fftw_optimization_mode_name)
+
+
     if ( verbose_mode ) call print_parameters()
     !write(0,*) "Allocated and initialized all variables"
 
-    ! loop over orientations
-    do neul = 1,norientations
-
-        ! fetch Euler angles
-        eul_ang = get_new_euler_angles(neul)
-
-        ! calculate rotation matrix corresponding to euler angles
-        rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
-        
-        if (geometry .eq. 'ellipsoid') then 
-            !$omp parallel shared(sh,x,y,rm,k) 
-            !$omp do schedule(dynamic) private(i,j)
-            do i=1,size(x)
-                do j=1,size(y)
-                    sh(i,j) = shadow_ellipsoid(x(i),y(j),k,grain_a,delm,rm)
-                end do
-            end do
-            !$omp parallel shared(sh,x,y,rm,k) 
-            !$omp do schedule(dynamic) private(i,j)
-        elseif  (geometry .eq. 'sphere') then 
-            !$omp parallel shared(sh,x,y,rm,k) 
-            !$omp do schedule(dynamic) private(i,j)
-            do i=1,size(x)
-                do j=1,size(y)
-                    sh(i,j) = shadow_sphere(x(i),y(j), k, a_eff, delm)
-                end do
-            end do
-            !$omp parallel shared(sh,x,y,rm,k) 
-            !$omp do schedule(dynamic) private(i,j)
-        elseif (geometry .eq. 'spheres')    then
-            sh = shadow_spheres(x,y,k,rm)
-        else
-            write(0,*) "***ERROR*** Cannot understand geometry", geometry
-        end if 
-       
-        ftsh = fft_faster(sh,kmin,kmax,enhancement)
-
-        !$omp parallel shared(scatter,ftsh,k,dx,dy) 
-        !$omp do schedule(dynamic) private(i,j)
-        do i=1,size(kx)
-            do j=1,size(ky)
-                scatter(i,j) = scatter(i,j) + ((k*dx*dy*abs(ftsh(i,j))/twopi)**2)/real(norientations,kind=dp_real)
-            end do
-        end do
-        !$omp end do nowait
-        !$omp end parallel
-
-
-        write(0,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
-                & " percent complete: ", (real(neul)/real(norientations))*100.0, "%"
-    end do
-
-    if (timing_mode) stop 
-
-    print *, "# [thetax] [thetay] [dqscat/domega]"
-    
-    do i=1,size(thetax)
-        do j=1,size(thetay)
-            print *,thetax(i),thetay(j),scatter(i,j)/(pi*a_eff*a_eff)
-        end do
-    end do
-    if (verbose_mode) write(0,*) "done."
-
+    if (sed_mode) then 
+        call calculate_sed_of_cross_sections()
+    else
+        call calculate_differential_scattering_cross_section()
+    end if 
 
     call cleanup()
 
 contains
 
+    subroutine calculate_sed_of_cross_sections()
+        implicit none
+        print *,"# [ephot] [sigma_scat] [sigma_abs]"
+        do i=1,nephots
+            print *,ephots(i), sigma_scat(energies(i)), sigma_abs(energies(i))
+        end do
+
+    end subroutine calculate_sed_of_cross_sections
+
+
+    function sigma_scat(energy)
+        implicit none
+        real(kind=dp_real), intent(in) :: energy
+        real(kind=dp_real), intent(in) :: sigma_scat
+
+        sigma_scat = 1.0
+    end function sigma_scat
+
+    function sigma_abs(energy)
+        implicit none
+        real(kind=dp_real), intent(in) :: energy
+        real(kind=dp_real), intent(in) :: sigma_scat
+
+        sigma_abs = 1.0
+    end function sigma_scat
+
+    subroutine calculate_differential_scattering_cross_section()
+
+        ! loop over orientations
+        do neul = 1,norientations
+
+            ! fetch Euler angles
+            eul_ang = get_new_euler_angles(neul)
+
+            ! calculate rotation matrix corresponding to euler angles
+            rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
+            
+            if (geometry .eq. 'ellipsoid') then 
+                !$omp parallel shared(sh,x,y,rm,k) 
+                !$omp do schedule(dynamic) private(i,j)
+                do i=1,size(x)
+                    do j=1,size(y)
+                        sh(i,j) = shadow_ellipsoid(x(i),y(j),k,grain_a,delm,rm)
+                    end do
+                end do
+                !$omp parallel shared(sh,x,y,rm,k) 
+                !$omp do schedule(dynamic) private(i,j)
+            elseif  (geometry .eq. 'sphere') then 
+                !$omp parallel shared(sh,x,y,rm,k) 
+                !$omp do schedule(dynamic) private(i,j)
+                do i=1,size(x)
+                    do j=1,size(y)
+                        sh(i,j) = shadow_sphere(x(i),y(j), k, a_eff, delm)
+                    end do
+                end do
+                !$omp parallel shared(sh,x,y,rm,k) 
+                !$omp do schedule(dynamic) private(i,j)
+            elseif (geometry .eq. 'spheres')    then
+                sh = shadow_spheres(x,y,k,rm)
+            else
+                write(0,*) "***ERROR*** Cannot understand geometry", geometry
+            end if 
+           
+            ftsh = fft_faster(sh,kmin,kmax,enhancement)
+
+            !$omp parallel shared(scatter,ftsh,k,dx,dy) 
+            !$omp do schedule(dynamic) private(i,j)
+            do i=1,size(kx)
+                do j=1,size(ky)
+                    scatter(i,j) = scatter(i,j) + ((k*dx*dy*abs(ftsh(i,j))/twopi)**2)/real(norientations,kind=dp_real)
+                end do
+            end do
+            !$omp end do nowait
+            !$omp end parallel
+
+
+            write(0,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
+                    & " percent complete: ", (real(neul)/real(norientations))*100.0, "%"
+        end do
+
+        if (timing_mode) stop 
+
+        print *, "# [thetax] [thetay] [dqscat/domega]"
+        
+        do i=1,size(thetax)
+            do j=1,size(thetay)
+                print *,thetax(i),thetay(j),scatter(i,j)/(pi*a_eff*a_eff)
+            end do
+        end do
+        if (verbose_mode) write(0,*) "done."
+    end subroutine calculate_differential_scattering_cross_section
 
     subroutine initialize_and_allocate_vars()
       implicit none 
