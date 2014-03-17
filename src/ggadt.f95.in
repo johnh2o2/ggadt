@@ -14,10 +14,11 @@ program ggadt
 
     real(kind=dp_real), allocatable :: x(:), y(:), kx(:), ky(:), thetax(:), thetay(:)
 
-    complex(kind=dp_complex), allocatable :: sh(:,:), ftsh(:,:)
+    complex(kind=dp_complex), allocatable :: sh(:,:), ftsh(:,:), phi_total
+    real(kind=dp_real), allocatable ::  phi1(:,:), phi2(:,:)
 
     real(kind=dp_real), allocatable :: scatter(:,:)
-    real(kind=dp_real), allocatable :: energies(:), ior_res(:), ior_ims(:) ! NEW variables (for doing sed of extinction)
+    real(kind=dp_real), allocatable :: ephots(:), ior_res(:), ior_ims(:) ! NEW variables (for doing sed of extinction)
 
     real(kind=dp_real) :: xmin, xmax, ymin, ymax, dx, dy, k, l, dk
     real(kind=dp_real), dimension(3) :: eul_ang
@@ -46,38 +47,164 @@ contains
 
     subroutine calculate_sed_of_cross_sections()
         implicit none
-        print *,"# [ephot] [sigma_scat] [sigma_abs]"
+        real(kind=dp_real) :: sigma_scat, sigma_abs
         call get_ior()
+        print *,"# [ephot] [sigma_scat] [sigma_abs]"
+        
 
         do i=1,nephots
-            print *,ephots(i), sigma_scat(energies(i)), sigma_abs(energies(i))
+            get_integrated_cross_sections(ephots(i), m, sigma_scat, sigma_abs)
+            print *,ephots(i), sigma_scat, sigma_abs
         end do
 
     end subroutine calculate_sed_of_cross_sections
     
     ! TODO: add ability to read in a custom material file and interpolate it.
 
+    function linterp(x,y,xval)
+        implicit none 
+        real(kind=dp_real), intent(in) :: x(:), y(:), xval
+        real(kind=dp_real) :: linterp
+        integer :: i 
+        real(kind=dp_real) :: a,b
+
+        if ( xval < x(1) ) then
+            write(0,*) "ERROR: (linterp) requested value at x=",xval," however, &
+                & this is below the minimum value of x=",x(1)
+            stop 
+        else if ( xval > x(size(x)) ) then 
+            write(0,*) "ERROR: (linterp) requested value at x=",xval," however, &
+                & this is above the maximum value of x=",x(size(x))
+            stop 
+        end if 
+
+
+        i=1
+        do while( (x(i) < xval) )
+            i = i + 1
+        end do 
+
+    
+        a = xval - x(i-1)
+        b = x(i) - x(i-1)
+
+        linterp = x(i-1) + (a/b)*( x(i) - x(i-1) )
+
+
+    end function linterp
+
     subroutine get_ior()
         implicit none
+        real(kind=dp_real) :: 
+        integer  :: i, allocatestatus, niors
+        real(kind=dp_real), allocatable  :: file_ior_re(:), file_ior_im(:), file_ephots(:)
 
 
+        open(unit=1,file=material_file) ! open sphere file.
+
+        ! Read header
+        read(1,*) niors, material
+
+        ! -- 
+        allocate(file_ior_re(noirs),stat=allocatestatus)
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (file_ior_re) array ***"
+        allocate(file_ior_im(noirs),stat=allocatestatus)
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (file_ior_im) array ***"
+        allocate(file_ephots(noirs),stat=allocatestatus)
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (file_ephots) array ***"
+
+
+        if (material .eq. 'custom') then
+            do i=1,niors
+                read(1,*) file_ephots(i), file_ior_re(i), file_ior_im(i)
+            end do 
+            do i=1,nephots
+                ior_res(i) = linterp(file_ephots,file_ior_re,ephots(i))
+                ior_ims(i) = linterp(file_ephots,file_ior_im,ephots(i))
+            end do 
+        else
+            write (0,*) "ERROR: Do not recognize material", material,". &
+                & GGADT does not currently have any built-in materials. &
+                & Specify --material='custom' and --material-file='/path/to/file'."
+            stop
+        end if
 
     end subroutine get_ior
-    function sigma_scat(energy)
+    function get_integrated_cross_sections(energy,delm,sigma_scat,sigma_abs)
         implicit none
         real(kind=dp_real), intent(in) :: energy
-        real(kind=dp_real), intent(in) :: sigma_scat
+        real(kind=dp_real), intent(out) :: sigma_abs, sigma_scat
+        complex(kind=dp_complex), intent(in) :: delm
 
-        sigma_scat = 1.0
-    end function sigma_scat
+        real(kind=dp_real) :: kphot
+        integer :: c1,c2
 
-    function sigma_abs(energy)
-        implicit none
-        real(kind=dp_real), intent(in) :: energy
-        real(kind=dp_real), intent(in) :: sigma_scat
 
-        sigma_abs = 1.0
-    end function sigma_scat
+        kphot = TWOPI*(energy/0.001239842)
+
+        sigma_scat = 0.0
+        sigma_abs = 0.0
+
+        ! loop over orientations
+        do neul = 1,norientations
+
+            ! fetch Euler angles
+            eul_ang = get_new_euler_angles(neul)
+
+            ! calculate rotation matrix corresponding to euler angles
+            rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
+
+            if (geometry .eq. 'sphere') then 
+                 do c1=1,size(x)
+                    do c2=1,size(y)
+                        sh(c1,c2) = shadow_sphere(x(c1),y(c2), kphot, a_eff, delm)
+                        phi_total(c1,c2) = phi_sphere(x(c1),y(c2),kphot,a_eff,delm)
+                        phi1(c1,c2) = REAL(phi_total(c1,c2))
+                        phi2(c1,c2) = IM(phi_total(c1,c2))
+                    end do
+                 end do
+
+            else if (geometry .eq. 'spheres') then 
+                call rotate_spheres(rm)
+                do c1=1,nspheres
+                    ior_r(c1) = REAL(delm)
+                    ior_i(c1) = IM(delm)
+                end do
+                sh = shadow_spheres(x,y,kphot)
+                phi_total = phi_spheres(x,y,kphot)
+                do c1=1,size(x)
+                    do c2=1,size(y)
+                        phi1(c1,c2) = REAL(phi_total(c1,c2))
+                        phi2(c1,c2) = IM(phi_total(c1,c2))
+                    end do
+                 end do
+            else if (geometry .eq. 'ellipsoid') then 
+                do c1=1,size(x)
+                    do c2=1,size(y)
+                        sh(c1,c2) = shadow_ellipsoid(x(c1),y(c2), kphot, grain_a, delm, rm)
+                        phi_total(c1,c2) = phi_ellipsoid(x(c1),y(c2),kphot,grain_a, delm, rm )
+                        phi1(c1,c2) = REAL(phi_total(c1,c2))
+                        phi2(c1,c2) = IM(phi_total(c1,c2))
+                    end do
+                end do
+
+            else then 
+                write(0,*) "ERROR: Do not understand geometry=",geometry
+                stop
+            end if
+
+            do c1=1,size(x)
+                do c2=1,size(y)
+                 sigma_scat = sigma_scat + (1 - exp(-2*phi2(c1,c2)))*dx*dy 
+                 sigma_abs = sigma_abs + (abs(sh(c1,c2))**2)*dx*dy
+                end do 
+            end do 
+
+        end do 
+        sigma_scat = sigma_scat/norientations
+        sigma_abs = sigma_abs/norientations
+        
+    end function get_integrated_cross_sections
 
     subroutine calculate_differential_scattering_cross_section()
 
@@ -90,6 +217,7 @@ contains
             ! calculate rotation matrix corresponding to euler angles
             rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
             
+
             if (geometry .eq. 'ellipsoid') then 
                 !$omp parallel shared(sh,x,y,rm,k) 
                 !$omp do schedule(dynamic) private(i,j)
@@ -111,9 +239,10 @@ contains
                 !$omp parallel shared(sh,x,y,rm,k) 
                 !$omp do schedule(dynamic) private(i,j)
             elseif (geometry .eq. 'spheres')    then
-                sh = shadow_spheres(x,y,k,rm)
+                call rotate_spheres(rm)
+                sh = shadow_spheres(x,y,k)
             else
-                write(0,*) "***ERROR*** Cannot understand geometry", geometry
+                write(0,*) "ERROR: Do not understand geometry: ", geometry
             end if 
            
             ftsh = fft_faster(sh,kmin,kmax,enhancement)
@@ -151,7 +280,19 @@ contains
       real(kind=dp_real) :: ds, max_dist, scale
       character(len=100) :: junk
 
-        
+        if(sed_mode) then
+            allocate(ephots(nephots),stat=allocatestatus)
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ephots) array ***"
+            allocate(ior_res(nephots),stat=allocatestatus)
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ior_res) array ***"
+            allocate(ior_ims(nephots),stat=allocatestatus)
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ior_ims) array ***"
+            
+
+            do i=1,nephots
+                e(i) = ephot_min + (i-1)*dephot
+            end do
+        end if 
       ! Set Euler angles -------------------------------
         if (euler_angle_mode == 'sequential') then
             norientations_new = int(real(norientations)**(1.0/3.0))**3
@@ -274,7 +415,12 @@ contains
         ! sh
         allocate(sh(ngrid,ngrid),stat = allocatestatus)
             if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (sh) array ***"
-        
+        if (sed_mode) then
+            allocate(phi1(ngrid,ngrid),stat = allocatestatus)
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi1) array ***"
+            allocate(phi2(ngrid,ngrid),stat = allocatestatus)
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi2) array ***"
+        end if 
     ! ----------------------------------------------------
       
     ! set grid boundaries and spacing in physical coords
@@ -302,6 +448,7 @@ contains
     ! figures out what kmin, kmax, enhancement and kactual are.
         call get_fft_vals(-max_angle,max_angle,nscatter,kmin,kmax,enhancement,kactual)   
 
+      
       
     ! allocate arrays that depend on kactual
 
@@ -340,6 +487,7 @@ contains
             end do 
         end do
     ! -----------------------------------
+
 
 
     end subroutine initialize_and_allocate_vars

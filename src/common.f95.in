@@ -51,6 +51,7 @@ module common_mod
 ! new variables
   integer                                     ::  nephots
   real(kind=dp_real)                          ::  ephot_min
+  real(kind=dp_real)                          ::  dephot
   real(kind=dp_real)                          ::  ephot_max 
   character(len=200)                          ::  material          ! name of predefined material
   character(len=200)                          ::  material_file     ! file that defines ior_re and ior_im for a range of energies
@@ -150,15 +151,15 @@ module common_mod
         "nephots", default_nephot,&
         description="Number of photon energies to calculate SED")
       call define_option_integer(opts,&
-        "dephot", default_nenergies,&
-        description="Spading between photon energies")
+        "dephot", default_dephot,&
+        description="Spacing between photon energies")
       
       call define_option_sting(opts,&
         "material", default_material,&
-        description="Maximum photon energy for which to calculate the cross sections")
+        description="Name of grain material (say 'custom' and use 'material-file=/path/to/file' to use your own material)")
       call define_option_sting(opts,&
         "material-file", default_material_file,&
-        description="Maximum photon energy for which to calculate the cross sections")
+        description="Name of custom material file")
 
       call define_option_string(opts,"fftw-optimization",default_fftw_optimization_mode_name,required=.false.,&
         description="[estimate,measure,patient,exhaustive]")
@@ -194,7 +195,7 @@ module common_mod
       call get_option_real(opts,"grain-axis-z",grain_a(3))
       call get_option_real(opts,"ephot",ephot)
       call get_flag(opts,"use-padded-fft",use_padded_fft)
-      !call get_flag(opts,"sed",sed_mode)  ! NEW FLAG for sed mode
+      call get_flag(opts,"sed",sed_mode)  ! NEW FLAG for sed mode
       call get_flag(opts,"verbose",verbose_mode)
       call get_flag(opts,"timing",timing_mode)
       call get_option_real(opts,"ior-re",ior_re)
@@ -210,7 +211,17 @@ module common_mod
       call get_option_real(opts,"max-angle",max_angle)
       call get_option_string(opts,"cluster-file-name",cluster_file_name)
       call get_option_string(opts,"fftw-optimization",fftw_optimization_mode_name)
+
+      call get_option_real(opts,"ephot-min", ephot_min)
+      call get_option_real(opts,"ephot-max", ephot_min)
+      call get_option_integer(opts,"nephots", ephot_min)
+      call get_option_real(opts,"dephot", dephot)
+      
+      call get_option_string(opts,"material",material)
+      call get_option_string(opts,"material-file",material_file)
+     
       call get_flag(opts,"version",asked_for_version)
+
 
       if (asked_for_version) then
         print *, VERSION
@@ -234,7 +245,14 @@ module common_mod
           nscatter = int(ceiling(real(2*max_angle,kind=dp_real)/dtheta))
       end if 
 
-      
+      if (option_found(opts,"dephot") .and. option_found(opts, "nephots")) then
+          write(0,*) "Warning: You have specified BOTH the 'nephots' and 'dephot' options."
+          write(0,*) "We will use your specified value of nephots:", nephots
+      else if (option_found(opts,"dephot")) then
+          nscatter = int(ceiling((ephot_max - ephot_min)/dtheta))
+      else then 
+          dephot = (ephot_max - ephot_min)/(nephots - 1)
+      end if 
     end subroutine set_parameter_values
 
     subroutine print_help(opts)
