@@ -11,7 +11,7 @@ automake -a
 
 std="f2003"
 
-bash configure --enable-openmp #FCFLAGS="-O2 -fimplicit-none -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=${std} -pedantic -fbacktrace" || exit
+bash configure  #FCFLAGS="-O2 -fimplicit-none -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=${std} -pedantic -fbacktrace" || exit
 #make || exit
 #cp doc/*png doc/ggadt.html
 #make html || exit
@@ -19,10 +19,18 @@ bash configure --enable-openmp #FCFLAGS="-O2 -fimplicit-none -Wall -Wline-trunca
 #python scripts/plot.py test_output_fftw3.dat || exit
 
 #bash configure --enable-fftw3 
-make 
-make html
-cp doc/*png doc/ggadt.html
+make || exit
+make html || exit
+cp doc/*png doc/ggadt.html || exit
 
+src/ggadt --sed --material=custom --material-file=data/silicate.mat --ephot-min=0.7 --ephot-max=1.8 --dephot=0.2 || exit
+
+echo "SUCCESS!!!"
+
+
+
+
+<<COMMENT
 cluster_dir="$HOME/Desktop/Draine_temp/GGADT_JohnsMac/GGADT/data/clusters/"
 
 rm -f test_changes_exp.dat
@@ -53,4 +61,4 @@ time src/ggadt $args > test_changes_exp.dat || exit
 #python scripts/HD09.py
 #src/ggadt --grain-geometry=spheres --cluster-file-name=data/clusters/BA.256.1.targ --euler-angle-mode=file --euler-angle-file=eul_angle_file.dat > test_output_gpfa.dat || exit
 #python scripts/plot.py test_output_gpfa.dat || exit
-
+COMMENT

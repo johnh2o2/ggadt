@@ -44,7 +44,7 @@ module ellipsoid
         end if
     end function chord_ellipsoid
 
-    function phi_ellipsoid(x,y,k,r,delm,grain_a)
+    function phi_ellipsoid(x,y,k,grain_a,delm,r)
         implicit none
         real(kind=dp_real),  intent(in) :: x,y,k
         complex(kind=dp_complex), intent(in) :: delm
@@ -66,7 +66,7 @@ module ellipsoid
         real(kind=dp_real),  dimension(3), intent(in) :: grain_a
         complex(kind=dp_complex) :: shadow_ellipsoid
 
-        shadow_ellipsoid = 1.0-exp( (0.0,1.0)*phi_ellipsoid(x,y,k,r,delm,grain_a) )
+        shadow_ellipsoid = 1.0-exp( (0.0,1.0)*phi_ellipsoid(x,y,k,grain_a,delm,r) )
         
     end function shadow_ellipsoid
 

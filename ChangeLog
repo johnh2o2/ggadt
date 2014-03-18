@@ -1,3 +1,27 @@
+* commit dca5b289ba3a1eafdea27c10761210a64f436f89
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Mar 17 16:49:51 2014 -0500
+| 
+|     progress towards a working SED module. Code is UNTESTED and only takes custom material files. (made a sample one: data/silicate.mat). No option to have mixed composition agglomerates. Made a new subroutine in the spheres module to rotate the spheres. The ellipsoid module does not have this, and maybe it's a good idea to make one for consistency.
+|  
+* commit 9037831442b657f5886806bb667de308c21c46ab
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Fri Mar 14 22:28:07 2014 -0400
+| 
+|     added get_ior() subroutine. Also just a placeholder for the moment.
+|  
+* commit 5bdb2432dd246f6013af0f16af47d33cb80ef4b4
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Fri Mar 14 22:22:39 2014 -0400
+| 
+|     Added sigma_scat and sigma_abs functions, but they only return 1 at the moment. Added logic to ggadt.f95 to choose between sed mode and differential scattering cross section mode.
+|  
+* commit ec720ec3e0f283ac5628f5ff5224f8b61b69fab8
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Fri Mar 14 19:03:23 2014 -0400
+| 
+|     Discovered that OpenMP does NOT currently work. I also have to figure out why AC_OPENMP doesnt automatically add -fopenmp to the FCFLAGS environment variable. Added some minor documentation.
+|  
 * commit 10a6c1d742953493408f3a28cef61993e5a28b2d
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Fri Mar 14 01:57:27 2014 -0400

@@ -148,16 +148,18 @@ module common_mod
         "ephot-max", default_ephot_max,&
         description="Maximum photon energy for which to calculate the cross sections")
       call define_option_integer(opts,&
-        "nephots", default_nephot,&
+        "nephots", default_nephots,&
         description="Number of photon energies to calculate SED")
-      call define_option_integer(opts,&
+      call define_option_real(opts,&
         "dephot", default_dephot,&
         description="Spacing between photon energies")
       
-      call define_option_sting(opts,&
+      call define_option_string(opts,&
         "material", default_material,&
-        description="Name of grain material (say 'custom' and use 'material-file=/path/to/file' to use your own material)")
-      call define_option_sting(opts,&
+        description="Name of grain material &
+            &(say 'custom' and use 'material-file=/path/to/file' &
+            &to use your own material)")
+      call define_option_string(opts,&
         "material-file", default_material_file,&
         description="Name of custom material file")
 
@@ -213,8 +215,8 @@ module common_mod
       call get_option_string(opts,"fftw-optimization",fftw_optimization_mode_name)
 
       call get_option_real(opts,"ephot-min", ephot_min)
-      call get_option_real(opts,"ephot-max", ephot_min)
-      call get_option_integer(opts,"nephots", ephot_min)
+      call get_option_real(opts,"ephot-max", ephot_max)
+      call get_option_integer(opts,"nephots", nephots)
       call get_option_real(opts,"dephot", dephot)
       
       call get_option_string(opts,"material",material)
@@ -249,8 +251,8 @@ module common_mod
           write(0,*) "Warning: You have specified BOTH the 'nephots' and 'dephot' options."
           write(0,*) "We will use your specified value of nephots:", nephots
       else if (option_found(opts,"dephot")) then
-          nscatter = int(ceiling((ephot_max - ephot_min)/dtheta))
-      else then 
+          nephots = int(ceiling((ephot_max - ephot_min)/dephot))
+      else 
           dephot = (ephot_max - ephot_min)/(nephots - 1)
       end if 
     end subroutine set_parameter_values
@@ -432,6 +434,37 @@ module common_mod
             end do
         end do
     end function kspace_shift
+    function linterp(x,y,xval)
+        implicit none 
+        real(kind=dp_real), intent(in) :: x(:), y(:), xval
+        real(kind=dp_real) :: linterp
+        integer :: i 
+        real(kind=dp_real) :: a,b
+
+        if ( xval < x(1) ) then
+            write(0,*) "ERROR: (linterp) requested value at x=",xval," however, &
+                & this is below the minimum value of x=",x(1)
+            stop 
+        else if ( xval > x(size(x)) ) then 
+            write(0,*) "ERROR: (linterp) requested value at x=",xval," however, &
+                & this is above the maximum value of x=",x(size(x))
+            stop 
+        end if 
+
+
+        i=1
+        do while( (x(i) < xval) )
+            i = i + 1
+        end do 
+
+    
+        a = xval - x(i-1)
+        b = x(i) - x(i-1)
+
+        linterp = y(i-1) + (a/b)*( y(i) - y(i-1) )
+
+
+    end function linterp
 
 
 end module common_mod

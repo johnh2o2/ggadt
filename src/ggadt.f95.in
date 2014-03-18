@@ -14,7 +14,7 @@ program ggadt
 
     real(kind=dp_real), allocatable :: x(:), y(:), kx(:), ky(:), thetax(:), thetay(:)
 
-    complex(kind=dp_complex), allocatable :: sh(:,:), ftsh(:,:), phi_total
+    complex(kind=dp_complex), allocatable :: sh(:,:), ftsh(:,:), phi_total(:,:)
     real(kind=dp_real), allocatable ::  phi1(:,:), phi2(:,:)
 
     real(kind=dp_real), allocatable :: scatter(:,:)
@@ -48,12 +48,20 @@ contains
     subroutine calculate_sed_of_cross_sections()
         implicit none
         real(kind=dp_real) :: sigma_scat, sigma_abs
-        call get_ior()
+        complex(kind=dp_complex) :: delm
+
+
+
+        call get_ior(material_file, ior_res, ior_ims)
+        !write(0,*) ior_res
+        !write(0,*) ior_ims
+
         print *,"# [ephot] [sigma_scat] [sigma_abs]"
         
 
         do i=1,nephots
-            get_integrated_cross_sections(ephots(i), m, sigma_scat, sigma_abs)
+            delm = CMPLX(ior_res(i), ior_ims(i))
+            call get_integrated_cross_sections(ephots(i), delm, sigma_scat, sigma_abs)
             print *,ephots(i), sigma_scat, sigma_abs
         end do
 
@@ -61,76 +69,49 @@ contains
     
     ! TODO: add ability to read in a custom material file and interpolate it.
 
-    function linterp(x,y,xval)
-        implicit none 
-        real(kind=dp_real), intent(in) :: x(:), y(:), xval
-        real(kind=dp_real) :: linterp
-        integer :: i 
-        real(kind=dp_real) :: a,b
-
-        if ( xval < x(1) ) then
-            write(0,*) "ERROR: (linterp) requested value at x=",xval," however, &
-                & this is below the minimum value of x=",x(1)
-            stop 
-        else if ( xval > x(size(x)) ) then 
-            write(0,*) "ERROR: (linterp) requested value at x=",xval," however, &
-                & this is above the maximum value of x=",x(size(x))
-            stop 
-        end if 
-
-
-        i=1
-        do while( (x(i) < xval) )
-            i = i + 1
-        end do 
-
     
-        a = xval - x(i-1)
-        b = x(i) - x(i-1)
 
-        linterp = x(i-1) + (a/b)*( x(i) - x(i-1) )
-
-
-    end function linterp
-
-    subroutine get_ior()
+    subroutine get_ior(matfile, iorres, iorims)
         implicit none
-        real(kind=dp_real) :: 
+        character(len=200), intent(in) :: matfile 
+        character(len=200) :: mat 
+        real(kind=dp_real), intent(out), dimension(size(ephots)) :: iorres, iorims
         integer  :: i, allocatestatus, niors
+
         real(kind=dp_real), allocatable  :: file_ior_re(:), file_ior_im(:), file_ephots(:)
 
-
-        open(unit=1,file=material_file) ! open sphere file.
+        if (material .ne. 'custom') then 
+            write(0,*) "ERROR: Do not recognize material", material,". &
+                & GGADT does not currently have any built-in materials. &
+                & Specify --material='custom' and --material-file='/path/to/file'."
+            stop 
+        end if 
+        open(unit=1,file=matfile) ! open sphere file.
 
         ! Read header
-        read(1,*) niors, material
+        read(1,*) niors, mat
 
         ! -- 
-        allocate(file_ior_re(noirs),stat=allocatestatus)
+        allocate(file_ior_re(niors),stat=allocatestatus)
                 if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (file_ior_re) array ***"
-        allocate(file_ior_im(noirs),stat=allocatestatus)
+        allocate(file_ior_im(niors),stat=allocatestatus)
                 if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (file_ior_im) array ***"
-        allocate(file_ephots(noirs),stat=allocatestatus)
+        allocate(file_ephots(niors),stat=allocatestatus)
                 if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (file_ephots) array ***"
 
 
-        if (material .eq. 'custom') then
-            do i=1,niors
-                read(1,*) file_ephots(i), file_ior_re(i), file_ior_im(i)
-            end do 
-            do i=1,nephots
-                ior_res(i) = linterp(file_ephots,file_ior_re,ephots(i))
-                ior_ims(i) = linterp(file_ephots,file_ior_im,ephots(i))
-            end do 
-        else
-            write (0,*) "ERROR: Do not recognize material", material,". &
-                & GGADT does not currently have any built-in materials. &
-                & Specify --material='custom' and --material-file='/path/to/file'."
-            stop
-        end if
+        do i=1,niors
+            read(1,*) file_ephots(i), file_ior_re(i), file_ior_im(i)
+        end do 
+        do i=1,nephots
+            iorres(i) = linterp(file_ephots,file_ior_re,ephots(i))
+            iorims(i) = linterp(file_ephots,file_ior_im,ephots(i))
+        end do 
+       
+        close(1)
 
     end subroutine get_ior
-    function get_integrated_cross_sections(energy,delm,sigma_scat,sigma_abs)
+    subroutine get_integrated_cross_sections(energy,delm,sigma_scat,sigma_abs)
         implicit none
         real(kind=dp_real), intent(in) :: energy
         real(kind=dp_real), intent(out) :: sigma_abs, sigma_scat
@@ -160,7 +141,7 @@ contains
                         sh(c1,c2) = shadow_sphere(x(c1),y(c2), kphot, a_eff, delm)
                         phi_total(c1,c2) = phi_sphere(x(c1),y(c2),kphot,a_eff,delm)
                         phi1(c1,c2) = REAL(phi_total(c1,c2))
-                        phi2(c1,c2) = IM(phi_total(c1,c2))
+                        phi2(c1,c2) = AIMAG(phi_total(c1,c2))
                     end do
                  end do
 
@@ -168,27 +149,27 @@ contains
                 call rotate_spheres(rm)
                 do c1=1,nspheres
                     ior_r(c1) = REAL(delm)
-                    ior_i(c1) = IM(delm)
+                    ior_i(c1) = AIMAG(delm)
                 end do
                 sh = shadow_spheres(x,y,kphot)
                 phi_total = phi_spheres(x,y,kphot)
                 do c1=1,size(x)
                     do c2=1,size(y)
                         phi1(c1,c2) = REAL(phi_total(c1,c2))
-                        phi2(c1,c2) = IM(phi_total(c1,c2))
+                        phi2(c1,c2) = AIMAG(phi_total(c1,c2))
                     end do
                  end do
             else if (geometry .eq. 'ellipsoid') then 
                 do c1=1,size(x)
                     do c2=1,size(y)
                         sh(c1,c2) = shadow_ellipsoid(x(c1),y(c2), kphot, grain_a, delm, rm)
-                        phi_total(c1,c2) = phi_ellipsoid(x(c1),y(c2),kphot,grain_a, delm, rm )
+                        phi_total(c1,c2) = phi_ellipsoid(x(c1),y(c2),kphot, grain_a, delm,rm )
                         phi1(c1,c2) = REAL(phi_total(c1,c2))
-                        phi2(c1,c2) = IM(phi_total(c1,c2))
+                        phi2(c1,c2) = AIMAG(phi_total(c1,c2))
                     end do
                 end do
 
-            else then 
+            else 
                 write(0,*) "ERROR: Do not understand geometry=",geometry
                 stop
             end if
@@ -204,7 +185,7 @@ contains
         sigma_scat = sigma_scat/norientations
         sigma_abs = sigma_abs/norientations
         
-    end function get_integrated_cross_sections
+    end subroutine get_integrated_cross_sections
 
     subroutine calculate_differential_scattering_cross_section()
 
@@ -290,7 +271,7 @@ contains
             
 
             do i=1,nephots
-                e(i) = ephot_min + (i-1)*dephot
+                ephots(i) = ephot_min + (i-1)*dephot
             end do
         end if 
       ! Set Euler angles -------------------------------
@@ -420,6 +401,8 @@ contains
                 if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi1) array ***"
             allocate(phi2(ngrid,ngrid),stat = allocatestatus)
                 if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi2) array ***"
+            allocate(phi_total(ngrid,ngrid),stat = allocatestatus)
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi_total) array ***"
         end if 
     ! ----------------------------------------------------
       
