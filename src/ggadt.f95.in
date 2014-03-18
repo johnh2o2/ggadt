@@ -74,11 +74,12 @@ contains
     subroutine get_ior(matfile, iorres, iorims)
         implicit none
         character(len=200), intent(in) :: matfile 
-        character(len=200) :: mat 
+        character(len=200) :: mat, junk 
         real(kind=dp_real), intent(out), dimension(size(ephots)) :: iorres, iorims
-        integer  :: i, allocatestatus, niors
-
+        real(kind=dp_real) :: eps, imeps
+        integer  :: i, allocatestatus, ICOMP, niors, counter, ios, maxrecs
         real(kind=dp_real), allocatable  :: file_ior_re(:), file_ior_im(:), file_ephots(:)
+        maxrecs = 100000
 
         if (material .ne. 'custom') then 
             write(0,*) "ERROR: Do not recognize material", material,". &
@@ -89,7 +90,25 @@ contains
         open(unit=1,file=matfile) ! open sphere file.
 
         ! Read header
-        read(1,*) niors, mat
+        read(1,'(i3,a8,a64)') ICOMP, junk, mat
+        write(0,*) "Reading ",trim(adjustl(matfile))," contains information about '",trim(adjustl(mat)),"'"
+        print *,"# Material file: '",trim(adjustl(matfile)), "' (",trim(adjustl(mat)),")"
+
+        read(1,*) junk 
+        niors = 0
+        do i=1,maxrecs
+            READ(1,*,IOSTAT=ios) junk 
+            IF (ios /= 0) EXIT 
+            IF (J == maxrecs) THEN 
+                write(0,*) "ERROR (get_ior): Maximum number of records exceeded..."
+                STOP 
+            ENDIF 
+            niors = niors + 1
+        end do  
+        REWIND(1) 
+
+        read(1,*) junk 
+        read(1,*) junk 
 
         ! -- 
         allocate(file_ior_re(niors),stat=allocatestatus)
@@ -101,8 +120,9 @@ contains
 
 
         do i=1,niors
-            read(1,*) file_ephots(i), file_ior_re(i), file_ior_im(i)
-        end do 
+            read(1,*) file_ephots(i), file_ior_re(i), file_ior_im(i), eps, imeps
+            file_ephots(i) = file_ephots(i) * 1000.0 ! convert from eV to keV
+        end do
         do i=1,nephots
             iorres(i) = linterp(file_ephots,file_ior_re,ephots(i))
             iorims(i) = linterp(file_ephots,file_ior_im,ephots(i))

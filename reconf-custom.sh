@@ -23,7 +23,7 @@ make || exit
 make html || exit
 cp doc/*png doc/ggadt.html || exit
 
-src/ggadt --sed --material=custom --material-file=data/silicate.mat --ephot-min=0.7 --ephot-max=1.8 --dephot=0.2 || exit
+src/ggadt --sed --material=custom --material-file=data/materials/index_silD03 --ephot-min=0.7 --ephot-max=1.8 --dephot=0.2 || exit
 
 echo "SUCCESS!!!"
 
