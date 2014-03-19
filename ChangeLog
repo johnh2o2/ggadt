@@ -1,3 +1,9 @@
+* commit 6d4e8bc2a070270676805cb20d2ebc6f16b44071
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Mar 18 13:16:16 2014 -0500
+| 
+|     Compiles, reads bruce's material files, new set of material files in data/materials
+|  
 * commit 32807525d1a93c3c1dd6d08362ad9d9ac6ddbb66
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Mon Mar 17 19:56:59 2014 -0500

@@ -13,11 +13,13 @@ data_dt = np.dtype([('theta', np.float_), ('phi', np.float_), ('f', np.float_)])
 conv = (360*60*60)/(2*np.pi) # convert from radians to arcseconds (a more sensible unit)
 
 
-def make_data(params,fname,echo=False):
+def make_data(params,fname,echo=False, flags=[]):
 	clargs = " "
 	add = ""
 	for p in params:
 		clargs = clargs + " --"+p+"="+`params[p]`
+	for f in flags:
+		clargs = clargs + " --"+f
 	command = ggadt+clargs+add+" > "+fname
 	if echo: print command
 	os.system(command)

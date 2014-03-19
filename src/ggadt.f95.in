@@ -15,7 +15,6 @@ program ggadt
     real(kind=dp_real), allocatable :: x(:), y(:), kx(:), ky(:), thetax(:), thetay(:)
 
     complex(kind=dp_complex), allocatable :: sh(:,:), ftsh(:,:), phi_total(:,:)
-    real(kind=dp_real), allocatable ::  phi1(:,:), phi2(:,:)
 
     real(kind=dp_real), allocatable :: scatter(:,:)
     real(kind=dp_real), allocatable :: ephots(:), ior_res(:), ior_ims(:) ! NEW variables (for doing sed of extinction)
@@ -63,6 +62,9 @@ contains
             delm = CMPLX(ior_res(i), ior_ims(i))
             call get_integrated_cross_sections(ephots(i), delm, sigma_scat, sigma_abs)
             print *,ephots(i), sigma_scat, sigma_abs
+            write(0,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
+                    & " percent complete: ", (real(i)/real(nephots))*100.0, "%"
+
         end do
 
     end subroutine calculate_sed_of_cross_sections
@@ -91,9 +93,10 @@ contains
 
         ! Read header
         read(1,'(i3,a8,a64)') ICOMP, junk, mat
-        write(0,*) "Reading ",trim(adjustl(matfile))," contains information about '",trim(adjustl(mat)),"'"
-        print *,"# Material file: '",trim(adjustl(matfile)), "' (",trim(adjustl(mat)),")"
-
+        write(0,*) "Material file: '",trim(adjustl(matfile)),"'"
+        write(0,*) "Material: '",trim(adjustl(mat)),"'"
+        print *,"# Material file: '",trim(adjustl(matfile)),"'"
+        print *,"# Material: '",trim(adjustl(mat)),"'"
         read(1,*) junk 
         niors = 0
         do i=1,maxrecs
@@ -118,10 +121,9 @@ contains
         allocate(file_ephots(niors),stat=allocatestatus)
                 if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (file_ephots) array ***"
 
-
         do i=1,niors
             read(1,*) file_ephots(i), file_ior_re(i), file_ior_im(i), eps, imeps
-            file_ephots(i) = file_ephots(i) * 1000.0 ! convert from eV to keV
+            file_ephots(i) = file_ephots(i) / 1000.0 ! convert from eV to keV
         end do
         do i=1,nephots
             iorres(i) = linterp(file_ephots,file_ior_re,ephots(i))
@@ -160,8 +162,6 @@ contains
                     do c2=1,size(y)
                         sh(c1,c2) = shadow_sphere(x(c1),y(c2), kphot, a_eff, delm)
                         phi_total(c1,c2) = phi_sphere(x(c1),y(c2),kphot,a_eff,delm)
-                        phi1(c1,c2) = REAL(phi_total(c1,c2))
-                        phi2(c1,c2) = AIMAG(phi_total(c1,c2))
                     end do
                  end do
 
@@ -171,12 +171,11 @@ contains
                     ior_r(c1) = REAL(delm)
                     ior_i(c1) = AIMAG(delm)
                 end do
-                sh = shadow_spheres(x,y,kphot)
+                
                 phi_total = phi_spheres(x,y,kphot)
                 do c1=1,size(x)
                     do c2=1,size(y)
-                        phi1(c1,c2) = REAL(phi_total(c1,c2))
-                        phi2(c1,c2) = AIMAG(phi_total(c1,c2))
+                        sh(c1,c2) = 1-exp( (0.0,1.0)*phi_total(c1,c2) )
                     end do
                  end do
             else if (geometry .eq. 'ellipsoid') then 
@@ -184,8 +183,7 @@ contains
                     do c2=1,size(y)
                         sh(c1,c2) = shadow_ellipsoid(x(c1),y(c2), kphot, grain_a, delm, rm)
                         phi_total(c1,c2) = phi_ellipsoid(x(c1),y(c2),kphot, grain_a, delm,rm )
-                        phi1(c1,c2) = REAL(phi_total(c1,c2))
-                        phi2(c1,c2) = AIMAG(phi_total(c1,c2))
+                    
                     end do
                 end do
 
@@ -196,7 +194,7 @@ contains
 
             do c1=1,size(x)
                 do c2=1,size(y)
-                 sigma_scat = sigma_scat + (1 - exp(-2*phi2(c1,c2)))*dx*dy 
+                 sigma_scat = sigma_scat + (1 - exp(-2*AIMAG(phi_total(c1,c2))))*dx*dy 
                  sigma_abs = sigma_abs + (abs(sh(c1,c2))**2)*dx*dy
                 end do 
             end do 
@@ -417,10 +415,10 @@ contains
         allocate(sh(ngrid,ngrid),stat = allocatestatus)
             if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (sh) array ***"
         if (sed_mode) then
-            allocate(phi1(ngrid,ngrid),stat = allocatestatus)
-                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi1) array ***"
-            allocate(phi2(ngrid,ngrid),stat = allocatestatus)
-                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi2) array ***"
+         !   allocate(phi1(ngrid,ngrid),stat = allocatestatus)
+         !       if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi1) array ***"
+         !   allocate(phi2(ngrid,ngrid),stat = allocatestatus)
+         !       if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi2) array ***"
             allocate(phi_total(ngrid,ngrid),stat = allocatestatus)
                 if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi_total) array ***"
         end if 
