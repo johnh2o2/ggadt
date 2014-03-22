@@ -3,6 +3,11 @@ module constants
   implicit none
 
   save
+  integer, parameter                            ::  stdout                 = 6
+  integer, parameter                            ::  stderr                 = 0
+  
+
+
   integer, parameter                            ::  ISIGN                  = 1
   integer, parameter                            ::  dp_real                = SELECTED_REAL_KIND(8,8)
   @FFTW3_UNCOMMENT@ integer, parameter          ::  dp_complex             = c_double_complex

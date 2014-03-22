@@ -174,7 +174,7 @@ module common_mod
 
       call process_command_line(opts,ierr)
       if (ierr .ne. 0) then
-        write (0,*) "ERROR in processing command line arguments." 
+        write (stderr,*) "ERROR in processing command line arguments." 
         stop
       end if 
       
@@ -185,7 +185,7 @@ module common_mod
       if (parameter_file_name .ne. "") then
         call process_input_file(opts,parameter_file_name,ierr,delim_char="=")
         if (ierr .ne. 0) then
-          print *,"Cannot read ",parameter_file_name,". Quitting."
+          write(stderr,*) "ERROR: Cannot read ",parameter_file_name,". Quitting."
           stop
         end if 
       end if
@@ -197,7 +197,7 @@ module common_mod
       call get_option_real(opts,"grain-axis-z",grain_a(3))
       call get_option_real(opts,"ephot",ephot)
       call get_flag(opts,"use-padded-fft",use_padded_fft)
-      call get_flag(opts,"sed",sed_mode)  ! NEW FLAG for sed mode
+      call get_flag(opts,"sed",sed_mode)  
       call get_flag(opts,"verbose",verbose_mode)
       call get_flag(opts,"timing",timing_mode)
       call get_option_real(opts,"ior-re",ior_re)
@@ -226,8 +226,8 @@ module common_mod
 
 
       if (asked_for_version) then
-        print *, VERSION
-        print *, INFO 
+        write(stdout,*) VERSION
+        write(stdout,*) INFO 
         stop
       end if 
 
@@ -241,15 +241,15 @@ module common_mod
 
 
       if (option_found(opts,"nscatter") .and. option_found(opts, "dtheta")) then
-          write(0,*) "Warning: You have specified BOTH the 'nscatter' and 'dtheta' options."
-          write(0,*) "We will use your specified value of nscatter:", nscatter
+          write(stderr,*) "Warning: You have specified BOTH the 'nscatter' and 'dtheta' options."
+          write(stderr,*) "We will use your specified value of nscatter:", nscatter
       else if (option_found(opts,"dtheta")) then
           nscatter = int(ceiling(real(2*max_angle,kind=dp_real)/dtheta))
       end if 
 
       if (option_found(opts,"dephot") .and. option_found(opts, "nephots")) then
-          write(0,*) "Warning: You have specified BOTH the 'nephots' and 'dephot' options."
-          write(0,*) "We will use your specified value of nephots:", nephots
+          write(stderr,*) "Warning: You have specified BOTH the 'nephots' and 'dephot' options."
+          write(stderr,*) "We will use your specified value of nephots:", nephots
       else if (option_found(opts,"dephot")) then
           nephots = int(ceiling((ephot_max - ephot_min)/dephot))
       else 
@@ -374,8 +374,8 @@ module common_mod
         fftsize = norig*enhancement + 1
         
         if (fsize < norig) then
-            write(0,*) "ERROR"
-            write(0,*) "Your chosen value for ngrain is too low to obtain &
+            write(stderr,*) "ERROR"
+            write(stderr,*) "Your chosen value for ngrain is too low to obtain &
                     &high resolution features within the scattering region &
                     &that you've specified. &
                     &Choose an ngrain value of at least",norig
@@ -442,11 +442,11 @@ module common_mod
         real(kind=dp_real) :: a,b
 
         if ( xval < x(1) ) then
-            write(0,*) "ERROR: (linterp) requested value at x=",xval," however, &
+            write(stderr,*) "ERROR: (linterp) requested value at x=",xval," however, &
                 & this is below the minimum value of x=",x(1)
             stop 
         else if ( xval > x(size(x)) ) then 
-            write(0,*) "ERROR: (linterp) requested value at x=",xval," however, &
+            write(stderr,*) "ERROR: (linterp) requested value at x=",xval," however, &
                 & this is above the maximum value of x=",x(size(x))
             stop 
         end if 

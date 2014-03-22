@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 from installation_vars import *
-
+from datetime import timedelta, datetime, tzinfo
 
 data_dt = np.dtype([('theta', np.float_), ('phi', np.float_), ('f', np.float_)])
 conv = (360*60*60)/(2*np.pi) # convert from radians to arcseconds (a more sensible unit)
@@ -51,6 +51,14 @@ def all_zeros(data):
 
 def load_data(fname):
 	return np.loadtxt(fname,dtype=data_dt)
+
+def load_sed_data(fname):
+	dt_sed = np.dtype([
+			('ephot',np.float_),
+			('sig_scat',np.float_),
+			('sig_abs',np.float_)
+			])
+	return np.loadtxt(fname,dtype=dt_sed)
 
 def filter_data(data,boundaries=[-2000,2000,-2000,2000],delta=100):
 	xmin = boundaries[0]
@@ -247,4 +255,106 @@ def add_subplot_axes(fig,ax,rect,axisbg='w'):
     subax.xaxis.set_tick_params(labelsize=x_labelsize)
     subax.yaxis.set_tick_params(labelsize=y_labelsize)
     return subax
+def get_cluster_header(filename):
 
+    header = {
+    	'MIGRATE' : None,
+    	'ISEED' : None,
+    	'NS' : None,
+    	'VTOT' : None,
+    	'alpha' : np.zeros(3),
+    	'A_1' : np.zeros(3),
+    	'A_2' : np.zeros(3),
+    }
+    Cfile = open(filename,'r')
+
+    for i in range(0,4):
+    	line = Cfile.readline()
+    	words = line[:-1].split(' ')
+    	while '' in words: words.remove('')
+    	#print words
+    	for j,w in enumerate(words):
+    		
+    		if w == 'MIGRATE=': header['MIGRATE'] = words[j+1]
+    		elif w == 'ISEED=' : header['ISEED'] = words[j+1]
+    		elif w == 'NS,':
+    			header['NS'] = words[j-6]
+    			header['VTOT'] = words[j-5]
+    			header['alpha'][0] = words[j-4]
+    			header['alpha'][1] = words[j-3]
+    			header['alpha'][2] = words[j-2]
+    		elif w == 'A_1':
+    			header['A_1'][0] = words[j-4]
+    			header['A_1'][1] = words[j-3]
+    			header['A_1'][2] = words[j-2]
+    		elif w == 'A_2':
+    			header['A_2'][0] = words[j-4]
+    			header['A_2'][1] = words[j-3]
+    			header['A_2'][2] = words[j-2]
+    		'''
+    		if w == 'MIGRATE=': print 'MIGRATE: "',words[j+1],'"'
+    		elif w == 'ISEED=' : print 'ISEED: "', words[j+1],'"'
+    		elif w == 'NS,':
+    			print 'NS: "', words[j-6],'"'
+    			print 'VTOT: "', words[j-5],'"'
+    			print 'alpha[0]: "',words[j-4],'"'
+    			print 'alpha[1]: "',words[j-2],'"'
+    			print 'alpha[2]: "',words[j-3],'"'
+    			
+    		elif w == 'A_1':
+    			print 'A_1[0]: "',words[j-4],'"'
+    			print 'A_1[1]: "',words[j-2],'"'
+    			print 'A_1[2]: "',words[j-3],'"'
+    		elif w == 'A_2':
+    			print 'A_2[0]: "',words[j-4],'"'
+    			print 'A_2[1]: "',words[j-2],'"'
+    			print 'A_2[2]: "',words[j-3],'"'
+    		'''
+    Cfile.close()
+    
+    return header
+def get_porosity(clusterfname):
+	header = get_cluster_header(clusterfname)
+	a = header['alpha']
+
+	f = (a[0] + a[1] - a[2])
+	f*= (a[0] + a[2] - a[1])
+	f*= (a[1] + a[2] - a[0])
+
+	f = 1.0/sqrt(f)
+
+	return 1-f
+def get_eq_ellipsoid(clusterfname):
+	header = get_cluster_header(clusterfname)
+	a = header['alpha']
+
+	A = pow((a[0] + a[1] - a[2]),0.5)
+	B = pow((a[0] + a[2] - a[1]),0.5)
+	C = pow((a[1] + a[2] - a[0]),0.5)
+
+	return A,B,C
+def get_timestamp():
+	class EST(tzinfo):
+		def utcoffset(self, dt):
+			return timedelta(hours=-5) + self.dst(dt)
+		def dst(self, dt):
+			# DST starts 2nd Sunday in March
+			d = datetime(dt.year, 3, 11)   
+			self.dston = d - timedelta(days=d.weekday() + 1)
+			d = datetime(dt.year, 11, 4)
+			self.dstoff = d - timedelta(days=d.weekday() + 1)
+			if self.dston <=  dt.replace(tzinfo=None) < self.dstoff:
+				return timedelta(hours=1)
+			else:
+				return timedelta(0)
+		def tzname(self,dt):
+			return "EST"
+
+	time_now = datetime.now(tz=EST())
+	timestamp = "%s (%s)"%(time_now.ctime(), time_now.tzname())
+	return timestamp
+
+def add_timestamp(f):
+	f.text(0.04,0.01,get_timestamp(),va='bottom',ha='left',fontsize=10)
+
+#def get_header_from_ggadt_output(filename):

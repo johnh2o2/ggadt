@@ -14,7 +14,7 @@ from matplotlib import rc
 from installation_vars import *
 import plot_utilities as pu
 
-FORCE_REDO = False
+FORCE_REDO = True
 rc('font',**{'family':'serif'})
 ## for Palatino and other serif fonts use:
 #rc('font',**{'family':'serif','serif':['Palatino']})
@@ -32,22 +32,22 @@ material_names = { 	'index_CpeD03' :  "graphite, E perp to c axis, improved eps2
 material_name = material_names[material_file_name]
 
 
-cluster = "BAM2.256.1"
+cluster = "BA.256.1"
 
 flags = [ 'sed' ]
 params = {
 	'material' 			: 'custom',
 	'material-file' 	: material_file,
-	'grain-geometry' 	: 'sphere',
+	'grain-geometry' 	: 'spheres',
 	'aeff' 				: 0.2,
 	'ephot-min'			: 0.1,
 	'ephot-max'			: 7.3,
-	'dephot'			: 0.001,
+	'dephot'			: 0.0005,
 	'cluster-file-name'	: cluster_dir + "/"+cluster+".targ",
 	'grain-axis-x'		: sqrt(2),
 	'grain-axis-y'		: 1.0,
 	'grain-axis-z'		: 1.0,
-	'ngrain'			: 128,
+	'ngrain'			: 512,
 	'norientations'		: 50
 }
 output_file = pu.data_dir + "/D03_f7_"+material_file_name
@@ -68,10 +68,11 @@ dt = np.dtype([('E',np.float_), ('sig_scat',np.float_),('sig_abs',np.float_)])
 
 
 comp_data_name = spheres_output
+#if FORCE_REDO or not os.path.exists(comp_data_name): 
 
 data = np.loadtxt(output_file, dtype=dt)
 
-comparison_data = None#np.loadtxt(comp_data_name,dtype=dt)
+comparison_data = np.loadtxt(comp_data_name,dtype=dt)
 
 
 data['E'] *= 1000
@@ -160,5 +161,8 @@ ax32.xaxis.set_minor_locator(plt.MultipleLocator(5))
 f.text(0.5, 0.04, 'E (eV)', ha='center', va='center')
 f.text(0.06, 0.5, '$Q = \\sigma/(\\pi a_{eff}^2)$', ha='center', va='center', rotation='vertical')
 f.text(0.5,0.89,fig_title,ha='center', va='bottom')
-f.savefig(output_file+".png")
+if comparison_data is not None:
+	f.text(0.89,0.04,'Red: '+cluster,fontweight='bold',fontsize=10,color='r',ha='right', va='center')
+	f.savefig(output_file+"_compared_to_"+cluster+".png")
+else: f.savefig(output_file+".png")
 plt.show()

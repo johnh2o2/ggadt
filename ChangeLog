@@ -1,3 +1,9 @@
+* commit 898f767321834e5196f9c56fb2e438158135180b
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Mar 18 19:11:24 2014 -0500
+| 
+|     D03_f7.py now works, started exploring_fluffiness.py to look at changes as a function of porosity. Will need to get full set of agglomerate files from Bruce's website.
+|  
 * commit 6d4e8bc2a070270676805cb20d2ebc6f16b44071
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Tue Mar 18 13:16:16 2014 -0500
