@@ -7,6 +7,7 @@ import numpy as np
 from scipy.interpolate import RectBivariateSpline
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
+import pylab
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
@@ -14,13 +15,20 @@ from matplotlib import rc
 from installation_vars import *
 import plot_utilities as pu
 
-rc('font',**{'family':'serif','serif':['Palatino']})
+params = {'legend.fontsize': 10,
+          'legend.linewidth': 1}
+pylab.rcParams.update(params)
+rc('font',**{'family':'serif'})
 
 ForceRedo = False
+ForceRedo_answer = False
 Material = "index_silD03"
-cluster = "BA.256.1"
-ngrains = np.array([ 32, 64, 128, 256, 512, 1024 ])
-norientations = np.array([ 10, 50, 100, 150, 200])
+cluster = "BA.1024.1"
+ngrains = np.array([ 16, 32, 64, 128 ])
+norientations = np.array([ 1, 5, 10, 50, 100, 200 ])
+
+Answer_norientations = 100
+Answer_ngrain = 512
 
 '''
 MigrationModes = [ '', 'M1', 'M2' ]
@@ -59,12 +67,12 @@ params = {
 	'norientations'		: None
 }
 
-params['ngrain'] = ngrains[-1]
-params['norientations'] = norientations[-1]
+params['ngrain'] = Answer_ngrain
+params['norientations'] = Answer_norientations
 ans_fname = data_dir + "/exploring_fluffiness/ggadt_ans"+cluster+"_emin%.1f_emax%.1f_deph%.1e_ng%d_no%d_%s.dat"%(params['ephot-min'],params['ephot-max'],params['dephot'],params['ngrain'],params['norientations'],Material)
 
 
-if ForceRedo or not os.path.exists(ans_fname) or os.stat(ans_fname).st_size == 0: pu.make_data(params,ans_fname,flags=flags)
+if ForceRedo_answer or not os.path.exists(ans_fname) or os.stat(ans_fname).st_size == 0: pu.make_data(params,ans_fname,flags=flags)
 
 ans_dat = pu.load_sed_data(ans_fname)
 
@@ -93,21 +101,35 @@ footnote = footnote + "\nMaterial: %s"%(material_name)
 footnote = footnote + "\nMaterial file: %s"%(Material)
 footnote = footnote + "\nEnergy range: [%.1f, %.1f] keV (step: %.2f eV)"%(params['ephot-min'],params['ephot-max'],params['dephot']*1000)
 footnote = footnote + "\na_eff: %.1f"%(params['aeff'])
-footnote = footnote + "\nnorientations: %d"%(params['norientations'])
 
 f = plt.figure()
 pu.add_timestamp(f)
 f.text(0.15,0.15,footnote,va='bottom',ha='left',fontsize=10)
-ax = f.add_subplot(111)
-ax.set_xlabel("ngrain")
-ax.set_ylabel("Accuracy")
-colors = ['b','g','r','k']
-lss = [ ':', '--','-']
-for i in range(0,len(norientations)):
-	ax.plot(ngrains,RMS_ext[:,i]*100,label="ext, norien. = %d"%(norientations[i]),color=colors[i%len(colors)],ls=lss[i/len(colors)])
+ax = f.add_subplot(311)
+ax2 = f.add_subplot(312)
+ax3 = f.add_subplot(313)
 
-ax.set_xscale('log')
-ax.set_yscale('log')
-ax.legend(loc='best')
+colors = ['b','g','r','k']
+lss = [ ':','--','-']
+dats = [ RMS_abs, RMS_scat, RMS_ext ]
+labs = ["abs", "scat", "ext"]
+for j,AX in enumerate([ax, ax2, ax3]):
+	for i in range(0,len(ngrains)):
+		AX.plot(norientations,dats[j][i,:],label="ngrain=%d"%(ngrains[i]),color=colors[i%len(colors)],ls=lss[i/len(colors)])
+	AX.text(0.1,0.9,labs[j],transform=AX.transAxes, ha='left',va='top')
+	#AX.axhline(0.01,color='k',ls='-',lw=2)
+	#AX.yaxis.set_major_locator(plt.MultipleLocator(0.01))
+	#AX.yaxis.set_minor_locator(plt.MultipleLocator(0.005))
+	if j != 2: AX.set_xticks(())
+	AX.set_xscale('log')
+	AX.set_yscale('log')
+	AX.set_ylim(pow(10,-5),pow(10,-2))
+	#AX.legend(loc='best')
+ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2),
+          ncol=2, fancybox=True, shadow=True)
+
+f.text(0.5, 0.04, 'norientations', ha='center', va='center')
+f.text(0.06, 0.5, 'RMS difference', ha='center', va='center', rotation='vertical')
+f.subplots_adjust(hspace=0)
 plt.show()
 

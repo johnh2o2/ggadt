@@ -1,3 +1,9 @@
+* commit 75aa5bc5a0ab88b70cb746e379e73abf4392da53
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Fri Mar 21 21:02:32 2014 -0500
+| 
+|     added cluster files. OpenMP works. Wrote several python scripts to test the sed of absorption/scattering cross sections. Absorption efficiency DECREASES with porosity. The opposite should happen.
+|  
 * commit 898f767321834e5196f9c56fb2e438158135180b
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Tue Mar 18 19:11:24 2014 -0500

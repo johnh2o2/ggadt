@@ -27,10 +27,12 @@ import plot_utilities as pu
 ## for Palatino and other serif fonts use:
 rc('font',**{'family':'serif','serif':['Palatino']})
 
+PLOT_EMT = False
+
 ForceRedo = False
 Material = "index_silD03"
 MigrationModes = [ '', 'M1', 'M2' ]
-Realizations = np.arange(1,7) #np.arange(1,13) is max (goes up to 12) 
+Realizations = np.arange(1,9) #np.arange(1,13) is max (goes up to 12) 
 NumSpheres = [ 8, 16, 32, 64, 128, 256, 512, 1024 ] #[ 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096 ]
 
 
@@ -58,7 +60,7 @@ params = {
 	'grain-axis-x'		: 1.0,
 	'grain-axis-y'		: 1.0,
 	'grain-axis-z'		: 1.0,
-	'ngrain'			: 512,
+	'ngrain'			: 64,
 	'norientations'		: 100
 }
 
@@ -145,45 +147,53 @@ all_data = np.sort(all_data,order='porosity')
 f = plt.figure()
 ax = f.add_subplot(111)
 ax.set_xlim(0,1)
-ax.set_ylabel("$\\left<Q\\right>$")
+#ax.set_ylabel("$\\left<Q\\right>$")
+ax.set_ylabel("$\\Delta\\sigma /\\sigma$")
 ax.set_xlabel("Porosity")
 
 
-#por_emt, abs_emt, scat_emt, ext_emt, fudge = np.load(data_dir + "/exploring_fluffiness/emt_results.npy")
 
-
+mode = "fdiff_"
 name="scat"
-ax.scatter(all_data['porosity'],all_data['avg_q'+name],color='b',alpha=0.5,label = name)
-#ax.plot(por_emt, scat_emt, color='b',lw=2,alpha=0.5,ls='--')
+ax.scatter(all_data['porosity'],all_data[mode+name],color='b',alpha=0.5,label = name)
 
 name="abs"
-ax.scatter(all_data['porosity'],all_data['avg_q'+name],color='g',alpha=0.5, label = name)
-#ax.plot(por_emt, abs_emt, color='g',lw=2,alpha=0.5,ls='--')
+ax.scatter(all_data['porosity'],all_data[mode+name],color='g',alpha=0.5, label = name)
 
-ax.scatter(all_data['porosity'],all_data['avg_qext'],color='k', label="ext")
-#ax.plot(por_emt, ext_emt, color='k',lw=2,alpha=0.5,ls='--')
+
+name="ext"
+ax.scatter(all_data['porosity'],all_data[mode+name],color='k', label=name)
+
 ax.legend(loc=2)
-'''
-porind = int(0.25*len(por_emt))
-di = 1
-ax.annotate('EMT scat', xy=(por_emt[porind+2*di+1],scat_emt[porind+2*di+2]),  xycoords='data',
-            xytext=(0.09,-0.6), textcoords='data',
-            arrowprops=dict(facecolor='black', width=0.5,headwidth=2.0),
-            horizontalalignment='left', verticalalignment='top',
-            )
-ax.annotate('EMT ext', xy=(por_emt[porind+di],ext_emt[porind+di]-0.01),  xycoords='data',
-            xytext=(0.07,-0.5), textcoords='data',
-            arrowprops=dict(facecolor='black', width=0.5,headwidth=2.0),
-            horizontalalignment='left', verticalalignment='top',
-            )
-ax.annotate('EMT abs', xy=(por_emt[porind],abs_emt[porind]-0.01),  xycoords='data',
-            xytext=(0.05,-0.4), textcoords='data',
-            arrowprops=dict(facecolor='black', width=0.5,headwidth=2.0),
-            horizontalalignment='left', verticalalignment='top',
-            )
 
-ax.text(0.85,0.05,"EMT: $f_{vac}=%.2f P$"%(fudge),va='bottom',ha='right',fontsize=12,transform=ax.transAxes)
-'''
+if PLOT_EMT:
+
+	por_emt, abs_emt, scat_emt, ext_emt, fudge = np.load(data_dir + "/exploring_fluffiness/emt_results.npy")
+	ax.plot(por_emt, scat_emt, color='b',lw=2,alpha=0.5,ls='--')
+	ax.plot(por_emt, abs_emt, color='g',lw=2,alpha=0.5,ls='--')
+	ax.plot(por_emt, ext_emt, color='k',lw=2,alpha=0.5,ls='--')
+
+
+	porind = int(0.25*len(por_emt))
+	di = 1
+	ax.annotate('EMT scat', xy=(por_emt[porind+2*di+1],scat_emt[porind+2*di+2]),  xycoords='data',
+	            xytext=(0.09,-0.6), textcoords='data',
+	            arrowprops=dict(facecolor='black', width=0.5,headwidth=2.0),
+	            horizontalalignment='left', verticalalignment='top',
+	            )
+	ax.annotate('EMT ext', xy=(por_emt[porind+di],ext_emt[porind+di]-0.01),  xycoords='data',
+	            xytext=(0.07,-0.5), textcoords='data',
+	            arrowprops=dict(facecolor='black', width=0.5,headwidth=2.0),
+	            horizontalalignment='left', verticalalignment='top',
+	            )
+	ax.annotate('EMT abs', xy=(por_emt[porind],abs_emt[porind]-0.01),  xycoords='data',
+	            xytext=(0.05,-0.4), textcoords='data',
+	            arrowprops=dict(facecolor='black', width=0.5,headwidth=2.0),
+	            horizontalalignment='left', verticalalignment='top',
+	            )
+
+	ax.text(0.85,0.05,"EMT: $f_{vac}=%.2f P$"%(fudge),va='bottom',ha='right',fontsize=12,transform=ax.transAxes)
+
 footnote = "Material: %s"%(material_name)
 footnote = footnote + "\nMaterial file: %s"%(Material)
 footnote = footnote + "\nEnergy range: [%.1f, %.1f] keV (step: %.2f eV)"%(params['ephot-min'],params['ephot-max'],params['dephot']*1000)
@@ -193,6 +203,6 @@ footnote = footnote + "\nnorientations: %d"%(params['norientations'])
 
 f.text(0.15,0.15,footnote,va='bottom',ha='left',fontsize=10)
 pu.add_timestamp(f)
-f.savefig(parent_dir+"/comparing_emt_to_ggadt.png")
+f.savefig(parent_dir+"/comparing_emtto_ggadt.png")
 plt.show()
 

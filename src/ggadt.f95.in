@@ -212,8 +212,8 @@ contains
             !$omp do schedule(dynamic) private(c1,c2) 
             do c1=1,size(x)
                 do c2=1,size(y)
-                 sigma_scat = sigma_scat + (1 - exp(-2*AIMAG(phi_total(c1,c2))))*dx*dy 
-                 sigma_abs = sigma_abs + (abs(sh(c1,c2))**2)*dx*dy
+                 sigma_abs = sigma_abs + (1 - exp(-2*AIMAG(phi_total(c1,c2))))*dx*dy 
+                 sigma_scat = sigma_scat + (abs(sh(c1,c2))**2)*dx*dy
                 end do 
             end do
             !$omp end do nowait
