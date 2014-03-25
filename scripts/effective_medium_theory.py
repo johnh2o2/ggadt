@@ -15,20 +15,23 @@ from matplotlib import rc
 from installation_vars import *
 import plot_utilities as pu
 
-rc('font',**{'family':'serif','serif':['Palatino']})
-
+rc('font',**{'family':'serif'})
 porosities = []
+
+
+fudge = 0.30
 
 local_error = True
 global_error = True
 comparison = True
-
+use_shen_definition = False
+hold_sum_fi_equal_to_one = True
 
 ForceRedo = False
 Material = "index_silD03"
 cluster = "BA.256.1"
 cluster2 = "BAM2.512.1"
-hold_sum_fi_equal_to_one = True
+
 clusters = np.array([ 	
 					["BA.64.1", "BA.256.1", "BA.512.1" ], 
 					["BAM1.64.1", "BAM1.256.1", "BAM1.512.1"],
@@ -76,8 +79,8 @@ params = {
 	'grain-axis-x'		: 1.0,
 	'grain-axis-y'		: 1.0,
 	'grain-axis-z'		: 1.0,
-	'ngrain'			: 512,
-	'norientations'		: 100
+	'ngrain'			: 64,
+	'norientations'		: 64
 }
 
 eps_vac = 1
@@ -136,12 +139,18 @@ def get_ior_eff(porosity,m,fud=0.94):
 	eps_m = comp_pow(m,-2)
 	return comp_pow(get_eps_eff(fud*porosity,1-porosity,eps_m),-0.5)
 
+def get_ior_eff_shen(porosity,m):
+	return 1 + porosity*(m - 1.0)
+
 def q_emt(porosity,ephot,ior_re,ior_im, a_eff, fud=0.94):
 	hc = 0.00124
 	k = 2*np.pi*ephot/hc
 
-	if hold_sum_fi_equal_to_one:
+	if use_shen_definition:
+		m = get_ior_eff_shen(porosity,complex(ior_re,ior_im))
+	elif hold_sum_fi_equal_to_one:
 		m = get_ior_eff_old(porosity,complex(ior_re,ior_im),fud=fud)
+	
 	else:
 		m = get_ior_eff(porosity,complex(ior_re,ior_im),fud=fud)
 	rho = 2*k*a_eff*(m-1)
@@ -183,7 +192,6 @@ ggadt_data = pu.load_sed_data(fname)
 ephots = ggadt_data['ephot']
 
 
-fudge = 0.94
 if global_error:
 	fvacs = np.linspace(0.1,0.99)
 	err_abs = np.zeros((clusters.size,len(fvacs),len(ephots)))

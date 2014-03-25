@@ -43,6 +43,7 @@ module common_mod
 
   logical                                     ::  use_padded_fft
   logical                                     ::  asked_for_version
+  logical                                     ::  asked_for_help
   logical                                     ::  verbose_mode
   logical                                     ::  timing_mode
   character(len=200)                          ::  parameter_file_name
@@ -73,7 +74,10 @@ module common_mod
      
       ! define help flag
 
-      call define_help_flag(opts,print_help)
+      !call define_help_flag(opts,print_help)
+
+      call define_flag(opts,"help",abbrev='h',description="Print this help message.",&
+         group=group)
       call define_flag(opts, &
         "version",abbrev='v',&
         description="Print version information")
@@ -163,7 +167,7 @@ module common_mod
         "material-file", default_material_file,&
         description="Name of custom material file")
 
-      call define_option_string(opts,"fftw-optimization",default_fftw_optimization_mode_name,required=.false.,&
+      call define_option_string(opts,"fftw-optimization",default_fftw_opt_name,required=.false.,&
         description="[estimate,measure,patient,exhaustive]")
       call define_flag(opts,"use-padded-fft",&
         description="Use a slower FFT method that pads a &
@@ -223,12 +227,16 @@ module common_mod
       call get_option_string(opts,"material-file",material_file)
      
       call get_flag(opts,"version",asked_for_version)
+      call get_flag(opts,"help",asked_for_help)
 
 
       if (asked_for_version) then
         write(stdout,*) VERSION
         write(stdout,*) INFO 
         stop
+      end if
+      if (asked_for_help) then
+        call print_help(opts) 
       end if 
 
       delm = cmplx(ior_re,ior_im)

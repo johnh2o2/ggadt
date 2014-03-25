@@ -5,6 +5,9 @@ module constants
   save
   integer, parameter                            ::  stdout                 = 6
   integer, parameter                            ::  stderr                 = 0
+  integer, parameter                            ::  input_unit             = 1
+
+  integer, parameter                            ::  max_str_len            = 300
   
 
 
@@ -20,30 +23,30 @@ module constants
   integer, parameter                            ::  MAX_NGRID              = 2048
 
 
-  real(kind=dp_real), parameter                 ::  default_aeff           = real(0.2,kind=dp_real)
-  real(kind=dp_real), parameter                 ::  default_ephot          = real(2.0,kind=dp_real)
-  real(kind=dp_real), parameter                 ::  default_grain_a1       = real(1.0,kind=dp_real)
-  real(kind=dp_real), parameter                 ::  default_grain_a2       = real(1.0,kind=dp_real)
-  real(kind=dp_real), parameter                 ::  default_grain_a3       = real(1.0,kind=dp_real)
-  real(kind=dp_real), parameter                 ::  default_ior_re         = real(-1.920E-4,kind=dp_real)
-  real(kind=dp_real), parameter                 ::  default_ior_im         = real(2.807E-5,kind=dp_real)
+  real(kind=dp_real), parameter                 ::  default_aeff           = 0.2
+  real(kind=dp_real), parameter                 ::  default_ephot          = 2.0
+  real(kind=dp_real), parameter                 ::  default_grain_a1       = 1.0
+  real(kind=dp_real), parameter                 ::  default_grain_a2       = 1.0
+  real(kind=dp_real), parameter                 ::  default_grain_a3       = 1.0
+  real(kind=dp_real), parameter                 ::  default_ior_re         = -1.920E-4
+  real(kind=dp_real), parameter                 ::  default_ior_im         = 2.807E-5
   character(len=200), parameter                 ::  default_grain_geometry = 'sphere'
   character(len=50), parameter                  ::  default_euler_angle_mode = 'random'
   character(len=200), parameter                 ::  default_euler_angle_file = ''
   integer, parameter                            ::  default_ngrain         = 256
   integer, parameter                            ::  default_nscatter       = 100
   integer, parameter                            ::  default_norientations  = 100
-  real(kind=dp_real), parameter                 ::  default_dtheta         = real(10.0,kind=dp_real)
-  real(kind=dp_real), parameter                 ::  default_max_angle      = real(3000.,kind=dp_real)
+  real(kind=dp_real), parameter                 ::  default_dtheta         = 10.0
+  real(kind=dp_real), parameter                 ::  default_max_angle      = 3000.
   character(len=200), parameter                 ::  default_cluster_file_name = ''
-  character(len=100), parameter                 ::  default_fftw_optimization_mode_name = 'estimate'
+  character(len=100), parameter                 ::  default_fftw_opt_name = 'estimate'
 
 
 ! New defaults for sed variables
-  integer, parameter                            ::  default_nephots              = real(100,kind=dp_real)
-  real(kind=dp_real), parameter                 ::  default_ephot_min              = real(0.1,kind=dp_real)
-  real(kind=dp_real), parameter                 ::  default_ephot_max              = real(5.0,kind=dp_real)
-  character(len=200), parameter                 ::  default_material               = "olivine"
+  integer, parameter                            ::  default_nephots                = 100
+  real(kind=dp_real), parameter                 ::  default_ephot_min              = 0.1
+  real(kind=dp_real), parameter                 ::  default_ephot_max              = 5.0
+  character(len=200), parameter                 ::  default_material               = "custom"
   character(len=200), parameter                 ::  default_material_file          = ""
   real(kind=dp_real), parameter                 ::  default_dephot                 = 0.1
      

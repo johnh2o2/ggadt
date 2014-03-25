@@ -1,3 +1,9 @@
+* commit 08d48078c2d39205c9cc907483bed36cd1029ba4
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Sun Mar 23 09:54:30 2014 -0500
+| 
+|     Tested ellipsoid, sphere and spheres module against mie theory, all is well (had abs and scat switched in the code somewhere). OpenMP mode is BROKEN. Does not produce sensible results (lots of stochasticity). Need to find fix. Mie theory python script added.
+|  
 * commit 75aa5bc5a0ab88b70cb746e379e73abf4392da53
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Fri Mar 21 21:02:32 2014 -0500

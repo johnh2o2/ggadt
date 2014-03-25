@@ -3,6 +3,8 @@
 ! v0.8b2
 !
 ! Copyright (c) 2009, 2012 Christopher N. Gilbreth
+! Modified : 3/25/2014 -- John Hoffman
+!     + Compatible with F90 (no longer uses define_help_flag.)
 !
 ! Permission is hereby granted, free of charge, to any person obtaining a copy
 ! of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +25,10 @@
 ! SOFTWARE.
 
 module options
-  use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
+  !use, intrinsic :: iso_fortran_env, only: stdout, stderr
   use constants
   implicit none
+  integer, external :: iargc
   private
 
   ! Can customize these parameters as desired:
@@ -83,6 +86,8 @@ module options
      character (len=opt_len)   :: cval
   end type opt_t
 
+  
+
   ! Predicate:
   ! Defined(opt) :=
   !   Defined(name,abbrev,descr,required,found,dtype,group)
@@ -111,15 +116,15 @@ module options
      character(len=opt_len) :: args(maxargs)
 
      ! Help routine
-     procedure(helpr), pointer, nopass :: help_routine => null()
+     ! procedure(helpr), pointer, nopass :: help_routine => null()
   end type options_t
 
-  abstract interface
-     subroutine helpr(opts)
-       import
-       type(options_t), intent(in) :: opts
-     end subroutine helpr
-  end interface
+  !abstract interface
+  !   subroutine helpr(opts)
+  !     import
+  !     type(options_t), intent(in) :: opts
+  !   end subroutine helpr
+  !end interface
 
   ! Invariants:
   ! 1. nopts ≤ maxopts
@@ -134,7 +139,7 @@ module options
   ! ** Public interface functions **********************************************
 
   public :: define_option_integer, define_option_real, define_option_logical, &
-       define_option_string, define_flag, define_help_flag
+       define_option_string, define_flag!, define_help_flag
   public :: get_option_integer, get_option_real, get_option_logical, &
        get_option_string, get_flag
   public :: print_option, print_options, print_option_values, print_args
@@ -205,17 +210,17 @@ contains
 
     ierr = 1
     if (.not. is_real(valstr)) then
-       write (error_unit,'(3a)') "Error: parameter ", trim(valstr), " is not a valid real number."
+       write (stderr,'(3a)') "Error: parameter ", trim(valstr), " is not a valid real number."
        return
     end if
     read(valstr,*,iostat=ios) opt%rval
     if (ios .ne. 0) then
-       write (error_unit,'(3a)') "Error: couldn't convert ", trim(valstr), " to a real number."
+       write (stderr,'(3a)') "Error: couldn't convert ", trim(valstr), " to a real number."
        return
     end if
     if (opt%rval < opt%rmin .or. opt%rval > opt%rmax) then
-       write (error_unit,'(3a)') 'Error: value for option "', trim(opt%name), '" out of range.'
-       write (error_unit,'(3(a,es15.8))') "Value: ", opt%rval, ", min: ", opt%rmin, ", max: ", opt%rmax
+       write (stderr,'(3a)') 'Error: value for option "', trim(opt%name), '" out of range.'
+       write (stderr,'(3(a,es15.8))') "Value: ", opt%rval, ", min: ", opt%rmin, ", max: ", opt%rmax
        return
     end if
     ierr = 0
@@ -230,7 +235,7 @@ contains
 
     integer :: m_unit
 
-    m_unit = output_unit
+    m_unit = stdout
     if (present(unit)) m_unit = unit
     write (m_unit,'(2a,t30,es22.14e3)') trim(opt%name), ': ', opt%rval
   end subroutine print_value_real
@@ -264,6 +269,14 @@ contains
     if (present(max)) opt%imax = max
   end subroutine define_option_integer
 
+  function new_line(char)
+    implicit none 
+    character(len=max_str_len), intent(in) :: char 
+    character(len=1) :: new_line 
+
+    new_line = '/'
+  end function new_line
+
 
   subroutine get_option_integer(opts,name,val)
     ! Status: reviewed
@@ -292,21 +305,21 @@ contains
 
     ierr = 1
     if (.not. is_integer(valstr)) then
-       write (error_unit,'(3a)') "Error: parameter ", trim(valstr), " is not a valid integer."
+       write (stderr,'(3a)') "Error: parameter ", trim(valstr), " is not a valid integer."
        ! ierr == 1 .and. .not.  is_integer(valstr)
        return
     end if
     read(valstr,*,iostat=ios) opt%ival
     if (ios .ne. 0) then
-       write (error_unit,'(3a)') "Error: couldn't convert ", trim(valstr), " to an integer&
+       write (stderr,'(3a)') "Error: couldn't convert ", trim(valstr), " to an integer&
             & (may be too large)."
        ! ierr == 1 .and. .not. valid(opt%ival)
        return
     end if
     ! valid(opt%ival) .and. is_integer(valstr)
     if (opt%ival < opt%imin .or. opt%ival > opt%imax) then
-       write (error_unit,'(3a)') 'Error: value for option "', trim(opt%name), '" out of range.'
-       write (error_unit,'(3(a,i0))') "Value: ", opt%ival, ", min: ", opt%imin, ", max: ", opt%imax
+       write (stderr,'(3a)') 'Error: value for option "', trim(opt%name), '" out of range.'
+       write (stderr,'(3(a,i0))') "Value: ", opt%ival, ", min: ", opt%imin, ", max: ", opt%imax
        ! ierr == 1 .and. valid(opt%ival) .and. is_integer(valstr) .and. OutOfBounds(opts%ival)
        return
     end if
@@ -324,7 +337,7 @@ contains
 
     integer :: m_unit
 
-    m_unit = output_unit
+    m_unit = stdout
     if (present(unit)) m_unit = unit
     write (m_unit,'(2a,t30,i0)') trim(opt%name), ': ', opt%ival
   end subroutine print_value_integer
@@ -378,12 +391,12 @@ contains
 
     ierr = 1
     if (.not. is_logical(valstr)) then
-       write (error_unit,'(3a)') "Error: parameter ", trim(valstr), " is not a valid logical value."
+       write (stderr,'(3a)') "Error: parameter ", trim(valstr), " is not a valid logical value."
        return
     end if
     read(valstr,*,iostat=ios) opt%lval
     if (ios .ne. 0) then
-       write (error_unit,'(3a)') "Error: couldn't convert ", trim(valstr), " to a logical value."
+       write (stderr,'(3a)') "Error: couldn't convert ", trim(valstr), " to a logical value."
        return
     end if
     ierr = 0
@@ -398,7 +411,7 @@ contains
 
     integer :: m_unit
 
-    m_unit = output_unit
+    m_unit = stdout
     if (present(unit)) m_unit = unit
     write (m_unit,'(2a,t30,l1)') trim(opt%name), ': ', opt%lval
   end subroutine print_value_logical
@@ -438,7 +451,7 @@ contains
 
     opt => find_opt(opts,name=name,dtype=T_STRING)
     if (len_trim(opt%cval) > len(val)) then
-       write (error_unit,'(a)') "get_option_string: string too long. &
+       write (stderr,'(a)') "get_option_string: string too long. &
             &Need to supply more storage space when calling this routine."
        stop
     end if
@@ -455,7 +468,7 @@ contains
 
     ierr = 1
     if (len_trim(valstr) > len(opt%cval)) then
-       write (error_unit,'(a)') "set_value_string: value too long. Need to &
+       write (stderr,'(a)') "set_value_string: value too long. Need to &
             &increase parameter opt_len in options.f90."
        return
     end if
@@ -472,7 +485,7 @@ contains
 
     integer :: m_unit
 
-    m_unit = output_unit
+    m_unit = stdout
     if (present(unit)) m_unit = unit
     write (m_unit,'(2a,t30,3a)') trim(opt%name), ': ', '"', trim(opt%cval), '"'
   end subroutine print_value_string
@@ -526,7 +539,7 @@ contains
     type(opt_t), pointer :: opt
     integer :: iopt, m_unit
 
-    m_unit = output_unit
+    m_unit = stdout
     if (present(unit)) m_unit = unit
     write (m_unit,'(a)') "Option values: "
 
@@ -567,7 +580,7 @@ contains
     select case (upcase(overwrite))
     case ("ERROR")
        if (opt%found) then
-          write (error_unit,'(3a)') 'Error: tried to set option "', trim(opt%name), '" twice.'
+          write (stderr,'(3a)') 'Error: tried to set option "', trim(opt%name), '" twice.'
           return
        end if
     case ("YES")
@@ -577,7 +590,7 @@ contains
           return
        end if
     case default
-       write (error_unit,'(a)') "Error: invalid value for overwrite policy ('", trim(overwrite), "')"
+       write (stderr,'(a)') "Error: invalid value for overwrite policy ('", trim(overwrite), "')"
        stop
     end select
 
@@ -604,21 +617,21 @@ contains
   ! ** GENERAL ROUTINES ********************************************************
 
 
-  subroutine define_help_flag(opts,help_routine,group)
-    implicit none
-    type(options_t), target, intent(inout) :: opts
-    interface
-       subroutine help_routine(opts)
-         import
-         type(options_t), intent(in) :: opts
-       end subroutine help_routine
-    end interface
-    character(len=*), optional, intent(in) :: group
-
-    call define_flag(opts,"help",abbrev='h',description="Print this help message.",&
-         group=group)
-    opts%help_routine => help_routine
-  end subroutine define_help_flag
+!  subroutine define_help_flag(opts,help_routine,group)
+!    implicit none
+!    type(options_t), target, intent(inout) :: opts
+!    interface
+!       subroutine help_routine(opts)
+!         import
+!         type(options_t), intent(in) :: opts
+!       end subroutine help_routine
+!    end interface
+!    character(len=*), optional, intent(in) :: group
+!
+!    call define_flag(opts,"help",abbrev='h',description="Print this help message.",&
+!         group=group)
+!    opts%help_routine => help_routine
+!  end subroutine define_help_flag
 
 
   logical function is_logical(str)
@@ -751,13 +764,13 @@ contains
 
     if (len(name) == 0) stop "Error: empty name for option."
     if (.not. is_name(name)) then
-       write (error_unit,*) "Error: invalid option name: ", trim(name)
+       write (stderr,*) "Error: invalid option name: ", trim(name)
        stop
     end if
     ! is_name(name)
     if (present(abbrev)) then
        if (.not. (len(abbrev) == 1 .and. is_abbrev_char(abbrev))) then
-          write (error_unit,*) "Error: invalid option abbreviation: '", abbrev, "'"
+          write (stderr,*) "Error: invalid option abbreviation: '", abbrev, "'"
           stop
        end if
     end if
@@ -797,7 +810,7 @@ contains
     integer :: m_unit, iopt
     type(opt_t), pointer :: opt
 
-    m_unit = output_unit
+    m_unit = stdout
     if (present(unit)) m_unit = unit
 
     if (opts%nopts > 0) then
@@ -825,7 +838,7 @@ contains
     type(opt_t), pointer :: opt
     integer :: m_unit
 
-    m_unit = output_unit
+    m_unit = stdout
     if (present(unit)) m_unit = unit
 
     opt => find_opt(opts,name)
@@ -852,7 +865,7 @@ contains
 
     if (abbrev == ' ') then
        if (2*len_trim(name) + 3 > len(buf)) then
-          write (error_unit,'(a)') "Error in format_val_synopsis: need to increase buffer size"
+          write (stderr,'(a)') "Error in format_val_synopsis: need to increase buffer size"
           stop
        end if
        if (upcase(m_style) == "CMDLINE") then
@@ -864,7 +877,7 @@ contains
        end if
     else
        if (3*len_trim(name) + len_trim(abbrev) + 7 > len(buf)) then
-          write (error_unit,'(a)') "Error in format_val_synopsis: need to increase buffer size"
+          write (stderr,'(a)') "Error in format_val_synopsis: need to increase buffer size"
           stop
        end if
        if (upcase(m_style) == "CMDLINE") then
@@ -893,7 +906,7 @@ contains
 
     if (abbrev == ' ') then
        if (len_trim(name) + 2 > len(buf)) then
-          write (error_unit,'(a)') "Error in format_flag_synopsis: need to increase buffer size"
+          write (stderr,'(a)') "Error in format_flag_synopsis: need to increase buffer size"
           stop
        end if
        if (upcase(m_style) == "CMDLINE") then
@@ -905,7 +918,7 @@ contains
        end if
     else
        if (len_trim(name) + len_trim(abbrev) + 5 > len(buf)) then
-          write (error_unit,'(a)') "Error in format_flag_synopsis: need to increase buffer size"
+          write (stderr,'(a)') "Error in format_flag_synopsis: need to increase buffer size"
           stop
        end if
        if (upcase(m_style) == "CMDLINE") then
@@ -1006,7 +1019,7 @@ contains
     ! Write <name> and advance to the description column, on the next line if
     ! necessary
     if (name_column + len_trim(name) + 1 + descr_column > len(buf)) then
-       write (error_unit,'(a)') "format_opt: need to increase format_buf_size in options.f90."
+       write (stderr,'(a)') "format_opt: need to increase format_buf_size in options.f90."
        stop
     end if
     buf = ' '
@@ -1072,7 +1085,7 @@ contains
     end do
 
     if (bufidx > len(buf)) then
-       write (error_unit,'(a)') "format_opt: need to increase format_buf_size in options.f90."
+       write (stderr,'(a)') "format_opt: need to increase format_buf_size in options.f90."
        stop
     end if
     buf(bufidx:bufidx) = new_line('a')
@@ -1088,7 +1101,7 @@ contains
     integer :: iarg, m_unit, ierr, nargs
     character(len=opt_len) :: arg
 
-    m_unit = output_unit
+    m_unit = stdout
     if (present(unit)) m_unit = unit
 
     write (m_unit,'(a)') 'Arguments: '
@@ -1152,7 +1165,7 @@ contains
        !            .and. opt%group == group
        if (found .and. present(dtype)) then
           if (dtype .ne. opt%dtype) then
-             write (error_unit,'(a,a)') "find_opt(): Datatype doesn't match for option: ", trim(name)
+             write (stderr,'(a,a)') "find_opt(): Datatype doesn't match for option: ", trim(name)
              stop
           end if
        end if
@@ -1165,14 +1178,14 @@ contains
     nullify(opt)
     if (m_assert) then
        if (present(name)) then
-          write (error_unit,'(3a)',advance='no') "find_opt(): Option ", trim(name), " doesn't exist"
+          write (stderr,'(3a)',advance='no') "find_opt(): Option ", trim(name), " doesn't exist"
        else if (present(abbrev)) then
-          write (error_unit,'(3a)',advance='no') "find_opt(): Option ", trim(abbrev), " doesn't exist"
+          write (stderr,'(3a)',advance='no') "find_opt(): Option ", trim(abbrev), " doesn't exist"
        end if
        if (present(group)) then
-          write (error_unit,'(a,a)') " in group ", trim(group)
+          write (stderr,'(a,a)') " in group ", trim(group)
        else
-          write (error_unit,'(a)') ""
+          write (stderr,'(a)') ""
        end if
        stop
     end if
@@ -1190,6 +1203,18 @@ contains
     opts%args(opts%nargs) = str
   end subroutine store_arg
 
+  function get_string_length(strval)
+    implicit none 
+    integer :: i, get_string_length
+    character(len=*), intent(in) :: strval
+    do i=1,max_str_len
+      if (str(i) == ' ') then 
+        get_string_length = i 
+        exit
+      end if
+    end do 
+
+  end function
 
   subroutine getarg_check(iarg,buf,status)
     ! Status: Proved
@@ -1201,16 +1226,20 @@ contains
 
     integer :: l
 
-    if (iarg > command_argument_count()) stop "Error in getarg_check"
+    if (iarg > iargc()) stop "Error in getarg_check"
+    !if (iarg > command_argument_count()) stop "Error in getarg_check"
     buf = ''
-    call get_command_argument(iarg,buf,status=status,length=l)
+    !call get_command_argument(iarg,buf,status=status,length=l)
+    call getarg(iarg,buf)
+    l = get_string_length(buf)
+    status = 1
     if (status .ne. 0) then
        ! If the value was truncated or the retrieval fails, status .ne. 0.
        ! Otherwise status == 0.
-       write (error_unit,'(a,i0,a,i0)') "Error retrieving command argument ", &
+       write (stderr,'(a,i0,a,i0)') "Error retrieving command argument ", &
             iarg, " status: ", status
        if (l > len(buf)) then
-          write (error_unit,'(a,i0,a)') "Error: command argument ", iarg, &
+          write (stderr,'(a,i0,a)') "Error: command argument ", iarg, &
                " too long. May need to increase opt_len in options.f90."
        end if
        return
@@ -1266,7 +1295,7 @@ contains
     integer :: iarg, max, j
     logical :: help
 
-    max = command_argument_count()
+    max = iargc()!command_argument_count()
 
     buf = ''
     iarg = 0
@@ -1281,11 +1310,11 @@ contains
              a = buf(j:j)
              opt => find_opt(opts,abbrev=a,assert=.false.,group=group)
              if (.not. associated(opt)) then
-                write (error_unit,'(3a)',advance='no') 'Error: unknown option "-', buf(j:j), '"'
+                write (stderr,'(3a)',advance='no') 'Error: unknown option "-', buf(j:j), '"'
                 if (present(group)) then
-                   write (error_unit,'(3a)') ' in group "', trim(group), '"'
+                   write (stderr,'(3a)') ' in group "', trim(group), '"'
                 else
-                   write (error_unit,'(a)') ''
+                   write (stderr,'(a)') ''
                 end if
                 ierr = 1
                 goto 99
@@ -1300,7 +1329,7 @@ contains
                 ! Non-flag options: -<abbrev> <value>
                 iarg = iarg + 1
                 if (j .ne. len_trim(buf) .or. iarg > max) then
-                   write (error_unit,'(3a)') 'Error: Option "-', buf(j:j), '" requires an argument.'
+                   write (stderr,'(3a)') 'Error: Option "-', buf(j:j), '" requires an argument.'
                    ierr = 1
                    goto 99
                 end if
@@ -1320,18 +1349,18 @@ contains
           ! Long options
           call parse_long_option(buf,name,eqlc,val,ierr)
           if (ierr .ne. 0) then
-             write (error_unit,'(2a)') 'Error: invalid option string "', trim(buf), '"'
+             write (stderr,'(2a)') 'Error: invalid option string "', trim(buf), '"'
              goto 99
           end if
           ! IsNameString(name) .and. eqlc ∈ " =" .and. (eqlc == '=' ==> Defined(val))
           ! Find option
           opt => find_opt(opts,name=name,assert=.false.,group=group)
           if (.not. associated(opt)) then
-             write (error_unit,'(3a)',advance='no') 'Error: unknown option "--', trim(name), '"'
+             write (stderr,'(3a)',advance='no') 'Error: unknown option "--', trim(name), '"'
              if (present(group)) then
-                write (error_unit,'(3a)') ' in group "', trim(group), '"'
+                write (stderr,'(3a)') ' in group "', trim(group), '"'
              else
-                write (error_unit,'(a)') ''
+                write (stderr,'(a)') ''
              end if
              ierr = 1
              goto 99
@@ -1354,7 +1383,7 @@ contains
                 ! Case (5) --<opt_name> <value>
                 iarg = iarg + 1
                 if (iarg > max) then
-                   write (error_unit,'(3a)') 'Error: option "--', trim(name), '" requires an argument.'
+                   write (stderr,'(3a)') 'Error: option "--', trim(name), '" requires an argument.'
                    ierr = 1
                    goto 99
                 end if
@@ -1385,7 +1414,7 @@ contains
           ! Case (8) Numeric
           if (.not. is_real(buf)) then
              ! Note is_integer(buf) ==> is_real(buf), so we just check the latter
-             write (error_unit,'(3a)') 'Error: expected a numeric argument: "', trim(buf), '"'
+             write (stderr,'(3a)') 'Error: expected a numeric argument: "', trim(buf), '"'
              ierr = 1
              goto 99
           end if
@@ -1398,23 +1427,24 @@ contains
           call store_arg(opts,buf)
        else
           ! Anything else
-          write (error_unit,'(3a)') 'Error: invalid argument: "', trim(buf), '"'
+          write (stderr,'(3a)') 'Error: invalid argument: "', trim(buf), '"'
           ierr = 1
           goto 99
        end if
     end do
     ierr = 0
-    if (associated(opts%help_routine)) then
-       call get_flag(opts,'help',help)
-       if (help) then
-          call opts%help_routine(opts)
-          ierr = 3
-       end if
-    end if
+    !if (associated(opts%help_routine)) then
+    !   call get_flag(opts,'help',help)
+    !   if (help) then
+    !      call opts%help_routine(opts)
+    !      ierr = 3
+    !   end if
+    !end if
     return
-99  if (associated(opts%help_routine)) then
-       write (error_unit,'(a)') "Try using -h for more info."
-    end if
+99  write (stderr,'(a)') "Try using -h for more info."
+    !if (associated(opts%help_routine)) then
+    !   write (stderr,'(a)') "Try using -h for more info."
+    !end if
   end subroutine process_command_line
 
 
@@ -1431,12 +1461,12 @@ contains
     do iopt=1,opts%nopts
        opt => opts%opts(iopt)
        if (opt%required .and. .not. opt%found) then
-          write (error_unit,'(3a)') 'Error: missing required parameter: "', &
+          write (stderr,'(3a)') 'Error: missing required parameter: "', &
                trim(opt%name), '"'
           ierr = 2
-          if (associated(opts%help_routine)) then
-             write (error_unit,'(a)') "Try using -h for more info."
-          end if
+          !if (associated(opts%help_routine)) then
+          write (stderr,'(a)') "Try using -h for more info."
+          !end if
           return
        end if
     end do
@@ -1631,13 +1661,13 @@ contains
     character(len=1), optional, intent(in) :: abbrev
 
     if (opt%name == name) then
-       write (error_unit,'(3a)') 'Error: duplicate definition of option "', &
+       write (stderr,'(3a)') 'Error: duplicate definition of option "', &
             trim(name), '"'
        stop
     end if
     if (present(abbrev)) then
        if (opt%abbrev == abbrev) then
-          write (error_unit,'(3a)') 'Error: duplicate definition of option "-', &
+          write (stderr,'(3a)') 'Error: duplicate definition of option "-', &
                trim(abbrev), '"'
           stop
        end if
@@ -1682,7 +1712,7 @@ contains
     !   ierr:  0 upon success, nonzero if an error occured
     ! Notes:
     !   Blank lines and comments
-    use iso_fortran_env, only: input_unit
+    !use iso_fortran_env, only: input_unit
     implicit none
     type(options_t), target, intent(inout) :: opts
     character(len=*), intent(in) :: filename
@@ -1741,11 +1771,11 @@ contains
        ! Lookup & set the option
        opt => find_opt(opts,name=name,assert=.false.,group=group)
        if (.not. associated(opt)) then
-          write (error_unit,'(3a)',advance='no') 'Error: unknown option "', trim(name), '"'
+          write (stderr,'(3a)',advance='no') 'Error: unknown option "', trim(name), '"'
           if (present(group)) then
-             write (error_unit,'(3a)') ' in group "', trim(group), '"'
+             write (stderr,'(3a)') ' in group "', trim(group), '"'
           else
-             write (error_unit,'(a)') ''
+             write (stderr,'(a)') ''
           end if
           return
        end if
@@ -1802,12 +1832,12 @@ contains
 
     call read_while(unit,is_name_char,idx,name,nchar,ios)
     if (nchar .eq. 0) then
-       write (error_unit,'(a,i0,a)') 'Error: expected option name at position ', &
+       write (stderr,'(a,i0,a)') 'Error: expected option name at position ', &
             idx, ' of input file'
        return
     end if
     if (ios < 0) then
-       write (error_unit,'(3a)') 'Error: unexpected end of file after "', &
+       write (stderr,'(3a)') 'Error: unexpected end of file after "', &
             trim(name), '" in input file (expected option value)'
        return
     end if
@@ -1815,7 +1845,7 @@ contains
 
     call skip_chars(unit,blank,idx,nchar,ios)
     if (ios < 0) then
-       write (error_unit,'(3a)') 'Error: unexpected end of file found while&
+       write (stderr,'(3a)') 'Error: unexpected end of file found while&
             &processing option "', trim(name), '" in input file'
        return
     end if
@@ -1823,11 +1853,11 @@ contains
 
     call skip_chars(unit,delim_char,idx,nchar,ios)
     if (nchar .eq. 0) then
-       write (error_unit,'(3a,i0,a)',advance='no') &
+       write (stderr,'(3a,i0,a)',advance='no') &
             "Error: expected '", delim_char, ''' at position ', idx, ' of input file'
        if (len_trim(name) > 0) &
-            write (error_unit,'(3a)',advance='no') ' (after "', trim(name), '")'
-       write (error_unit,'(a)') ''
+            write (stderr,'(3a)',advance='no') ' (after "', trim(name), '")'
+       write (stderr,'(a)') ''
        return
     end if
 
@@ -1847,7 +1877,7 @@ contains
        call read_until_char(unit,c,idx,val,nchar,ios)
        if (ios > 0) return
        if (ios < 0) then
-          write (error_unit,'(2a)') 'Error: unterminated quote found while reading&
+          write (stderr,'(2a)') 'Error: unterminated quote found while reading&
                & value of option "', trim(name), '"'
        end if
        idx = idx + 1

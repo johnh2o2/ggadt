@@ -60,7 +60,7 @@ medium by using anomalous diffraction theory (ADT).
 * Installation::	How to install @command{ggadt} on your system.
 * Invoking GGADT::	Giving @command{ggadt} your input.	
 * Example usage::	Quick examples to get you started.
-* Testing against previous results::  Comparing GGADT to literature
+* Testing against previous results::  Comparing GGADT to existing literature
 * FFT comparison::		Comparison between GPFA and FFTW3 timing.
 * GNU Free Documentation License:: Copying and sharing this documentation.
 * Concept index::	Index of concepts.
@@ -73,11 +73,7 @@ medium by using anomalous diffraction theory (ADT).
 @cindex greetings
 @cindex overview
 
-The @command{ggadt} program calculates the x-ray scattering properties of dust
-in the interstellar medium. You define the geometry and composition
-of a dust grain, the energy of the incident x-ray photons, and a few other parameters. 
-The @command{ggadt} program then calculates the orientationally-averaged scattering 
-cross-section in the plane perpendicular to the incident photons. 
+GGADT stands for General Geometry Anomalous Diffraction Theory. GGADT allows a user to specify a custom dust geometry (either a spheroid, sphere, or an agglomerate of spheres), and calculates either the differential scattering cross section as a function of scattering angle, or the energy-dependent absorption and scattering cross sections. Anomalous diffraction theory is valid when @math{ka_{eff} \lesssim 1}, where @math{k} is the wavenumber of the incident photon, and @math{a_{eff}} is the ``effective radius" of the grain, defined to be the radius of a sphere that has the same volume as the grain.
 
 @cindex authors
 @cindex Hoffman, John
@@ -88,14 +84,7 @@ GGADT was written by John Hoffman and Michael Tarczon.
 @section Language
 @cindex Fortran 2003
 
-GGADT is written in Fortran, using the Fortran 2003 standard. In the future, 
-GGADT may be changed to comply with earlier Fortran standards (90 or 95) for
-compatibility reasons.
-
-Fortran 2003 provides an easy way to interface Fortran programs with C 
-libraries. In this case, Fortran 2003 made the FFTW3 library (@url{http://www.fftw.org/})
-easy to implement for performing fast Fourier transforms. FFTW3 is a well-tested, optimized, 
-and popular suite for performing FFT's.
+GGADT is written in Fortran, using the Fortran 2003 standard. In the future, GGADT will likely be reverted to Fortran 90 or 95 to be more compatible with Fortran compilers.
 
 
 @section Background
@@ -144,7 +133,7 @@ The scattering properties of the grain can be obtained from @math{S(\vec{n})}, w
 
 @section Basic GGADT logic outline
 
-Thus, GGADT does the following:
+GGADT does the following:
 
 @enumerate
 
@@ -168,7 +157,6 @@ Thus, GGADT does the following:
 @cindex installing
 @cindex configure
 @cindex enable-openmp
-@cindex enable-mpi
 @cindex gcc 
 
 @section System requirements
@@ -355,6 +343,10 @@ For @code{ELLIPSOID} grains, we define the lengths of x, y and z axes.
 @opindex --ephot
 Energy of the incident X-ray photons in keV.
 
+@item --sed
+@opindex --sed
+This flag tells GGADT that you would like to calculate the energy-dependent absorption and scattering cross sections. To specify the energy range that you would like the calculation done
+
 @item --ior-re=@var{value}
 @opindex --ior-re
 The real component of the complex index of refraction, minus one.
@@ -362,6 +354,14 @@ The real component of the complex index of refraction, minus one.
 @item --ior-im=@var{value}
 @opindex --ior-im
 The imaginary component of the complex index of refraction.
+
+@item --material=@var{value}
+@opindex --material
+Specifies the name of the material you're using. Currently, there are no built-in materials in GGADT, so you must use @code{--material='custom'}, and then specify the path to the material file by the @code{--material-file} argument.
+
+@item --material-file=@var{value}
+@opindex --material-file
+Path to file defining the energy-dependent index of refraction and dielectric constant for the grain material you would like to use. Needs to be formatted in a particular way.
 
 
 @item --ngrain=@var{value}
@@ -386,8 +386,9 @@ Must be one of @code{ESTIMATE}, @code{MEASURE}, @code{PATIENT} or @code{EXHAUSTI
 @opindex -s 
 This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by @code{nscatter}), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.
 
-@end table
 
+
+@end table
 
 
 @section Getting the accuracy you want

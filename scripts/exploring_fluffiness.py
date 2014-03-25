@@ -23,17 +23,15 @@ import plot_utilities as pu
 #
 # 2) A plot like fig 7 in D03a, except the ratio of BA and sphere efficiencies
 
-#rc('font',**{'family':'serif'})
-## for Palatino and other serif fonts use:
-rc('font',**{'family':'serif','serif':['Palatino']})
+rc('font',**{'family':'serif'})
 
 PLOT_EMT = False
 
 ForceRedo = False
 Material = "index_silD03"
 MigrationModes = [ '', 'M1', 'M2' ]
-Realizations = np.arange(1,9) #np.arange(1,13) is max (goes up to 12) 
-NumSpheres = [ 8, 16, 32, 64, 128, 256, 512, 1024 ] #[ 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096 ]
+Realizations = np.arange(1,13) #np.arange(1,13) is max (goes up to 12) 
+NumSpheres = [ 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096 ] #[ 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096 ]
 
 
 material_dir = data_dir + "/materials"
@@ -55,13 +53,13 @@ params = {
 	'aeff' 				: 0.2,
 	'ephot-min'			: 1.0,
 	'ephot-max'			: 7.0,
-	'dephot'			: 0.1,
+	'dephot'			: 0.01,
 	'cluster-file-name'	: None,
 	'grain-axis-x'		: 1.0,
 	'grain-axis-y'		: 1.0,
 	'grain-axis-z'		: 1.0,
 	'ngrain'			: 64,
-	'norientations'		: 100
+	'norientations'		: 64
 }
 
 i = 0
@@ -177,17 +175,17 @@ if PLOT_EMT:
 	porind = int(0.25*len(por_emt))
 	di = 1
 	ax.annotate('EMT scat', xy=(por_emt[porind+2*di+1],scat_emt[porind+2*di+2]),  xycoords='data',
-	            xytext=(0.09,-0.6), textcoords='data',
+	            xytext=(0.1,0.35), textcoords='axes fraction',
 	            arrowprops=dict(facecolor='black', width=0.5,headwidth=2.0),
 	            horizontalalignment='left', verticalalignment='top',
 	            )
 	ax.annotate('EMT ext', xy=(por_emt[porind+di],ext_emt[porind+di]-0.01),  xycoords='data',
-	            xytext=(0.07,-0.5), textcoords='data',
+	            xytext=(0.08,0.4), textcoords='axes fraction',
 	            arrowprops=dict(facecolor='black', width=0.5,headwidth=2.0),
 	            horizontalalignment='left', verticalalignment='top',
 	            )
 	ax.annotate('EMT abs', xy=(por_emt[porind],abs_emt[porind]-0.01),  xycoords='data',
-	            xytext=(0.05,-0.4), textcoords='data',
+	            xytext=(0.06,0.45), textcoords='axes fraction',
 	            arrowprops=dict(facecolor='black', width=0.5,headwidth=2.0),
 	            horizontalalignment='left', verticalalignment='top',
 	            )
@@ -203,6 +201,6 @@ footnote = footnote + "\nnorientations: %d"%(params['norientations'])
 
 f.text(0.15,0.15,footnote,va='bottom',ha='left',fontsize=10)
 pu.add_timestamp(f)
-f.savefig(parent_dir+"/comparing_emtto_ggadt.png")
+f.savefig(parent_dir+"/cross_sections_vs_porosity.png")
 plt.show()
 
