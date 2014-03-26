@@ -8,12 +8,12 @@ git log --pretty --graph > ChangeLog
 aclocal -I./m4
 autoconf
 automake -a
-
-std="f95"
+bash configure
+#std="f95"
 # add -fimplicit-none
 #bash configure FCFLAGS="-O2 -fall-intrinsics -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=${std} -pedantic -fbacktrace" || exit
-bash configure FCFLAGS="-O2 -std=$std -fall-intrinsics"
-#make || exit
+#bash configure FCFLAGS="-O2 -std=$std -fall-intrinsics"
+#bash configure FC="/opt/local/bin/g95" # FCFLAGS="-O2 -std=$std -fall-intrinsics"
 #cp doc/*png doc/ggadt.html
 #make html || exit
 #src/ggadt > test_output_fftw3.dat || exit

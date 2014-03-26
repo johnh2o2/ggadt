@@ -1,3 +1,9 @@
+* commit 3ac0c67628e6984279002727d8d74281acb26aff
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Mar 25 23:46:45 2014 -0400
+| 
+|     Should now be compatible with F95. Moved data files to a folder that will not be distributed with releases
+|  
 * commit 42ef741767a8039323b5120d2def4d32fa347f32
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Tue Mar 25 18:10:04 2014 -0400

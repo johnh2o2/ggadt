@@ -16,3 +16,4 @@ uninstall-local:
 	rm -rf @data_dir@
 clean-local:
 	rm -rf @data_dir@
+	rm -rf *mod

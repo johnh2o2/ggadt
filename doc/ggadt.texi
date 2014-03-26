@@ -73,18 +73,13 @@ medium by using anomalous diffraction theory (ADT).
 @cindex greetings
 @cindex overview
 
-GGADT stands for General Geometry Anomalous Diffraction Theory. GGADT allows a user to specify a custom dust geometry (either a spheroid, sphere, or an agglomerate of spheres), and calculates either the differential scattering cross section as a function of scattering angle, or the energy-dependent absorption and scattering cross sections. Anomalous diffraction theory is valid when @math{ka_{eff} \lesssim 1}, where @math{k} is the wavenumber of the incident photon, and @math{a_{eff}} is the ``effective radius" of the grain, defined to be the radius of a sphere that has the same volume as the grain.
+GGADT stands for General Geometry Anomalous Diffraction Theory, and is Fortran 95 compliant. GGADT allows a user to specify a custom dust geometry (either a spheroid, sphere, or an agglomerate of spheres), and calculates either the differential scattering cross section as a function of scattering angle, or the energy-dependent absorption and scattering cross sections. Anomalous diffraction theory is valid when @math{ka_{eff} \lesssim 1}, where @math{k} is the wavenumber of the incident photon, and @math{a_{eff}} is the ``effective radius" of the grain, defined to be the radius of a sphere that has the same volume as the grain.
 
 @cindex authors
 @cindex Hoffman, John
 @cindex Tarczon, Michael
 GGADT was written by John Hoffman and Michael Tarczon.
 
-
-@section Language
-@cindex Fortran 2003
-
-GGADT is written in Fortran, using the Fortran 2003 standard. In the future, GGADT will likely be reverted to Fortran 90 or 95 to be more compatible with Fortran compilers.
 
 
 @section Background
@@ -124,6 +119,7 @@ Once the shadow function is known, Huygens' principle allows the amplitude of th
 @math{S(\vec{n}) = S(k_x, k_y) = \frac{k^2}{2\pi}\int \exp{[i(k_xx+k_yy)]}f(x,y)dxdy}@*
 @math{k_x = k(\vec{n}\cdot\vec{x})}@*
 @math{k_y = k(\vec{n}\cdot\vec{y})}@*
+
 The scattering properties of the grain can be obtained from @math{S(\vec{n})}, with the differential scattering cross section given by 
 
 @math{\frac{d\sigma_{sca}}{d\Omega}(\vec{n}) = \frac{|S(\vec{n})|^2}{k^2}}
@@ -138,15 +134,23 @@ GGADT does the following:
 @enumerate
 
 @item Reads in dust and x-ray parameters
-@item For each of the @option{nangle} orientations,
+@item For each of the @option{nangle} orientations (and @option{nephots} photon energies, if the total cross section is being calculated),
 @enumerate
-@item Project grain onto 2D grid
+@item Calculate the shadow function of the grain on a 2D grid
+@item If calculating the differential scattering cross section:
+@itemize
 @item Take the centered FFT of this grid using FFTW
 @item Normalize this result so that it represents @math{dQ_{scat}/d\Omega}, i.e., the differential scattering cross section divided by @math{\pi a^2}.
 @item Add contribution of differential cross-section to orientational average
+@end itemize
+@item If calculating the total cross sections:
+@itemize
+@item Calculate the cross sections from the shadow function for the given orientation (and photon energy)
+@item Add contribution of this orientation to the average cross section at the given photon energy
+@end itemize
 @end enumerate
 
-@item Output orientationally averaged grid.
+@item Output orientationally averaged grid (if calculating differential scattering cross section) or the energy dependent absorption and scattering cross sections.
 
 @end enumerate
 
@@ -168,14 +172,22 @@ make
 make install
 @end example
 
+We haven't tested any speed improvements, but it might be advantageous to also add O2 optimization to the compilation via:
+
+@example
+./configure FCFLAGS="-O2" [--enable-openmp] [--enable-fftw3] @dots{}
+make
+make install
+@end example
 @section Package dependencies
 
+If you would like to use a particular Fortran compiler, you may specify one by adding @code{FC=/path/to/compiler} to the @code{configure} arguments.
 
 @itemize @bullet
 
-@item @strong{Suitable C and Fortran compilers}: GGADT was developed using the GNU compiler suite (version 4.5.4 and higher) throughout, but the @code{configure} script will try to work with most common compilers. Your Fortran compiler must be able to compile Fortran 2003 code.
+@item @strong{Suitable C and Fortran compilers}: GGADT was developed using the GNU compiler suite (version 4.5.4 and higher) throughout, but the @code{configure} script will try to work with most common compilers. GGADT has been tested to compile on versions 4.3 and later of gfortran. If you experience any compilation problems, please let John Hoffman know!
 
-@item @strong{FFTW 3}. Available at @url{http://www.fftw.org/}.
+@item (@emph{Optional}) @strong{FFTW 3}. Available at @url{http://www.fftw.org/}. FFTW3 is NOT required (or currently supported, but will be in the next version). 
 @itemize @minus
 
 @item @emph{Location of the FFTW3 headers}: In order for GGADT to find the Fortran headers for FFTW3, they must be in the standard location (@code{/usr/local/include} or @code{usr/include}) or in @code{$prefix/include} where @code{$prefix} is defined by doing @code{./configure --prefix=<prefix>} at the configuration step for @code{ggadt}. If you have FFTW3 installed with MacPorts, the configure script should be able to find it for you, and you don't have to specify anything extra.
@@ -197,16 +209,16 @@ make install
 @item @strong{Macports} is highly recommended. It provides a convenient, safe package manager for Mac (unofficial, of course). To set up an environment condusive to compiling and running @code{ggadt}, do the following from the terminal:
 @enumerate
 @item Download and install macports from @url{http://www.macports.org/}.
-@item Install gcc (4.5.4 or higher is recommended), and the FFTW3 library:
+@item Install gcc (4.5.4 or higher is recommended), and the FFTW3 library if you want:
 @example
 sudo port install gcc45
-sudo port install fftw-3
+sudo port install fftw-3 (optional)
 @end example
 @item Set the gcc compiler: @code{sudo port select --set gcc mp-gcc45}
 @end enumerate
 @end itemize
 @item (@emph{Optional}) @strong{Python 2.7} or later for some of the included scripts.
-@item (@emph{Optional} @strong{matplotlib},@strong{numpy}, @strong{scipy} python librarys if you wish to use the included plotting scripts. More information can be found at @url{http://scipy.org/getting-started.html}.
+@item (@emph{Optional}) @strong{matplotlib},@strong{numpy}, @strong{scipy} python librarys if you wish to use the included plotting scripts. More information can be found at @url{http://scipy.org/getting-started.html}.
 @end itemize
 
 
@@ -264,7 +276,7 @@ another-parameter=another-value
 @dots{}
 @end example
 
-@strong{Note --} The @code{cluster-file-name} and @code{euler-file-name} options must be specified with quotes surrounding their values. In order to make the parameter file portable, you should specify an absolute file path, not a relative one.
+@strong{Warning} The @code{cluster-file-name} and @code{euler-file-name} options must be specified with quotes surrounding their values. In order to make the parameter file portable, you should specify an absolute file path, not a relative one.
 
 E.g.:
 
@@ -347,6 +359,23 @@ Energy of the incident X-ray photons in keV.
 @opindex --sed
 This flag tells GGADT that you would like to calculate the energy-dependent absorption and scattering cross sections. To specify the energy range that you would like the calculation done
 
+@item --nephots=@var{value}
+@opindex --nephots
+For @code{sed} mode, defines the number of photon energies to calculate the cross sections between @code{--ephot-min} and @code{--ephot-max}
+
+@item --dephot=@var{value}
+@opindex --dephot
+For @code{sed} mode, defines the energy spacing between different photon energies for which the cross sections are calculated. 
+
+@item --ephot-min=@var{value}
+@opindex --ephot-min
+For @code{sed} mode, defines the minimum photon energy at which the cross sections are calculated
+
+@item --ephot-max=@var{value}
+@opindex --ephot-max
+For @code{sed} mode, defines the maximum photon energy at which the cross sections are calculated
+
+
 @item --ior-re=@var{value}
 @opindex --ior-re
 The real component of the complex index of refraction, minus one.
@@ -390,10 +419,49 @@ This will force GGADT to do only one FFT. In order to provide you with the desir
 
 @end table
 
+@section The scattering mode versus the @code{sed} mode
+By default, GGADT will determine the orientation-averaged differential scattering cross section for your grain. If, instead, you wish to calculate the absorption and (total) scattering cross sections of the grain as a function of energy, add the @code{--sed} flag to the command line arguments. The additional command line arguments that are relevant for the ``sed" mode are:
+
+@table @option
+@item @code{--dephot} (or @code{--nephots})
+@item @code{--ephot-min}
+@item @code{--ephot-max}
+@item @code{--material}: this MUST be specified as @code{--material='custom'} for the time being. In the future, we'll hard-code some materials into the program so the user doesn't have to lug around a set of text files that define the energy-dependent dielectric constant for common materials.
+@item @code{--material-file}
+@end table
+
+@subsection Materials and material files
+
+The material files must be formatted in the way that GGADT expects, namely with a header of:
+
+@example
+17 =ICOMP: amorphous olivine-like astrosilicate
+    E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
+@end example
+
+followed by material values:
+
+@example
+1.000000E-05  2.435E+00 1.119E-03  1.080E+01 7.688E-03
+1.240000E-05  2.435E+00 1.388E-03  1.080E+01 9.534E-03
+1.771000E-05  2.435E+00 1.982E-03  1.080E+01 1.362E-02
+2.000000E-05  2.435E+00 2.239E-03  1.080E+01 1.538E-02
+@dots{}
+@end example
+
+@strong{Future goals} : 
+@itemize
+@item Allow for multiple grain compositions at once
+@item Allow for the user to specify different types of mixed compositions (layers, inclusions, solid spheroidal cores with no porosity, user-defined, etc.). Suggestions for improvement and utility are very welcome.
+@item Allow a user-defined set of energies to calculate the cross sections
+@end itemize
 
 @section Getting the accuracy you want
 
-GGADT solves for the differential scattering cross section as a function of scattering angle, and must do so on a numerical grid. The accuracy of the solution provided by GGADT depends on the resolution of these grids. In the case where the grain is non-spherical, the accuracy also depends on the number of orientations over which the calculation is averaged.
+
+@subsection Differential scattering cross section calculations 
+
+GGADT solves for either the differential scattering cross section as a function of scattering angle, or the total scattering and absorption cross sections as a function of photon energy, and must do so on a 2D numerical grid. The accuracy of the solution provided by GGADT depends on the resolution of these grids. In the case where the grain is non-spherical, the accuracy also depends on the number of orientations over which the calculation is averaged.
 
 The input parameters that determine accuracy are:
 
@@ -406,6 +474,8 @@ The input parameters that determine accuracy are:
 We've done some sample runs for a spherical grain,
 
 @image{RMS_ngrain_nscatter,5in,5in}
+
+Accuracy results for TOTAL cross section calculations to come soon...
 
 
 
@@ -491,6 +561,8 @@ The inset within the plot, on the upper left corner, shows the full 2d grid of t
 @image{HD09_f3,5in,5in}
 @node FFT comparison
 @chapter FFT comparison
+@strong{FFTW3 NOT supported in current version}: There is currently NO support for FFTW3 at the moment. The FFTW module needs to be reverted to the Fortran 95 standard. At this time, it's not a huge priority. GGADT works just fine, and does not require you to install an external library. Future versions of GGADT will likely include FFTW3 support.
+
 Currently, GGADT allows you to choose between two FFT algorithms: FFTW 3 (@url{http://fftw.org/}), which requires you install the FFTW3 library, and GPFA (Generalized Prime Factor Algorithm)@footnote{Temperton, C. (1992). A Generalized Prime Factor FFT Algorithm for any N=2^p3^q5^r. SIAM Journal on Scientific and Statistical Computing, 13(3), 676-686.}, which is self-contained and included with the GGADT package. GPFA is used by default, and, as shown below, is slightly faster than FFTW in the current version of GGADT. This will change in later versions, since at the moment, we do not take advantage of saving and loading FFTW "wisdom". 
 
 Earlier versions of GGADT, which did FFT's in a different way (only did padded FFT's, but utilized FFTW wisdom), had FFTW being about 20 percent faster than GPFA.

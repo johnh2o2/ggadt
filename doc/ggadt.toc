@@ -1,0 +1,29 @@
+@numchapentry{Overview}{1}{Overview}{1}
+@numsecentry{Language}{1.1}{}{1}
+@numsecentry{Background}{1.2}{}{1}
+@numsubsecentry{Dust in the interstellar medium (ISM)}{1.2.1}{}{1}
+@numsubsecentry{Anomalous Diffraction Theory (ADT)}{1.2.2}{}{1}
+@numsecentry{Basic GGADT logic outline}{1.3}{}{2}
+@numchapentry{Installation}{2}{Installation}{3}
+@numsecentry{System requirements}{2.1}{}{3}
+@numsecentry{Package dependencies}{2.2}{}{3}
+@numchapentry{Invoking GGADT}{3}{Invoking GGADT}{4}
+@numsecentry{Setting parameter values}{3.1}{}{4}
+@numsecentry{Parameter file syntax}{3.2}{}{4}
+@numsecentry{Options and parameters}{3.3}{}{5}
+@numsecentry{Getting the accuracy you want}{3.4}{}{6}
+@numchapentry{Example usage}{4}{Example usage}{8}
+@numsecentry{Default case}{4.1}{}{8}
+@numsecentry{Using @code {make_sample_plots.py}}{4.2}{}{8}
+@numchapentry{Testing against previous results}{5}{Testing against previous results}{12}
+@numsecentry{Spherical case (ADT/Mie theory)}{5.1}{}{12}
+@numsubsecentry{GGADT}{5.1.1}{}{12}
+@numsubsecentry{Actual (Figure 1) from Draine & Allaf-Akbari 2006}{5.1.2}{}{13}
+@numsecentry{Ellipsoidal case (Draine and Allaf-Akbari 2006)}{5.2}{}{13}
+@numsubsecentry{GGADT}{5.2.1}{}{13}
+@numsubsecentry{Actual (Figure 2) from Draine & Allaf-Akbari 2006}{5.2.2}{}{14}
+@numsecentry{Agglomeration of spheres (Heng & Draine 2009)}{5.3}{}{15}
+@numchapentry{FFT comparison}{6}{FFT comparison}{16}
+@numsecentry{Timing}{6.1}{}{17}
+@appentry{GNU Free Documentation License}{A}{GNU Free Documentation License}{19}
+@unnchapentry{Concept index}{10001}{Concept index}{27}

@@ -17,3 +17,6 @@
 
 info_TEXINFOS = ggadt.texi
 ggadt_TEXINFOS = fdl.texi
+
+html-local:
+	cp *png ggadt.html
