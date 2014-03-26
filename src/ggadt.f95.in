@@ -37,7 +37,7 @@ program ggadt
     if (sed_mode) then 
         call calculate_sed_of_cross_sections()
     else
-        call calculate_differential_scattering_cross_section()
+        call diff_scat_cross_sect()
     end if 
 
     call cleanup()
@@ -225,7 +225,7 @@ contains
         
     end subroutine get_integrated_cross_sections
 
-    subroutine calculate_differential_scattering_cross_section()
+    subroutine diff_scat_cross_sect()
         implicit none 
         integer :: neul, i, j
         ! loop over orientations
@@ -265,7 +265,7 @@ contains
                 write(stderr,*) "ERROR: Do not understand geometry: ", geometry
             end if 
            
-            ftsh = fft_faster(sh,kmin,kmax,enhancement)
+            call fft_faster(sh,kmin,kmax,enhancement, ftsh)
 
             !$omp parallel shared(scatter,ftsh,k,dx,dy,norientations) 
             !$omp do schedule(dynamic) private(i,j)
@@ -292,7 +292,7 @@ contains
             end do
         end do
         if (verbose_mode) write(stderr,*) "done."
-    end subroutine calculate_differential_scattering_cross_section
+    end subroutine diff_scat_cross_sect
 
     subroutine initialize_and_allocate_vars()
       implicit none 
@@ -538,7 +538,7 @@ contains
 
 
     subroutine init_random_seed()
-        use, intrinsic :: iso_fortran_env
+        !use, intrinsic :: iso_fortran_env
         implicit none
 
         integer, allocatable :: seed(:)

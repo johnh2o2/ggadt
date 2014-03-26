@@ -12,7 +12,8 @@ macports_include="."
 
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_PROG_CC
-AC_PROG_FC 
+AC_PROG_FC
+
 
 #define default prefix
 AC_PREFIX_DEFAULT(/usr/local)
@@ -49,7 +50,7 @@ AC_CHECK_LIB([m],[cos]) #check for the math library
 
 case $host_os in
   darwin* )
-        #test for macports
+        # test for macports
         AC_MSG_NOTICE([MAC OSX specific checks:])
         AC_MSG_NOTICE([========================])
 
@@ -98,7 +99,7 @@ case $host_os in
         # Do something specific for BSD
         ;;
     *)
-        #Default Case
+        # Default case
         AC_MSG_ERROR([Your platform is not currently supported])
         ;;
 esac
@@ -204,28 +205,28 @@ AC_RUN_IFELSE([
   	)
 
 # adds -pg compiler flag for using gprof
-AC_ARG_ENABLE([profiling],
-[  --enable-profiling    Add -pg compiler flag ],
-[case "${enableval}" in
-  yes) 
-		FCFLAGSOLD=$FCFLAGS
-		FCFLAGS="${FCFLAGS} -pg" 
-		AC_MSG_CHECKING([ if compiler recognizes -pg ])
-		AC_COMPILE_IFELSE([
-  			AC_LANG_PROGRAM([],	[[ 
-  									integer :: i 
-  								]]
-  				)],
-  		AC_MSG_RESULT(yes), 
-  		[	AC_MSG_RESULT(no) ; 
-  			FCFLAGS=$FCFLAGSOLD ; 
-  			AC_MSG_WARN([Your fortran compiler does not recognize the '-pg' tag. Ignoring --enable-profiling.]) 
-  		]
-  	)
-	;;
-  no)  ;;
-  *) AC_MSG_ERROR([bad value ${enableval} for --enable-profiling]) ;;
-esac],[])
+#AC_ARG_ENABLE([profiling],
+#[  --enable-profiling    Add -pg compiler flag ],
+#[case "${enableval}" in
+#  yes) 
+#		FCFLAGSOLD=$FCFLAGS
+#		FCFLAGS="${FCFLAGS} -pg" 
+#		AC_MSG_CHECKING([ if compiler recognizes -pg ])
+#		AC_COMPILE_IFELSE([
+#  			AC_LANG_PROGRAM([],	[[ 
+#  									integer :: i 
+#  								]]
+#  				)],
+#  		AC_MSG_RESULT(yes), 
+#  		[	AC_MSG_RESULT(no) ; 
+#  			FCFLAGS=$FCFLAGSOLD ; 
+#  			AC_MSG_WARN([Your fortran compiler does not recognize the '-pg' tag. Ignoring --enable-profiling.]) 
+#  		]
+#  	)
+#	;;
+#  no)  ;;
+#  *) AC_MSG_ERROR([bad value ${enableval} for --enable-profiling]) ;;
+#esac],[])
 
 
 
@@ -276,19 +277,96 @@ then
 	AC_RUN_IFELSE([	
 		AC_LANG_PROGRAM([], 
   						[[  
-  							use, intrinsic :: iso_c_binding
-  							use, intrinsic :: iso_fortran_env
   							use omp_lib
   						]]
   			)],
   		AC_MSG_RESULT(yes), 
   		[ AC_MSG_RESULT(no) ; AC_MSG_ERROR([Cannot seem to use openmp in fortran! Check config.log for more details.])]
   	)
+
 	FCFLAGS=$FCFLAGSOLD
   FCFLAGS="${FCFLAGS} $OPENMP_FCFLAGS"
   	
 fi
 AC_LANG([Fortran])
+
+
+#Figure out how the Fortran compiler deals with command line arguments
+IF_GETARG= 
+IF_GET_COM_ARG= 
+IF_IARGC= 
+IF_COM_ARG_CNT=
+IF_NEWLINE=
+IF_NO_NEWLINE=
+
+
+#This is a f2003 thing, but if it works, woohoo!
+AC_MSG_CHECKING([if Fortran compiler recognizes command_argument_count])
+
+AC_RUN_IFELSE([ 
+  AC_LANG_PROGRAM([], 
+            [[  
+               integer :: i 
+               i = command_argument_count()
+            ]]
+      )],
+    [ AC_MSG_RESULT(yes) ; com_arg_cnt_works=true],  
+    [ AC_MSG_RESULT(no) ; com_arg_cnt_works=false]
+  )
+
+# if that didn't work, check that iargc() works.
+if test $com_arg_cnt_works = false
+  then
+  AC_MSG_CHECKING([Fortran compiler didn't seem to recognize command_argument_count, trying iargc])
+
+  AC_RUN_IFELSE([ 
+  AC_LANG_PROGRAM([], 
+            [[  
+               integer :: i 
+               i = iargc()
+            ]]
+      )],
+    [ AC_MSG_RESULT(yes) ],  
+    [ AC_MSG_RESULT(no) ; AC_MSG_ERROR([neither iargc nor command_argument_count seem to be recognized by your compiler...]) ]
+  )
+fi
+
+# assume that if iargc works == > getarg works, and command_argument_count works ==> get_command_argument works.
+if test $com_arg_cnt_works = true
+  then 
+    IF_GETARG="!"
+    IF_IARGC="!"
+  else
+    IF_GET_COM_ARG="!"
+    IF_COM_ARG_CNT="!"
+fi
+
+AC_MSG_CHECKING([if Fortran compiler recognizes new_line('a')])
+
+AC_RUN_IFELSE([ 
+  AC_LANG_PROGRAM([], 
+            [[  
+               character(len=*) :: buf
+               buf = new_line('a')
+               
+            ]]
+      )],
+    [ AC_MSG_RESULT(yes) ; newline_works=true ],  
+    [ AC_MSG_RESULT(no) ; newline_works=false ]
+  )
+
+if test $newline_works = true
+  then 
+    IF_NO_NEWLINE="!"
+  else
+    IF_NEWLINE="!"
+fi
+
+FCFLAGS=$FCFLAGSOLD
+FCFLAGS="${FCFLAGS} $OPENMP_FCFLAGS"
+
+
+
 if test $using_fftw3 = true
   then
   echo "USING FFTW3 -- should be in makefile..."
@@ -309,7 +387,7 @@ AC_CONFIG_FILES([ 	Makefile
           src/ggadt.f95
 					src/common.f95
           src/constants.f95
-
+          src/options.f95
           
 
           scripts/installation_vars.py
@@ -329,7 +407,11 @@ AC_SUBST(GPFA_COMMENT)
 AC_SUBST(USE_GPFA)
 AC_SUBST(omp_lib)
 AC_SUBST(abs_builddir)
-
-
+AC_SUBST(IF_GETARG) 
+AC_SUBST(IF_GET_COM_ARG)
+AC_SUBST(IF_IARGC)
+AC_SUBST(IF_COM_ARG_CNT)
+AC_SUBST(IF_NEWLINE)
+AC_SUBST(IF_NO_NEWLINE)
 
 AC_OUTPUT

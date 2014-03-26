@@ -10,8 +10,9 @@ autoconf
 automake -a
 
 std="f95"
-
-bash configure FCFLAGS="-O2 -fimplicit-none -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=${std} -pedantic -fbacktrace" || exit
+# add -fimplicit-none
+#bash configure FCFLAGS="-O2 -fall-intrinsics -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=${std} -pedantic -fbacktrace" || exit
+bash configure FCFLAGS="-O2 -std=$std -fall-intrinsics"
 #make || exit
 #cp doc/*png doc/ggadt.html
 #make html || exit
@@ -24,7 +25,7 @@ make html || exit
 cp doc/*png doc/ggadt.html || exit
 
 src/ggadt --sed --material=custom --material-file=data/materials/index_silD03 --ephot-min=0.7 --ephot-max=1.8 --dephot=0.2 || exit
-
+src/ggadt -h
 echo "SUCCESS!!!"
 
 

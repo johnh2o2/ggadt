@@ -9,8 +9,6 @@ module constants
 
   integer, parameter                            ::  max_str_len            = 300
   
-
-
   integer, parameter                            ::  ISIGN                  = 1
   integer, parameter                            ::  dp_real                = SELECTED_REAL_KIND(8,8)
   @FFTW3_UNCOMMENT@ integer, parameter          ::  dp_complex             = c_double_complex

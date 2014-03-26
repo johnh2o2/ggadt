@@ -35,7 +35,7 @@ module options
   ! Can customize these parameters as desired:
 
   ! Max number of options & positional arguments
-  character, parameter :: new_line = achar(10)
+  @IF_NO_NEWLINE@character, parameter :: new_line = achar(10)
   integer, parameter :: maxopts = 32
   integer, parameter :: maxargs = 32
   ! For formatting output
@@ -1021,8 +1021,8 @@ contains
     buf(name_column:) = trim(name)
     bufidx = name_column + len_trim(name)
     if (bufidx >= descr_column) then
-       buf(bufidx:bufidx) = new_line
-       !buf(bufidx:bufidx) = new_line('a')
+       @IF_NO_NEWLINE@buf(bufidx:bufidx) = new_line
+       @IF_NEWLINE@buf(bufidx:bufidx) = new_line('a')
        bufidx = bufidx + descr_column
     else
        bufidx = descr_column
@@ -1043,8 +1043,8 @@ contains
        ! last_blank_didx == 0 .or. last_blank_didx >= beginning_of_line
        ! last_blank_didx == 0 .or. descr(last_blank_didx) == ' '
        ! last_blank_didx == 0 .or. descr(last_blank_bufidx) == ' '
-       if (descr(didx:didx) .ne. new_line) then
-       !if (descr(didx:didx) .ne. new_line('a')) then
+       @IF_NO_NEWLINE@if (descr(didx:didx) .ne. new_line) then
+       @IF_NEWLINE@if (descr(didx:didx) .ne. new_line('a')) then
           if (descr(didx:didx) == ' ') then
              last_blank_didx = didx
              last_blank_bufidx = bufidx
@@ -1075,8 +1075,8 @@ contains
        end if
        cycle
        ! Linebreak
-100    buf(bufidx:bufidx) = new_line
-!100    buf(bufidx:bufidx) = new_line('a')
+@IF_NO_NEWLINE@100    buf(bufidx:bufidx) = new_line
+@IF_NEWLINE@100    buf(bufidx:bufidx) = new_line('a')
        bufidx = bufidx + descr_column
        last_blank_didx = 0
        col = descr_column
@@ -1086,8 +1086,8 @@ contains
        write (stderr,'(a)') "format_opt: need to increase format_buf_size in options.f90."
        stop
     end if
-    buf(bufidx:bufidx) = new_line
-    !buf(bufidx:bufidx) = new_line('a')
+    @IF_NO_NEWLINE@buf(bufidx:bufidx) = new_line
+    @IF_NEWLINE@buf(bufidx:bufidx) = new_line('a')
   end subroutine format_opt
 
 
@@ -1214,13 +1214,13 @@ contains
 
     integer :: l
 
-    !if (iarg > iargc()) stop "Error in getarg_check"
-    if (iarg > command_argument_count()) stop "Error in getarg_check"
+    @IF_IARGC@if (iarg > iargc()) stop "Error in getarg_check"
+    @IF_COM_ARG_CNT@if (iarg > command_argument_count()) stop "Error in getarg_check"
     buf = ''
-    call get_command_argument(iarg,buf,status=status,length=l)
-    !call getarg(iarg,buf)
-    !l = len(buf)
-    !status = 0
+    @IF_GET_COM_ARG@call get_command_argument(iarg,buf,status=status,length=l)
+    @IF_GETARG@call getarg(iarg,buf)
+    @IF_GETARG@l = len(buf)
+    @IF_GETARG@status = 0
     if (status .ne. 0) then
        ! If the value was truncated or the retrieval fails, status .ne. 0.
        ! Otherwise status == 0.
@@ -1283,8 +1283,8 @@ contains
     integer :: iarg, max, j
     logical :: help
 
-    !max = iargc()!command_argument_count()
-    max = command_argument_count()
+    @IF_IARGC@max = iargc()!command_argument_count()
+    @IF_GET_COM_ARG@max = command_argument_count()
 
     buf = ''
     iarg = 0
