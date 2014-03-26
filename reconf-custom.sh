@@ -3,6 +3,8 @@
 set -x
 
 bash cleandist-custom.sh
+rm configure
+
 git log --pretty --graph > ChangeLog
 
 aclocal -I./m4
