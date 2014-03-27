@@ -1,4 +1,5 @@
-#Exploring effects of porosity on scattering, extinction, absorption		
+# Consistency testing. 
+# Tests the sphere, spheres and ellipsoid modules to make sure that they're consistent with Mie theory
 
 from math import *
 
@@ -16,7 +17,7 @@ from installation_vars import *
 import plot_utilities as pu
 rc('font',**{'family':'serif'})
 
-ForceRedo = False
+ForceRedo = True
 PLOT_DIFFERENCE = False
 Material = "index_silD03"
 

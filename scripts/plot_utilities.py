@@ -1,3 +1,58 @@
+#Contains several useful functions for generating, loading, analyzing and plotting GGADT output.
+#
+# Functions:
+# ----------
+#   + make_data(
+#			params,
+#			fname,
+#			echo=True, 
+#			flags=[]
+#		)
+#   + quick_plots(
+#			fname,
+#			scale='log'
+#		)
+#   + all_zeros(
+#			data
+#		)
+#   + load_data(
+#			fname
+#		)
+#   + load_sed_data(
+#			fname
+#		)
+#
+#   + filter_data(
+#			data,
+#			boundaries=[-2000,2000,-2000,2000],
+#			delta=100
+#		)
+#   + convert_to_arcseconds(
+#			data
+#		)
+#   + add_1d_slice(
+#			ax,
+#			data_function,
+#			phis=[ 0.0, np.pi/2.0 ],
+#			boundaries=[-2000,2000,-2000,2000],
+#			PlotAvg=True,
+#			PlotMinMax=True,
+#			PlotOneSigma=True,
+#			AddLabels=True, 
+#			AddLegend=True, 
+#			colors = [ 'b', 'r', 'c', 'g' ],
+#			linestyles = [ '--', '-.', '..']
+#		)
+#	+ get_1d_slice(
+#			data_function,
+#			phi=0.0,
+#			boundaries=[-2000,2000,-2000,2000]
+#		)
+#	+ get_1d_avg(
+#			data_function,
+#			boundaries=[-2000,2000,-2000,2000]
+#		)
+# [To be continued ... ]
 from math import *
 import sys
 import os
@@ -13,7 +68,7 @@ data_dt = np.dtype([('theta', np.float_), ('phi', np.float_), ('f', np.float_)])
 conv = (360*60*60)/(2*np.pi) # convert from radians to arcseconds (a more sensible unit)
 
 
-def make_data(params,fname,echo=False, flags=[]):
+def make_data(params,fname,echo=True, flags=[]):
 	clargs = " "
 	add = ""
 	for p in params:
