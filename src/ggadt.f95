@@ -1,6 +1,6 @@
 program ggadt
-    @FFTW3_UNCOMMENT@use, intrinsic :: iso_c_binding
-    @FFTW3_UNCOMMENT@use, intrinsic :: iso_fortran_env
+    !use, intrinsic :: iso_c_binding
+    !use, intrinsic :: iso_fortran_env
 
     use sphere
     use spheres
@@ -8,7 +8,7 @@ program ggadt
     use common_mod
     use constants
 
-    @USE_OMP_LIB@
+    use omp_lib
 
     implicit none
 
@@ -29,7 +29,7 @@ program ggadt
     call set_parameter_values()
     call initialize_and_allocate_vars()
     
-    @FFTW3_UNCOMMENT@call set_optimization_mode(fftw_optimization_mode_name)
+    !call set_optimization_mode(fftw_optimization_mode_name)
     
     call print_parameters(stdout)
     

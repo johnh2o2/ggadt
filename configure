@@ -2257,6 +2257,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 #AC_CONFIG_MACRO_DIRS([m4])
 
 
+
+#AM_MAINTAINER_MODE([disable])
+
 ac_aux_dir=
 for ac_dir in "$srcdir" "$srcdir/.." "$srcdir/../.."; do
   if test -f "$ac_dir/install-sh"; then
@@ -4192,7 +4195,6 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-
 #define default prefix
 
 ac_prefix=$prefix
@@ -4375,6 +4377,7 @@ if test $using_fftw3 = true
   then
   FFTW3_UNCOMMENT=
   FFTW3_COMMENT="!"
+
   USE_FFTW="use fftw"
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftw_plan_dft_1d in -lfftw3" >&5
 $as_echo_n "checking for fftw_plan_dft_1d in -lfftw3... " >&6; }
@@ -5425,7 +5428,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile doc/Makefile src/fftwmod.f95 src/spheres.f95 src/ggadt.f95 src/common.f95 src/constants.f95 src/options.f95 scripts/installation_vars.py"
+ac_config_files="$ac_config_files Makefile src/Makefile doc/Makefile src/fftwmod.f95 src/spheres.f95 src/common.f95 src/constants.f95 src/options.f95 src/ggadt.f95 scripts/installation_vars.py"
 
 
 
@@ -6212,10 +6215,10 @@ do
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "src/fftwmod.f95") CONFIG_FILES="$CONFIG_FILES src/fftwmod.f95" ;;
     "src/spheres.f95") CONFIG_FILES="$CONFIG_FILES src/spheres.f95" ;;
-    "src/ggadt.f95") CONFIG_FILES="$CONFIG_FILES src/ggadt.f95" ;;
     "src/common.f95") CONFIG_FILES="$CONFIG_FILES src/common.f95" ;;
     "src/constants.f95") CONFIG_FILES="$CONFIG_FILES src/constants.f95" ;;
     "src/options.f95") CONFIG_FILES="$CONFIG_FILES src/options.f95" ;;
+    "src/ggadt.f95") CONFIG_FILES="$CONFIG_FILES src/ggadt.f95" ;;
     "scripts/installation_vars.py") CONFIG_FILES="$CONFIG_FILES scripts/installation_vars.py" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

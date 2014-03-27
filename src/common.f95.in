@@ -27,6 +27,8 @@ module common_mod
   character(len=50)                           ::  euler_angle_mode
 
 
+
+
   integer                                     ::  ngrain
   integer                                     ::  nscatter_min 
   integer                                     ::  ngrid
@@ -54,13 +56,23 @@ module common_mod
   real(kind=dp_real)                          ::  ephot_min
   real(kind=dp_real)                          ::  dephot
   real(kind=dp_real)                          ::  ephot_max 
-  character(len=200)                          ::  material          ! name of predefined material
+ ! character(len=200)                          ::  material          ! name of predefined material
   character(len=200)                          ::  material_file     ! file that defines ior_re and ior_im for a range of energies
   logical                                     ::  sed_mode          ! are we doing the spectral energy distribution? Maybe
                                                                     !   it's better to define a global "mode" variable
                                                                     !   with a default value and then the user only has 
                                                                     !   to specify "--mode='sed'" or something
 !-------
+
+  character(len=200), dimension(10)           ::  material_files
+  character(len=200), dimension(10)           ::  material_tags
+  character(len=200), dimension(10)           ::  agglom_composition_file
+  character(len=200), allocatable             ::  agglom_material_tags
+  integer                                     ::  nmaterials
+  real(kind=dp_real), dimension(10)           ::  matfracs
+
+
+
   character(len=200)                          ::  euler_angle_file
   character(len=100)                          ::  fftw_optimization_mode_name
   character(len=200)                          ::  cluster_file_name
@@ -92,6 +104,50 @@ module common_mod
         "parameter-file-name","",&
         description="Path to parameter file")
 
+
+      ! Allow user to specify up to 10 materials:
+      !call define_option_string(opts,&
+      !  "material-file1","",&
+      !  description="Path to material file for material 1")
+
+      !call define_option_string(opts,&
+      !  "material-file2","",&
+      !  description="Path to material file for material 2")
+
+      !call define_option_string(opts,&
+      !  "material-file3","",&
+      !  description="Path to material file for material 3")
+      
+      !call define_option_string(opts,&
+      !  "material-tag1","",&
+      !  description="Tag to associate with material 1")
+
+      !call define_option_string(opts,&
+      !  "material-tag2","",&
+      !  description="Tag to associate with material 2")
+
+      !call define_option_string(opts,&
+      !  "material-tag3","",&
+      !  description="Tag to associate with material 3")
+
+      !call define_option_string(opts,&
+      !  "agglom-composition-file","",&
+      !  description="File matching each sphere in an agglomerate with a material tag")
+
+      !call define_option_real(opts,&
+      !  "material-frac1","",&
+      !  description="Volume fraction of the grain composed of material 1")
+
+      !call define_option_real(opts,&
+      !  "material-frac2","",&
+      !  description="Volume fraction of the grain composed of material 2")
+
+      !call define_option_real(opts,&
+      !  "material-frac3","",&
+      !  description="Volume fraction of the grain composed of material 3")
+
+
+      !
       ! Define command line options
 
       call define_option_string(opts,&
@@ -158,12 +214,11 @@ module common_mod
       
       call define_option_string(opts,&
         "material", default_material,&
-        description="Name of grain material &
-            &(say 'custom' and use 'material-file=/path/to/file' &
-            &to use your own material)")
+        description="Name of material (this will be obselete in future versions). Must be --material='custom'")
       call define_option_string(opts,&
         "material-file", default_material_file,&
-        description="Name of custom material file")
+        description="Path to file providing energy dependent indices of refraction and &
+                  &dielectric constant for the grain material")
 
       call define_option_string(opts,"fftw-optimization",default_fftw_opt_name,required=.false.,&
         description="[estimate,measure,patient,exhaustive]")
@@ -221,7 +276,7 @@ module common_mod
       call get_option_integer(opts,"nephots", nephots)
       call get_option_real(opts,"dephot", dephot)
       
-      call get_option_string(opts,"material",material)
+      !call get_option_string(opts,"material",material)
       call get_option_string(opts,"material-file",material_file)
      
       call get_flag(opts,"version",asked_for_version)

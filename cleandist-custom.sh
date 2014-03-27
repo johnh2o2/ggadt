@@ -24,7 +24,6 @@ rm -f src/*mod
 rm -f src/Makefile.in
 rm -f src/Makefile
 
-rm -f src/ggadt.f95
 rm -f src/spheres.f95
 rm -f src/common.f95
 rm -f src/constants.f95
