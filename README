@@ -1,20 +1,12 @@
-GGADT version 0.9.3 -- Jan 27, 2014
-Authors: John Hoffman, Michael Tarczon
+GGADT -- General Geometry Anomalous Diffraction Theory
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+Version 0.9.8
 
+John Hoffman and Michael Tarczon
+README last updated: March 27, 2014
 
-GGADT calculates the x-ray scattering properties of dust
-in the interstellar medium. You define the geometry and composition
-of a dust grain, the energy of the incident x-ray photons, and a few other parameters. 
-GGADT then calculates the orientationally-averaged scattering 
-cross-section in the plane perpendicular to the incident photons. 
+GGADT is a set of Fortran 95 routines that calculate the x-ray scattering and absorption properties of dust grains using anomalous diffraction theory (valid when the grain is large compared to the wavelength of incident light).
 
---INSTALLATION/DEPENDENCIES--
+-- Documentation -- 
 
-Please see the documentation in the doc/ directory. The ggadt.info file can be
-read by virtually any text reader. The INSTALL file in the top directory has
-more details about installing and working with the "configure" script.
-
-For HTML documentation: simply open ggadt.html/index.html in a browser of your choice.
-
-
-
+Full documentation (in HTML form) is available. Open the doc/htmldoc/index.html file in a browser of your choice.

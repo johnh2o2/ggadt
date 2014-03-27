@@ -1,0 +1,100 @@
+<html lang="en">
+<head>
+<title>Installation - GGADT 0.9.8</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GGADT 0.9.8">
+<meta name="generator" content="makeinfo 4.8">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Overview.html#Overview" title="Overview">
+<link rel="next" href="Invoking-GGADT.html#Invoking-GGADT" title="Invoking GGADT">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This manual is for GGADT (version 0.9.8, 26 March 2014),
+which calculates scattering properties of dust grains in the interstellar
+medium by using anomalous diffraction theory (ADT).
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with no Front-Cover Texts,
+     and with no Back-Cover Texts.  A copy of the license is included
+     in the section entitled ``GNU Free Documentation License''.
+   -->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<div class="node">
+<p>
+<a name="Installation"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="Invoking-GGADT.html#Invoking-GGADT">Invoking GGADT</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Overview.html#Overview">Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">2 Installation</h2>
+
+<p><a name="index-installing-9"></a><a name="index-configure-10"></a><a name="index-enable_002dopenmp-11"></a><a name="index-gcc-12"></a>
+
+<h3 class="section">2.1 System requirements</h3>
+
+<p>GGADT should install easily on most <em>Unix-based systems</em> (e.g. Linux, Mac) by following the standard GNU install procedures, described in <samp><span class="file">INSTALL</span></samp>.
+
+<pre class="example">     ./configure [--enable-openmp] [--enable-fftw3] ...
+     make
+     make install
+</pre>
+   <p>We haven't tested any speed improvements, but it might be advantageous to also add O2 optimization to the compilation via:
+
+<pre class="example">     ./configure FCFLAGS="-O2" [--enable-openmp] [--enable-fftw3] ...
+     make
+     make install
+</pre>
+   <h3 class="section">2.2 Package dependencies</h3>
+
+<p>If you would like to use a particular Fortran compiler, you may specify one by adding <code>FC=/path/to/compiler</code> to the <code>configure</code> arguments.
+
+     <ul>
+<li><strong>Suitable C and Fortran compilers</strong>: GGADT was developed using the GNU compiler suite (version 4.5.4 and higher) throughout, but the <code>configure</code> script will try to work with most common compilers. GGADT has been tested to compile on versions 4.3 and later of gfortran. If you experience any compilation problems, please let John Hoffman know!
+
+     <li>(<em>Optional</em>) <strong>FFTW 3</strong>. Available at <a href="http://www.fftw.org/">http://www.fftw.org/</a>. FFTW3 is NOT required (or currently supported, but will be in the next version).
+          <ul>
+<li><em>Location of the FFTW3 headers</em>: In order for GGADT to find the Fortran headers for FFTW3, they must be in the standard location (<code>/usr/local/include</code> or <code>usr/include</code>) or in <code>$prefix/include</code> where <code>$prefix</code> is defined by doing <code>./configure --prefix=&lt;prefix&gt;</code> at the configuration step for <code>ggadt</code>. If you have FFTW3 installed with MacPorts, the configure script should be able to find it for you, and you don't have to specify anything extra.
+
+     </ul>
+
+          <ul>
+<li><strong>OpenMP</strong>: For the OpenMP version of GGADT, you must have C and Fortran compilers that are compatible with OpenMP version 4.0.
+
+     </ul>
+
+     <li><strong>Mac users</strong>
+          <ul>
+<li>Install the latest edition of <strong>XCode command-line tools</strong>. As of Mac OSX v10.9.1, the command-line tools are not included in XCode automatically, so you have to do this on your own. 
+<li><strong>Macports</strong> is highly recommended. It provides a convenient, safe package manager for Mac (unofficial, of course). To set up an environment condusive to compiling and running <code>ggadt</code>, do the following from the terminal:
+               <ol type=1 start=1>
+<li>Download and install macports from <a href="http://www.macports.org/">http://www.macports.org/</a>. 
+<li>Install gcc (4.5.4 or higher is recommended), and the FFTW3 library if you want:
+               <pre class="example">                    sudo port install gcc45
+                    sudo port install fftw-3 (optional)
+               </pre>
+               <li>Set the gcc compiler: <code>sudo port select --set gcc mp-gcc45</code>
+               </ol>
+</ul>
+     <li>(<em>Optional</em>) <strong>Python 2.7</strong> or later for some of the included scripts. 
+<li>(<em>Optional</em>) <strong>matplotlib</strong>,<strong>numpy</strong>, <strong>scipy</strong> python librarys if you wish to use the included plotting scripts. More information can be found at <a href="http://scipy.org/getting-started.html">http://scipy.org/getting-started.html</a>. 
+</ul>
+
+   </body></html>
+
