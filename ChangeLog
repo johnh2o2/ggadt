@@ -1,3 +1,9 @@
+* commit a628c5296eb7feeb08ac728d89338595ff9b0b74
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Fri Mar 28 11:49:43 2014 -0400
+| 
+|     Changed extension from to f95 to f90, since ifort doesnt seem to automatically recognize the f95 file extension. There might be some way to tell it to, but for now I'll take the coward's way out and just change the file extensions.
+|  
 * commit 203d9032cc72073dd50d76cf0fef723a51e47ceb
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Fri Mar 28 11:28:40 2014 -0400
