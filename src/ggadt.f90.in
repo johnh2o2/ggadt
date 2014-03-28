@@ -666,7 +666,9 @@ contains
         if (euler_angle_mode == "file") write(i,*) "# euler_angle_file:", trim(adjustl(euler_angle_file))
         write(i,*) "# ngrain:",ngrain
         write(i,*) "# norientations:",norientations
-        write(i,*) "# grain_axes:",grain_a
+        write(i,*) "# grain-axis-x:",grain_a(1)
+        write(i,*) "# grain-axis-y:",grain_a(2)
+        write(i,*) "# grain-axis-z:",grain_a(3)
         write(i,*) "# use_padded_fft:",use_padded_fft
         write(i,*) "# parameter_file_name:",trim(adjustl(parameter_file_name))
         write(i,*) "# fftw_optimization_mode_name:",trim(adjustl(fftw_optimization_mode_name))

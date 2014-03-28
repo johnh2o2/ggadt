@@ -1,3 +1,9 @@
+* commit f5505a543e864dec66acdd5591a01046a2beca11
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Fri Mar 28 12:04:14 2014 -0400
+| 
+|     Added trim(adjustl()) to strings in the print_parameters function to reduce whitespace
+|  
 * commit 192e6154892a8dc5eed4ce85babeb607414bcdfd
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Fri Mar 28 11:53:55 2014 -0400
