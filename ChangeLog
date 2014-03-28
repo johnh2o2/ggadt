@@ -1,3 +1,9 @@
+* commit 192e6154892a8dc5eed4ce85babeb607414bcdfd
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Fri Mar 28 11:53:55 2014 -0400
+| 
+|     Ooops, forgot to make changes to the Makefile.am in the last commit.
+|  
 * commit a628c5296eb7feeb08ac728d89338595ff9b0b74
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Fri Mar 28 11:49:43 2014 -0400

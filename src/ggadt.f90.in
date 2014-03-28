@@ -661,16 +661,16 @@ contains
             write(i,*) "# nephots:",nephots
             write(i,*) "# Material file: '",trim(adjustl(material_file)),"'"
         end if 
-        write(i,*) "# geometry:", geometry
-        write(i,*) "# euler_angle_mode:",euler_angle_mode
-        if (euler_angle_mode == "file") write(i,*) "# euler_angle_file:", euler_angle_file
+        write(i,*) "# geometry:", trim(adjustl(geometry))
+        write(i,*) "# euler_angle_mode:",trim(adjustl(euler_angle_mode))
+        if (euler_angle_mode == "file") write(i,*) "# euler_angle_file:", trim(adjustl(euler_angle_file))
         write(i,*) "# ngrain:",ngrain
         write(i,*) "# norientations:",norientations
         write(i,*) "# grain_axes:",grain_a
         write(i,*) "# use_padded_fft:",use_padded_fft
-        write(i,*) "# parameter_file_name:",parameter_file_name
-        write(i,*) "# fftw_optimization_mode_name:",fftw_optimization_mode_name
-        if (geometry == "spheres") write(i,*) "# cluster_file_name:",cluster_file_name
+        write(i,*) "# parameter_file_name:",trim(adjustl(parameter_file_name))
+        write(i,*) "# fftw_optimization_mode_name:",trim(adjustl(fftw_optimization_mode_name))
+        if (geometry == "spheres") write(i,*) "# cluster_file_name:",trim(adjustl(cluster_file_name))
         write(i,*) "# -----------------------------------"
     
 
