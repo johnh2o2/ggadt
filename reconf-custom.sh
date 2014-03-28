@@ -10,7 +10,7 @@ git log --pretty --graph > ChangeLog
 aclocal -I./m4
 autoconf
 automake -a
-bash configure --enable-openmp
+#bash configure --enable-openmp
 #std="f95"
 # add -fimplicit-none
 #bash configure FCFLAGS="-O2 -fall-intrinsics -Wall -Wline-truncation -Wcharacter-truncation -Wsurprising -Waliasing -Wimplicit-interface -Wunused-parameter -fwhole-file -fcheck=all -std=${std} -pedantic -fbacktrace" || exit
@@ -22,8 +22,8 @@ bash configure --enable-openmp
 #python scripts/plot.py test_output_fftw3.dat || exit
 
 #bash configure --enable-fftw3 
-make || exit
-make html || exit
-cp doc/ggadt.html/* doc/htmldoc/
+#make || exit
+#make html || exit
+#cp doc/ggadt.html/* doc/htmldoc/
 
-python scripts/testing_against_mie_theory.py
+#python scripts/testing_against_mie_theory.py
