@@ -1,3 +1,9 @@
+* commit caa2867adfad90b6c53b6937b7ce8bb0fa982c61
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Thu Mar 27 21:00:09 2014 -0400
+| 
+|     Added files that will be relevant to configuring on other systems. (i.e. ran aclocal, autoconf and automake).
+|  
 * commit b44fe0feb83f6d5c5b4d6d9a0cfaa420fa35cd66
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Thu Mar 27 18:04:42 2014 -0400

@@ -8,7 +8,7 @@ program ggadt
     use common_mod
     use constants
 
-    use omp_lib
+    
 
     implicit none
 
