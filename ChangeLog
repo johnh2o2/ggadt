@@ -1,3 +1,9 @@
+* commit 203d9032cc72073dd50d76cf0fef723a51e47ceb
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Fri Mar 28 11:28:40 2014 -0400
+| 
+|     edited common.f95.in to not use an allocatable array of characters for agglom_material_tags (changed to just agglom_material_tag, which will be a buffer when iterating through spheres). Perhaps define a new datatype for materials?
+|  
 * commit 7583869e5798e84a184e106c95e45171f35eb482
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Fri Mar 28 11:20:36 2014 -0400
