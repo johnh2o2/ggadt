@@ -1,15 +1,15 @@
 <html lang="en">
 <head>
-<title>Invoking GGADT - GGADT 0.9.8</title>
+<title>Invoking GGADT - GGADT 0.9.84</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="GGADT 0.9.8">
+<meta name="description" content="GGADT 0.9.84">
 <meta name="generator" content="makeinfo 4.8">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="prev" href="Installation.html#Installation" title="Installation">
 <link rel="next" href="Example-usage.html#Example-usage" title="Example usage">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
-This manual is for GGADT (version 0.9.8, 26 March 2014),
+This manual is for GGADT (version 0.9.84, 28 March 2014),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT).
 
@@ -150,7 +150,13 @@ standard output and then exit successfully.
 
      <br><dt><samp><span class="option">--fftw-optimization=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dfftw_002doptimization-42"></a>Must be one of <code>ESTIMATE</code>, <code>MEASURE</code>, <code>PATIENT</code> or <code>EXHAUSTIVE</code>. FFTW wisdom is saved in <code>$HOME/.ggadt/plans</code>. For more information about what these tags mean and about FFTW wisdom, see <a href="http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans">http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans</a>.
 
-     <br><dt><samp><span class="option">--use-padded-fft</span></samp><dt><samp><span class="option">-s</span></samp><dd><a name="index-g_t_002d_002duse_002dpadded_002dfft-43"></a><a name="index-g_t_002ds-44"></a>This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by <code>nscatter</code>), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.
+     <br><dt><samp><span class="option">--euler-angle-mode=</span><var>value</var></samp><dd><a name="index-g_t_002d_002deuler_002dangle_002dmode-43"></a>Must be one of <code>random</code>, <code>sequential</code>, or <code>file</code>. Specifying <code>random</code> will average over <code>norientations</code> grain orientations, with each Euler angle chosen from a uniform distribution over [0,2*pi). Specifying <code>sequential</code> will make GGADT use Euler angles that are separated from each other by a fixed amount. Specifying <code>file</code> allows you to give GGADT specific Euler angles to use in orientational averaging. The <code>file</code> mode requires that you also specify <code>--euler-angle-file=/path/to/euler-file</code> which contains a list of Euler angles.
+
+     <br><dt><samp><span class="option">--euler-angle-file=</span><var>value</var></samp><dd><a name="index-g_t_002d_002deuler_002dangle_002dfile-44"></a>Path to a file containing a list of Euler angles which GGADT will use to compute orientational averages. Only used when <code>--euler-angle-mode=file</code>.
+
+     <br><dt><samp><span class="option">--rotation-axis=</span><var>value</var></samp><dd><a name="index-g_t_002d_002drotation_002daxis-45"></a>Must be one of <code>none</code>, <code>xaxis</code>, <code>yaxis</code>, or <code>zaxis</code>. If not <code>none</code>, this will average over all orientations about the specified principle axis. Useful for grains that are aligned, for instance, with a magnetic field.
+
+     <br><dt><samp><span class="option">--use-padded-fft</span></samp><dt><samp><span class="option">-s</span></samp><dd><a name="index-g_t_002d_002duse_002dpadded_002dfft-46"></a><a name="index-g_t_002ds-47"></a>This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by <code>nscatter</code>), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.
 
    </dl>
 
@@ -201,7 +207,9 @@ standard output and then exit successfully.
 
    <div class="block-image"><img src="RMS_ngrain_nscatter.png" alt="RMS_ngrain_nscatter.png"></div>
 
-   <p>Accuracy results for TOTAL cross section calculations to come soon...
+<h4 class="subsection">3.5.2 Scattering and absorption cross-section calculations</h4>
+
+<p>Accuracy results for TOTAL cross section calculations to come soon...
 
    </body></html>
 

@@ -30,6 +30,7 @@ module constants
   real(kind=dp_real), parameter                 ::  default_ior_im         = 2.807E-5
   character(len=200), parameter                 ::  default_grain_geometry = 'sphere'
   character(len=50), parameter                  ::  default_euler_angle_mode = 'random'
+  character(len=50), parameter                  ::  default_rotation_axis = 'none'
   character(len=200), parameter                 ::  default_euler_angle_file = ''
   integer, parameter                            ::  default_ngrain         = 256
   integer, parameter                            ::  default_nscatter       = 100

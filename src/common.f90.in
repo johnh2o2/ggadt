@@ -25,6 +25,7 @@ module common_mod
 
   character(len=50)                           ::  geometry  
   character(len=50)                           ::  euler_angle_mode
+  character(len=50)                           ::  rotation_axis
 
 
 
@@ -64,12 +65,12 @@ module common_mod
                                                                     !   to specify "--mode='sed'" or something
 !-------
 
-  character(len=200), dimension(10)           ::  material_files
-  character(len=200), dimension(10)           ::  material_tags
-  character(len=200), dimension(10)           ::  agglom_composition_file
-  character(len=200)                          ::  agglom_material_tag
-  integer                                     ::  nmaterials
-  real(kind=dp_real), dimension(10)           ::  matfracs
+  !character(len=200), dimension(10)           ::  material_files
+  !character(len=200), dimension(10)           ::  material_tags
+  !character(len=200), dimension(10)           ::  agglom_composition_file
+  !character(len=200)                          ::  agglom_material_tag
+  !integer                                     ::  nmaterials
+  !real(kind=dp_real), dimension(10)           ::  matfracs
 
 
 
@@ -196,6 +197,10 @@ module common_mod
         "euler-angle-mode",default_euler_angle_mode,&
         description="How to choose Euler angles (sequential, random, file)")
       call define_option_string(opts,&
+        "rotation-axis",default_rotation_axis,&
+        description="Sampled orientations will be rotations about this axis (none, xaxis, yaxis, zaxis)")
+
+      call define_option_string(opts,&
         "euler-angle-file",default_euler_angle_file,&
         description="Path to a text file containing a list of orientations")
       
@@ -261,6 +266,7 @@ module common_mod
       call get_option_real(opts,"ior-im",ior_im)
       call get_option_string(opts,"grain-geometry",geometry)
       call get_option_string(opts,"euler-angle-mode",euler_angle_mode)
+      call get_option_string(opts,"rotation-axis",rotation_axis)
       call get_option_string(opts,"euler-angle-file",euler_angle_file)
       call get_option_integer(opts,"ngrain",ngrain)
       
@@ -297,6 +303,7 @@ module common_mod
       ! Set to lower case
       fftw_optimization_mode_name = strlowcase(fftw_optimization_mode_name)
       euler_angle_mode = strlowcase(euler_angle_mode)
+      rotation_axis = strlowcase(rotation_axis)
       geometry = strlowcase(geometry)
 
 
@@ -320,8 +327,8 @@ module common_mod
 
     subroutine print_help(opts)
       type(options_t), intent(in) :: opts
-      write (*,'(a)') "ggadt: Compute orientationally &
-      &averaged scattering cross section of ISM grain as a function of the scattering angle."
+      write (*,'(a)') "ggadt: Computes orientationally averaged scattering and absorption&
+        &quantities for a user-defined dust grain."
       write (*,'(a)') "Usage: ggadt [options]"
       write (*,'(a)') ""
       write (*,'(a)') "Options:"

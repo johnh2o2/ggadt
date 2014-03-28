@@ -312,12 +312,21 @@ contains
         end if 
       ! Set Euler angles -------------------------------
         if (euler_angle_mode == 'sequential') then
-            norientations_new = int(real(norientations)**(1.0/3.0))**3
-            if (norientations /= norientations_new) then
-                write(stderr,*) ""
-                write(stderr,*) "   + norientations: ",norientations,"-->",norientations_new
-                norientations = norientations_new
-            endif
+            if (rotation_axis == 'none') then 
+                norientations_new = int(real(norientations)**(1.0/3.0))**3
+                if (norientations /= norientations_new) then
+                    write(stderr,*) ""
+                    write(stderr,*) "Warning: norientations: ",norientations,"-->",norientations_new
+                    norientations = norientations_new
+                endif
+            else
+                norientations_new = int(real(norientations)**(1.0/2.0))**2
+                if (norientations /= norientations_new) then
+                    write(stderr,*) ""
+                    write(stderr,*) "Warning: norientations: ",norientations,"-->",norientations_new
+                    norientations = norientations_new
+                endif
+            end if
         else if (euler_angle_mode == 'random') then
             call init_random_seed()
 
@@ -349,9 +358,6 @@ contains
               end if
               close(10) 
             end if 
-        else 
-            write(stderr,*) " ERROR: do not understand euler_angle_mode=",euler_angle_mode
-            stop
         end if 
 
     ! ---------------------------------------------------
@@ -592,17 +598,50 @@ contains
         integer, intent(in) :: i
         integer                :: j 
         character(len=50)    :: junk
-        integer :: cbrt_norientations, nx, ny, nz
+        real(kind=dp_real) :: norm
+        integer :: cbrt_norientations, nx, ny, nz, sqrt_norientations
 
 
         if (euler_angle_mode .eq. 'sequential') then 
-            cbrt_norientations = int(norientations**(1.0/3.0))
-            nx = mod(i/(cbrt_norientations*cbrt_norientations),   cbrt_norientations)
-            ny = mod(i/(cbrt_norientations),               cbrt_norientations)
-            nz = mod(i,                             cbrt_norientations) 
-            get_new_euler_angles(1) = 2*pi*(nx-1)/cbrt_norientations
-            get_new_euler_angles(2) = 2*pi*(ny-1)/cbrt_norientations
-            get_new_euler_angles(3) = 2*pi*(nz-1)/cbrt_norientations
+            if (rotation_axis == 'none') then 
+                cbrt_norientations = int(norientations**(1.0/3.0))
+                norm = real(norientations,kind=dp_real)**(1.0/3.0)
+                nx = mod(i/(cbrt_norientations*cbrt_norientations),   cbrt_norientations)
+                ny = mod(i/(cbrt_norientations),               cbrt_norientations)
+                nz = mod(i,                             cbrt_norientations) 
+                get_new_euler_angles(1) = (2*pi*(nx-1))*norm
+                get_new_euler_angles(2) = (2*pi*(ny-1))*norm
+                get_new_euler_angles(3) = (2*pi*(nz-1))*norm
+            else if ( rotation_axis .eq. 'xaxis' ) then 
+                sqrt_norientations = int(norientations**(1.0/2.0))
+                norm = real(norientations,kind=dp_real)**(1.0/2.0)
+                nx = 1
+                ny = mod(i,                             sqrt_norientations)
+                nz = mod(i/(sqrt_norientations),               sqrt_norientations)
+                get_new_euler_angles(1) = 2*pi*(nx-1)*norm
+                get_new_euler_angles(2) = 2*pi*(ny-1)*norm
+                get_new_euler_angles(3) = 2*pi*(nz-1)*norm
+            else if ( rotation_axis .eq. 'yaxis' ) then 
+                sqrt_norientations = int(norientations**(1.0/2.0))
+                norm = real(norientations,kind=dp_real)**(1.0/2.0)
+                ny = 1
+                nz = mod(i,                             sqrt_norientations)
+                nx = mod(i/(sqrt_norientations),               sqrt_norientations)
+                get_new_euler_angles(1) = 2*pi*(nx-1)*norm
+                get_new_euler_angles(2) = 2*pi*(ny-1)*norm
+                get_new_euler_angles(3) = 2*pi*(nz-1)*norm
+            else if ( rotation_axis .eq. 'zaxis' ) then 
+                sqrt_norientations = int(norientations**(1.0/2.0))
+                norm = real(norientations,kind=dp_real)**(1.0/2.0)
+                nz = 1
+                ny = mod(i,                             sqrt_norientations)
+                nx = mod(i/(sqrt_norientations),               sqrt_norientations)
+                get_new_euler_angles(1) = 2*pi*(nx-1)*norm
+                get_new_euler_angles(2) = 2*pi*(ny-1)*norm
+                get_new_euler_angles(3) = 2*pi*(nz-1)*norm
+            else 
+                write(stderr,*) "ERROR (get_new_euler_angles): Do not understand rotation_axis: '",trim(adjustl(rotation_axis)),"'"
+            end if 
         else if ( euler_angle_mode .eq. 'file' ) then
             open(unit=1,file=euler_angle_file)
             if (i > 1) then 
@@ -612,11 +651,34 @@ contains
             end if 
             read(1,*) get_new_euler_angles
             close(1)
-        else
+        else if ( euler_angle_mode .eq. 'random' ) then
             call random_number(get_new_euler_angles)
-            get_new_euler_angles(1) = 2*pi*get_new_euler_angles(1)
-            get_new_euler_angles(2) = 2*pi*get_new_euler_angles(2) 
-            get_new_euler_angles(3) = 2*pi*get_new_euler_angles(3)
+            if (rotation_axis .eq. "none") then 
+                
+                get_new_euler_angles(1) = 2*pi*get_new_euler_angles(1)
+                get_new_euler_angles(2) = 2*pi*get_new_euler_angles(2) 
+                get_new_euler_angles(3) = 2*pi*get_new_euler_angles(3)
+            else if ( rotation_axis .eq. 'xaxis' ) then 
+                
+                get_new_euler_angles(1) = 0.0
+                get_new_euler_angles(2) = 2*pi*get_new_euler_angles(1)
+                get_new_euler_angles(3) = 2*pi*get_new_euler_angles(2)
+            else if ( rotation_axis .eq. 'yaxis' ) then 
+                get_new_euler_angles(1) = 2*pi*get_new_euler_angles(1)
+                get_new_euler_angles(2) = 0.0
+                get_new_euler_angles(3) = 2*pi*get_new_euler_angles(2)
+            else if ( rotation_axis .eq. 'zaxis' ) then 
+                get_new_euler_angles(1) = 2*pi*get_new_euler_angles(1)
+                get_new_euler_angles(2) = 2*pi*get_new_euler_angles(2)
+                get_new_euler_angles(3) = 0.0
+            else 
+                write(stderr,*) "ERROR (get_new_euler_angles): Do not understand rotation_axis: '",trim(adjustl(rotation_axis)),"'"
+            end if 
+        else 
+            write(stderr, *) "ERROR (get_new_euler_angles): Do not understand&
+            & euler_angle_mode '",trim(adjustl(euler_angle_mode)),"'."
+            stop 
+
         endif
     end function get_new_euler_angles
 
@@ -650,29 +712,30 @@ contains
         write(i,*) "# Parameter values"
         write(i,*) "# -----------------------------------"
         if (.not. sed_mode) then 
-            write(i,*) "# delm:",delm
-            write(i,*) "# ephot:",ephot
-            write(i,*) "# nscatter:",nscatter
-            write(i,*) "# ior_re:",ior_re
-            write(i,*) "# ior_im:",ior_im
+            write(i,*) "# delm: ",delm
+            write(i,*) "# ephot: ",ephot
+            write(i,*) "# nscatter: ",nscatter
+            write(i,*) "# ior_re: ",ior_re
+            write(i,*) "# ior_im: ",ior_im
         else 
-            write(i,*) "# ephot_min:",ephot_min
-            write(i,*) "# ephot_max:",ephot_max
-            write(i,*) "# nephots:",nephots
+            write(i,*) "# ephot_min: ",ephot_min
+            write(i,*) "# ephot_max: ",ephot_max
+            write(i,*) "# nephots: ",nephots
             write(i,*) "# Material file: '",trim(adjustl(material_file)),"'"
         end if 
-        write(i,*) "# geometry:", trim(adjustl(geometry))
-        write(i,*) "# euler_angle_mode:",trim(adjustl(euler_angle_mode))
-        if (euler_angle_mode == "file") write(i,*) "# euler_angle_file:", trim(adjustl(euler_angle_file))
-        write(i,*) "# ngrain:",ngrain
-        write(i,*) "# norientations:",norientations
-        write(i,*) "# grain-axis-x:",grain_a(1)
-        write(i,*) "# grain-axis-y:",grain_a(2)
-        write(i,*) "# grain-axis-z:",grain_a(3)
-        write(i,*) "# use_padded_fft:",use_padded_fft
-        write(i,*) "# parameter_file_name:",trim(adjustl(parameter_file_name))
-        write(i,*) "# fftw_optimization_mode_name:",trim(adjustl(fftw_optimization_mode_name))
-        if (geometry == "spheres") write(i,*) "# cluster_file_name:",trim(adjustl(cluster_file_name))
+        write(i,*) "# geometry: ", trim(adjustl(geometry))
+        write(i,*) "# euler_angle_mode: ",trim(adjustl(euler_angle_mode))
+        if (euler_angle_mode == "file") write(i,*) "# euler_angle_file: ", trim(adjustl(euler_angle_file))
+        write(i,*) "# ngrain: ",ngrain
+        write(i,*) "# norientations: ",norientations
+        write(i,*) "# grain-axis-x: ",grain_a(1)
+        write(i,*) "# grain-axis-y: ",grain_a(2)
+        write(i,*) "# grain-axis-z: ",grain_a(3)
+        write(i,*) "# rotation-axis: ",rotation_axis
+        write(i,*) "# use_padded_fft: ",use_padded_fft
+        write(i,*) "# parameter_file_name: ",trim(adjustl(parameter_file_name))
+        write(i,*) "# fftw_optimization_mode_name: ",trim(adjustl(fftw_optimization_mode_name))
+        if (geometry == "spheres") write(i,*) "# cluster_file_name: ",trim(adjustl(cluster_file_name))
         write(i,*) "# -----------------------------------"
     
 

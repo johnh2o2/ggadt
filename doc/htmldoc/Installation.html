@@ -1,15 +1,15 @@
 <html lang="en">
 <head>
-<title>Installation - GGADT 0.9.8</title>
+<title>Installation - GGADT 0.9.84</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="GGADT 0.9.8">
+<meta name="description" content="GGADT 0.9.84">
 <meta name="generator" content="makeinfo 4.8">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="prev" href="Overview.html#Overview" title="Overview">
 <link rel="next" href="Invoking-GGADT.html#Invoking-GGADT" title="Invoking GGADT">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
-This manual is for GGADT (version 0.9.8, 26 March 2014),
+This manual is for GGADT (version 0.9.84, 28 March 2014),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT).
 
@@ -53,13 +53,14 @@ Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
 
 <pre class="example">     ./configure [--enable-openmp] [--enable-fftw3] ...
      make
-     make install
 </pre>
-   <p>We haven't tested any speed improvements, but it might be advantageous to also add O2 optimization to the compilation via:
+   <p>The <code>ggadt</code> binary is now located in the <code>src</code> directory. An optional next step is to do <code>make install</code>, which installs the ggadt into a globally-accessible folder (usually <code>/usr/local/bin</code>). If you would like to do this, fine, but we prefer a more self-contained setup. We will assume for the remainder of the documentation that you did <em>not</em> do a <code>make install</code>.
 
-<pre class="example">     ./configure FCFLAGS="-O2" [--enable-openmp] [--enable-fftw3] ...
-     make
-     make install
+   <p>If you did do <code>make install</code>, you can undo it by running <code>make uninstall</code>. To clean and remake GGADT, simply do <code>make clean</code> and then <code>make</code>.
+
+   <p>We haven't tested any speed improvements, but it might be advantageous to also add compiler optimization to the compilation, e.g.
+
+<pre class="example">     ./configure FCFLAGS="-O3" [--enable-openmp] [--enable-fftw3] ...
 </pre>
    <h3 class="section">2.2 Package dependencies</h3>
 

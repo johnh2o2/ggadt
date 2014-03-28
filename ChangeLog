@@ -1,3 +1,9 @@
+* commit e19fa0e482d39e5c4452c8607dc13f97f3df69a5
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Fri Mar 28 12:10:32 2014 -0400
+| 
+|     Divided write(0,*) grain_a into grain-axis-x,y,z because printing the array in the header bleeds into the next line, which is not commented out.
+|  
 * commit f5505a543e864dec66acdd5591a01046a2beca11
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Fri Mar 28 12:04:14 2014 -0400
