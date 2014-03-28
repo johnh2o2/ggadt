@@ -67,7 +67,7 @@ module common_mod
   character(len=200), dimension(10)           ::  material_files
   character(len=200), dimension(10)           ::  material_tags
   character(len=200), dimension(10)           ::  agglom_composition_file
-  character(len=200), allocatable             ::  agglom_material_tags
+  character(len=200)                          ::  agglom_material_tag
   integer                                     ::  nmaterials
   real(kind=dp_real), dimension(10)           ::  matfracs
 

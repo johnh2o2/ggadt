@@ -1,20 +1,74 @@
-* commit caa2867adfad90b6c53b6937b7ce8bb0fa982c61
+* commit 7583869e5798e84a184e106c95e45171f35eb482
 | Author: John Hoffman <jah5@princeton.edu>
-| Date:   Thu Mar 27 21:00:09 2014 -0400
+| Date:   Fri Mar 28 11:20:36 2014 -0400
 | 
-|     Added files that will be relevant to configuring on other systems. (i.e. ran aclocal, autoconf and automake).
+|     deleted test-changes.sh and Icon^M to clean up the clutter.
 |  
-* commit b44fe0feb83f6d5c5b4d6d9a0cfaa420fa35cd66
-| Author: John Hoffman <jah5@princeton.edu>
-| Date:   Thu Mar 27 18:04:42 2014 -0400
+* commit e37569bdbf0ac2232327352d3bcd17c5085f61f2
+| Author: John <johnh2o2@gmail.com>
+| Date:   Fri Mar 28 11:14:53 2014 -0400
 | 
-|     Some minor changes to common.f95.in (all commented out). Defining terms that we will need when doing mixed composition agglomerates.
-|  
-* commit 942d0dd1d555da06243d7e8201c70723f6be2ea3
-| Author: John Hoffman <jah5@princeton.edu>
-| Date:   Thu Mar 27 16:01:04 2014 -0400
-| 
-|     Added dedicated HTML doc directory, so users can access HTML docs before compiling everything. Also added the beginnings of a comprehensive developers' README_dev, replaced the old README. Fixed OpenMP problems for SED mode. Added some brief documentation to plot_utilities.py and testing_against_mie_theory.py.
+|     Delete .dropbox
+|    
+*   commit 86faeaf99d9c7f8bdebc3fe119e1055c72d9e11e
+|\  Merge: dd5a031 9755d69
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Fri Mar 28 11:13:01 2014 -0400
+| | 
+| |     Fixed merge conflicts (ggadt.f95 wasn't deleted)
+| |   
+| * commit 9755d69b5b46b5ae125991ec4732831ac79c52e4
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Fri Mar 28 11:11:02 2014 -0400
+| | 
+| |     Fixed compilation errors (didn't request USING_FFTW be substituted in the configure.ac script). make distcheck still fails because automake (?) misuses tex2dvi command (complains that --output cannot be used when there is more than one argument ?)
+| |     
+* |   commit dd5a0312a5d65561161265b266c1f9109ee5607e
+|\ \  Merge: 97cf286 caa2867
+| |/  Author: John Hoffman <jah5@princeton.edu>
+| |   Date:   Thu Mar 27 21:00:17 2014 -0400
+| |   
+| |       Merge branch 'hoffman'
+| |       merging changes from hoffman...
+| |   
+| * commit caa2867adfad90b6c53b6937b7ce8bb0fa982c61
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Thu Mar 27 21:00:09 2014 -0400
+| | 
+| |     Added files that will be relevant to configuring on other systems. (i.e. ran aclocal, autoconf and automake).
+| |     
+* |   commit 97cf286f4e3995e36636162784d54738149e6d9a
+|\ \  Merge: de052e4 b44fe0f
+| |/  Author: John Hoffman <jah5@princeton.edu>
+| |   Date:   Thu Mar 27 20:53:35 2014 -0400
+| |   
+| |       Deleted non source files, merged changes from hoffman branch.
+| |   
+| * commit b44fe0feb83f6d5c5b4d6d9a0cfaa420fa35cd66
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Thu Mar 27 18:04:42 2014 -0400
+| | 
+| |     Some minor changes to common.f95.in (all commented out). Defining terms that we will need when doing mixed composition agglomerates.
+| |     
+* |   commit de052e4af9cd1a358081c90fd3443534f8bc29b6
+|\ \  Merge: 5c1d45c 942d0dd
+| |/  Author: John Hoffman <jah5@princeton.edu>
+| |   Date:   Thu Mar 27 16:02:27 2014 -0400
+| |   
+| |       Merge branch 'hoffman'
+| |       ...I'm not sure why I'm being asked to explain myself. The merge should just add the changes that were in the hoffman branch on my local machine. Changes include fixing the OpenMP version of the SED mode, and adding some documentation.
+| |   
+| * commit 942d0dd1d555da06243d7e8201c70723f6be2ea3
+| | Author: John Hoffman <jah5@princeton.edu>
+| | Date:   Thu Mar 27 16:01:04 2014 -0400
+| | 
+| |     Added dedicated HTML doc directory, so users can access HTML docs before compiling everything. Also added the beginnings of a comprehensive developers' README_dev, replaced the old README. Fixed OpenMP problems for SED mode. Added some brief documentation to plot_utilities.py and testing_against_mie_theory.py.
+| |   
+* | commit 5c1d45c3ef3050de8545a403f51f336f8cd33f19
+|/  Author: John Hoffman <jah5@princeton.edu>
+|   Date:   Thu Mar 27 16:02:21 2014 -0400
+|   
+|       Added untracked files? I don't think there are any changes here...
 |  
 * commit f14cd1408c51884b92c4b9d0738fa467964a1460
 | Author: John Hoffman <jah5@princeton.edu>
