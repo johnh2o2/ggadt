@@ -3,6 +3,9 @@ AC_PREREQ([2.63])
 #AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/sphere.f95])
 
+
+#AM_MAINTAINER_MODE([disable])
+
 AC_CANONICAL_HOST
 # Check for which host we are on and setup a few things
 # specifically based on the host
@@ -13,7 +16,6 @@ macports_include="."
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_PROG_CC
 AC_PROG_FC
-
 
 #define default prefix
 AC_PREFIX_DEFAULT(/usr/local)
@@ -29,7 +31,7 @@ AC_DEFINE_UNQUOTED(CONFIG_PREFIX, ["$ac_prefix"], [Default installation prefix.]
 AC_ARG_ENABLE([openmp],
 [  --enable-openmp    Use OpenMP ],
 [case "${enableval}" in
-  yes) openmp=true ;;
+  yes) openmp=true ;; 
   no)  openmp=false ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-openmp]) ;;
 esac],[openmp=false])
@@ -115,6 +117,7 @@ if test $using_fftw3 = true
   then
   FFTW3_UNCOMMENT=
   FFTW3_COMMENT="!"
+
   USE_FFTW="use fftw"
   AC_CHECK_LIB(fftw3,fftw_plan_dft_1d,, AC_MSG_ERROR([Missing FFTW library])) #check for fftw3 library
   AC_CHECK_HEADERS([ fftw3.h ]) #Check for necessary headers
@@ -384,11 +387,10 @@ AC_CONFIG_FILES([ 	Makefile
 					doc/Makefile 
 					src/fftwmod.f95 
           src/spheres.f95
-          src/ggadt.f95
 					src/common.f95
           src/constants.f95
           src/options.f95
-          
+          src/ggadt.f95
 
           scripts/installation_vars.py
 				])

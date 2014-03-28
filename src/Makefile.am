@@ -1,5 +1,6 @@
 bin_PROGRAMS = ggadt
 
+
 ggadt_SOURCES = constants.f95 options.f95
 
 if USING_FFTW

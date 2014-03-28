@@ -8,7 +8,11 @@ program ggadt
     use common_mod
     use constants
 
+<<<<<<< HEAD
     
+=======
+    use omp_lib
+>>>>>>> hoffman
 
     implicit none
 
@@ -28,12 +32,22 @@ program ggadt
 
     call set_parameter_values()
     call initialize_and_allocate_vars()
+<<<<<<< HEAD
     !call set_optimization_mode(fftw_optimization_mode_name)
     call print_parameters(stdout)
     if (verbose_mode) call print_parameters(stderr)
 
     !write(stderr,*) "Allocated and initialized all variables"
 
+=======
+    
+    !call set_optimization_mode(fftw_optimization_mode_name)
+    
+    call print_parameters(stdout)
+    
+    if (verbose_mode) call print_parameters(stderr)
+
+>>>>>>> hoffman
     if (sed_mode) then 
         call calculate_sed_of_cross_sections()
     else
@@ -84,12 +98,21 @@ contains
 
         maxrecs = 100000
 
+<<<<<<< HEAD
         if (material .ne. 'custom') then 
             write(stderr,*) "ERROR: Do not recognize material", material,". &
                 & GGADT does not currently have any built-in materials. &
                 & Specify --material='custom' and --material-file='/path/to/file'."
             stop 
         end if 
+=======
+        ! if (material .ne. 'custom') then 
+        !    write(stderr,*) "ERROR: Do not recognize material", material,". &
+        !        & GGADT does not currently have any built-in materials. &
+        !        & Specify --material='custom' and --material-file='/path/to/file'."
+        !    stop 
+        !end if 
+>>>>>>> hoffman
         open(unit=1,file=matfile) ! open sphere file.
 
         ! Read header
@@ -208,16 +231,24 @@ contains
                 stop
             end if
 
+<<<<<<< HEAD
             !$omp parallel shared(sigma_scat, sh, sigma_abs, phi_total, dx, dy) 
             !$omp do schedule(dynamic) private(c1,c2) 
+=======
+
+>>>>>>> hoffman
             do c1=1,size(x)
                 do c2=1,size(y)
                  sigma_abs = sigma_abs + (1 - exp(-2*AIMAG(phi_total(c1,c2))))*dx*dy 
                  sigma_scat = sigma_scat + (abs(sh(c1,c2))**2)*dx*dy
                 end do 
             end do
+<<<<<<< HEAD
             !$omp end do nowait
             !$omp end parallel
+=======
+           
+>>>>>>> hoffman
         end do
         
         sigma_scat = sigma_scat/norientations

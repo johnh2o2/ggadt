@@ -1,3 +1,9 @@
+* commit 942d0dd1d555da06243d7e8201c70723f6be2ea3
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Thu Mar 27 16:01:04 2014 -0400
+| 
+|     Added dedicated HTML doc directory, so users can access HTML docs before compiling everything. Also added the beginnings of a comprehensive developers' README_dev, replaced the old README. Fixed OpenMP problems for SED mode. Added some brief documentation to plot_utilities.py and testing_against_mie_theory.py.
+|  
 * commit f14cd1408c51884b92c4b9d0738fa467964a1460
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Wed Mar 26 16:29:57 2014 -0400

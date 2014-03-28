@@ -1,6 +1,4 @@
 program ggadt
-    @FFTW3_UNCOMMENT@use, intrinsic :: iso_c_binding
-    @FFTW3_UNCOMMENT@use, intrinsic :: iso_fortran_env
 
     use sphere
     use spheres
@@ -85,12 +83,12 @@ contains
 
         maxrecs = 100000
 
-        if (material .ne. 'custom') then 
-            write(stderr,*) "ERROR: Do not recognize material", material,". &
-                & GGADT does not currently have any built-in materials. &
-                & Specify --material='custom' and --material-file='/path/to/file'."
-            stop 
-        end if 
+        ! if (material .ne. 'custom') then 
+        !    write(stderr,*) "ERROR: Do not recognize material", material,". &
+        !        & GGADT does not currently have any built-in materials. &
+        !        & Specify --material='custom' and --material-file='/path/to/file'."
+        !    stop 
+        !end if 
         open(unit=1,file=matfile) ! open sphere file.
 
         ! Read header
