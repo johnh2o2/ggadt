@@ -1,5 +1,4 @@
 module constants
-  @FFTW3_UNCOMMENT@ use, intrinsic :: iso_c_binding
   implicit none
 
   save
@@ -28,6 +27,7 @@ module constants
   real(kind=dp_real), parameter                 ::  default_grain_a3       = 1.0
   real(kind=dp_real), parameter                 ::  default_ior_re         = -1.920E-4
   real(kind=dp_real), parameter                 ::  default_ior_im         = 2.807E-5
+  real(kind=dp_real), parameter                 ::  default_grain_axis_ratio = 1.0
   character(len=200), parameter                 ::  default_grain_geometry = 'sphere'
   character(len=50), parameter                  ::  default_euler_angle_mode = 'random'
   character(len=50), parameter                  ::  default_rotation_axis = 'none'
@@ -38,6 +38,7 @@ module constants
   real(kind=dp_real), parameter                 ::  default_dtheta         = 10.0
   real(kind=dp_real), parameter                 ::  default_max_angle      = 3000.
   character(len=200), parameter                 ::  default_cluster_file_name = ''
+
   character(len=100), parameter                 ::  default_fftw_opt_name = 'estimate'
 
 

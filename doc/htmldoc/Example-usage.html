@@ -9,7 +9,7 @@
 <link rel="next" href="Testing-against-previous-results.html#Testing-against-previous-results" title="Testing against previous results">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
-This manual is for GGADT (version 0.9.84, 28 March 2014),
+This manual is for GGADT (version 0.9.84, 29 March 2014),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT).
 
@@ -104,9 +104,35 @@ Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
 
 <p>If you wish to calculate orientationally-averaged quantities of a grain <em>about a principal axis</em>, GGADT allows you to do this through specifying <code>--rotation-axis=xaxis,yaxis,zaxis,none</code>. The <code>--rotation-axis</code> parameter is 'none' by default.
 
-   <p>This parameter will work for grain agglomerates as well. Note, however, that the positions of the agglomerates as specified in the agglomerate file define the coordinate system that GGADT works in. Be sure the axis you specify via <code>--rotation-axis</code> is really the axis you want. You'll have to know something about how the coordinate system of the agglomerate file is defined.
+<h5 class="subsubsection">4.3.1.1 Coordinate systems</h5>
+
+<p>The <code>--rotation-axis</code> parameter will work for grain agglomerates as well. The positions of the agglomerates as specified in the agglomerate file define the coordinate system that GGADT works in. Be sure the axis you specify via <code>--rotation-axis</code> is really the axis you want. You'll have to know something about how the coordinate system of the agglomerate file is defined.
+
+   <p>If you are using an <code>ELLIPSOID</code> grain geometry, the coordinate system is such that the z-axis points towards the observer (i.e. the incident photons' direction of propagation), and the x and y directions are defined by the <code>--grain-axis-x,y,z</code> input parameters.
 
    <p>Currently, there is no option to specify a custom rotation axis about which to orient the grain. If this is something you would like added to GGADT, let John Hoffman know.
+
+<h5 class="subsubsection">4.3.1.2 Example runs for a prolate spheroid</h5>
+
+<p>Below are the results from running GGADT on a prolate spheroid (with axes ratios 2:1:1), with the grain's x-axis being the longest.
+
+   <p><strong>Orientation-averaged differential scattering efficiency about the x-axis</strong>
+<pre class="example">     src/ggadt --grain-axis-y=0.5 --grain-axis-z=0.5 --grain-geometry=ellipsoid --rotation-axis=xaxis &gt; outputx.dat
+     python scripts/plot.py outputx.dat
+</pre>
+   <div class="block-image"><img src="spheroid_rot_xaxis.png" alt="spheroid_rot_xaxis.png"></div>
+
+   <p><strong>Orientation-averaged differential scattering efficiency about the y-axis</strong>
+<pre class="example">     src/ggadt --grain-axis-y=0.5 --grain-axis-z=0.5 --grain-geometry=ellipsoid --rotation-axis=yaxis &gt; outputy.dat
+     python scripts/plot.py outputy.dat
+</pre>
+   <div class="block-image"><img src="spheroid_rot_yaxis.png" alt="spheroid_rot_yaxis.png"></div>
+
+   <p><strong>Orientation-averaged differential scattering efficiency about the z-axis</strong>
+<pre class="example">     src/ggadt --grain-axis-y=0.5 --grain-axis-z=0.5 --grain-geometry=ellipsoid --rotation-axis=zaxis &gt; outputz.dat
+     python scripts/plot.py outputz.dat
+</pre>
+   <div class="block-image"><img src="spheroid_rot_zaxis.png" alt="spheroid_rot_zaxis.png"></div>
 
    </body></html>
 

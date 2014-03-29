@@ -285,7 +285,7 @@ contains
         
         do i=1,size(thetax)
             do j=1,size(thetay)
-                write(stdout,*) thetax(i),thetay(j),scatter(i,j)/(pi*a_eff*a_eff)
+                write(stdout,*) thetax(i),thetay(j),scatter(j,i)/(pi*a_eff*a_eff)
             end do
         end do
         if (verbose_mode) write(stderr,*) "done."
@@ -319,14 +319,7 @@ contains
                     write(stderr,*) "Warning: norientations: ",norientations,"-->",norientations_new
                     norientations = norientations_new
                 endif
-            else
-                norientations_new = int(real(norientations)**(1.0/2.0))**2
-                if (norientations /= norientations_new) then
-                    write(stderr,*) ""
-                    write(stderr,*) "Warning: norientations: ",norientations,"-->",norientations_new
-                    norientations = norientations_new
-                endif
-            end if
+            end if 
         else if (euler_angle_mode == 'random') then
             call init_random_seed()
 
@@ -605,7 +598,7 @@ contains
         if (euler_angle_mode .eq. 'sequential') then 
             if (rotation_axis == 'none') then 
                 cbrt_norientations = int(norientations**(1.0/3.0))
-                norm = real(norientations,kind=dp_real)**(1.0/3.0)
+                norm = real(cbrt_norientations ,kind=dp_real)**(-1.0)
                 nx = mod(i/(cbrt_norientations*cbrt_norientations),   cbrt_norientations)
                 ny = mod(i/(cbrt_norientations),               cbrt_norientations)
                 nz = mod(i,                             cbrt_norientations) 
@@ -613,32 +606,18 @@ contains
                 get_new_euler_angles(2) = (2*pi*(ny-1))*norm
                 get_new_euler_angles(3) = (2*pi*(nz-1))*norm
             else if ( rotation_axis .eq. 'xaxis' ) then 
-                sqrt_norientations = int(norientations**(1.0/2.0))
-                norm = real(norientations,kind=dp_real)**(1.0/2.0)
-                nx = 1
-                ny = mod(i,                             sqrt_norientations)
-                nz = mod(i/(sqrt_norientations),               sqrt_norientations)
-                get_new_euler_angles(1) = 2*pi*(nx-1)*norm
-                get_new_euler_angles(2) = 2*pi*(ny-1)*norm
-                get_new_euler_angles(3) = 2*pi*(nz-1)*norm
+                norm = real(norientations ,kind=dp_real)**(-1.0)
+                get_new_euler_angles(1) =  2*pi*(i-1)*norm
+                get_new_euler_angles(2) = 0.0
+                get_new_euler_angles(3) = 0.0
             else if ( rotation_axis .eq. 'yaxis' ) then 
-                sqrt_norientations = int(norientations**(1.0/2.0))
-                norm = real(norientations,kind=dp_real)**(1.0/2.0)
-                ny = 1
-                nz = mod(i,                             sqrt_norientations)
-                nx = mod(i/(sqrt_norientations),               sqrt_norientations)
-                get_new_euler_angles(1) = 2*pi*(nx-1)*norm
-                get_new_euler_angles(2) = 2*pi*(ny-1)*norm
-                get_new_euler_angles(3) = 2*pi*(nz-1)*norm
+                get_new_euler_angles(1) = 0.0
+                get_new_euler_angles(2) = 2*pi*(i-1)*norm
+                get_new_euler_angles(3) = 0.0
             else if ( rotation_axis .eq. 'zaxis' ) then 
-                sqrt_norientations = int(norientations**(1.0/2.0))
-                norm = real(norientations,kind=dp_real)**(1.0/2.0)
-                nz = 1
-                ny = mod(i,                             sqrt_norientations)
-                nx = mod(i/(sqrt_norientations),               sqrt_norientations)
-                get_new_euler_angles(1) = 2*pi*(nx-1)*norm
-                get_new_euler_angles(2) = 2*pi*(ny-1)*norm
-                get_new_euler_angles(3) = 2*pi*(nz-1)*norm
+                get_new_euler_angles(1) = 0.0
+                get_new_euler_angles(2) = 0.0
+                get_new_euler_angles(3) = 2*pi*(i-1)*norm 
             else 
                 write(stderr,*) "ERROR (get_new_euler_angles): Do not understand rotation_axis: '",trim(adjustl(rotation_axis)),"'"
             end if 
@@ -653,24 +632,24 @@ contains
             close(1)
         else if ( euler_angle_mode .eq. 'random' ) then
             call random_number(get_new_euler_angles)
+            
             if (rotation_axis .eq. "none") then 
                 
                 get_new_euler_angles(1) = 2*pi*get_new_euler_angles(1)
                 get_new_euler_angles(2) = 2*pi*get_new_euler_angles(2) 
                 get_new_euler_angles(3) = 2*pi*get_new_euler_angles(3)
             else if ( rotation_axis .eq. 'xaxis' ) then 
-                
-                get_new_euler_angles(1) = 0.0
-                get_new_euler_angles(2) = 2*pi*get_new_euler_angles(1)
-                get_new_euler_angles(3) = 2*pi*get_new_euler_angles(2)
-            else if ( rotation_axis .eq. 'yaxis' ) then 
                 get_new_euler_angles(1) = 2*pi*get_new_euler_angles(1)
                 get_new_euler_angles(2) = 0.0
-                get_new_euler_angles(3) = 2*pi*get_new_euler_angles(2)
-            else if ( rotation_axis .eq. 'zaxis' ) then 
-                get_new_euler_angles(1) = 2*pi*get_new_euler_angles(1)
+                get_new_euler_angles(3) = 0.0
+            else if ( rotation_axis .eq. 'yaxis' ) then 
+                get_new_euler_angles(1) = 0.0
                 get_new_euler_angles(2) = 2*pi*get_new_euler_angles(2)
                 get_new_euler_angles(3) = 0.0
+            else if ( rotation_axis .eq. 'zaxis' ) then 
+                get_new_euler_angles(1) = 0.0
+                get_new_euler_angles(2) = 0.0
+                get_new_euler_angles(3) = 2*pi*get_new_euler_angles(3)
             else 
                 write(stderr,*) "ERROR (get_new_euler_angles): Do not understand rotation_axis: '",trim(adjustl(rotation_axis)),"'"
             end if 

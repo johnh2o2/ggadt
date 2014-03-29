@@ -562,9 +562,38 @@ GGADT allows you to specify a general, ellipsoidal (tri-axial) grain through the
 
 If you wish to calculate orientationally-averaged quantities of a grain @emph{about a principal axis}, GGADT allows you to do this through specifying @code{--rotation-axis=xaxis,yaxis,zaxis,none}. The @code{--rotation-axis} parameter is 'none' by default.
 
-This parameter will work for grain agglomerates as well. Note, however, that the positions of the agglomerates as specified in the agglomerate file define the coordinate system that GGADT works in. Be sure the axis you specify via @code{--rotation-axis} is really the axis you want. You'll have to know something about how the coordinate system of the agglomerate file is defined.
+@subsubsection Coordinate systems
+
+The @code{--rotation-axis} parameter will work for grain agglomerates as well. The positions of the agglomerates as specified in the agglomerate file define the coordinate system that GGADT works in. Be sure the axis you specify via @code{--rotation-axis} is really the axis you want. You'll have to know something about how the coordinate system of the agglomerate file is defined.
+
+If you are using an @code{ELLIPSOID} grain geometry, the coordinate system is such that the z-axis points towards the observer (i.e. the incident photons' direction of propagation), and the x and y directions are defined by the @code{--grain-axis-x,y,z} input parameters. 
 
 Currently, there is no option to specify a custom rotation axis about which to orient the grain. If this is something you would like added to GGADT, let John Hoffman know.
+
+@subsubsection Example runs for a prolate spheroid
+
+Below are the results from running GGADT on a prolate spheroid (with axes ratios 2:1:1), with the grain's x-axis being the longest.
+
+@strong{Orientation-averaged differential scattering efficiency about the x-axis}
+@example
+src/ggadt --grain-axis-y=0.5 --grain-axis-z=0.5 --grain-geometry=ellipsoid --rotation-axis=xaxis > outputx.dat
+python scripts/plot.py outputx.dat
+@end example
+@image{spheroid_rot_xaxis,5in,5in}
+
+@strong{Orientation-averaged differential scattering efficiency about the y-axis}
+@example
+src/ggadt --grain-axis-y=0.5 --grain-axis-z=0.5 --grain-geometry=ellipsoid --rotation-axis=yaxis > outputy.dat
+python scripts/plot.py outputy.dat
+@end example
+@image{spheroid_rot_yaxis,5in,5in}
+
+@strong{Orientation-averaged differential scattering efficiency about the z-axis}
+@example
+src/ggadt --grain-axis-y=0.5 --grain-axis-z=0.5 --grain-geometry=ellipsoid --rotation-axis=zaxis > outputz.dat
+python scripts/plot.py outputz.dat
+@end example
+@image{spheroid_rot_zaxis,5in,5in}
 
 @node Testing against previous results
 @chapter Testing against previous results
