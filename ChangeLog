@@ -1,3 +1,9 @@
+* commit af607588a85befd123fd334b9c73a0ae1dacce6d
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Sat Mar 29 13:55:24 2014 -0400
+| 
+|     Fixed errors in principal axis rotation, updated documentation to reflect changes and included figures
+|  
 * commit 739329da30fe9d2478d69e5e00f421d2ac588b67
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Fri Mar 28 18:45:47 2014 -0400
