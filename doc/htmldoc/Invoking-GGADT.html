@@ -1,15 +1,15 @@
 <html lang="en">
 <head>
-<title>Invoking GGADT - GGADT 0.9.85</title>
+<title>Invoking GGADT - GGADT 0.9.86</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="GGADT 0.9.85">
+<meta name="description" content="GGADT 0.9.86">
 <meta name="generator" content="makeinfo 4.8">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="prev" href="Installation.html#Installation" title="Installation">
 <link rel="next" href="Example-usage.html#Example-usage" title="Example usage">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
-This manual is for GGADT (version 0.9.85, 29 March 2014),
+This manual is for GGADT (version 0.9.86, 29 March 2014),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT).
 
@@ -56,7 +56,9 @@ To see usage and all available options for <code>ggadt</code>, simply use the <s
 
 <pre class="example">     ggadt <var>option</var> ...
 </pre>
-   <p>With no options, <samp><span class="command">ggadt</span></samp> runs calculations on a set of default grain parameters. Parameters may be specified as command-line arguments,
+   <p>With no options, <samp><span class="command">ggadt</span></samp> runs calculations on a set of default grain parameters. By default GGADT will calculate the differential scattering cross section as a function of scattering angle. To calculate the scattering and absorption cross sections for a range of energies, add the <code>--sed</code> flag as a command-line argument.
+
+   <p>Parameters may be specified as command-line arguments,
 
 <pre class="example">     ggadt --parameter=value ...
 </pre>
@@ -103,7 +105,9 @@ To see usage and all available options for <code>ggadt</code>, simply use the <s
 
 <p><samp><span class="command">ggadt</span></samp> supports the following options:
 
-   <p><a name="index-environment-variables_002c-help-for-17"></a>
+<h4 class="subsection">3.3.1 General options</h4>
+
+<p><a name="index-environment-variables_002c-help-for-17"></a>
      <dl>
 <dt><samp><span class="option">--help</span></samp><dt><samp><span class="option">-h</span></samp><dd><a name="index-g_t_002d_002dhelp-18"></a><a name="index-g_t_002dh-19"></a>The `help' screen&ndash;prints usage information and available options.
 
@@ -114,77 +118,104 @@ standard output and then exit successfully.
 
      <br><dt><samp><span class="option">--grain-geometry=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dgrain_002dgeometry-23"></a>Geometry of dust grain. Must be one of <code>SPHERE</code>, <code>ELLIPSOID</code>, <code>SPHERES</code>. A <code>SPHERES</code> grain geometry means that your grain is a conglomerate of smaller spheres. If you wish to use this grain geometry, you should supply a file (hereafter called a &ldquo;<em>cluster file</em>", see the next option) that defines the relative positions of the spheres that make up the grain. The sizes of these spheres will be normalized so that the effective radius of the grain is consistent with <samp><span class="option">aeff</span></samp>.
 
-     <br><dt><samp><span class="option">--cluster-file-name=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dcluster_002dfile_002dname-24"></a>Path to a correctly formatted cluster file. Several cluster files are included with the distribution (see <samp><span class="file">data/clusters</span></samp>), and if you wish to create your own, you must mimic exactly the format of these files.
+     <br><dt><samp><span class="option">--aeff=</span><var>value</var></samp><dd><a name="index-g_t_002d_002daeff-24"></a>Effective radius of dust grain. The effective radius is defined to be the radius of a sphere with the same volume as the dust grain.
 
-     <br><dt><samp><span class="option">--aeff=</span><var>value</var></samp><dd><a name="index-g_t_002d_002daeff-25"></a>Effective radius of dust grain. The effective radius is defined to be the radius of a sphere with the same volume as the dust grain.
+     <br><dt><samp><span class="option">--ngrain=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dngrain-25"></a>The (square root) of the number of grid elements with which you would like to resolve your grain. To get accurate results out to about 4000 arcseconds, we've found that a value of 64 is good enough.
 
-     <br><dt><samp><span class="option">--grain-axis-x=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dgrain_002daxis_002dx-26"></a>For <code>ELLIPSOID</code> grains, we define the lengths of x, y and z axes.
+     <br><dt><samp><span class="option">--norientations=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dnorientations-26"></a>The number of grain orientations relative to the incoming X-ray photon over which to average the differential cross-section.
 
-     <br><dt><samp><span class="option">--grain-axis-y=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dgrain_002daxis_002dy-27"></a>
-<br><dt><samp><span class="option">--grain-axis-z=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dgrain_002daxis_002dz-28"></a>
-<br><dt><samp><span class="option">--ephot=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dephot-29"></a>Energy of the incident X-ray photons in keV.
+     <br><dt><samp><span class="option">--fftw-optimization=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dfftw_002doptimization-27"></a>Must be one of <code>ESTIMATE</code>, <code>MEASURE</code>, <code>PATIENT</code> or <code>EXHAUSTIVE</code>. For more information about what these tags mean and about FFTW wisdom, see <a href="http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans">http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans</a>.
 
-     <br><dt><samp><span class="option">--sed</span></samp><dd><a name="index-g_t_002d_002dsed-30"></a>This flag tells GGADT that you would like to calculate the energy-dependent absorption and scattering cross sections. To specify the energy range that you would like the calculation done
+     <br><dt><samp><span class="option">--use-padded-fft</span></samp><dt><samp><span class="option">-s</span></samp><dd><a name="index-g_t_002d_002duse_002dpadded_002dfft-28"></a><a name="index-g_t_002ds-29"></a>This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by <code>nscatter</code>), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.
 
-     <br><dt><samp><span class="option">--nephots=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dnephots-31"></a>For <code>sed</code> mode, defines the number of photon energies to calculate the cross sections between <code>--ephot-min</code> and <code>--ephot-max</code>
+     <br><dt><samp><span class="option">--euler-angle-mode=</span><var>value</var></samp><dd><a name="index-g_t_002d_002deuler_002dangle_002dmode-30"></a>Must be one of <code>random</code>, <code>sequential</code>, or <code>file</code>. Specifying <code>random</code> will average over <code>norientations</code> grain orientations, with each Euler angle chosen from a uniform distribution over [0,2*pi). Specifying <code>sequential</code> will make GGADT use Euler angles that are separated from each other by a fixed amount. Specifying <code>file</code> allows you to give GGADT specific Euler angles to use in orientational averaging. The <code>file</code> mode requires that you also specify <code>--euler-angle-file=/path/to/euler-file</code> which contains a list of Euler angles.
 
-     <br><dt><samp><span class="option">--dephot=</span><var>value</var></samp><dd><a name="index-g_t_002d_002ddephot-32"></a>For <code>sed</code> mode, defines the energy spacing between different photon energies for which the cross sections are calculated.
+     <br><dt><samp><span class="option">--euler-angle-file=</span><var>value</var></samp><dd><a name="index-g_t_002d_002deuler_002dangle_002dfile-31"></a>Path to a file containing a list of Euler angles which GGADT will use to compute orientational averages. Only used when <code>--euler-angle-mode=file</code>.
 
-     <br><dt><samp><span class="option">--ephot-min=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dephot_002dmin-33"></a>For <code>sed</code> mode, defines the minimum photon energy at which the cross sections are calculated
+     <br><dt><samp><span class="option">--rotation-axis=</span><var>value</var></samp><dd><a name="index-g_t_002d_002drotation_002daxis-32"></a>Must be one of <code>none</code>, <code>xaxis</code>, <code>yaxis</code>, or <code>zaxis</code>. If not <code>none</code>, this will average over all orientations about the specified principle axis. Useful for grains that are aligned, for instance, with a magnetic field.
 
-     <br><dt><samp><span class="option">--ephot-max=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dephot_002dmax-34"></a>For <code>sed</code> mode, defines the maximum photon energy at which the cross sections are calculated
+     <br><dt><samp><span class="option">--material-file=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dmaterial_002dfile-33"></a>Path to file defining the energy-dependent index of refraction and dielectric constant for the grain material you would like to use. The material files must be formatted in the way that GGADT expects, namely with a two-line header,
 
-     <br><dt><samp><span class="option">--ior-re=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dior_002dre-35"></a>The real component of the complex index of refraction, minus one.
+     <pre class="example">          17 =ICOMP: amorphous olivine-like astrosilicate
+              E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
+     </pre>
+     <p>followed by data for the material:
 
-     <br><dt><samp><span class="option">--ior-im=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dior_002dim-36"></a>The imaginary component of the complex index of refraction.
+     <pre class="example">          1.000000E-05  2.435E+00 1.119E-03  1.080E+01 7.688E-03
+          1.240000E-05  2.435E+00 1.388E-03  1.080E+01 9.534E-03
+          1.771000E-05  2.435E+00 1.982E-03  1.080E+01 1.362E-02
+          2.000000E-05  2.435E+00 2.239E-03  1.080E+01 1.538E-02
+          ...
+     </pre>
+     </dl>
 
-     <br><dt><samp><span class="option">--material=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dmaterial-37"></a>Specifies the name of the material you're using. Currently, there are no built-in materials in GGADT, so you must use <code>--material='custom'</code>, and then specify the path to the material file by the <code>--material-file</code> argument.
+<h4 class="subsection">3.3.2 Ellipsoidal grains</h4>
 
-     <br><dt><samp><span class="option">--material-file=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dmaterial_002dfile-38"></a>Path to file defining the energy-dependent index of refraction and dielectric constant for the grain material you would like to use. Needs to be formatted in a particular way.
+     <dl>
+<dt><samp><span class="option">--grain-axis-x=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dgrain_002daxis_002dx-34"></a>For <code>ELLIPSOID</code> grains, we define the lengths of x, y and z axes.
 
-     <br><dt><samp><span class="option">--ngrain=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dngrain-39"></a>The (square root) of the number of grid elements with which you would like to resolve your grain. To get accurate results out to about 4000 arcseconds, we've found that a value of 64 is good enough.
+     <br><dt><samp><span class="option">--grain-axis-y=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dgrain_002daxis_002dy-35"></a>
+<br><dt><samp><span class="option">--grain-axis-z=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dgrain_002daxis_002dz-36"></a>
 
-     <br><dt><samp><span class="option">--nscatter=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dnscatter-40"></a>The (square root) of the number of grid elements with which you would like to resolve the scattering cross section.
+</dl>
 
-     <br><dt><samp><span class="option">--norientations=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dnorientations-41"></a>The number of grain orientations relative to the incoming X-ray photon over which to average the differential cross-section.
+<h4 class="subsection">3.3.3 Spherical agglomerate grains (single or multiple composition)</h4>
 
-     <br><dt><samp><span class="option">--fftw-optimization=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dfftw_002doptimization-42"></a>Must be one of <code>ESTIMATE</code>, <code>MEASURE</code>, <code>PATIENT</code> or <code>EXHAUSTIVE</code>. FFTW wisdom is saved in <code>$HOME/.ggadt/plans</code>. For more information about what these tags mean and about FFTW wisdom, see <a href="http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans">http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans</a>.
+     <dl>
+<dt><samp><span class="option">--cluster-file-name=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dcluster_002dfile_002dname-37"></a>Path to a correctly formatted cluster file. Several cluster files are included with the distribution (see <samp><span class="file">data/clusters</span></samp>), and if you wish to create your own, you must mimic exactly the format of these files.
 
-     <br><dt><samp><span class="option">--euler-angle-mode=</span><var>value</var></samp><dd><a name="index-g_t_002d_002deuler_002dangle_002dmode-43"></a>Must be one of <code>random</code>, <code>sequential</code>, or <code>file</code>. Specifying <code>random</code> will average over <code>norientations</code> grain orientations, with each Euler angle chosen from a uniform distribution over [0,2*pi). Specifying <code>sequential</code> will make GGADT use Euler angles that are separated from each other by a fixed amount. Specifying <code>file</code> allows you to give GGADT specific Euler angles to use in orientational averaging. The <code>file</code> mode requires that you also specify <code>--euler-angle-file=/path/to/euler-file</code> which contains a list of Euler angles.
+     <br><dt><samp><span class="option">--material-file1=</span><var>value</var><span class="option">, --material-file2=</span><var>value</var><span class="option">, ...</span></samp><dd><a name="index-g_t_002d_002dmaterial_002dfile1_002c-_002d_002dmaterial_002dfile2_002c-_0040dots_007b_007d-38"></a>For agglomerate grain geometries of mixed composition, <code>--material-file1,2,3</code> gives the path to the index file for material 1, 2, 3, etc.
 
-     <br><dt><samp><span class="option">--euler-angle-file=</span><var>value</var></samp><dd><a name="index-g_t_002d_002deuler_002dangle_002dfile-44"></a>Path to a file containing a list of Euler angles which GGADT will use to compute orientational averages. Only used when <code>--euler-angle-mode=file</code>.
+     <br><dt><samp><span class="option">--material-tag1=</span><var>value</var><span class="option">, --material-tag2=</span><var>value</var><span class="option">, ...</span></samp><dd><a name="index-g_t_002d_002dmaterial_002dtag1_002c-_002d_002dmaterial_002dtag2_002c-_0040dots_007b_007d-39"></a>For agglomerate grain geometries of mixed composition, <code>--material-tag1,2,3</code> provides the name by which material 1, 2, 3, etc. are referred to in the agglomerate composition file.
 
-     <br><dt><samp><span class="option">--rotation-axis=</span><var>value</var></samp><dd><a name="index-g_t_002d_002drotation_002daxis-45"></a>Must be one of <code>none</code>, <code>xaxis</code>, <code>yaxis</code>, or <code>zaxis</code>. If not <code>none</code>, this will average over all orientations about the specified principle axis. Useful for grains that are aligned, for instance, with a magnetic field.
+     <br><dt><samp><span class="option">--agglom-composition-file=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dagglom_002dcomposition_002dfile-40"></a>For agglomerate grain geometries of mixed composition, <code>--agglom-composition-file</code> provides the path to a text file that lists the spherical agglomerates and a material 'tag' which is associated with an index file.
 
-     <br><dt><samp><span class="option">--use-padded-fft</span></samp><dt><samp><span class="option">-s</span></samp><dd><a name="index-g_t_002d_002duse_002dpadded_002dfft-46"></a><a name="index-g_t_002ds-47"></a>This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by <code>nscatter</code>), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.
+     <p>The agglomerate composition file is assumed to be formatted with one header line, followed by as many lines as there are agglomerates in the grain, with each line containing the index of an agglomerate and a material 'tag'.
+
+     <pre class="example">                 j      material tag
+                 1    silicate
+                 2    silicate
+                 3    iron
+                 4    silicate
+                 ...
+     </pre>
+     </dl>
+
+<h4 class="subsection">3.3.4 Differential scattering cross section</h4>
+
+     <dl>
+<dt><samp><span class="option">--nscatter=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dnscatter-41"></a>The (square root) of the number of grid elements with which you would like to resolve the scattering cross section.
+
+     <br><dt><samp><span class="option">--dtheta=</span><var>value</var></samp><dd><a name="index-g_t_002d_002ddtheta-42"></a>Alternate to <code>--nscatter</code>: this defines the spacing of the scattering angles (in arcseconds) that you would like to calculate the differential cross section.
+
+     <br><dt><samp><span class="option">--ephot=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dephot-43"></a>Energy of the incident X-ray photon in keV.
+
+     <br><dt><samp><span class="option">--ior-re=</span><var>value</var><span class="option">,  --ior-im=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dior_002dre_002c-_002d_002dior_002dim-44"></a>The real and imaginary components of the complex index of refraction, minus one. If <code>--material-file</code> is specified, these parameters are overwritten by the linearly interpolated value of the index of refraction at E = <code>ephot</code>.
+
+     <br><dt><samp><span class="option">--max-angle=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dmax_002dangle-45"></a>The maximum scattering angle for which you would like to calculate the differential scattering cross section.
+
+</dl>
+
+<h4 class="subsection">3.3.5 Energy-dependent scattering and absorption cross sections (<code>sed</code> mode)</h4>
+
+<p>You must also define a <code>--material-file</code> to do this calculation.
+
+     <dl>
+<dt><samp><span class="option">--sed</span></samp><dd><a name="index-g_t_002d_002dsed-46"></a>This flag tells GGADT that you would like to calculate the energy-dependent absorption and scattering cross sections.
+
+     <br><dt><samp><span class="option">--nephots=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dnephots-47"></a>Defines the number of photon energies to calculate the cross sections between <code>--ephot-min</code> and <code>--ephot-max</code>. You can also define the energy spacing directly, via the <code>--dephot</code> parameter.
+
+     <br><dt><samp><span class="option">--dephot=</span><var>value</var></samp><dd><a name="index-g_t_002d_002ddephot-48"></a>Alternate to <code>--nephots</code>, defines the energy spacing between different photon energies for which the cross sections are calculated.
+
+     <br><dt><samp><span class="option">--ephot-min=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dephot_002dmin-49"></a>Defines the minimum photon energy for which the cross sections are calculated
+
+     <br><dt><samp><span class="option">--ephot-max=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dephot_002dmax-50"></a>Defines the maximum photon energy for which the cross sections are calculated
 
    </dl>
 
-<h3 class="section">3.4 The scattering mode versus the <code>sed</code> mode</h3>
+<h3 class="section">3.4 Future goals</h3>
 
-<p>By default, GGADT will determine the orientation-averaged differential scattering cross section for your grain. If, instead, you wish to calculate the absorption and (total) scattering cross sections of the grain as a function of energy, add the <code>--sed</code> flag to the command line arguments. The additional command line arguments that are relevant for the &ldquo;sed" mode are:
-
-     <dl>
-<dt><samp><code>--dephot</code><span class="option"> (or </span><code>--nephots</code><span class="option">)</span></samp><br><dt><samp><code>--ephot-min</code></samp><br><dt><samp><code>--ephot-max</code></samp><br><dt><samp><code>--material</code><span class="option">: this MUST be specified as </span><code>--material='custom'</code><span class="option"> for the time being. In the future, we'll hard-code some materials into the program so the user doesn't have to lug around a set of text files that define the energy-dependent dielectric constant for common materials.</span></samp><br><dt><samp><code>--material-file</code></samp><dd></dl>
-
-<h4 class="subsection">3.4.1 Materials and material files</h4>
-
-<p>The material files must be formatted in the way that GGADT expects, namely with a header of:
-
-<pre class="example">     17 =ICOMP: amorphous olivine-like astrosilicate
-         E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
-</pre>
-   <p>followed by material values:
-
-<pre class="example">     1.000000E-05  2.435E+00 1.119E-03  1.080E+01 7.688E-03
-     1.240000E-05  2.435E+00 1.388E-03  1.080E+01 9.534E-03
-     1.771000E-05  2.435E+00 1.982E-03  1.080E+01 1.362E-02
-     2.000000E-05  2.435E+00 2.239E-03  1.080E+01 1.538E-02
-     ...
-</pre>
-   <p><strong>Future goals</strong> :
      <ul>
-<li>Allow for multiple grain compositions at once
 <li>Allow for the user to specify different types of mixed compositions (layers, inclusions, solid spheroidal cores with no porosity, user-defined, etc.). Suggestions for improvement and utility are very welcome. 
 <li>Allow a user-defined set of energies to calculate the cross sections
 </ul>

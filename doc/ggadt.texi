@@ -248,7 +248,9 @@ The format for running the @command{ggadt} program is:
 ggadt @var{option} @dots{}
 @end example
 
-With no options, @command{ggadt} runs calculations on a set of default grain parameters. Parameters may be specified as command-line arguments, 
+With no options, @command{ggadt} runs calculations on a set of default grain parameters. By default GGADT will calculate the differential scattering cross section as a function of scattering angle. To calculate the scattering and absorption cross sections for a range of energies, add the @code{--sed} flag as a command-line argument.
+
+Parameters may be specified as command-line arguments, 
 
 @example
 ggadt --parameter=value @dots{}
@@ -312,6 +314,8 @@ will work, as long as I @strong{always} run @code{ggadt} from the parent directo
 
 @command{ggadt} supports the following options:
 
+@subsection General options
+
 @cindex environment variables, help for
 
 @table @option
@@ -336,73 +340,13 @@ Path to a correctly formatted parameter file.
 @opindex --grain-geometry
 Geometry of dust grain. Must be one of @code{SPHERE}, @code{ELLIPSOID}, @code{SPHERES}. A @code{SPHERES} grain geometry means that your grain is a conglomerate of smaller spheres. If you wish to use this grain geometry, you should supply a file (hereafter called a ``@emph{cluster file}", see the next option) that defines the relative positions of the spheres that make up the grain. The sizes of these spheres will be normalized so that the effective radius of the grain is consistent with @option{aeff}.  
 
-@item --cluster-file-name=@var{value}
-@opindex --cluster-file-name
-Path to a correctly formatted cluster file. Several cluster files are included with the distribution (see @file{data/clusters}), and if you wish to create your own, you must mimic exactly the format of these files.
-
 @item --aeff=@var{value}
 @opindex --aeff
 Effective radius of dust grain. The effective radius is defined to be the radius of a sphere with the same volume as the dust grain.
 
-@item --grain-axis-x=@var{value}
-@opindex --grain-axis-x
-For @code{ELLIPSOID} grains, we define the lengths of x, y and z axes.
-
-@item --grain-axis-y=@var{value}
-@opindex --grain-axis-y
-
-@item --grain-axis-z=@var{value}
-@opindex --grain-axis-z
-
-@item --ephot=@var{value}
-@opindex --ephot
-Energy of the incident X-ray photons in keV.
-
-@item --sed
-@opindex --sed
-This flag tells GGADT that you would like to calculate the energy-dependent absorption and scattering cross sections. To specify the energy range that you would like the calculation done
-
-@item --nephots=@var{value}
-@opindex --nephots
-For @code{sed} mode, defines the number of photon energies to calculate the cross sections between @code{--ephot-min} and @code{--ephot-max}
-
-@item --dephot=@var{value}
-@opindex --dephot
-For @code{sed} mode, defines the energy spacing between different photon energies for which the cross sections are calculated. 
-
-@item --ephot-min=@var{value}
-@opindex --ephot-min
-For @code{sed} mode, defines the minimum photon energy at which the cross sections are calculated
-
-@item --ephot-max=@var{value}
-@opindex --ephot-max
-For @code{sed} mode, defines the maximum photon energy at which the cross sections are calculated
-
-
-@item --ior-re=@var{value}
-@opindex --ior-re
-The real component of the complex index of refraction, minus one.
-
-@item --ior-im=@var{value}
-@opindex --ior-im
-The imaginary component of the complex index of refraction.
-
-@item --material=@var{value}
-@opindex --material
-Specifies the name of the material you're using. Currently, there are no built-in materials in GGADT, so you must use @code{--material='custom'}, and then specify the path to the material file by the @code{--material-file} argument.
-
-@item --material-file=@var{value}
-@opindex --material-file
-Path to file defining the energy-dependent index of refraction and dielectric constant for the grain material you would like to use. Needs to be formatted in a particular way.
-
-
 @item --ngrain=@var{value}
 @opindex --ngrain
 The (square root) of the number of grid elements with which you would like to resolve your grain. To get accurate results out to about 4000 arcseconds, we've found that a value of 64 is good enough.
-
-@item --nscatter=@var{value}
-@opindex --nscatter
-The (square root) of the number of grid elements with which you would like to resolve the scattering cross section.
 
 @item --norientations=@var{value}
 @opindex --norientations
@@ -410,7 +354,13 @@ The number of grain orientations relative to the incoming X-ray photon over whic
 
 @item --fftw-optimization=@var{value}
 @opindex --fftw-optimization
-Must be one of @code{ESTIMATE}, @code{MEASURE}, @code{PATIENT} or @code{EXHAUSTIVE}. FFTW wisdom is saved in @code{$HOME/.ggadt/plans}. For more information about what these tags mean and about FFTW wisdom, see @url{http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans}.
+Must be one of @code{ESTIMATE}, @code{MEASURE}, @code{PATIENT} or @code{EXHAUSTIVE}. For more information about what these tags mean and about FFTW wisdom, see @url{http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans}.
+
+@item --use-padded-fft
+@itemx -s
+@opindex --use-padded-fft
+@opindex -s 
+This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by @code{nscatter}), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.
 
 @item --euler-angle-mode=@var{value}
 @opindex --euler-angle-mode
@@ -424,37 +374,16 @@ Path to a file containing a list of Euler angles which GGADT will use to compute
 @opindex --rotation-axis
 Must be one of @code{none}, @code{xaxis}, @code{yaxis}, or @code{zaxis}. If not @code{none}, this will average over all orientations about the specified principle axis. Useful for grains that are aligned, for instance, with a magnetic field.
 
-@item --use-padded-fft
-@itemx -s
-@opindex --use-padded-fft
-@opindex -s 
-This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by @code{nscatter}), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.
-
-
-
-@end table
-
-@section The scattering mode versus the @code{sed} mode
-By default, GGADT will determine the orientation-averaged differential scattering cross section for your grain. If, instead, you wish to calculate the absorption and (total) scattering cross sections of the grain as a function of energy, add the @code{--sed} flag to the command line arguments. The additional command line arguments that are relevant for the ``sed" mode are:
-
-@table @option
-@item @code{--dephot} (or @code{--nephots})
-@item @code{--ephot-min}
-@item @code{--ephot-max}
-@item @code{--material}: this MUST be specified as @code{--material='custom'} for the time being. In the future, we'll hard-code some materials into the program so the user doesn't have to lug around a set of text files that define the energy-dependent dielectric constant for common materials.
-@item @code{--material-file}
-@end table
-
-@subsection Materials and material files
-
-The material files must be formatted in the way that GGADT expects, namely with a header of:
+@item --material-file=@var{value}
+@opindex --material-file
+Path to file defining the energy-dependent index of refraction and dielectric constant for the grain material you would like to use. The material files must be formatted in the way that GGADT expects, namely with a two-line header,
 
 @example
 17 =ICOMP: amorphous olivine-like astrosilicate
     E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
 @end example
 
-followed by material values:
+followed by data for the material:
 
 @example
 1.000000E-05  2.435E+00 1.119E-03  1.080E+01 7.688E-03
@@ -464,9 +393,119 @@ followed by material values:
 @dots{}
 @end example
 
-@strong{Future goals} : 
+
+@end table
+
+@subsection Ellipsoidal grains
+
+@table @option
+
+
+
+@item --grain-axis-x=@var{value}
+@opindex --grain-axis-x
+For @code{ELLIPSOID} grains, we define the lengths of x, y and z axes.
+
+@item --grain-axis-y=@var{value}
+@opindex --grain-axis-y
+
+@item --grain-axis-z=@var{value}
+@opindex --grain-axis-z
+
+
+@end table
+
+@subsection Spherical agglomerate grains (single or multiple composition)
+
+@table @option
+
+@item --cluster-file-name=@var{value}
+@opindex --cluster-file-name
+Path to a correctly formatted cluster file. Several cluster files are included with the distribution (see @file{data/clusters}), and if you wish to create your own, you must mimic exactly the format of these files.
+
+@item --material-file1=@var{value}, --material-file2=@var{value}, @dots{}
+@opindex --material-file1, --material-file2, @dots{}
+For agglomerate grain geometries of mixed composition, @code{--material-file1,2,3} gives the path to the index file for material 1, 2, 3, etc.
+
+@item --material-tag1=@var{value}, --material-tag2=@var{value}, @dots{}
+@opindex --material-tag1, --material-tag2, @dots{}
+For agglomerate grain geometries of mixed composition, @code{--material-tag1,2,3} provides the name by which material 1, 2, 3, etc. are referred to in the agglomerate composition file.
+
+@item --agglom-composition-file=@var{value}
+@opindex --agglom-composition-file
+For agglomerate grain geometries of mixed composition, @code{--agglom-composition-file} provides the path to a text file that lists the spherical agglomerates and a material 'tag' which is associated with an index file.
+
+The agglomerate composition file is assumed to be formatted with one header line, followed by as many lines as there are agglomerates in the grain, with each line containing the index of an agglomerate and a material 'tag'.
+
+@example
+       j      material tag
+       1    silicate
+       2    silicate
+       3    iron
+       4    silicate
+       @dots{}
+@end example
+
+
+@end table
+
+@subsection Differential scattering cross section
+
+@table @option
+
+@item --nscatter=@var{value}
+@opindex --nscatter
+The (square root) of the number of grid elements with which you would like to resolve the scattering cross section.
+
+@item --dtheta=@var{value}
+@opindex --dtheta
+Alternate to @code{--nscatter}: this defines the spacing of the scattering angles (in arcseconds) that you would like to calculate the differential cross section.
+
+@item --ephot=@var{value}
+@opindex --ephot
+Energy of the incident X-ray photon in keV.
+
+@item --ior-re=@var{value},  --ior-im=@var{value}
+@opindex --ior-re, --ior-im
+The real and imaginary components of the complex index of refraction, minus one. If @code{--material-file} is specified, these parameters are overwritten by the linearly interpolated value of the index of refraction at E = @code{ephot}.
+
+@item --max-angle=@var{value}
+@opindex --max-angle
+The maximum scattering angle for which you would like to calculate the differential scattering cross section.
+
+@end table
+
+@subsection Energy-dependent scattering and absorption cross sections (@code{sed} mode)
+
+You must also define a @code{--material-file} to do this calculation.
+
+@table @option
+
+@item --sed
+@opindex --sed
+This flag tells GGADT that you would like to calculate the energy-dependent absorption and scattering cross sections. 
+
+@item --nephots=@var{value}
+@opindex --nephots
+Defines the number of photon energies to calculate the cross sections between @code{--ephot-min} and @code{--ephot-max}. You can also define the energy spacing directly, via the @code{--dephot} parameter.
+
+@item --dephot=@var{value}
+@opindex --dephot
+Alternate to @code{--nephots}, defines the energy spacing between different photon energies for which the cross sections are calculated. 
+
+@item --ephot-min=@var{value}
+@opindex --ephot-min
+Defines the minimum photon energy for which the cross sections are calculated
+
+@item --ephot-max=@var{value}
+@opindex --ephot-max
+Defines the maximum photon energy for which the cross sections are calculated
+
+@end table
+
+
+@section Future goals 
 @itemize
-@item Allow for multiple grain compositions at once
 @item Allow for the user to specify different types of mixed compositions (layers, inclusions, solid spheroidal cores with no porosity, user-defined, etc.). Suggestions for improvement and utility are very welcome.
 @item Allow a user-defined set of energies to calculate the cross sections
 @end itemize

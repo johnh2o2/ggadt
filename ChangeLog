@@ -1,3 +1,9 @@
+* commit 62c3592381ef693a96f39c73d9b3de179a074fce
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Sat Mar 29 20:56:02 2014 -0400
+| 
+|     Added ability to do mixed composition agglomerates.
+|  
 * commit 2178239186496d2278e749096ab1f15d963e81a6
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Sat Mar 29 14:15:03 2014 -0400
