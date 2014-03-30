@@ -23,7 +23,7 @@ def make_data(params,fname):
 	for p in params:
 		clargs = clargs + " --"+p+"="+`params[p]`
 
-	command = ggadt+clargs+" --use-experimental-fft > "+fname
+	command = ggadt+clargs+" --max-angle=5000 > "+fname
 	#print command
 	os.system(command)
 

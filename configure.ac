@@ -37,6 +37,16 @@ AC_ARG_ENABLE([openmp],
 esac],[openmp=false])
 AM_CONDITIONAL([OMP], [test x$openmp = xtrue])
 
+#Enable user to choose double precision
+AC_ARG_ENABLE([double],
+[  --enable-double   Use double precision ],
+[case "${enableval}" in
+  yes) use_double=true ;; 
+  no)  use_double=false ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-double]) ;;
+esac],[use_double=false])
+AM_CONDITIONAL([OMP], [test x$use_double = xtrue])
+
 #specify that you want to use the FFTW3 algorithm for your FFT's
 AC_ARG_ENABLE([fftw3],
 [  --enable-fftw3    Use the FFTW3 library (if installed) ],
@@ -108,6 +118,14 @@ esac
 FFTW3_UNCOMMENT="!"
 FFTW3_COMMENT=
 USE_FFTW=
+
+DOUBLE_UNCOMMENT="!"
+SINGLE_UNCOMMENT=
+if test $use_double = true
+  then
+  DOUBLE_UNCOMMENT=
+  SINGLE_UNCOMMENT="!"
+fi
 
 GPFA_UNCOMMENT="!"
 GPFA_COMMENT=
@@ -374,5 +392,6 @@ AC_SUBST(IF_IARGC)
 AC_SUBST(IF_COM_ARG_CNT)
 AC_SUBST(IF_NEWLINE)
 AC_SUBST(IF_NO_NEWLINE)
-
+AC_SUBST(DOUBLE_UNCOMMENT)
+AC_SUBST(SINGLE_UNCOMMENT)
 AC_OUTPUT

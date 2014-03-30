@@ -1,14 +1,13 @@
 module common_mod
-  @FFTW3_UNCOMMENT@ use, intrinsic :: iso_c_binding
 
   @USE_FFTW@
   @USE_GPFA@
   use options
   use constants
+
   implicit none
 
   public
-
 
   save
 
@@ -18,75 +17,75 @@ module common_mod
   character(len=100), parameter ::  INFO = "Written by John Hoffman (jah5@princeton.edu)&
     & and Michael Tarczon (mtarczon@princeton.edu)"
 
-  complex(kind=dp_complex)                    ::  delm 
+  complex(kind=dp_complex)               ::  delm 
   
-  real(kind=dp_real)                          ::  a_eff     
-  real(kind=dp_real)                          ::  ephot 
+  real(dp_real)                          ::  a_eff     
+  real(dp_real)                          ::  ephot 
 
-  character(len=50)                           ::  geometry  
-  character(len=50)                           ::  euler_angle_mode
-  character(len=50)                           ::  rotation_axis
-
-
+  character(len=50)                      ::  geometry  
+  character(len=50)                      ::  euler_angle_mode
+  character(len=50)                      ::  rotation_axis
 
 
-  integer                                     ::  ngrain
-  integer                                     ::  nscatter_min 
-  integer                                     ::  ngrid
-  integer                                     ::  nscatter
-  integer                                     ::  norientations 
-  integer                                     ::  ierr
 
-  real(kind=dp_real)                          ::  grid_width  
-  real(kind=dp_real)                          ::  dtheta
-  real(kind=dp_real)                          ::  ior_im        
-  real(kind=dp_real)                          ::  ior_re     
-  real(kind=dp_real), dimension(3)            ::  grain_a 
-  real(kind=dp_real)                          ::  max_angle
 
-  logical                                     ::  use_padded_fft
-  logical                                     ::  asked_for_version
-  logical                                     ::  asked_for_help
-  logical                                     ::  verbose_mode
-  logical                                     ::  timing_mode
-  character(len=200)                          ::  parameter_file_name
+  integer                                ::  ngrain
+  integer                                ::  nscatter_min 
+  integer                                ::  ngrid
+  integer                                ::  nscatter
+  integer                                ::  norientations 
+  integer                                ::  ierr
+
+  real(dp_real)                          ::  grid_width  
+  real(dp_real)                          ::  dtheta
+  real(dp_real)                          ::  ior_im        
+  real(dp_real)                          ::  ior_re     
+  real(dp_real), dimension(3)            ::  grain_a 
+  real(dp_real)                          ::  max_angle
+
+  logical                                ::  use_padded_fft
+  logical                                ::  asked_for_version
+  logical                                ::  asked_for_help
+  logical                                ::  verbose_mode
+  logical                                ::  timing_mode
+  character(len=200)                     ::  parameter_file_name
 
 
 ! new variables
-  integer                                     ::  nephots
-  real(kind=dp_real)                          ::  ephot_min
-  real(kind=dp_real)                          ::  dephot
-  real(kind=dp_real)                          ::  ephot_max 
- ! character(len=200)                          ::  material          ! name of predefined material
-  character(len=200)                          ::  material_file     ! file that defines ior_re and ior_im for a range of energies
-  logical                                     ::  sed_mode          ! are we doing the spectral energy distribution? Maybe
-                                                                    !   it's better to define a global "mode" variable
-                                                                    !   with a default value and then the user only has 
-                                                                    !   to specify "--mode='sed'" or something
+  integer                                ::  nephots
+  real(dp_real)                          ::  ephot_min
+  real(dp_real)                          ::  dephot
+  real(dp_real)                          ::  ephot_max 
+ !character(len=200)                     ::  material          ! name of predefined material
+  character(len=200)                     ::  material_file     ! file that defines ior_re and ior_im for a range of energies
+  logical                                ::  sed_mode          ! are we doing the spectral energy distribution? Maybe
+                                                               !   it's better to define a global "mode" variable
+                                                               !   with a default value and then the user only has 
+                                                               !   to specify "--mode='sed'" or something
 !-------
 
-  !character(len=200), dimension(10)           ::  material_files
-  !character(len=200), dimension(10)           ::  material_tags
-  !character(len=200), dimension(10)           ::  agglom_composition_file
-  !character(len=200)                          ::  agglom_material_tag
-  !integer                                     ::  nmaterials
-  !real(kind=dp_real), dimension(10)           ::  matfracs
+  character(len=200), dimension(max_num_mats)           ::  material_files
+  character(len=200), dimension(max_num_mats)           ::  material_tags
+  character(len=200)                                    ::  agglom_composition_file
+  integer, allocatable                                  ::  agglom_material_tags(:)
+  integer                                               ::  nmaterials
+  real(dp_real), dimension(max_num_mats)                ::  matfracs
+  real(dp_real), dimension(max_num_mats)                ::  ior_res_single_en
+  real(dp_real), dimension(max_num_mats)                ::  ior_ims_single_en
 
 
 
-  character(len=200)                          ::  euler_angle_file
-  character(len=100)                          ::  fftw_optimization_mode_name
-  character(len=200)                          ::  cluster_file_name
+  character(len=200)                                    ::  euler_angle_file
+  character(len=100)                                    ::  fftw_optimization_mode_name
+  character(len=200)                                    ::  cluster_file_name
 
   contains
 
     subroutine set_parameter_values()
       implicit none
-      
+      character(len=100) :: optname
+      integer :: i
      
-      ! define help flag
-
-      !call define_help_flag(opts,print_help)
 
       call define_flag(opts,"help",abbrev='h',description="Print this help message.")
       call define_flag(opts, &
@@ -106,50 +105,32 @@ module common_mod
         description="Path to parameter file")
 
 
-      ! Allow user to specify up to 10 materials:
-      !call define_option_string(opts,&
-      !  "material-file1","",&
-      !  description="Path to material file for material 1")
+      ! Allow user to specify up to max_num_mats materials:
 
-      !call define_option_string(opts,&
-      !  "material-file2","",&
-      !  description="Path to material file for material 2")
-
-      !call define_option_string(opts,&
-      !  "material-file3","",&
-      !  description="Path to material file for material 3")
+      do i=1,max_num_mats
+        if (i .gt. 10) then 
+          write(optname,'(i2)') i 
+        else
+          write(optname,'(i1)') i 
+        end if 
+        
+        call define_option_string(opts,&
+          "material-file"//optname,"",&
+          description="Path to material file for material "//optname)
+        call define_option_string(opts,&
+          "material-tag"//optname,"",&
+           description="Tag to associate with material "//optname)
+        !call define_option_real(opts,&
+       !  "material-frac"//optname,"",&
+       !  description="Volume fraction of the grain composed of material "//optname)
+      end do 
       
-      !call define_option_string(opts,&
-      !  "material-tag1","",&
-      !  description="Tag to associate with material 1")
 
-      !call define_option_string(opts,&
-      !  "material-tag2","",&
-      !  description="Tag to associate with material 2")
-
-      !call define_option_string(opts,&
-      !  "material-tag3","",&
-      !  description="Tag to associate with material 3")
-
-      !call define_option_string(opts,&
-      !  "agglom-composition-file","",&
-      !  description="File matching each sphere in an agglomerate with a material tag")
-
-      !call define_option_real(opts,&
-      !  "material-frac1","",&
-      !  description="Volume fraction of the grain composed of material 1")
-
-      !call define_option_real(opts,&
-      !  "material-frac2","",&
-      !  description="Volume fraction of the grain composed of material 2")
-
-      !call define_option_real(opts,&
-      !  "material-frac3","",&
-      !  description="Volume fraction of the grain composed of material 3")
+      call define_option_string(opts,&
+        "agglom-composition-file","",&
+        description="File matching each sphere in an agglomerate with a material tag")
 
 
-      !
-      ! Define command line options
 
       call define_option_string(opts,&
         "grain-geometry",default_grain_geometry,&
@@ -157,6 +138,7 @@ module common_mod
       call define_option_string(opts,&
         "cluster-file-name",default_cluster_file_name,&
         description="Path to file that defines a grain made up of a cluster of spheres")
+
       call define_option_real(opts,&
         "aeff",default_aeff,&
         description="Effective radius of grain")
@@ -177,7 +159,7 @@ module common_mod
         description="Maximum scattering angle in arcseconds")
       call define_option_real(opts,&
         "ior-re",default_ior_re,&
-        description="real(kind=dp_real) component of the index of refraction, minus 1")
+        description="real(dp_real) component of the index of refraction, minus 1")
       call define_option_real(opts,&
         "ior-im",default_ior_im,&
         description="Imaginary component of the index of refraction")
@@ -281,8 +263,20 @@ module common_mod
       call get_option_real(opts,"ephot-max", ephot_max)
       call get_option_integer(opts,"nephots", nephots)
       call get_option_real(opts,"dephot", dephot)
-      
-      !call get_option_string(opts,"material",material)
+
+      do i=1,max_num_mats
+        if (i .gt. 10) then
+          write(optname,'(i2)') i 
+        else
+          write(optname,'(i1)') i 
+        end if 
+        
+        call get_option_string(opts,"material-file"//optname,material_files(i))
+        call get_option_string(opts,"material-tag"//optname,material_tags(i))
+
+      end do 
+
+      call get_option_string(opts,"agglom-composition-file",agglom_composition_file)
       call get_option_string(opts,"material-file",material_file)
      
       call get_flag(opts,"version",asked_for_version)
@@ -306,13 +300,54 @@ module common_mod
       rotation_axis = strlowcase(rotation_axis)
       geometry = strlowcase(geometry)
 
+      ! make sure all material files have a corresponding material tag and count number of materials
+      nmaterials = 0
+      
+      do i=1,max_num_mats
+        write(optname,'(I1)') i
+        if (option_found(opts,"material-file"//optname) .and. .not. &
+            option_found(opts,"material-tag"//optname) ) then
+          write(stderr,*) "ERROR: material_tags(",i,") defined as '",&
+              material_tags(i),"', but no corresponding material file defined."
+          stop
+        else if (option_found(opts,"material-tag"//optname) .and. .not. &
+            option_found(opts,"material-file"//optname) ) then
+          write(stderr,*) "ERROR: material_files(",i,") defined as '",&
+              material_files(i),"', but no corresponding material tag defined."
+          stop
+        end if 
+        
+        if (option_found(opts,"material-file"//optname)) then
+          ! can't mix material-file and material-file1,2,... parameters
+          if (option_found(opts,"material-file")) then 
+            write(stderr,*) "ERROR: Cannot use BOTH --material-file and --material-file(1,2,..) options"
+            stop
+          end if 
+          nmaterials = nmaterials + 1
+        end if 
+      end do
+     
+
+
+      ! check that the user didn't forget to provide the agglom-composition-file
+      if ( nmaterials .gt. 0 .and. .not. option_found(opts,"agglom-composition-file")) then
+        write(stderr, *) "ERROR: agglom-composition-file parameter is not set, but material-file1 and material-tag1 are."
+        stop
+      end if 
+      
+      ! if we're just doing a single composition, 
+      if (nmaterials == 0 .and. option_found(opts,"material-file")) then 
+        material_files(1) = material_file 
+        nmaterials = 1
+      end if 
+
 
 
       if (option_found(opts,"nscatter") .and. option_found(opts, "dtheta")) then
           write(stderr,*) "Warning: You have specified BOTH the 'nscatter' and 'dtheta' options."
           write(stderr,*) "We will use your specified value of nscatter:", nscatter
       else if (option_found(opts,"dtheta")) then
-          nscatter = int(ceiling(real(2*max_angle,kind=dp_real)/dtheta))
+          nscatter = int(ceiling(real(2*max_angle,dp_real)/dtheta))
       end if 
 
       if (option_found(opts,"dephot") .and. option_found(opts, "nephots")) then
@@ -323,6 +358,7 @@ module common_mod
       else 
           dephot = (ephot_max - ephot_min)/(nephots - 1)
       end if 
+
     end subroutine set_parameter_values
 
     subroutine print_help(opts)
@@ -339,8 +375,8 @@ module common_mod
 
     function rot_matrix(eul_ang)
       implicit none
-      real(kind=dp_real), dimension(3), intent(in) :: eul_ang
-      real(kind=dp_real), dimension(3,3) :: rot_matrix
+      real(dp_real), dimension(3), intent(in) :: eul_ang
+      real(dp_real), dimension(3,3) :: rot_matrix
       rot_matrix(1,1) =  cos(eul_ang(2))*cos(eul_ang(3))
       rot_matrix(1,2) = -cos(eul_ang(1))*sin(eul_ang(3))-sin(eul_ang(1))*sin(eul_ang(2))*cos(eul_ang(3))
       rot_matrix(1,3) =  sin(eul_ang(1))*sin(eul_ang(3))-cos(eul_ang(1))*sin(eul_ang(2))*sin(eul_ang(3))
@@ -356,8 +392,8 @@ module common_mod
 
     function rot_x(eul_ang)
       implicit none
-      real(kind=dp_real), intent(in) :: eul_ang
-      real(kind=dp_real), dimension(3,3) :: rot_x
+      real(dp_real), intent(in) :: eul_ang
+      real(dp_real), dimension(3,3) :: rot_x
       rot_x(1,1) = 1.0
       rot_x(1,2) = 0.0
       rot_x(1,3) = 0.0
@@ -373,8 +409,8 @@ module common_mod
 
     function rot_y(eul_ang)
       implicit none
-      real(kind=dp_real), intent(in) :: eul_ang
-      real(kind=dp_real), dimension(3,3) :: rot_y
+      real(dp_real), intent(in) :: eul_ang
+      real(dp_real), dimension(3,3) :: rot_y
       rot_y(1,1) =  cos(eul_ang)
       rot_y(1,2) =  0.0
       rot_y(1,3) =  sin(eul_ang)
@@ -390,8 +426,8 @@ module common_mod
 
     function rot_z(eul_ang)
       implicit none
-      real(kind=dp_real), intent(in) :: eul_ang
-      real(kind=dp_real), dimension(3,3) :: rot_z
+      real(dp_real), intent(in) :: eul_ang
+      real(dp_real), dimension(3,3) :: rot_z
       rot_z(1,1) = cos(eul_ang)
       rot_z(1,2) = sin(eul_ang)
       rot_z(1,3) = 0.0
@@ -435,9 +471,9 @@ module common_mod
         complex(kind=dp_complex), allocatable :: working_fft(:,:)
         complex(kind=dp_complex), dimension(size(f(:,1)), size(f(1,:))) :: new_grid
         integer :: i,j,a,b,norig, fsize, fftsize, ix, iy
-        real(kind=dp_real) :: deltax, deltay
+        real(dp_real) :: deltax, deltay
 
-        f = kspace_shift(f,real(kmin,kind=dp_real),real(kmin,kind=dp_real)) ! shift the input function so that the k-space origin is at (kmin,kmin)
+        f = kspace_shift(f,real(kmin,dp_real),real(kmin,dp_real)) ! shift the input function so that the k-space origin is at (kmin,kmin)
         norig = kmax - kmin 
         fsize = size(f(:,1))
         fftsize = norig*enhancement + 1
@@ -479,7 +515,7 @@ module common_mod
             end do
         end do 
           
-        f = kspace_shift(f,real(-kmin,kind=dp_real),real(-kmin,kind=dp_real)) ! shift the input function back.
+        f = kspace_shift(f,real(-kmin,dp_real),real(-kmin,dp_real)) ! shift the input function back.
     end subroutine fft_faster
 
     function fft_center(f)
@@ -496,7 +532,7 @@ module common_mod
     end function fft_center
 
     function kspace_shift(f,shiftx,shifty)
-        real(kind=dp_real),  intent(in) :: shiftx,shifty
+        real(dp_real),  intent(in) :: shiftx,shifty
         complex(kind=dp_complex), intent(in) :: f(:,:)
         complex(kind=dp_complex), dimension(size(f(:,1)),size(f(1,:))) :: kspace_shift
         integer :: i, j, n
@@ -505,16 +541,16 @@ module common_mod
 
         do i=1,n
             do j=1,n
-                kspace_shift(i,j) = f(i,j)*exp(ISIGN*CMPLX(0,1)*twopi*(shiftx*(i-1)+shifty*(j-1))/real(n))
+                kspace_shift(i,j) = f(i,j)*exp(ISIGN*CMPLX(0,1.0, kind=dp_complex)*twopi*(shiftx*(i-1)+shifty*(j-1))/real(n))
             end do
         end do
     end function kspace_shift
     function linterp(x,y,xval)
         implicit none 
-        real(kind=dp_real), intent(in) :: x(:), y(:), xval
-        real(kind=dp_real) :: linterp
+        real(dp_real), intent(in) :: x(:), y(:), xval
+        real(dp_real) :: linterp
         integer :: i 
-        real(kind=dp_real) :: a,b
+        real(dp_real) :: a,b
 
         if ( xval < x(1) ) then
             write(stderr,*) "ERROR: (linterp) requested value at x=",xval," however, &

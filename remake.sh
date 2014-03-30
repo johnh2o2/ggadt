@@ -11,10 +11,5 @@ aclocal -I./m4
 autoconf
 automake -a
 
-./configure || exit
-make html || exit
-cp doc/ggadt.html/* doc/htmldoc
-
-make clean
-
-#make dist
+./configure --enable-double || exit
+make

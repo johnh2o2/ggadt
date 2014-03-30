@@ -18,6 +18,30 @@ module spheres
     
     contains
 
+    subroutine read_spheres_composition(cluster_comp_name,all_tags,cluster_tags_arr)
+        implicit none 
+        character(len=200), intent(in) :: cluster_comp_name
+        character(len=200) :: tagname
+        character(len=200), intent(in) :: all_tags(:)
+        integer, intent(out) :: cluster_tags_arr(:)
+        integer :: i,j
+        open(unit=file_unit,file=cluster_comp_name)
+
+        read(file_unit,*) junk
+        do i=1,nspheres
+            read(file_unit,*) j, tagname
+            do j=1,size(all_tags)
+                if (tagname .eq. all_tags(j)) then 
+                    cluster_tags_arr(i) = j
+                end if 
+            end do 
+        end do
+
+        close(file_unit)
+
+    end subroutine read_spheres_composition
+
+
     subroutine read_spheres(cluster_file_name,a_eff,max_dist)
         implicit none
         real(kind=dp_real) :: v = 0.0, dist

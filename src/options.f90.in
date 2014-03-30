@@ -36,8 +36,8 @@ module options
 
   ! Max number of options & positional arguments
   @IF_NO_NEWLINE@character, parameter :: new_line = achar(10)
-  integer, parameter :: maxopts = 32
-  integer, parameter :: maxargs = 32
+  integer, parameter :: maxopts = 64
+  integer, parameter :: maxargs = 64
   ! For formatting output
   integer, parameter :: name_column  = 3
   integer, parameter :: descr_column = 30

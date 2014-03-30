@@ -15,8 +15,10 @@ program ggadt
     complex(kind=dp_complex), allocatable :: sh(:,:), ftsh(:,:), phi_total(:,:)
 
     real(kind=dp_real), allocatable :: scatter(:,:)
-    real(kind=dp_real), allocatable :: ephots(:), ior_res(:), ior_ims(:) ! NEW variables (for doing sed of extinction)
+    real(kind=dp_real), allocatable :: ephots(:), ior_res(:), ior_ims(:), ior_res_mult(:,:), ior_ims_mult(:,:)
 
+
+    logical :: multiple_compositions
     real(kind=dp_real) :: xmin, xmax, ymin, ymax, dx, dy, k, l, dk
     real(kind=dp_real), dimension(3) :: eul_ang
     real(kind=dp_real), dimension(3,3) :: rm 
@@ -49,16 +51,17 @@ contains
         implicit none
         real(kind=dp_real) :: sigma_scat, sigma_abs
         real(kind=dp_real),dimension(size(ephots)) :: sigma_scats, sigma_abss
-        complex(kind=dp_complex) :: delm
-        integer :: i
+        complex(kind=dp_complex), dimension(10) :: delms
+        integer :: i, j
 
-        call get_ior(material_file, ior_res, ior_ims)
 
         write(stdout,*) "# [ephot] [sigma_scat] [sigma_abs]"
         
         do i=1,nephots
-            delm = CMPLX(ior_res(i), ior_ims(i))
-            call get_integrated_cross_sections(ephots(i), delm, sigma_scat, sigma_abs)
+            do j=1,nmaterials
+                delms(j) = CMPLX(ior_res_mult(j,i), ior_ims_mult(j,i))
+            end do 
+            call get_integrated_cross_sections(ephots(i), delms, sigma_scat, sigma_abs)
             sigma_scats(i) = sigma_scat
             sigma_abss(i) = sigma_abs
             write(stderr,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
@@ -72,11 +75,12 @@ contains
 
     end subroutine calculate_sed_of_cross_sections
 
-    subroutine get_ior(matfile, iorres, iorims)
+    subroutine get_ior(matfile, iorres, iorims, iorre, iorim)
         implicit none
         character(len=200), intent(in) :: matfile 
         character(len=200) :: mat, junk 
-        real(kind=dp_real), intent(out), dimension(size(ephots)) :: iorres, iorims
+        real(kind=dp_real), intent(out) :: iorres(:), iorims(:)
+        real(kind=dp_real), intent(out) :: iorre, iorim
         real(kind=dp_real) :: eps, imeps
         integer  :: i,j, allocatestatus, ICOMP, niors, counter, ios, maxrecs
         real(kind=dp_real), allocatable  :: file_ior_re(:), file_ior_im(:), file_ephots(:)
@@ -124,25 +128,32 @@ contains
             read(1,*) file_ephots(i), file_ior_re(i), file_ior_im(i), eps, imeps
             file_ephots(i) = file_ephots(i) / 1000.0 ! convert from eV to keV
         end do
+        iorre = linterp(file_ephots,file_ior_re,ephot)
+        iorim = linterp(file_ephots,file_ior_im,ephot)
 
+        if (sed_mode) then 
 
-        do i=1,nephots
-            iorres(i) = linterp(file_ephots,file_ior_re,ephots(i))
-            iorims(i) = linterp(file_ephots,file_ior_im,ephots(i))
-        end do 
+            do i=1,nephots
+                iorres(i) = linterp(file_ephots,file_ior_re,ephots(i))
+                iorims(i) = linterp(file_ephots,file_ior_im,ephots(i))
+                
+            end do 
+        end if 
        
         close(1)
 
     end subroutine get_ior
-    subroutine get_integrated_cross_sections(energy,delm,sigma_scat,sigma_abs)
+    subroutine get_integrated_cross_sections(energy,delms,sigma_scat,sigma_abs)
         implicit none
         real(kind=dp_real), intent(in) :: energy
         real(kind=dp_real), intent(out) :: sigma_abs, sigma_scat
-        complex(kind=dp_complex), intent(in) :: delm
+        complex(kind=dp_complex) :: delm
+        complex(kind=dp_complex), dimension(10), intent(in) :: delms
 
         real(kind=dp_real) :: kphot
         integer :: c1,c2, neul
 
+        delm = delms(1)
 
         kphot = TWOPI*(energy/0.001239842)
 
@@ -175,6 +186,10 @@ contains
             else if (geometry .eq. 'spheres') then 
                 call rotate_spheres(rm)
                 do c1=1,nspheres
+                    if (multiple_compositions) then
+                        c2 = agglom_material_tags(c1)
+                        delm = delms(c2)
+                    end if 
                     ior_r(c1) = REAL(delm)
                     ior_i(c1) = AIMAG(delm)
                 end do
@@ -293,6 +308,7 @@ contains
 
     subroutine initialize_and_allocate_vars()
       implicit none 
+
       integer :: line, status, next, ng, n, allocatestatus, i, j, norientations_new
       real(kind=dp_real) :: ds, max_dist, scale
       character(len=100) :: junk
@@ -505,6 +521,49 @@ contains
             end do 
         end do
     ! -----------------------------------
+
+        !write(stderr, *) " going to "
+        if (sed_mode) then
+            allocate(ior_res_mult(nmaterials,nephots),stat=allocatestatus) 
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ior_res_mult) array ***"
+            allocate(ior_ims_mult(nmaterials,nephots),stat=allocatestatus)
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ior_ims_mult) array ***"
+        end if 
+        if (nmaterials .gt. 1) then 
+            multiple_compositions = .TRUE.
+
+
+            allocate(agglom_material_tags(nspheres),stat=allocatestatus)
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (agglom_material_tags) array ***"
+            
+            do i=1, nmaterials
+                call get_ior(material_files(i), ior_res_mult(i,:), ior_ims_mult(i,:), ior_res_single_en(i), ior_ims_single_en(i))
+            end do 
+            if (geometry .eq. "spheres") then 
+                call read_spheres_composition(agglom_composition_file, material_tags, agglom_material_tags)
+                if (.not. sed_mode) then 
+                    do i=1,nspheres
+                        j = agglom_material_tags(i)
+                        ior_r(i) = ior_res_single_en(j)
+                        ior_i(i) = ior_ims_single_en(j)
+                    end do 
+                end if 
+            end if 
+
+        else 
+            multiple_compositions = .FALSE.
+            if (material_file .ne. "") then 
+                call get_ior(material_file, ior_res, ior_ims, ior_re, ior_im)
+                if (geometry .eq. "spheres") then
+                    if (.not. sed_mode) then 
+                        do i=1,nspheres
+                            ior_r(i) = ior_re
+                            ior_i(i) = ior_im
+                        end do 
+                    end if 
+                end if 
+            end if 
+        end if 
 
 
 

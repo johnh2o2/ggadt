@@ -17,8 +17,8 @@ defaults = {
 			    'ephot' 				: 2.0,
 			    'ior-re' 				: -1.920*pow(10.0,-4.0),
 			    'ior-im' 				: 2.807*pow(10.0,-5.0),
-			    'ngrain' 				: 1024,
-			    'nscatter'				: 512,
+			    'ngrain' 				: 280,
+			    'nscatter'				: 256,
 			    'norientations'			: 100,
 			    'euler-angle-mode'		: 'random',
 			    'euler-angle-file'		: None,
@@ -119,11 +119,11 @@ fname_sphere = data_dir+"/HD09_sphere.dat"
 fname_ellipsoid = data_dir+"/HD09_ellipsoid.dat"
 
 #Make data
-#pu.make_data(params_3BA,fname_3BA)
-#pu.make_data(params_3BAM1,fname_3BAM1)
-#pu.make_data(params_3BAM2,fname_3BAM2)
-#pu.make_data(params_sphere,fname_sphere)
-#pu.make_data(params_ellipsoid,fname_ellipsoid)
+pu.make_data(params_3BA,fname_3BA)
+pu.make_data(params_3BAM1,fname_3BAM1)
+pu.make_data(params_3BAM2,fname_3BAM2)
+pu.make_data(params_sphere,fname_sphere)
+pu.make_data(params_ellipsoid,fname_ellipsoid)
 
 #Load data
 data_3BA = pu.load_data(fname_3BA)

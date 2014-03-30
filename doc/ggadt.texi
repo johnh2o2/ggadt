@@ -167,7 +167,7 @@ GGADT does the following:
 GGADT should install easily on most @emph{Unix-based systems} (e.g. Linux, Mac) by following the standard GNU install procedures, described in @file{INSTALL}.
 
 @example
-./configure [--enable-openmp] [--enable-fftw3] @dots{}
+./configure [--enable-openmp] [--enable-fftw3] [--enable-double] @dots{}
 make
 @end example
 
@@ -555,14 +555,12 @@ The inset within the plot, on the upper left corner, shows the full 2d grid of t
 
 @image{sample-spheres,5in,5in}
 
-@section Ellipsoids and spheroids
+@section Ellipsoids and spheroids --  orientational averages about a principal axis
 GGADT allows you to specify a general, ellipsoidal (tri-axial) grain through the input options @code{--grain-axis-x,y,z=}@emph{val}. These specify the relative lengths of the three principal axes of the grain. These axes lengths are then normalized so that the effective radius of the grain is consistent with the @code{--aeff} parameter.
-
-@subsection Orientational averages about a principal axis
 
 If you wish to calculate orientationally-averaged quantities of a grain @emph{about a principal axis}, GGADT allows you to do this through specifying @code{--rotation-axis=xaxis,yaxis,zaxis,none}. The @code{--rotation-axis} parameter is 'none' by default.
 
-@subsubsection Coordinate systems
+@subsection Coordinate systems
 
 The @code{--rotation-axis} parameter will work for grain agglomerates as well. The positions of the agglomerates as specified in the agglomerate file define the coordinate system that GGADT works in. Be sure the axis you specify via @code{--rotation-axis} is really the axis you want. You'll have to know something about how the coordinate system of the agglomerate file is defined.
 
@@ -570,7 +568,7 @@ If you are using an @code{ELLIPSOID} grain geometry, the coordinate system is su
 
 Currently, there is no option to specify a custom rotation axis about which to orient the grain. If this is something you would like added to GGADT, let John Hoffman know.
 
-@subsubsection Example runs for a prolate spheroid
+@subsection Example runs for a prolate spheroid
 
 Below are the results from running GGADT on a prolate spheroid (with axes ratios 2:1:1), with the grain's x-axis being the longest.
 

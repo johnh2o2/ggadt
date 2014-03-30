@@ -1,3 +1,9 @@
+* commit 2178239186496d2278e749096ab1f15d963e81a6
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Sat Mar 29 14:15:03 2014 -0400
+| 
+|     Fixed errors in configure.ac (was checking for new_line wrong), added check for random_number(), tested dist on metis.
+|  
 * commit af607588a85befd123fd334b9c73a0ae1dacce6d
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Sat Mar 29 13:55:24 2014 -0400
