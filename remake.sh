@@ -11,5 +11,5 @@ aclocal -I./m4
 autoconf
 automake -a
 
-./configure --enable-double || exit
+./configure --enable-openmp || exit
 make

@@ -425,15 +425,15 @@ Path to a correctly formatted cluster file. Several cluster files are included w
 
 @item --material-file1=@var{value}, --material-file2=@var{value}, @dots{}
 @opindex --material-file1, --material-file2, @dots{}
-For agglomerate grain geometries of mixed composition, @code{--material-file1,2,3} gives the path to the index file for material 1, 2, 3, etc.
+Path(s) to the index file for material 1, 2, 3, etc.
 
 @item --material-tag1=@var{value}, --material-tag2=@var{value}, @dots{}
 @opindex --material-tag1, --material-tag2, @dots{}
-For agglomerate grain geometries of mixed composition, @code{--material-tag1,2,3} provides the name by which material 1, 2, 3, etc. are referred to in the agglomerate composition file.
+The name(s) by which material 1, 2, 3, etc. are referred to in the agglomerate composition file.
 
 @item --agglom-composition-file=@var{value}
 @opindex --agglom-composition-file
-For agglomerate grain geometries of mixed composition, @code{--agglom-composition-file} provides the path to a text file that lists the spherical agglomerates and a material 'tag' which is associated with an index file.
+Provides the path to a text file that lists the spherical agglomerates and a material 'tag' which is associated with an index file.
 
 The agglomerate composition file is assumed to be formatted with one header line, followed by as many lines as there are agglomerates in the grain, with each line containing the index of an agglomerate and a material 'tag'.
 
