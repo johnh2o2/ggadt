@@ -1,0 +1,136 @@
+<html lang="en">
+<head>
+<title>Example usage - GGADT 0.9.86</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GGADT 0.9.86">
+<meta name="generator" content="makeinfo 4.8">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Invoking-GGADT.html#Invoking-GGADT" title="Invoking GGADT">
+<link rel="next" href="Testing-against-previous-results.html#Testing-against-previous-results" title="Testing against previous results">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This manual is for GGADT (version 0.9.86, 29 March 2014),
+which calculates scattering properties of dust grains in the interstellar
+medium by using anomalous diffraction theory (ADT).
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with no Front-Cover Texts,
+     and with no Back-Cover Texts.  A copy of the license is included
+     in the section entitled ``GNU Free Documentation License''.
+   -->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<div class="node">
+<p>
+<a name="Example-usage"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="Testing-against-previous-results.html#Testing-against-previous-results">Testing against previous results</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Invoking-GGADT.html#Invoking-GGADT">Invoking GGADT</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">4 Example usage</h2>
+
+<p><a name="index-sample-output-51"></a><a name="index-examples-52"></a>
+
+<h3 class="section">4.1 Default case</h3>
+
+<p>If you simply want to test that <code>ggadt</code> is running properly, you can simply do
+
+<pre class="example">     src/ggadt
+</pre>
+   <p>From the parent directory. This will solve a test case, which is defined by the following hard-coded default parameters:
+
+<pre class="example">     aeff           = 0.2
+     ephot          = 2.0
+     grain-axis-x   = 1.0
+     grain-axis-y   = 1.0
+     grain-axis-z   = 1.0
+     ior-re         = -1.920E-4
+     ior-im         = 2.807E-5
+     grain-geometry = 'sphere'
+     euler-angle-mode = 'random'
+     euler-angle-file = ''
+     ngrain         = 256
+     nscatter       = 100
+     norientations  = 100
+     dtheta         = 10.0
+     max-angle      = 3000.
+     cluster-file-name = ''
+     fftw-optimization = 'estimate'
+</pre>
+   <p>If you would like to plot the output of this code, pipe the standard output of <code>ggadt</code> to a file of your choice. Then run the python plotting scripts:
+
+<pre class="example">     
+     src/ggadt &gt; output.dat
+     python scripts/plot.py output.dat
+     
+</pre>
+   <p>This will display two plots. One plot shows the full 2D cross-scattering efficiency. The other shows: (1) a phi-averaged plot of the differential cross-section efficiency (2) a slice of the full 2D grid at phi=0.0 and phi = pi/2 (3) the one-sigma RMS fluctuations over phi (in light green) and the max/min values over phi (in light grey).
+
+<h3 class="section">4.2 Using <code>make_sample_plots.py</code></h3>
+
+<p>We have made a small python script (<code>scripts/make_sample_plots.py</code>) that runs example cases for different grain geometries. You will need the matplotlib, numpy and scipy libraries in order to run this script. More information about these libaries is available at <a href="http://scipy.org/getting-started.html">http://scipy.org/getting-started.html</a>.
+
+   <p>The python script runs GGADT for a grain with an effective radius of 0.2 microns, composed of MgFeSiO_4 silicate, with an incident photon energy of 2.0 keV, and with <code>ngrain</code> of 256 and a <code>nscatter</code> of 100.
+
+   <p>The inset within the plot, on the upper left corner, shows the full 2d grid of the scattering cross section efficiency.
+
+   <div class="block-image"><img src="sample-sphere.png" alt="sample-sphere.png"></div>
+
+   <div class="block-image"><img src="sample-ellipsoid.png" alt="sample-ellipsoid.png"></div>
+
+   <div class="block-image"><img src="sample-spheres.png" alt="sample-spheres.png"></div>
+
+<h3 class="section">4.3 Ellipsoids and spheroids &ndash;  orientational averages about a principal axis</h3>
+
+<p>GGADT allows you to specify a general, ellipsoidal (tri-axial) grain through the input options <code>--grain-axis-x,y,z=</code><em>val</em>. These specify the relative lengths of the three principal axes of the grain. These axes lengths are then normalized so that the effective radius of the grain is consistent with the <code>--aeff</code> parameter.
+
+   <p>If you wish to calculate orientationally-averaged quantities of a grain <em>about a principal axis</em>, GGADT allows you to do this through specifying <code>--rotation-axis=xaxis,yaxis,zaxis,none</code>. The <code>--rotation-axis</code> parameter is 'none' by default.
+
+<h4 class="subsection">4.3.1 Coordinate systems</h4>
+
+<p>The <code>--rotation-axis</code> parameter will work for grain agglomerates as well. The positions of the agglomerates as specified in the agglomerate file define the coordinate system that GGADT works in. Be sure the axis you specify via <code>--rotation-axis</code> is really the axis you want. You'll have to know something about how the coordinate system of the agglomerate file is defined.
+
+   <p>If you are using an <code>ELLIPSOID</code> grain geometry, the coordinate system is such that the z-axis points towards the observer (i.e. the incident photons' direction of propagation), and the x and y directions are defined by the <code>--grain-axis-x,y,z</code> input parameters.
+
+   <p>Currently, there is no option to specify a custom rotation axis about which to orient the grain. If this is something you would like added to GGADT, let John Hoffman know.
+
+<h4 class="subsection">4.3.2 Example runs for a prolate spheroid</h4>
+
+<p>Below are the results from running GGADT on a prolate spheroid (with axes ratios 2:1:1), with the grain's x-axis being the longest.
+
+   <p><strong>Orientation-averaged differential scattering efficiency about the x-axis</strong>
+<pre class="example">     src/ggadt --grain-axis-y=0.5 --grain-axis-z=0.5 --grain-geometry=ellipsoid --rotation-axis=xaxis &gt; outputx.dat
+     python scripts/plot.py outputx.dat
+</pre>
+   <div class="block-image"><img src="spheroid_rot_xaxis.png" alt="spheroid_rot_xaxis.png"></div>
+
+   <p><strong>Orientation-averaged differential scattering efficiency about the y-axis</strong>
+<pre class="example">     src/ggadt --grain-axis-y=0.5 --grain-axis-z=0.5 --grain-geometry=ellipsoid --rotation-axis=yaxis &gt; outputy.dat
+     python scripts/plot.py outputy.dat
+</pre>
+   <div class="block-image"><img src="spheroid_rot_yaxis.png" alt="spheroid_rot_yaxis.png"></div>
+
+   <p><strong>Orientation-averaged differential scattering efficiency about the z-axis</strong>
+<pre class="example">     src/ggadt --grain-axis-y=0.5 --grain-axis-z=0.5 --grain-geometry=ellipsoid --rotation-axis=zaxis &gt; outputz.dat
+     python scripts/plot.py outputz.dat
+</pre>
+   <div class="block-image"><img src="spheroid_rot_zaxis.png" alt="spheroid_rot_zaxis.png"></div>
+
+   </body></html>
+

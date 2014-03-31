@@ -1,0 +1,141 @@
+<html lang="en">
+<head>
+<title>Overview - GGADT 0.9.86</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GGADT 0.9.86">
+<meta name="generator" content="makeinfo 4.8">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="index.html#Top" title="Top">
+<link rel="next" href="Installation.html#Installation" title="Installation">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This manual is for GGADT (version 0.9.86, 29 March 2014),
+which calculates scattering properties of dust grains in the interstellar
+medium by using anomalous diffraction theory (ADT).
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with no Front-Cover Texts,
+     and with no Back-Cover Texts.  A copy of the license is included
+     in the section entitled ``GNU Free Documentation License''.
+   -->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<div class="node">
+<p>
+<a name="Overview"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="Installation.html#Installation">Installation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="index.html#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">1 Overview</h2>
+
+<p><a name="index-greetings-1"></a><a name="index-overview-2"></a>
+GGADT stands for General Geometry Anomalous Diffraction Theory, and is Fortran 95 compliant. GGADT allows a user to specify a custom dust geometry (either a spheroid, sphere, or an agglomerate of spheres), and calculates either the differential scattering cross section as a function of scattering angle, or the energy-dependent absorption and scattering cross sections. Anomalous diffraction theory is valid when ka_eff \lesssim 1, where k is the wavenumber of the incident photon, and a_eff is the &ldquo;effective radius" of the grain, defined to be the radius of a sphere that has the same volume as the grain.
+
+   <p><a name="index-authors-3"></a><a name="index-Hoffman_002c-John-4"></a><a name="index-Tarczon_002c-Michael-5"></a>GGADT was written by John Hoffman and Michael Tarczon.
+
+<h3 class="section">1.1 Background</h3>
+
+<p><a name="index-background-6"></a><a name="index-interstellar-medium-7"></a><a name="index-astrophysics-8"></a>
+
+<h4 class="subsection">1.1.1 Dust in the interstellar medium (ISM)</h4>
+
+<p>The interstellar medium (ISM) refers to everything that occupies the space between stars in a galaxy. The ISM of the Milky Way contains rich physics and is an active area of astrophysical research. Dust, molecules, gas, radiation, cosmic rays &ndash; all of these are important constituents of the ISM, and all of these constituents play roles of varying dyanmical importance, depending on the local ISM environment in question.<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>.
+
+   <p>One area of active research in ISM physics is determining the size distribution and composition of interstellar dust. One way to probe the size distributions and dust composition is by measuring how ISM dust interacts with x-ray radiation.<a rel="footnote" href="#fn-2" name="fnd-2"><sup>2</sup></a><a rel="footnote" href="#fn-3" name="fnd-3"><sup>3</sup></a><a rel="footnote" href="#fn-4" name="fnd-4"><sup>4</sup></a> When looking at an x-ray source through interstellar dust, the scattering properties of the intermediate dust create an x-ray &ldquo;halo&rdquo; around the source.<a rel="footnote" href="#fn-5" name="fnd-5"><sup>5</sup></a>.
+
+   <p>GGADT is designed to be a tool to test dust models against observations of x-ray halos. Since the size of a typical dust grain (0.1 micrometers) is large compared to typical x-ray wavelengths (1 nanometer), an approximation known as Anomalous Diffraction Theory (ADT)<a rel="footnote" href="#fn-6" name="fnd-6"><sup>6</sup></a> can be used to calculate the absorption and scattering properties of dust grains<a rel="footnote" href="#fn-7" name="fnd-7"><sup>7</sup></a>.
+
+<h4 class="subsection">1.1.2 Anomalous Diffraction Theory (ADT)</h4>
+
+<p>The mathematics of what GGADT does is best explained in Draine and Allaf-Akbari 2006; we include a portion of that paper below. 
+<blockquote>
+
+        <p>At X-ray energies materials have refractive indices very close to unity (|m - 1| &lt;&lt; 1), and the dust grains responsible for most of the scattering are usually much larger than the wavelength of the incoming radiation (ka &gt;&gt; 1 [k is the wavenumber of the incident radiation, a is the effective radius of the grain]). In this regime, the scattering and absorption of X-rays can be calculated using an approximation first developed by van de Hulst (1957) and known as anomalous diffraction theory (ADT). ADT is a combination of ray-tracing optics (applicable because k*a &gt;&gt; 1) and Huygens' principle of propagation of a scalar field, applied to cases in which the electromagnetic wave can enter and propagate through the grain with essentially no reflection or refraction (|m - 1| &lt;&lt; 1).
+
+        <p>Consider an incident plane wave U_inc = U_0\exp(ikz), propagating in the z-direction. Under the conditions above, the plane wave, once reaching a plane V located just beyond the grain and normal to the direction of the propagation of the incident wave, will have changed by a fractional amount that we refer to as the <em>shadow function</em>, f(x,y):
+
+        <p>f(x,y) = 1-\phi(x,y)
+
+        <p>where the complex phase function phi is
+
+        <p>\phi(x,y) = k\int_-\infty^\infty[1-m(x,y,z)]dz
+
+        <p>where m(x,y,z) is the refractive index at the point (x,y,z).
+
+        <p>Once the shadow function is known, Huygens' principle allows the amplitude of the scattered part of the wave, in the radiation zone, to be calculated as a Fourier transform of the shadow function over the plane V:
+
+        <p>U_sca(r\vecn) = U_0\frac\exp(ikr)krS(\vecn)<br>
+S(\vecn) = S(k_x, k_y) = \frack^22\pi\int \exp[i(k_xx+k_yy)]f(x,y)dxdy<br>
+k_x = k(\vecn\cdot\vecx)<br>
+k_y = k(\vecn\cdot\vecy)<br>
+
+        <p>The scattering properties of the grain can be obtained from S(\vecn), with the differential scattering cross section given by
+
+        <p>\fracd\sigma_scad\Omega(\vecn) = \frac|S(\vecn)|^2k^2
+
+        <p>&mdash; Draine and Allaf-Akbari 2006</blockquote>
+
+<h3 class="section">1.2 Basic GGADT logic outline</h3>
+
+<p>GGADT does the following:
+
+     <ol type=1 start=1>
+
+     <li>Reads in dust and x-ray parameters
+<li>For each of the <samp><span class="option">nangle</span></samp> orientations (and <samp><span class="option">nephots</span></samp> photon energies, if the total cross section is being calculated),
+          <ol type=1 start=1>
+<li>Calculate the shadow function of the grain on a 2D grid
+<li>If calculating the differential scattering cross section:
+               <ul>
+<li>Take the centered FFT of this grid using FFTW
+<li>Normalize this result so that it represents dQ_scat/d\Omega, i.e., the differential scattering cross section divided by \pi a^2. 
+<li>Add contribution of differential cross-section to orientational average
+</ul>
+          <li>If calculating the total cross sections:
+               <ul>
+<li>Calculate the cross sections from the shadow function for the given orientation (and photon energy)
+<li>Add contribution of this orientation to the average cross section at the given photon energy
+</ul>
+          </ol>
+
+     <li>Output orientationally averaged grid (if calculating differential scattering cross section) or the energy dependent absorption and scattering cross sections.
+
+        </ol>
+
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> Draine, Bruce T., Physics of the Interstellar and Intergalactic Medium, 2011, Princeton University Press, NJ.</p>
+
+   <p class="footnote"><small>[<a name="fn-2" href="#fnd-2">2</a>]</small> Overbeck, J.W. 1965, ApJ, 141, 864</p>
+
+   <p class="footnote"><small>[<a name="fn-3" href="#fnd-3">3</a>]</small> Hayakawa, S. 1970, Prog. Theor. Phys., 43, 1224</p>
+
+   <p class="footnote"><small>[<a name="fn-4" href="#fnd-4">4</a>]</small> Martin, P.G. 1970, MNRAS, 149, 221</p>
+
+   <p class="footnote"><small>[<a name="fn-5" href="#fnd-5">5</a>]</small> Draine, B.T. 2003, ApJ, 598, 1026</p>
+
+   <p class="footnote"><small>[<a name="fn-6" href="#fnd-6">6</a>]</small> van de Hulst H., Light scattering by small particles, 1957, J.Wiley &amp; Sons, NY.</p>
+
+   <p class="footnote"><small>[<a name="fn-7" href="#fnd-7">7</a>]</small> Draine, B.T. and Allaf-Akbari, K. 2006, ApJ, 652, 1318</p>
+
+   <p><hr></div>
+
+   </body></html>
+
