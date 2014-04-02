@@ -48,6 +48,7 @@ module common_mod
   logical                                ::  asked_for_help
   logical                                ::  verbose_mode
   logical                                ::  timing_mode
+  logical                                ::  material_file_specified
   character(len=200)                     ::  parameter_file_name
 
 
@@ -300,6 +301,7 @@ module common_mod
       rotation_axis = strlowcase(rotation_axis)
       geometry = strlowcase(geometry)
 
+      material_file_specified = option_found(opts,"material-file")
       ! make sure all material files have a corresponding material tag and count number of materials
       nmaterials = 0
       
@@ -318,6 +320,7 @@ module common_mod
         end if 
         
         if (option_found(opts,"material-file"//optname)) then
+          material_file_specified = .TRUE.
           ! can't mix material-file and material-file1,2,... parameters
           if (option_found(opts,"material-file")) then 
             write(stderr,*) "ERROR: Cannot use BOTH --material-file and --material-file(1,2,..) options"
@@ -337,6 +340,7 @@ module common_mod
       
       ! if we're just doing a single composition, 
       if (nmaterials == 0 .and. option_found(opts,"material-file")) then 
+        material_file_specified = .TRUE.
         material_files(1) = material_file 
         nmaterials = 1
       end if 

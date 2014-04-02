@@ -15,7 +15,7 @@ program ggadt
     complex(kind=dp_complex), allocatable :: sh(:,:), ftsh(:,:), phi_total(:,:)
 
     real(kind=dp_real), allocatable :: scatter(:,:)
-    real(kind=dp_real), allocatable :: ephots(:), ior_res(:), ior_ims(:), ior_res_mult(:,:), ior_ims_mult(:,:)
+    real(kind=dp_real), allocatable :: ephots(:), ior_res(:,:), ior_ims(:,:)
 
 
     logical :: multiple_compositions
@@ -59,7 +59,7 @@ contains
         
         do i=1,nephots
             do j=1,nmaterials
-                delms(j) = CMPLX(ior_res_mult(j,i), ior_ims_mult(j,i))
+                delms(j) = CMPLX(ior_res(j,i), ior_ims(j,i))
             end do 
             call get_integrated_cross_sections(ephots(i), delms, sigma_scat, sigma_abs)
             sigma_scats(i) = sigma_scat
@@ -316,15 +316,17 @@ contains
         if(sed_mode) then
             allocate(ephots(nephots),stat=allocatestatus)
                 if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ephots) array ***"
-            allocate(ior_res(nephots),stat=allocatestatus)
-                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ior_res) array ***"
-            allocate(ior_ims(nephots),stat=allocatestatus)
-                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ior_ims) array ***"
-            
+            allocate(ior_res(nmaterials,nephots),stat=allocatestatus) 
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ior_res_mult) array ***"
+            allocate(ior_ims(nmaterials,nephots),stat=allocatestatus)
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ior_ims_mult) array ***"
 
             do i=1,nephots
                 ephots(i) = ephot_min + (i-1)*dephot
             end do
+            do i=1, nmaterials
+                call get_ior(material_files(i), ior_res(i,:), ior_ims(i,:), ior_res_single_en(i), ior_ims_single_en(i))
+            end do 
         end if 
       ! Set Euler angles -------------------------------
         if (euler_angle_mode == 'sequential') then
@@ -523,23 +525,16 @@ contains
     ! -----------------------------------
 
         !write(stderr, *) " going to "
-        if (sed_mode) then
-            allocate(ior_res_mult(nmaterials,nephots),stat=allocatestatus) 
-                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ior_res_mult) array ***"
-            allocate(ior_ims_mult(nmaterials,nephots),stat=allocatestatus)
-                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ior_ims_mult) array ***"
-        end if 
+       
         if (nmaterials .gt. 1) then 
             multiple_compositions = .TRUE.
 
-
-            allocate(agglom_material_tags(nspheres),stat=allocatestatus)
-                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (agglom_material_tags) array ***"
-            
-            do i=1, nmaterials
-                call get_ior(material_files(i), ior_res_mult(i,:), ior_ims_mult(i,:), ior_res_single_en(i), ior_ims_single_en(i))
-            end do 
             if (geometry .eq. "spheres") then 
+                allocate(agglom_material_tags(nspheres),stat=allocatestatus)
+                    if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (agglom_material_tags) array ***"
+                
+                
+                
                 call read_spheres_composition(agglom_composition_file, material_tags, agglom_material_tags)
                 if (.not. sed_mode) then 
                     do i=1,nspheres
@@ -547,21 +542,16 @@ contains
                         ior_r(i) = ior_res_single_en(j)
                         ior_i(i) = ior_ims_single_en(j)
                     end do 
-                end if 
+                end if
             end if 
 
         else 
             multiple_compositions = .FALSE.
-            if (material_file .ne. "") then 
-                call get_ior(material_file, ior_res, ior_ims, ior_re, ior_im)
-                if (geometry .eq. "spheres") then
-                    if (.not. sed_mode) then 
-                        do i=1,nspheres
-                            ior_r(i) = ior_re
-                            ior_i(i) = ior_im
-                        end do 
-                    end if 
-                end if 
+            if (material_file_specified .and. geometry .eq. "spheres" .and. .not. sed_mode) then 
+                do i=1,nspheres
+                    ior_r(i) = ior_res_single_en(1)
+                    ior_i(i) = ior_ims_single_en(1)
+                end do 
             end if 
         end if 
 

@@ -14,7 +14,7 @@ from matplotlib import rc
 from installation_vars import *
 import plot_utilities as pu
 
-FORCE_REDO = False
+FORCE_REDO = True
 plt_abs = True
 plt_ext = True
 plt_scat = True

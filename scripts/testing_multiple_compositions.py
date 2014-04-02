@@ -40,6 +40,7 @@ params = {
 	'material-file2' 	: file2,
 	'material-tag1' 	: tag1,
 	'material-tag2' 	: tag2,	
+	#'material-file' 	: file1,
 	'agglom-composition-file' : None,
 	'grain-geometry' 	: 'spheres',
 	'aeff' 				: 0.2,
@@ -89,11 +90,11 @@ ax_abs.set_xlabel("E [keV]")
 ax_abs.set_ylabel("$Q_{abs}$")
 ax_scat.set_ylabel("$Q_{scat}$")
 ax_scat.plot(data1['ephot'], data1['sig_scat']/Area,color='b',label="All "+tag1)
-ax_scat.plot(data12['ephot'], data12['sig_scat']/Area ,color='k',ls='--',label="Mix "+tag1+" and "+tag2)
+ax_scat.plot(data12['ephot'], data12['sig_scat']/Area ,color='k',ls=':',label="Mix "+tag1+" and "+tag2)
 ax_scat.plot(data2['ephot'], data2['sig_scat']/Area,color='r',label="All "+tag2)
 
 ax_abs.plot(data1['ephot'], data1['sig_abs']/Area,color='b',label="All "+tag1)
-ax_abs.plot(data12['ephot'], data12['sig_abs']/Area,color='k',ls='--',label="Mix "+tag1+" and "+tag2)
+ax_abs.plot(data12['ephot'], data12['sig_abs']/Area,color='k',ls=':',label="Mix "+tag1+" and "+tag2)
 ax_abs.plot(data2['ephot'], data2['sig_abs']/Area,color='r',label="All "+tag2)
 
 ax_scat.legend(loc='best')
