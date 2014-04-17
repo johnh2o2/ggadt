@@ -1,4 +1,4 @@
-AC_INIT([ggadt], [0.9.86], [jah5@princeton.edu])
+AC_INIT([ggadt], [0.9.87], [jah5@princeton.edu])
 AC_PREREQ([2.63]) 
 #AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/sphere.f90])

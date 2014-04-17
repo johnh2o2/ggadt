@@ -8,10 +8,12 @@ module constants
   integer, parameter                            ::  file_unit             = 7
 
   integer, parameter                            ::  max_str_len            = 300
-  
+
   integer, parameter                            ::  max_num_mats         = 3 ! must be less than 100
   
   integer, parameter                            ::  ISIGN                  = 1
+
+  
   @SINGLE_UNCOMMENT@integer, parameter                           ::  dp_real                = 4
   @DOUBLE_UNCOMMENT@integer, parameter                           ::  dp_real                = 8
   integer, parameter                            ::  dp_complex             = dp_real
@@ -43,6 +45,7 @@ module constants
   character(len=200), parameter                 ::  default_cluster_file_name = ''
 
   character(len=100), parameter                 ::  default_fftw_opt_name = 'estimate'
+  integer, parameter                            :: nu_sphere = 100
 
 
 ! New defaults for sed variables
@@ -52,6 +55,7 @@ module constants
   character(len=200), parameter                 ::  default_material               = "custom"
   character(len=200), parameter                 ::  default_material_file          = ""
   real(dp_real), parameter                 ::  default_dephot                 = 0.1
+
      
 
 

@@ -150,7 +150,7 @@ contains
         complex(kind=dp_complex) :: delm
         complex(kind=dp_complex), dimension(10), intent(in) :: delms
 
-        real(kind=dp_real) :: kphot
+        real(kind=dp_real) :: kphot,sigma_ext
         integer :: c1,c2, neul
 
         delm = delms(1)
@@ -159,6 +159,8 @@ contains
 
         sigma_scat = 0.0
         sigma_abs = 0.0
+
+        if (geometry .eq. 'sphere' .and. .not. force_numerical) goto 99
 
         ! loop over orientations        
         do neul = 1,norientations
@@ -169,7 +171,7 @@ contains
             ! calculate rotation matrix corresponding to euler angles
             rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
 
-            if (geometry .eq. 'sphere') then
+            if (geometry .eq. 'sphere' .and. force_numerical) then
 
                 !$omp parallel shared(sh,x,y,kphot,a_eff,delm) 
                 !$omp do schedule(dynamic) private(c1,c2) 
@@ -222,18 +224,23 @@ contains
                 stop
             end if
 
-
+            
             do c1=1,size(x)
                 do c2=1,size(y)
                  sigma_abs = sigma_abs + (1 - exp(-2*AIMAG(phi_total(c1,c2))))*dx*dy 
                  sigma_scat = sigma_scat + (abs(sh(c1,c2))**2)*dx*dy
                 end do 
-            end do
-           
+            end do               
         end do
         
         sigma_scat = sigma_scat/norientations
         sigma_abs = sigma_abs/norientations
+
+99      if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
+            call q_sphere(kphot,a_eff,delm,sigma_abs,sigma_scat,sigma_ext)
+            sigma_abs = sigma_abs*(pi*a_eff*a_eff)
+            sigma_scat = sigma_scat*(pi*a_eff*a_eff)
+        end if 
         
     end subroutine get_integrated_cross_sections
 

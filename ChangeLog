@@ -1,3 +1,9 @@
+* commit 3794b4b48c14cbc1ac56d5e3eb6bb9b94bd45b58
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Apr 1 20:41:59 2014 -0400
+| 
+|     Fixed a bug which was caused when using material-file and not material-file1,2,etc. One subroutine was using the wrong array of indices of refraction (the array it was using was uninitialized), so ggadt printed gibberish. Problem should be fixed now.
+|  
 * commit 2217f259db4c05dcf199fbadaf4175b4dc8f3598
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Mon Mar 31 09:24:03 2014 -0400

@@ -49,6 +49,7 @@ module common_mod
   logical                                ::  verbose_mode
   logical                                ::  timing_mode
   logical                                ::  material_file_specified
+  logical                                ::  force_numerical
   character(len=200)                     ::  parameter_file_name
 
 
@@ -101,6 +102,9 @@ module common_mod
       call define_flag(opts, &
         "sed",&
         description="Generates an SED of the scattering, absorption and extinction cross sections.")
+      call define_flag(opts, &
+        "force-numerical",&
+        description="Forces GGADT to use a numerical, rather than an analytical, solution for spherical grains.")
       call define_option_string(opts,&
         "parameter-file-name","",&
         description="Path to parameter file")
@@ -242,6 +246,7 @@ module common_mod
       call get_option_real(opts,"grain-axis-z",grain_a(3))
       call get_option_real(opts,"ephot",ephot)
       call get_flag(opts,"use-padded-fft",use_padded_fft)
+      call get_flag(opts,"force-numerical",force_numerical)
       call get_flag(opts,"sed",sed_mode)  
       call get_flag(opts,"verbose",verbose_mode)
       call get_flag(opts,"timing",timing_mode)
