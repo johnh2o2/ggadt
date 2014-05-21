@@ -1,3 +1,9 @@
+* commit c9f14c4723f06b935e25084c860f27a1520ee46d
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Wed Apr 16 23:32:00 2014 -0400
+| 
+|     Implemented analytical version of cross section calculation for spheres. Still need to implement analytical solution to the differential cross section for spheres.
+|  
 * commit 3794b4b48c14cbc1ac56d5e3eb6bb9b94bd45b58
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Tue Apr 1 20:41:59 2014 -0400

@@ -247,6 +247,9 @@ contains
     subroutine diff_scat_cross_sect()
         implicit none 
         integer :: neul, i, j
+        real(kind=dp_real) :: th, sc
+
+        if (geometry .eq. 'sphere' .and. .not. force_numerical) goto 99
         ! loop over orientations
         do neul = 1,norientations
 
@@ -267,7 +270,7 @@ contains
                 end do
                 !$omp end do nowait
                 !$omp end parallel
-            elseif  (geometry .eq. 'sphere') then 
+            elseif  (geometry .eq. 'sphere' .and. .not. force_numerical) then 
                 !$omp parallel shared(sh,x,y,rm,k,delm,grain_a)
                 !$omp do schedule(dynamic) private(i,j)
                 do i=1,size(x)
@@ -311,6 +314,20 @@ contains
             end do
         end do
         if (verbose_mode) write(stderr,*) "done."
+
+99      if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
+
+            write(stdout,*) "# [thetax] [thetay] [dqscat/domega]"
+            do i=1,size(thetax)
+                do j=1,size(thetay)
+                    th = sqrt(thetax(i)*thetax(i) + thetay(i)*thetay(i))
+                    sc = scatter_sphere(k,a_eff,th,delm)/(pi*a_eff*a_eff)
+                   
+                    write(stdout,*) thetax(i),thetay(j), sc
+                end do
+            end do
+
+        end if 
     end subroutine diff_scat_cross_sect
 
     subroutine initialize_and_allocate_vars()

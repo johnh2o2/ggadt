@@ -2,58 +2,57 @@ module constants
   implicit none
 
   save
-  integer, parameter                            ::  stdout                 = 6
-  integer, parameter                            ::  stderr                 = 0
-  integer, parameter                            ::  input_unit             = 1
-  integer, parameter                            ::  file_unit             = 7
+  integer, parameter                       ::  stdout                         = 6
+  integer, parameter                       ::  stderr                         = 0
+  integer, parameter                       ::  input_unit                     = 1
+  integer, parameter                       ::  file_unit                      = 7
 
-  integer, parameter                            ::  max_str_len            = 300
-
-  integer, parameter                            ::  max_num_mats         = 3 ! must be less than 100
+  integer, parameter                       ::  max_str_len                    = 300
+  integer, parameter                       ::  max_num_mats                   = 3 ! must be less than 100
   
-  integer, parameter                            ::  ISIGN                  = 1
+  integer, parameter                       ::  ISIGN                          = 1
 
   
   @SINGLE_UNCOMMENT@integer, parameter                           ::  dp_real                = 4
   @DOUBLE_UNCOMMENT@integer, parameter                           ::  dp_real                = 8
-  integer, parameter                            ::  dp_complex             = dp_real
-  integer, parameter                            ::  ip                     = 4
-  real(dp_real), parameter                 ::  pi                     = 3.14159265358979323846
-  real(dp_real), parameter                 ::  twopi                  = 2*3.14159265358979323846
-  real(dp_real), parameter                 ::  HUGE_NUMBER            = 1.0D20
-  real(dp_real), parameter                 ::  ARCSECONDS_PER_RADIAN  = (360.0D0*60.0D0*60.0D0)/(2.0D0*pi)
-  integer, parameter                            ::  MAX_NGRID              = 2048
+  integer, parameter                       ::  dp_complex                     = dp_real
+  integer, parameter                       ::  ip                             = 4
+  real(dp_real), parameter                 ::  pi                             = 3.14159265358979323846
+  real(dp_real), parameter                 ::  twopi                          = 2*3.14159265358979323846
+  real(dp_real), parameter                 ::  HUGE_NUMBER                    = 1.0D20
+  real(dp_real), parameter                 ::  ARCSECONDS_PER_RADIAN          = (360.0D0*60.0D0*60.0D0)/(2.0D0*pi)
+  integer, parameter                       ::  MAX_NGRID                      = 2048
 
 
-  real(dp_real), parameter                 ::  default_aeff           = 0.2
-  real(dp_real), parameter                 ::  default_ephot          = 2.0
-  real(dp_real), parameter                 ::  default_grain_a1       = 1.0
-  real(dp_real), parameter                 ::  default_grain_a2       = 1.0
-  real(dp_real), parameter                 ::  default_grain_a3       = 1.0
-  real(dp_real), parameter                 ::  default_ior_re         = -1.920E-4
-  real(dp_real), parameter                 ::  default_ior_im         = 2.807E-5
-  real(dp_real), parameter                 ::  default_grain_axis_ratio = 1.0
-  character(len=200), parameter                 ::  default_grain_geometry = 'sphere'
-  character(len=50), parameter                  ::  default_euler_angle_mode = 'random'
-  character(len=50), parameter                  ::  default_rotation_axis = 'none'
-  character(len=200), parameter                 ::  default_euler_angle_file = ''
-  integer, parameter                            ::  default_ngrain         = 256
-  integer, parameter                            ::  default_nscatter       = 100
-  integer, parameter                            ::  default_norientations  = 100
-  real(dp_real), parameter                 ::  default_dtheta         = 10.0
-  real(dp_real), parameter                 ::  default_max_angle      = 3000.
-  character(len=200), parameter                 ::  default_cluster_file_name = ''
+  real(dp_real), parameter                 ::  default_aeff                   = 0.2
+  real(dp_real), parameter                 ::  default_ephot                  = 2.0
+  real(dp_real), parameter                 ::  default_grain_a1               = 1.0
+  real(dp_real), parameter                 ::  default_grain_a2               = 1.0
+  real(dp_real), parameter                 ::  default_grain_a3               = 1.0
+  real(dp_real), parameter                 ::  default_ior_re                 = -1.920E-4
+  real(dp_real), parameter                 ::  default_ior_im                 = 2.807E-5
+  real(dp_real), parameter                 ::  default_grain_axis_ratio       = 1.0
+  character(len=200), parameter            ::  default_grain_geometry         = 'sphere'
+  character(len=50), parameter             ::  default_euler_angle_mode       = 'random'
+  character(len=50), parameter             ::  default_rotation_axis          = 'none'
+  character(len=200), parameter            ::  default_euler_angle_file       = ''
+  integer, parameter                       ::  default_ngrain                 = 256
+  integer, parameter                       ::  default_nscatter               = 100
+  integer, parameter                       ::  default_norientations          = 100
+  real(dp_real), parameter                 ::  default_dtheta                 = 10.0
+  real(dp_real), parameter                 ::  default_max_angle              = 3000.
+  character(len=200), parameter            ::  default_cluster_file_name      = ''
 
-  character(len=100), parameter                 ::  default_fftw_opt_name = 'estimate'
-  integer, parameter                            :: nu_sphere = 100
+  character(len=100), parameter            ::  default_fftw_opt_name          = 'estimate'
+  integer, parameter                       :: nu_sphere                       = 100
 
 
 ! New defaults for sed variables
-  integer, parameter                            ::  default_nephots                = 100
+  integer, parameter                       ::  default_nephots                = 100
   real(dp_real), parameter                 ::  default_ephot_min              = 0.1
   real(dp_real), parameter                 ::  default_ephot_max              = 5.0
-  character(len=200), parameter                 ::  default_material               = "custom"
-  character(len=200), parameter                 ::  default_material_file          = ""
+  character(len=200), parameter            ::  default_material               = "custom"
+  character(len=200), parameter            ::  default_material_file          = ""
   real(dp_real), parameter                 ::  default_dephot                 = 0.1
 
      
