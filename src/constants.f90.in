@@ -44,7 +44,7 @@ module constants
   character(len=200), parameter            ::  default_cluster_file_name      = ''
 
   character(len=100), parameter            ::  default_fftw_opt_name          = 'estimate'
-  integer, parameter                       :: nu_sphere                       = 100
+  integer, parameter                       :: nu_sphere                       = 1000
 
 
 ! New defaults for sed variables

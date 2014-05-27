@@ -1,15 +1,15 @@
 <html lang="en">
 <head>
-<title>Invoking GGADT - GGADT 0.9.87</title>
+<title>Invoking GGADT - GGADT 0.9.88</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="GGADT 0.9.87">
+<meta name="description" content="GGADT 0.9.88">
 <meta name="generator" content="makeinfo 4.8">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="prev" href="Installation.html#Installation" title="Installation">
 <link rel="next" href="Example-usage.html#Example-usage" title="Example usage">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
-This manual is for GGADT (version 0.9.87, 29 March 2014),
+This manual is for GGADT (version 0.9.88, 27 May 2014),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT).
 
@@ -56,7 +56,7 @@ To see usage and all available options for <code>ggadt</code>, simply use the <s
 
 <pre class="example">     ggadt <var>option</var> ...
 </pre>
-   <p>With no options, <samp><span class="command">ggadt</span></samp> runs calculations on a set of default grain parameters. By default GGADT will calculate the differential scattering cross section as a function of scattering angle. To calculate the scattering and absorption cross sections for a range of energies, add the <code>--sed</code> flag as a command-line argument.
+   <p>With no options, <samp><span class="command">ggadt</span></samp> runs calculations on a set of default grain parameters. By default GGADT will calculate the differential scattering cross section as a function of scattering angle. To calculate the integrated scattering and absorption cross sections for a range of energies, add the <code>--integrated</code> flag as a command-line argument.
 
    <p>Parameters may be specified as command-line arguments,
 
@@ -201,7 +201,7 @@ standard output and then exit successfully.
 <p>You must also define a <code>--material-file</code> to do this calculation.
 
      <dl>
-<dt><samp><span class="option">--sed</span></samp><dd><a name="index-g_t_002d_002dsed-46"></a>This flag tells GGADT that you would like to calculate the energy-dependent absorption and scattering cross sections.
+<dt><samp><span class="option">--integrated</span></samp><dd><a name="index-g_t_002d_002dintegrated-46"></a>This flag tells GGADT that you would like to calculate the energy-dependent integrated absorption and scattering cross sections.
 
      <br><dt><samp><span class="option">--nephots=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dnephots-47"></a>Defines the number of photon energies to calculate the cross sections between <code>--ephot-min</code> and <code>--ephot-max</code>. You can also define the energy spacing directly, via the <code>--dephot</code> parameter.
 

@@ -1,5 +1,5 @@
-AC_INIT([ggadt], [0.9.87], [jah5@princeton.edu])
-AC_PREREQ([2.63]) 
+AC_INIT([ggadt], [0.9.88], [jah5@princeton.edu])
+AC_PREREQ([2.69]) 
 #AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/sphere.f90])
 
@@ -37,15 +37,15 @@ AC_ARG_ENABLE([openmp],
 esac],[openmp=false])
 AM_CONDITIONAL([OMP], [test x$openmp = xtrue])
 
-#Enable user to choose double precision
-AC_ARG_ENABLE([double],
-[  --enable-double   Use double precision ],
+#Enable user to choose single precision
+AC_ARG_ENABLE([single],
+[  --enable-single   Use single precision (not recommended) ],
 [case "${enableval}" in
-  yes) use_double=true ;; 
-  no)  use_double=false ;;
+  yes) use_double=false ;; 
+  no)  use_double=true ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-double]) ;;
 esac],[use_double=false])
-AM_CONDITIONAL([OMP], [test x$use_double = xtrue])
+AM_CONDITIONAL([SINGLE], [test x$use_double = xfalse])
 
 #specify that you want to use the FFTW3 algorithm for your FFT's
 AC_ARG_ENABLE([fftw3],
@@ -55,7 +55,7 @@ AC_ARG_ENABLE([fftw3],
   no)  fftw3=false ; using_fftw3=false ; using_gpfa=true ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-fftw3]) ;;
 esac],[using_fftw3=false ; using_gpfa=true])
-AM_CONDITIONAL([OMP], [test x$openmp = xtrue])
+AM_CONDITIONAL([FFTW3], [test x$using_fftw3 = xtrue])
 
 AC_CHECK_LIB([m],[cos]) #check for the math library
 
@@ -112,7 +112,7 @@ case $host_os in
         ;;
     *)
         # Default case
-        AC_MSG_ERROR([Your platform is not currently supported])
+        AC_MSG_WARN([Your platform is not recognized; we will try to configure anyway!])
         ;;
 esac
 FFTW3_UNCOMMENT="!"
@@ -133,6 +133,7 @@ USE_GPFA=
 
 if test $using_fftw3 = true
   then
+  #AC_MSG_CHECKING([USER HAS SET FFTW, checking for library.])
   FFTW3_UNCOMMENT=
   FFTW3_COMMENT="!"
 
@@ -143,7 +144,7 @@ if test $using_fftw3 = true
   #Try to find the fftw3.f03 headers
 
   fftw3_inc_dir=${ac_srcdir}
-  AC_FIND_FILE("fftw3.f03", [ /usr/local/include /usr/include ${ac_srcdir} ${ac_prefix}/include $macports_include ], fftw3_fortran_header)
+  AC_FIND_FILE("fftw3.f03",  /usr/local/include /usr/include ${ac_srcdir} ${ac_prefix}/include $macports_include , fftw3_fortran_header)
 
   if test -f "${macports_include}/fftw3.f03"
   then 

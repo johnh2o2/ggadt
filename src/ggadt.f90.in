@@ -35,7 +35,7 @@ program ggadt
     
     if (verbose_mode) call print_parameters(stderr)
 
-    if (sed_mode) then 
+    if (integrated_mode) then 
         call calculate_sed_of_cross_sections()
     else
         call diff_scat_cross_sect()
@@ -55,7 +55,7 @@ contains
         integer :: i, j
 
 
-        write(stdout,*) "# [ephot] [sigma_scat] [sigma_abs]"
+        write(stdout,*) "# [ephot] [sigma_scat] [sigma_abs] [sigma_ext]"
         
         do i=1,nephots
             do j=1,nmaterials
@@ -69,7 +69,7 @@ contains
         end do
         
         do i=1,nephots
-            write(stdout,*) ephots(i), sigma_scats(i), sigma_abss(i)
+            write(stdout,*) ephots(i), sigma_scats(i), sigma_abss(i), sigma_scats(i) + sigma_abss(i) 
         end do
 
 
@@ -131,7 +131,7 @@ contains
         iorre = linterp(file_ephots,file_ior_re,ephot)
         iorim = linterp(file_ephots,file_ior_im,ephot)
 
-        if (sed_mode) then 
+        if (integrated_mode) then 
 
             do i=1,nephots
                 iorres(i) = linterp(file_ephots,file_ior_re,ephots(i))
@@ -160,174 +160,184 @@ contains
         sigma_scat = 0.0
         sigma_abs = 0.0
 
-        if (geometry .eq. 'sphere' .and. .not. force_numerical) goto 99
-
-        ! loop over orientations        
-        do neul = 1,norientations
-
-            ! fetch Euler angles
-            eul_ang = get_new_euler_angles(neul)
-
-            ! calculate rotation matrix corresponding to euler angles
-            rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
-
-            if (geometry .eq. 'sphere' .and. force_numerical) then
-
-                !$omp parallel shared(sh,x,y,kphot,a_eff,delm) 
-                !$omp do schedule(dynamic) private(c1,c2) 
-                 do c1=1,size(x)
-                    do c2=1,size(y)
-                        sh(c1,c2) = shadow_sphere(x(c1),y(c2), kphot, a_eff, delm)
-                        phi_total(c1,c2) = phi_sphere(x(c1),y(c2),kphot,a_eff,delm)
-                    end do
-                 end do
-                !$omp end do nowait
-                !$omp end parallel
-
-
-            else if (geometry .eq. 'spheres') then 
-                call rotate_spheres(rm)
-                do c1=1,nspheres
-                    if (multiple_compositions) then
-                        c2 = agglom_material_tags(c1)
-                        delm = delms(c2)
-                    end if 
-                    ior_r(c1) = REAL(delm)
-                    ior_i(c1) = AIMAG(delm)
-                end do
-                
-                phi_total = phi_spheres(x,y,kphot)
-                !$omp parallel shared(sh,phi_total) 
-                !$omp do schedule(dynamic) private(c1,c2) 
-                do c1=1,size(x)
-                    do c2=1,size(y)
-                        sh(c1,c2) = 1-exp( (0.0,1.0)*phi_total(c1,c2) )
-                    end do
-                 end do
-                !$omp end do nowait
-                !$omp end parallel
-            else if (geometry .eq. 'ellipsoid') then 
-
-                !$omp parallel shared(sh,phi_total,x,y,kphot,grain_a,delm,rm) 
-                !$omp do schedule(dynamic) private(c1,c2) 
-                do c1=1,size(x)
-                    do c2=1,size(y)
-                        sh(c1,c2) = shadow_ellipsoid(x(c1),y(c2), kphot, grain_a, delm, rm)
-                        phi_total(c1,c2) = phi_ellipsoid(x(c1),y(c2),kphot, grain_a, delm,rm )
-                    
-                    end do
-                end do
-                !$omp end do nowait
-                !$omp end parallel
-            else 
-                write(stderr,*) "ERROR: Do not understand geometry=",geometry
-                stop
-            end if
-
-            
-            do c1=1,size(x)
-                do c2=1,size(y)
-                 sigma_abs = sigma_abs + (1 - exp(-2*AIMAG(phi_total(c1,c2))))*dx*dy 
-                 sigma_scat = sigma_scat + (abs(sh(c1,c2))**2)*dx*dy
-                end do 
-            end do               
-        end do
-        
-        sigma_scat = sigma_scat/norientations
-        sigma_abs = sigma_abs/norientations
-
-99      if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
+        if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
             call q_sphere(kphot,a_eff,delm,sigma_abs,sigma_scat,sigma_ext)
             sigma_abs = sigma_abs*(pi*a_eff*a_eff)
             sigma_scat = sigma_scat*(pi*a_eff*a_eff)
-        end if 
+        else 
+
+            ! loop over orientations        
+            do neul = 1,norientations
+
+                ! fetch Euler angles
+                eul_ang = get_new_euler_angles(neul)
+
+                ! calculate rotation matrix corresponding to euler angles
+                rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
+
+                if (geometry .eq. 'sphere') then
+
+                    !$omp parallel shared(sh,x,y,kphot,a_eff,delm) 
+                    !$omp do schedule(dynamic) private(c1,c2) 
+                     do c1=1,size(x)
+                        do c2=1,size(y)
+                            sh(c1,c2) = shadow_sphere(x(c1),y(c2), kphot, a_eff, delm)
+                            phi_total(c1,c2) = phi_sphere(x(c1),y(c2),kphot,a_eff,delm)
+                        end do
+                     end do
+                    !$omp end do nowait
+                    !$omp end parallel
+
+
+                else if (geometry .eq. 'spheres') then 
+                    call rotate_spheres(rm)
+                    do c1=1,nspheres
+                        if (multiple_compositions) then
+                            c2 = agglom_material_tags(c1)
+                            delm = delms(c2)
+                        end if 
+                        ior_r(c1) = REAL(delm)
+                        ior_i(c1) = AIMAG(delm)
+                    end do
+                    
+                    phi_total = phi_spheres(x,y,kphot)
+                    !$omp parallel shared(sh,phi_total) 
+                    !$omp do schedule(dynamic) private(c1,c2) 
+                    do c1=1,size(x)
+                        do c2=1,size(y)
+                            sh(c1,c2) = 1-exp( (0.0,1.0)*phi_total(c1,c2) )
+                        end do
+                     end do
+                    !$omp end do nowait
+                    !$omp end parallel
+                else if (geometry .eq. 'ellipsoid') then 
+
+                    !$omp parallel shared(sh,phi_total,x,y,kphot,grain_a,delm,rm) 
+                    !$omp do schedule(dynamic) private(c1,c2) 
+                    do c1=1,size(x)
+                        do c2=1,size(y)
+                            sh(c1,c2) = shadow_ellipsoid(x(c1),y(c2), kphot, grain_a, delm, rm)
+                            phi_total(c1,c2) = phi_ellipsoid(x(c1),y(c2),kphot, grain_a, delm,rm )
+                        
+                        end do
+                    end do
+                    !$omp end do nowait
+                    !$omp end parallel
+                else 
+                    write(stderr,*) "ERROR: Do not understand geometry=",geometry
+                    stop
+                end if
+
+                
+                do c1=1,size(x)
+                    do c2=1,size(y)
+                     sigma_abs = sigma_abs + (1 - exp(-2*AIMAG(phi_total(c1,c2))))*dx*dy 
+                     sigma_scat = sigma_scat + (abs(sh(c1,c2))**2)*dx*dy
+                    end do 
+                end do               
+            end do
         
+            sigma_scat = sigma_scat/norientations
+            sigma_abs = sigma_abs/norientations
+        end if 
+
     end subroutine get_integrated_cross_sections
 
     subroutine diff_scat_cross_sect()
         implicit none 
         integer :: neul, i, j
-        real(kind=dp_real) :: th, sc
-
-        if (geometry .eq. 'sphere' .and. .not. force_numerical) goto 99
-        ! loop over orientations
-        do neul = 1,norientations
-
-            ! fetch Euler angles
-            eul_ang = get_new_euler_angles(neul)
-
-            ! calculate rotation matrix corresponding to euler angles
-            rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
-            
-
-            if (geometry .eq. 'ellipsoid') then 
-                !$omp parallel shared(sh,x,y,rm,k,delm,grain_a) 
-                !$omp do schedule(dynamic) private(i,j)
-                do i=1,size(x)
-                    do j=1,size(y)
-                        sh(i,j) = shadow_ellipsoid(x(i),y(j),k,grain_a,delm,rm)
-                    end do
-                end do
-                !$omp end do nowait
-                !$omp end parallel
-            elseif  (geometry .eq. 'sphere' .and. .not. force_numerical) then 
-                !$omp parallel shared(sh,x,y,rm,k,delm,grain_a)
-                !$omp do schedule(dynamic) private(i,j)
-                do i=1,size(x)
-                    do j=1,size(y)
-                        sh(i,j) = shadow_sphere(x(i),y(j), k, a_eff, delm)
-                    end do
-                end do
-                !$omp end do nowait
-                !$omp end parallel
-            elseif (geometry .eq. 'spheres')    then
-                call rotate_spheres(rm)
-                sh = shadow_spheres(x,y,k)
-            else
-                write(stderr,*) "ERROR: Do not understand geometry: ", geometry
-            end if 
-           
-            call fft_faster(sh,kmin,kmax,enhancement, ftsh)
-
-            !$omp parallel shared(scatter,ftsh,k,dx,dy,norientations) 
-            !$omp do schedule(dynamic) private(i,j)
-            do i=1,size(kx)
-                do j=1,size(ky)
-                    scatter(i,j) = scatter(i,j) + ((k*dx*dy*abs(ftsh(i,j))/twopi)**2)/real(norientations,kind=dp_real)
-                end do
-            end do
-            !$omp end do nowait
-            !$omp end parallel
-
-
-            write(stderr,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
-                    & " percent complete: ", (real(neul)/real(norientations))*100.0, "%"
-        end do
-
-        if (timing_mode) stop 
-
-        write(stdout,*) "# [thetax] [thetay] [dqscat/domega]"
+        real(kind=dp_real) :: th, sc, dth
+        real(kind=dp_real), dimension(10*size(thetax)) :: sc_array, thets
         
-        do i=1,size(thetax)
-            do j=1,size(thetay)
-                write(stdout,*) thetax(i),thetay(j),scatter(j,i)/(pi*a_eff*a_eff)
-            end do
-        end do
-        if (verbose_mode) write(stderr,*) "done."
 
-99      if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
 
+        if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
+            if (verbose_mode) write(stderr,*) " Using analytical ADT for sphere..."
+
+            ! Make a table of values for S(theta)
+            dth = (1.5*thetax(size(thetax)) - thetax(1))/REAL(size(thets)-1, kind=dp_real)
+            do i=1,size(thets)
+                thets(i) = thetax(1) + (i-1)*dth
+                sc_array(i) = scatter_sphere(k,a_eff,thets(i),delm)
+            end do 
+
+            ! Now output differential scattering cross section
             write(stdout,*) "# [thetax] [thetay] [dqscat/domega]"
             do i=1,size(thetax)
                 do j=1,size(thetay)
-                    th = sqrt(thetax(i)*thetax(i) + thetay(i)*thetay(i))
-                    sc = scatter_sphere(k,a_eff,th,delm)/(pi*a_eff*a_eff)
+                    th = sqrt(thetax(i)*thetax(i) + thetay(j)*thetay(j))
+                    sc = linterp(thets,sc_array,th)/(pi*a_eff*a_eff)
                    
                     write(stdout,*) thetax(i),thetay(j), sc
                 end do
             end do
+        else 
+            ! loop over orientations
+            do neul = 1,norientations
 
-        end if 
+                ! fetch Euler angles
+                eul_ang = get_new_euler_angles(neul)
+
+                ! calculate rotation matrix corresponding to euler angles
+                rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
+                
+
+                if (geometry .eq. 'ellipsoid') then 
+                    !$omp parallel shared(sh,x,y,rm,k,delm,grain_a) 
+                    !$omp do schedule(dynamic) private(i,j)
+                    do i=1,size(x)
+                        do j=1,size(y)
+                            sh(i,j) = shadow_ellipsoid(x(i),y(j),k,grain_a,delm,rm)
+                        end do
+                    end do
+                    !$omp end do nowait
+                    !$omp end parallel
+                elseif  (geometry .eq. 'sphere') then 
+                    !$omp parallel shared(sh,x,y,rm,k,delm,grain_a)
+                    !$omp do schedule(dynamic) private(i,j)
+                    do i=1,size(x)
+                        do j=1,size(y)
+                            sh(i,j) = shadow_sphere(x(i),y(j), k, a_eff, delm)
+                        end do
+                    end do
+                    !$omp end do nowait
+                    !$omp end parallel
+                elseif (geometry .eq. 'spheres')    then
+                    call rotate_spheres(rm)
+                    sh = shadow_spheres(x,y,k)
+                else
+                    write(stderr,*) "ERROR: Do not understand geometry: ", geometry
+                end if 
+               
+                call fft_faster(sh,kmin,kmax,enhancement, ftsh)
+
+                !$omp parallel shared(scatter,ftsh,k,dx,dy,norientations) 
+                !$omp do schedule(dynamic) private(i,j)
+                do i=1,size(kx)
+                    do j=1,size(ky)
+                        scatter(i,j) = scatter(i,j) + ((k*dx*dy*abs(ftsh(i,j))/twopi)**2)/real(norientations,kind=dp_real)
+                    end do
+                end do
+                !$omp end do nowait
+                !$omp end parallel
+
+
+                write(stderr,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
+                        & " percent complete: ", (real(neul)/real(norientations))*100.0, "%"
+            end do
+
+            if (timing_mode) stop 
+
+            write(stdout,*) "# [thetax] [thetay] [dqscat/domega]"
+            
+            do i=1,size(thetax)
+                do j=1,size(thetay)
+                    write(stdout,*) thetax(i),thetay(j),scatter(j,i)/(pi*a_eff*a_eff)
+                end do
+            end do
+            if (verbose_mode) write(stderr,*) "done."
+
+        endif 
     end subroutine diff_scat_cross_sect
 
     subroutine initialize_and_allocate_vars()
@@ -337,7 +347,8 @@ contains
       real(kind=dp_real) :: ds, max_dist, scale
       character(len=100) :: junk
 
-        if(sed_mode) then
+        if(integrated_mode) then
+        ! -- Allocate variables 
             allocate(ephots(nephots),stat=allocatestatus)
                 if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ephots) array ***"
             allocate(ior_res(nmaterials,nephots),stat=allocatestatus) 
@@ -473,7 +484,7 @@ contains
         ! sh
         allocate(sh(ngrid,ngrid),stat = allocatestatus)
             if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (sh) array ***"
-        if (sed_mode) then
+        if (integrated_mode) then
          !   allocate(phi1(ngrid,ngrid),stat = allocatestatus)
          !       if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi1) array ***"
          !   allocate(phi2(ngrid,ngrid),stat = allocatestatus)
@@ -560,7 +571,7 @@ contains
                 
                 
                 call read_spheres_composition(agglom_composition_file, material_tags, agglom_material_tags)
-                if (.not. sed_mode) then 
+                if (.not. integrated_mode) then 
                     do i=1,nspheres
                         j = agglom_material_tags(i)
                         ior_r(i) = ior_res_single_en(j)
@@ -571,7 +582,7 @@ contains
 
         else 
             multiple_compositions = .FALSE.
-            if (material_file_specified .and. geometry .eq. "spheres" .and. .not. sed_mode) then 
+            if (material_file_specified .and. geometry .eq. "spheres" .and. .not. integrated_mode) then 
                 do i=1,nspheres
                     ior_r(i) = ior_res_single_en(1)
                     ior_i(i) = ior_ims_single_en(1)
@@ -763,7 +774,7 @@ contains
         integer, intent(in) :: i
         write(i,*) "# Parameter values"
         write(i,*) "# -----------------------------------"
-        if (.not. sed_mode) then 
+        if (.not. integrated_mode) then 
             write(i,*) "# delm: ",delm
             write(i,*) "# ephot: ",ephot
             write(i,*) "# nscatter: ",nscatter

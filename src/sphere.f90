@@ -48,19 +48,25 @@ module sphere
         implicit none
         real(kind=dp_real), intent(in) :: x
         complex(kind=dp_complex), intent(in) :: rho
-        real(kind=dp_real) :: func1, umin, umax, du, u
+        complex(kind=dp_complex) :: func1, val1, val2
+        real(kind=dp_real) :: umin, umax, du, u
         integer :: i 
 
-        umin = 0
+        umin = 0.0
         umax = PI/2.0
         du = (umax - umin)/nu_sphere
 
         func1 = 0.0
+        val1 = 0.0
+        val2 = 0.0
 
         do i=0,(nu_sphere-1)
             u = umin + i*du
-            func1 = func1 + du*(1 - exp(-(0.0,1.0)*rho*sin(u)))*BesJ0(x*cos(u))*sin(u)*cos(u)
+            val1 = val1 + du*exp(-(0.0,1.0)*rho*sin(u))*BesJ0(x*cos(u))*sin(u)*cos(u)
+            val2 = val2 + du*BesJ0(x*cos(u))*sin(u)*cos(u)
         end do
+
+        func1 = val2 - val1
 
     end function func1
 
@@ -69,12 +75,16 @@ module sphere
         real(kind=dp_real), intent(in) :: k,aeff, theta
         complex(kind=dp_complex), intent(in) :: delta_m
 
-        complex(kind=dp_complex) :: scatter_sphere, rho
-        real(kind=dp_real) :: x
+        complex(kind=dp_complex) :: sc, rho
+        real(kind=dp_real) :: x, scatter_sphere
 
         rho = 2*k*aeff*delta_m
         x = k*aeff*theta
-        scatter_sphere = k*k*aeff*aeff*func1(x,rho)
+        sc = k*k*aeff*aeff*func1(x,rho)
+
+        scatter_sphere = REAL(ABS(sc),kind=dp_real)*REAL(ABS(sc),kind=dp_real)/(k*k)
+
+
         
 
     end function scatter_sphere

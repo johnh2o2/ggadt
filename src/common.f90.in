@@ -60,7 +60,8 @@ module common_mod
   real(dp_real)                          ::  ephot_max 
  !character(len=200)                     ::  material          ! name of predefined material
   character(len=200)                     ::  material_file     ! file that defines ior_re and ior_im for a range of energies
-  logical                                ::  sed_mode          ! are we doing the spectral energy distribution? Maybe
+  logical                                ::  integrated_mode          
+                                                               !   integrated cross section mode
                                                                !   it's better to define a global "mode" variable
                                                                !   with a default value and then the user only has 
                                                                !   to specify "--mode='sed'" or something
@@ -100,8 +101,8 @@ module common_mod
         "timing",abbrev='t',&
         description="suppresses output for timing purposes")
       call define_flag(opts, &
-        "sed",&
-        description="Generates an SED of the scattering, absorption and extinction cross sections.")
+        "integrated",&
+        description="Generates integrated cross sections (scattering, absorption and extinction) as a function of photon energy")
       call define_flag(opts, &
         "force-numerical",&
         description="Forces GGADT to use a numerical, rather than an analytical, solution for spherical grains.")
@@ -247,7 +248,7 @@ module common_mod
       call get_option_real(opts,"ephot",ephot)
       call get_flag(opts,"use-padded-fft",use_padded_fft)
       call get_flag(opts,"force-numerical",force_numerical)
-      call get_flag(opts,"sed",sed_mode)  
+      call get_flag(opts,"sed",integrated_mode)  
       call get_flag(opts,"verbose",verbose_mode)
       call get_flag(opts,"timing",timing_mode)
       call get_option_real(opts,"ior-re",ior_re)

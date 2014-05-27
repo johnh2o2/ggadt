@@ -248,7 +248,7 @@ The format for running the @command{ggadt} program is:
 ggadt @var{option} @dots{}
 @end example
 
-With no options, @command{ggadt} runs calculations on a set of default grain parameters. By default GGADT will calculate the differential scattering cross section as a function of scattering angle. To calculate the scattering and absorption cross sections for a range of energies, add the @code{--sed} flag as a command-line argument.
+With no options, @command{ggadt} runs calculations on a set of default grain parameters. By default GGADT will calculate the differential scattering cross section as a function of scattering angle. To calculate the integrated scattering and absorption cross sections for a range of energies, add the @code{--integrated} flag as a command-line argument.
 
 Parameters may be specified as command-line arguments, 
 
@@ -481,9 +481,9 @@ You must also define a @code{--material-file} to do this calculation.
 
 @table @option
 
-@item --sed
-@opindex --sed
-This flag tells GGADT that you would like to calculate the energy-dependent absorption and scattering cross sections. 
+@item --integrated
+@opindex --integrated
+This flag tells GGADT that you would like to calculate the energy-dependent integrated absorption and scattering cross sections. 
 
 @item --nephots=@var{value}
 @opindex --nephots
