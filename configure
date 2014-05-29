@@ -5446,7 +5446,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile doc/Makefile src/fftwmod.f90 src/spheres.f90 src/common.f90 src/constants.f90 src/options.f90 src/ggadt.f90 scripts/installation_vars.py"
+ac_config_files="$ac_config_files Makefile src/Makefile doc/Makefile src/fftwmod.f90 src/spheres.f90 src/common.f90 src/constants.f90 src/options.f90 src/ggadt.f90 scripts/installation_vars.py .defaults"
 
 
 
@@ -6244,6 +6244,7 @@ do
     "src/options.f90") CONFIG_FILES="$CONFIG_FILES src/options.f90" ;;
     "src/ggadt.f90") CONFIG_FILES="$CONFIG_FILES src/ggadt.f90" ;;
     "scripts/installation_vars.py") CONFIG_FILES="$CONFIG_FILES scripts/installation_vars.py" ;;
+    ".defaults") CONFIG_FILES="$CONFIG_FILES .defaults" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

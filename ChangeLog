@@ -1,3 +1,9 @@
+* commit 59e9cfd153f82e38b4073c8f2dab8a45e5e65f82
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue May 27 18:10:41 2014 -0400
+| 
+|     Fixed the bug in the analytic calculation of the differential scattering cross section (for a spherical grain). This still needs to be validated (there might still be significant differences between the analytical and numerical expressions) against Mie theory. The fudge factors are the 'nu_sphere' parameter defined in constants.f90.in, and the number of thetas for which to interpolate S(theta). Right now we use 10*size(thetax), but changing this might produce a few percent difference... Also changed 'sed' flag to 'integrated' flag. I think 'integrated' makes more sense than 'sed' for telling GGADT you want to calculate the integrated scattering/absorption cross sections. GGADT ALSO now outputs sigma_ext in addition to sigma_scat and sigma_abs.
+|  
 * commit 2104552302abaa2f9acc357ccf62fc0661b63e84
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Wed May 21 16:49:02 2014 -0400

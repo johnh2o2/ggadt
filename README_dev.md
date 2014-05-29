@@ -10,6 +10,11 @@ I've written GGADT with the goal of being as compatible as possible (within the 
 GGADT is public domain, open-source software, and you are free to amend, change, and improve the code in any way you see fit. If you have particular suggestions for future GGADT releases, feel free to e-mail me (John Hoffman, e-mail at the top of this file). The GitHub page (which should have the latest edition of GGADT) is provided above.
 
 
+###TODO list
+
+* Add ability for user to define a defaults file.
+* Add options to control (1) units of the output parameters, (2) whether or not to output Q or sigma, (3) some fudge parameters for interpolation and integration accuracy, etcetera.
+
 ###Using GNU Autoconf and Automake utilities
 
 Relevant files: **/Makefile.am, *.in, configure.ac, etc.
@@ -50,6 +55,8 @@ If you write your own [to be continued...]
 
 
 ###Source files and their purpose
+
+
 
 
 

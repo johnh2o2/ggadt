@@ -18,6 +18,7 @@ from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 
 LOGPLOT = True
+verbose = False
 
 nplot = 250 # dimension of plotted grid (interpolated)
 delta = 250 # distance above or below theta min/max for interpolation purposes
@@ -65,7 +66,7 @@ for i in range(0,len(z)):
 		th_max_data = x[i]
 
 max_angle = th_max_data
-print "max_angle = ",max_angle
+if verbose: print "max_angle = ",max_angle
 
 # min/max scattering angles to deal with
 xmin = -max_angle
@@ -76,7 +77,7 @@ ymax = xmax
 if num_zeros == len(z):
 	print "ALL ZERO!"
 	sys.exit()
-print num_infs," infinities found in the data. Replaced them with linearly interpolated values."
+if num_infs > 0: print num_infs," infinities found in the data. Replaced them with linearly interpolated values."
 
 
 # Now filter out data at high scattering angles (otherwise it takes too long to interpolate)
@@ -97,7 +98,7 @@ z = np.array(z_new)
 # Figure out dimension and reshape x,y and z
 n = 0
 while x[n] == x[0]: n+=1
-print n
+#print n
 x = np.reshape(x,(n,n))
 y = np.reshape(y,(n,n))
 z = np.reshape(z,(n,n))

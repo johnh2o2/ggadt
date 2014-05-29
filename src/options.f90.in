@@ -575,9 +575,10 @@ contains
     select case (upcase(overwrite))
     case ("ERROR")
        if (opt%found) then
-          write (stderr,'(3a)') 'Error: tried to set option "', trim(opt%name), '" twice.'
+          write (stderr,'(3a)') 'Error: option "', trim(opt%name), '" is already set and cannot be overwritten.'
           return
        end if
+    
     case ("YES")
     case ("NO")
        if (opt%found) then
@@ -1330,7 +1331,7 @@ contains
              end if
              ! Defined(val) .and. (IsFlag(opt) .or. (j == len_trim(buf))) .and. Defined(opt)
              ! Set the option value
-             call set_opt(opt,val,"error",ierr)
+             call set_opt(opt,val,"YES",ierr) ! Added overwrite option (JAH 5/29/2014)
              if (ierr .ne. 0) goto 99
              ! IsValid(val,opt)
           end do
@@ -1388,7 +1389,7 @@ contains
           end if
           ! Defined(opt) .and. Defined(val)
           ! Set the option value
-          call set_opt(opt,val,"error",ierr)
+          call set_opt(opt,val,"YES",ierr) !Added overwrite option (JAH 5/29/2014)
           if (ierr .ne. 0) goto 99
           ! IsValid(val,opt) .and. ValueSet(val,opt)
        else if (buf == "--") then
@@ -1737,26 +1738,34 @@ contains
 
     ierr = 1
     unit=10
-    !open(unit,file=filename,access='stream',status='old')
-    open(unit,file=filename,status='old')
+    open(unit,file=filename,access='stream',status='old')
+    !open(unit,file=filename,status='old')
 
     idx = 1
     status = 0
     do while (status .eq. 0)
        ! Skip blanks and newlines
+       if (options_debug) write(stderr,*) "OPTIONS: going to skip chars..."
        call skip_chars(unit,blank//crlf,idx,nchar,status)
        if (status .ne. 0) exit
+       if (options_debug) write(stderr,*) "OPTIONS: skipped chars."
        ! Skip comment lines
        call peek(unit,idx,c,status)
+
        if (status .ne. 0) exit
+       if (options_debug) write(stderr,*) "OPTIONS: peeked."
+
        if (in(c,m_comment_chars)) then
+          if (options_debug) write(stderr,*) "c='",c,"' is in m_comment_chars. Skipping until..."
           call skip_until_char(unit,crlf,idx,nchar,status)
           cycle
        end if
 
+
        ! Ok, at beginning of non-blank line, read option & value
        call parse_opt(unit,m_delim_char,m_comment_chars,idx,name,val,status)
        if (status .ne. 0) exit
+       if (options_debug) write(stderr,*) "OPTIONS: parsed opt."
 
        ! Lookup & set the option
        opt => find_opt(opts,name=name,assert=.false.,group=group)
@@ -1817,10 +1826,15 @@ contains
     name = ''
     beg = idx
 
+    if (options_debug) write(stderr,*) "OPTIONS (parse_opt): here.."
+
     call skip_chars(unit,blank,idx,nchar,ios)
+    if (options_debug) write(stderr,*) "OPTIONS (parse_opt): skipped_chars; ios = ",ios
+    
     if (ios .ne. 0) return
 
     call read_while(unit,is_name_char,idx,name,nchar,ios)
+    if (options_debug) write(stderr,*) "OPTIONS (parse_opt): read_while;"
     if (nchar .eq. 0) then
        write (stderr,'(a,i0,a)') 'Error: expected option name at position ', &
             idx, ' of input file'
@@ -1888,7 +1902,9 @@ contains
     character, intent(out) :: c
     integer, intent(out) :: ios
 
-    read (unit,pos=idx,iostat=ios) c
+
+    read (unit,pos=idx,iostat=ios) c 
+    !read (unit,'(A1)',iostat=ios) c 
   end subroutine peek
 
 
@@ -1905,14 +1921,19 @@ contains
     integer, intent(out) :: nchar, ios
 
     character :: c
-
+    if (options_debug) write(stderr,*) "OPTIONS (read_while): here.."
     nchar = 0
     read (unit,pos=idx,iostat=ios) c
+    !read (unit,'(A1)',iostat=ios) c
+
+    if (options_debug) write(stderr,*) "     : read first char: c = '",c,"'; ios =",ios
     do while (ios .eq. 0 .and. p(c))
        nchar = nchar + 1
        buf(nchar:nchar) = c
        idx = idx + 1
        read (unit,pos=idx,iostat=ios) c
+       !read (unit,'(A1)',iostat=ios) c
+       if (options_debug) write(stderr,*) "     : read char: c = '",c,"'; ios =",ios
     end do
   end subroutine read_while
 
@@ -1929,11 +1950,16 @@ contains
 
     nchar = 0
     read (unit,pos=idx,iostat=ios) c
+    if (options_debug) write(stderr,*) "OPTIONS (read_until_char): here.."
+    !read (unit,'(A1)',iostat=ios) c
+    if (options_debug) write(stderr,*) "     : read first char: c = '",c,"'; ios =",ios
     do while (ios .eq. 0 .and. .not. in(c,chars))
        nchar = nchar + 1
        buf(nchar:nchar) = c
        idx = idx + 1
        read (unit,pos=idx,iostat=ios) c
+       !read (unit,'(A1)',iostat=ios) c
+       if (options_debug) write(stderr,*) "     : read char: c = '",c,"'; ios =",ios
     end do
   end subroutine read_until_char
 
@@ -1947,13 +1973,20 @@ contains
 
     character :: c
 
+    if (options_debug) write(stderr,*) "OPTIONS (skip_until_char): here.."
+
     nchar = 0
     read (unit,pos=idx,iostat=ios) c
+    !read (unit,'(A1)',iostat=ios) c
+    if (options_debug) write(stderr,*) "     : read first char: c = '",c,"'; ios =",ios
     do while (ios .eq. 0 .and. .not. in(c,chars))
        nchar = nchar + 1
        idx = idx + 1
        read (unit,pos=idx,iostat=ios) c
+       !read (unit,'(A1)',iostat=ios) c
+       if (options_debug) write(stderr,*) "     : read char: c = '",c,"'; ios =",ios
     end do
+    if (options_debug) write(stderr,*) "     : done. nchar = ",nchar 
   end subroutine skip_until_char
 
 
@@ -1975,6 +2008,8 @@ contains
 
     nchar = 0
     read (unit,pos=idx,iostat=ios) c
+    !read (unit, *, iostat=ios) c
+    if (options_debug) write(stderr,*) " OPTIONS (skip_chars): c = '",c,"', ios=",ios 
     ! beg := idx
     ! 1. in(file[beg:idx-1],chars)
     ! 2. (ios .eq. 0) --> c = file[idx]
@@ -1985,6 +2020,8 @@ contains
        idx = idx + 1
        ! 1. in(file[beg:idx-1],chars)
        read (unit,pos=idx,iostat=ios) c
+       ! read (unit, '(a)', iostat=ios) c
+       if (options_debug) write(stderr,*) "     : c, ios = ", c,ios 
        ! 2. (ios .eq. 0) --> c = file[idx]
     end do
     ! 1. in(file[beg:idx-1],chars)

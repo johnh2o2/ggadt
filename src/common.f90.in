@@ -84,6 +84,8 @@ module common_mod
 
   contains
 
+
+
     subroutine set_parameter_values()
       implicit none
       character(len=100) :: optname
@@ -140,7 +142,7 @@ module common_mod
 
       call define_option_string(opts,&
         "grain-geometry",default_grain_geometry,&
-        description="SPHERES, ELLIPSOID, SPHERE")
+        description="SPHERES (or AGGLOMERATE), ELLIPSOID, SPHERE")
       call define_option_string(opts,&
         "cluster-file-name",default_cluster_file_name,&
         description="Path to file that defines a grain made up of a cluster of spheres")
@@ -200,7 +202,7 @@ module common_mod
         description="Maximum photon energy for which to calculate the cross sections")
       call define_option_integer(opts,&
         "nephots", default_nephots,&
-        description="Number of photon energies to calculate SED")
+        description="Number of photon energies for which to calculate integrated cross sections")
       call define_option_real(opts,&
         "dephot", default_dephot,&
         description="Spacing between photon energies")
@@ -220,25 +222,42 @@ module common_mod
         &2d grid to obtain more points in the desired range of scattering angles. &
         &This should only be used for consistency tests.")
 
-      ! Now process command line options and read any specified parameter file
+      ! First read in defaults
+      call process_input_file(opts,defaults_file_name,ierr,delim_char="=")
+      if (ierr .ne. 0) then
+        write(stderr,*) "ERROR: Cannot read '",trim(defaults_file_name),"'. Quitting."
+        stop
+      end if 
 
+      ! write(0,*) "Loaded defaults."
+
+      ! Now process command line options in order to read
       call process_command_line(opts,ierr)
       if (ierr .ne. 0) then
         write (stderr,*) "ERROR in processing command line arguments." 
         stop
-      end if 
+      end if
+      ! write(stderr,*) "Processed command line arguments (round 1 of 2)."
       
-
-    
-      ! Read parameter file if one is given (don't overwrite command-line options if already given)
+      ! Read parameter file if one is given (overwrite everything)
       call get_option_string(opts,"parameter-file-name",parameter_file_name)
       if (parameter_file_name .ne. "") then
-        call process_input_file(opts,parameter_file_name,ierr,delim_char="=")
+        call process_input_file(opts,parameter_file_name,ierr,delim_char="=",overwrite="YES")
+        ! write(stderr,*) "Processed parameter file."
         if (ierr .ne. 0) then
           write(stderr,*) "ERROR: Cannot read ",parameter_file_name,". Quitting."
           stop
         end if 
       end if
+
+      ! re-read command line arguments (to overwrite parameter file arguments)
+      call process_command_line(opts,ierr)
+      ! write(stderr,*) "Processed command line arguments (round 2 of 2)."
+      if (ierr .ne. 0) then
+        write (stderr,*) "ERROR in processing command line arguments." 
+        stop
+      end if
+      
 
       ! Set values
       call get_option_real(opts,"aeff",a_eff)
@@ -248,7 +267,7 @@ module common_mod
       call get_option_real(opts,"ephot",ephot)
       call get_flag(opts,"use-padded-fft",use_padded_fft)
       call get_flag(opts,"force-numerical",force_numerical)
-      call get_flag(opts,"sed",integrated_mode)  
+      call get_flag(opts,"integrated",integrated_mode)  
       call get_flag(opts,"verbose",verbose_mode)
       call get_flag(opts,"timing",timing_mode)
       call get_option_real(opts,"ior-re",ior_re)

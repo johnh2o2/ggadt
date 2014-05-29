@@ -34,4 +34,4 @@ rm -f src/options.f90
 
 rm -f scripts/*pyc
 rm -f scripts/installation_vars.py
-
+rm -f .defaults

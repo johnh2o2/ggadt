@@ -370,6 +370,8 @@ AC_CONFIG_FILES([ 	Makefile
           src/ggadt.f90
 
           scripts/installation_vars.py
+
+          .defaults
 				])
 AC_SUBST(fftw3_inc_dir)
 AC_SUBST(plan_dir)

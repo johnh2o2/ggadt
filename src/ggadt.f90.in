@@ -36,7 +36,7 @@ program ggadt
     if (verbose_mode) call print_parameters(stderr)
 
     if (integrated_mode) then 
-        call calculate_sed_of_cross_sections()
+        call calculate_int_cross_sections()
     else
         call diff_scat_cross_sect()
     end if 
@@ -47,7 +47,7 @@ program ggadt
     write(stderr,*) "Done."
 contains
 
-    subroutine calculate_sed_of_cross_sections()
+    subroutine calculate_int_cross_sections()
         implicit none
         real(kind=dp_real) :: sigma_scat, sigma_abs
         real(kind=dp_real),dimension(size(ephots)) :: sigma_scats, sigma_abss
@@ -73,7 +73,7 @@ contains
         end do
 
 
-    end subroutine calculate_sed_of_cross_sections
+    end subroutine calculate_int_cross_sections
 
     subroutine get_ior(matfile, iorres, iorims, iorre, iorim)
         implicit none
@@ -189,7 +189,7 @@ contains
                     !$omp end parallel
 
 
-                else if (geometry .eq. 'spheres') then 
+                else if (geometry .eq. 'spheres' .or. geometry .eq. 'agglomerate') then 
                     call rotate_spheres(rm)
                     do c1=1,nspheres
                         if (multiple_compositions) then
@@ -302,7 +302,7 @@ contains
                     end do
                     !$omp end do nowait
                     !$omp end parallel
-                elseif (geometry .eq. 'spheres')    then
+                elseif (geometry .eq. 'spheres' .or. geometry .eq. 'agglomerate')    then
                     call rotate_spheres(rm)
                     sh = shadow_spheres(x,y,k)
                 else
@@ -409,7 +409,7 @@ contains
     ! ---------------------------------------------------
 
         if ((geometry == 'sphere') .or. (geometry == 'spheres')) then 
-            if (geometry == 'spheres') then
+            if (geometry == 'spheres' .or. geometry .eq. 'agglomerate') then
                 default_ior_i = ior_im
                 default_ior_r = ior_re
                 call read_spheres(cluster_file_name, a_eff, max_dist)
@@ -564,7 +564,7 @@ contains
         if (nmaterials .gt. 1) then 
             multiple_compositions = .TRUE.
 
-            if (geometry .eq. "spheres") then 
+            if (geometry .eq. "spheres"  .or. geometry .eq. 'agglomerate') then 
                 allocate(agglom_material_tags(nspheres),stat=allocatestatus)
                     if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (agglom_material_tags) array ***"
                 
@@ -582,7 +582,8 @@ contains
 
         else 
             multiple_compositions = .FALSE.
-            if (material_file_specified .and. geometry .eq. "spheres" .and. .not. integrated_mode) then 
+            if (material_file_specified .and. &
+               & ( geometry .eq. "spheres" .or. geometry .eq. "agglomerate" ) .and. .not. integrated_mode) then 
                 do i=1,nspheres
                     ior_r(i) = ior_res_single_en(1)
                     ior_i(i) = ior_ims_single_en(1)
@@ -758,7 +759,7 @@ contains
         deallocate(ftsh,stat=deallocatestatus)
         deallocate(scatter,stat=deallocatestatus)
         
-        if (geometry .eq. 'spheres')    then
+        if (geometry .eq. 'spheres'  .or. geometry .eq. 'agglomerate')    then
             deallocate(pos)
             deallocate(pos_rot)
             deallocate(radii)
@@ -798,7 +799,8 @@ contains
         write(i,*) "# use_padded_fft: ",use_padded_fft
         write(i,*) "# parameter_file_name: ",trim(adjustl(parameter_file_name))
         write(i,*) "# fftw_optimization_mode_name: ",trim(adjustl(fftw_optimization_mode_name))
-        if (geometry == "spheres") write(i,*) "# cluster_file_name: ",trim(adjustl(cluster_file_name))
+        if (geometry == "spheres" .or. geometry .eq. 'agglomerate') &
+            & write(i,*) "# cluster_file_name: ",trim(adjustl(cluster_file_name))
         write(i,*) "# -----------------------------------"
     
 

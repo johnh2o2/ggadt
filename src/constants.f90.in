@@ -54,8 +54,10 @@ module constants
   character(len=200), parameter            ::  default_material               = "custom"
   character(len=200), parameter            ::  default_material_file          = ""
   real(dp_real), parameter                 ::  default_dephot                 = 0.1
-
+  character(len=200), parameter ::  defaults_file_name &
+    &=  "@abs_top_srcdir@/.defaults"
      
+  logical, parameter                        :: options_debug  = .false.
 
 
 end module constants
