@@ -45,6 +45,8 @@ module sphere
     end function shadow_sphere
 
     function func1(x,rho)
+        ! Performs the integral necessary to calculate the scattering matrix
+        ! for a spherical grain in ADT (see Draine & Allaf-Akbari 2006)
         implicit none
         real(kind=dp_real), intent(in) :: x
         complex(kind=dp_complex), intent(in) :: rho
@@ -71,6 +73,14 @@ module sphere
     end function func1
 
     function scatter_sphere(k,aeff,theta,delta_m)
+        ! Calculates the differential scattering amplitude for a spherical grain
+        !   inputs:
+        !       k        wavenumber of incident photon (in 1/microns)
+        !       aeff     radius of grain
+        !       theta    scattering angle at which to perform the calculation
+        !       delta_m  m-1 where m is the index of refraction of the material
+        !   outputs:
+        !       dsigma_scat/dOmega(theta)
         implicit none
         real(kind=dp_real), intent(in) :: k,aeff, theta
         complex(kind=dp_complex), intent(in) :: delta_m
@@ -83,13 +93,13 @@ module sphere
         sc = k*k*aeff*aeff*func1(x,rho)
 
         scatter_sphere = REAL(ABS(sc),kind=dp_real)*REAL(ABS(sc),kind=dp_real)/(k*k)
-
-
         
 
     end function scatter_sphere
 
     subroutine q_sphere(k,aeff,delta_m,qabs,qscat,qext)
+
+
         implicit none
         real(kind=dp_real), intent(in) :: k,aeff
         real(kind=dp_real), intent(out) :: qabs,qscat,qext

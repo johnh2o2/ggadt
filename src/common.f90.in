@@ -371,7 +371,7 @@ module common_mod
       end if 
 
 
-
+      ! Let the user know if they specified conflicting parameters
       if (option_found(opts,"nscatter") .and. option_found(opts, "dtheta")) then
           write(stderr,*) "Warning: You have specified BOTH the 'nscatter' and 'dtheta' options."
           write(stderr,*) "We will use your specified value of nscatter:", nscatter
@@ -403,6 +403,8 @@ module common_mod
 
 
     function rot_matrix(eul_ang)
+      ! Rotation matrix for a set of Euler angles -- for some reason this function does not work!
+      ! (We use rot_x*rot_y*rot_z instead.) It's a low-priority bug.
       implicit none
       real(dp_real), dimension(3), intent(in) :: eul_ang
       real(dp_real), dimension(3,3) :: rot_matrix
@@ -492,6 +494,12 @@ module common_mod
 
 
     subroutine fft_faster(f,kmin,kmax,enhancement, fft_output)
+        ! Performs an efficient series of FFT's to suit our needs
+        ! Astrophysical applications of ADT for x-ray scattering of dust
+        !   typically care about small angle scattering, which corresponds to
+        !   small values of K in the fourier transform. To get better resolution,
+        !   one can either pad the FFT, OR, one can do a series of off-set FFT's.
+        !   The latter approach takes about a 10th of the time.
         
         integer, intent(in) :: kmin, kmax, enhancement
         
@@ -575,6 +583,10 @@ module common_mod
         end do
     end function kspace_shift
     function linterp(x,y,xval)
+        ! Linear interpolation of a function defined as a set of (x_i,y_i) points
+        ! evaluated at x=xval.
+
+        
         implicit none 
         real(dp_real), intent(in) :: x(:), y(:), xval
         real(dp_real) :: linterp

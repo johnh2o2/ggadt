@@ -656,6 +656,7 @@ USING_FFTW_FALSE
 USING_FFTW_TRUE
 OPENMP_FCFLAGS
 OPENMP_CFLAGS
+FCFLAGS_f90
 EGREP
 GREP
 CPP
@@ -4952,9 +4953,65 @@ ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest
 ac_compiler_gnu=$ac_cv_fc_compiler_gnu
 
 
+ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Fortran flag to compile .f90 files" >&5
+$as_echo_n "checking for Fortran flag to compile .f90 files... " >&6; }
+if ${ac_cv_fc_srcext_f90+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_ext=f90
+ac_fcflags_srcext_save=$ac_fcflags_srcext
+ac_fcflags_srcext=
+ac_cv_fc_srcext_f90=unknown
+case $ac_ext in #(
+  [fF]77) ac_try=f77;; #(
+  *) ac_try=f95;;
+esac
+for ac_flag in none -qsuffix=f=f90 -Tf "-x $ac_try"; do
+  test "x$ac_flag" != xnone && ac_fcflags_srcext="$ac_flag"
+  cat > conftest.$ac_ext <<_ACEOF
+      program main
+
+      end
+_ACEOF
+if ac_fn_fc_try_compile "$LINENO"; then :
+  ac_cv_fc_srcext_f90=$ac_flag; break
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+done
+rm -f conftest.$ac_objext conftest.f90
+ac_fcflags_srcext=$ac_fcflags_srcext_save
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_fc_srcext_f90" >&5
+$as_echo "$ac_cv_fc_srcext_f90" >&6; }
+if test "x$ac_cv_fc_srcext_f90" = xunknown; then
+  as_fn_error $? "Cannot use .f90 suffix!" "$LINENO" 5
+
+else
+  ac_fc_srcext=f90
+  if test "x$ac_cv_fc_srcext_f90" = xnone; then
+    ac_fcflags_srcext=""
+    FCFLAGS_f90=""
+  else
+    ac_fcflags_srcext=$ac_cv_fc_srcext_f90
+    FCFLAGS_f90=$ac_cv_fc_srcext_f90
+  fi
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: Using .f90 as suffix for tests" >&5
+$as_echo "$as_me: Using .f90 as suffix for tests" >&6;}
+fi
+ac_ext=${ac_fc_srcext-f}
+ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking to see if Fortran supports iso_c_binding" >&5
 $as_echo_n "checking to see if Fortran supports iso_c_binding... " >&6; }
-
 if test "$cross_compiling" = yes; then :
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
@@ -5047,6 +5104,42 @@ rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
 fi
 
 
+
+# options file uses access='stream' option to read parameter files. This is not (to my knowledge)
+# part of the Fortran 95 standard.
+echo 'testing. remove this file.' > testfile.dat
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking to see if Fortran compiler supports access='stream' option for open()" >&5
+$as_echo_n "checking to see if Fortran compiler supports access='stream' option for open()... " >&6; }
+if test "$cross_compiling" = yes; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "cannot run test program while cross compiling
+See \`config.log' for more details" "$LINENO" 5; }
+else
+  cat > conftest.$ac_ext <<_ACEOF
+
+            program main
+
+           integer :: unit
+  open(unit,file='testfile.dat',access='stream',status='old')
+
+
+
+      end
+_ACEOF
+if ac_fn_fc_try_run "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+rm testfile.dat
 #check that random_number() is recognized
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking to see if Fortran supports random_number() " >&5

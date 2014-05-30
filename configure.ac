@@ -189,6 +189,10 @@ fi
 # Now make sure the Fortran compiler is sane.
 
 AC_LANG([Fortran])
+AC_FC_SRCEXT([f90], 
+  AC_MSG_NOTICE([Using .f90 as suffix for tests]), 
+  AC_MSG_ERROR([Cannot use .f90 suffix!])
+)
 
 AC_MSG_CHECKING([to see if Fortran supports iso_c_binding])
 AC_RUN_IFELSE([
@@ -224,6 +228,28 @@ AC_RUN_IFELSE([
   		AC_MSG_RESULT(no)
   	)
 
+
+# options file uses access='stream' option to read parameter files. This is not (to my knowledge)
+# part of the Fortran 95 standard.
+[echo 'testing. remove this file.' > testfile.dat]
+AC_MSG_CHECKING([to see if Fortran compiler supports access='stream' option for open()])
+AC_RUN_IFELSE([
+      AC_LANG_PROGRAM([], [[ 
+           integer :: unit       
+           open(unit,file='testfile.dat',access='stream',status='old')
+                  
+                ]]
+        )],
+      AC_MSG_RESULT(yes), 
+      [ AC_MSG_RESULT(no); 
+        AC_MSG_WARN([
+          ***WARNING*** your Fortran compiler does not support 'stream' access
+          to files. This means that you will NOT be able to use parameter files.
+        ])
+      ]
+      
+    )
+[rm testfile.dat]
 #check that random_number() is recognized
 
 AC_MSG_CHECKING([to see if Fortran supports random_number() ])

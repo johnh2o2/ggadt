@@ -1,3 +1,9 @@
+* commit f2bd344e93fcd1ab9e8846a5fa2167c784c5c1e0
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Thu May 29 18:15:58 2014 -0400
+| 
+|     Added default file. Added a markdown version of the README.md file (which is identical to the README file; both are kept so that the autoconf scripts don't complain. GNU compatible software has to have a file called 'README' in the parent directory. The options script also depends on the read(access=stream) command in Fortran, and this is NOT (I don't think) in the F95 standard. The configure.ac script should check that the fortran compiler can deal with this, otherwise they won't be able to use parameter files. Also added the grain-geometry=agglomerate option, but also kept the grain-geometry=spheres option as well.
+|  
 * commit 59e9cfd153f82e38b4073c8f2dab8a45e5e65f82
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Tue May 27 18:10:41 2014 -0400
