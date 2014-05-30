@@ -5,3 +5,6 @@ data_dev/*
 *a
 *npy
 src/ggadt
+batch.sh
+**dat
+**eps
