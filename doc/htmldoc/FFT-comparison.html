@@ -1,15 +1,15 @@
 <html lang="en">
 <head>
-<title>FFT comparison - GGADT 0.9.88</title>
+<title>FFT comparison - GGADT 0.9.90</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="GGADT 0.9.88">
+<meta name="description" content="GGADT 0.9.90">
 <meta name="generator" content="makeinfo 4.8">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="prev" href="Testing-against-previous-results.html#Testing-against-previous-results" title="Testing against previous results">
 <link rel="next" href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License" title="GNU Free Documentation License">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
-This manual is for GGADT (version 0.9.88, 27 May 2014),
+This manual is for GGADT (version 0.9.90, 31 May 2014),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT).
 
@@ -46,6 +46,8 @@ Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
 <h2 class="chapter">6 FFT comparison</h2>
 
 <p><strong>FFTW3 NOT supported in current version</strong>: There is currently NO support for FFTW3 at the moment. The FFTW module needs to be reverted to the Fortran 95 standard. At this time, it's not a huge priority. GGADT works just fine, and does not require you to install an external library. Future versions of GGADT will likely include FFTW3 support.
+
+   <p><strong>Text below this point is for earlier versions of GGADT which supported FFTW3.</strong>
 
    <p>Currently, GGADT allows you to choose between two FFT algorithms: FFTW 3 (<a href="http://fftw.org/">http://fftw.org/</a>), which requires you install the FFTW3 library, and GPFA (Generalized Prime Factor Algorithm)<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>, which is self-contained and included with the GGADT package. GPFA is used by default, and, as shown below, is slightly faster than FFTW in the current version of GGADT. This will change in later versions, since at the moment, we do not take advantage of saving and loading FFTW "wisdom".
 

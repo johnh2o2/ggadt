@@ -133,17 +133,17 @@ GGADT does the following:
 
 @enumerate
 
-@item Reads in dust and x-ray parameters
-@item For each of the @option{nangle} orientations (and @option{nephots} photon energies, if the total cross section is being calculated),
+@item Reads in dust and x-ray parameters (from command line or from a parameter file)
+@item For each of the @option{norientations} orientations
 @enumerate
 @item Calculate the shadow function of the grain on a 2D grid
 @item If calculating the differential scattering cross section:
 @itemize
 @item Take the centered FFT of this grid using FFTW
-@item Normalize this result so that it represents @math{dQ_{scat}/d\Omega}, i.e., the differential scattering cross section divided by @math{\pi a^2}.
+@item Normalize this result so that it represents the differential scattering cross section
 @item Add contribution of differential cross-section to orientational average
 @end itemize
-@item If calculating the total cross sections:
+@item If calculating the integrated cross sections:
 @itemize
 @item Calculate the cross sections from the shadow function for the given orientation (and photon energy)
 @item Add contribution of this orientation to the average cross section at the given photon energy
@@ -167,7 +167,7 @@ GGADT does the following:
 GGADT should install easily on most @emph{Unix-based systems} (e.g. Linux, Mac) by following the standard GNU install procedures, described in @file{INSTALL}.
 
 @example
-./configure [--enable-openmp] [--enable-fftw3] [--enable-double] @dots{}
+./configure [--enable-openmp] [--enable-fftw3] @dots{}
 make
 @end example
 
@@ -276,12 +276,16 @@ The syntax of parameter files is:
 
 @example
 #comment
-parameter=value
-another-parameter=another-value
+parameter           = value
+another-parameter   = another-value
 @dots{}
 @end example
 
-@strong{Warning} The @code{cluster-file-name} and @code{euler-file-name} options must be specified with quotes surrounding their values. In order to make the parameter file portable, you should specify an absolute file path, not a relative one.
+@strong{Warning (1)} One annoying feature of parameter file syntax is this: @strong{you cannot have spaces after a numerical parameter value}. This is somewhat of a low-priority bug for the time being.
+
+@strong{Warning (2)} The @code{cluster-file-name} and @code{euler-file-name} options must be specified with quotes surrounding their values. In order to make the parameter file portable, you should specify an absolute file path, not a relative one.
+
+
 
 E.g.:
 
@@ -308,6 +312,8 @@ cluster-file-name='data/parameter-files/parameter-file.ini'
 @end example 
 
 will work, as long as I @strong{always} run @code{ggadt} from the parent directory.
+
+
 
 @section Options and parameters
 
@@ -361,6 +367,11 @@ Must be one of @code{ESTIMATE}, @code{MEASURE}, @code{PATIENT} or @code{EXHAUSTI
 @opindex --use-padded-fft
 @opindex -s 
 This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by @code{nscatter}), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.
+
+
+@item --force-numerical
+@opindex --force-numerical 
+This will force GGADT to use a numerical calculation of the differential scattering cross section for spherical grains (an analytical Anomalous Diffraction Theory solution is implemented by default).
 
 @item --euler-angle-mode=@var{value}
 @opindex --euler-angle-mode
@@ -455,7 +466,7 @@ The agglomerate composition file is assumed to be formatted with one header line
 
 @item --nscatter=@var{value}
 @opindex --nscatter
-The (square root) of the number of grid elements with which you would like to resolve the scattering cross section.
+The (square root) of the number of grid elements (in theta) with which you would like to resolve the differential scattering cross section.
 
 @item --dtheta=@var{value}
 @opindex --dtheta
@@ -503,6 +514,10 @@ Defines the maximum photon energy for which the cross sections are calculated
 
 @end table
 
+@section Default parameter values
+
+Default parameter values are loaded from the @code{.defaults} file located in the parent directory of GGADT. You can edit this file, or (as a safer option), edit a copy of this file and pass the path as the value for @code{--parameter-file-name}.
+
 
 @section Future goals 
 @itemize
@@ -515,7 +530,9 @@ Defines the maximum photon energy for which the cross sections are calculated
 
 @subsection Differential scattering cross section calculations 
 
-GGADT solves for either the differential scattering cross section as a function of scattering angle, or the total scattering and absorption cross sections as a function of photon energy, and must do so on a 2D numerical grid. The accuracy of the solution provided by GGADT depends on the resolution of these grids. In the case where the grain is non-spherical, the accuracy also depends on the number of orientations over which the calculation is averaged.
+GGADT solves for either the differential scattering cross section as a function of scattering angle, or the total scattering and absorption cross sections as a function of photon energy, and must do so on a 2D numerical grid. The accuracy of the solution provided by GGADT depends on the resolution of these grids. The accuracy also depends on the number of orientations over which the calculation is averaged.
+
+An exception this are spherical grains: an analytical solution (in the context of Anomalous Diffraction Theory) is implemented for spherical grains. 
 
 The input parameters that determine accuracy are:
 
@@ -525,15 +542,13 @@ The input parameters that determine accuracy are:
 @item @code{norientations} -- The number of grain orientations over which to average the calculation.
 @end itemize
 
-We've done some sample runs for a spherical grain,
+We've done some sample runs for a spherical grain (using a numerical grid solution and NOT the analytical solution),
 
 @image{RMS_ngrain_nscatter,5in,5in}
 
 @subsection Scattering and absorption cross-section calculations 
 
 Accuracy results for TOTAL cross section calculations to come soon...
-
-
 
 @node Example usage
 @chapter Example usage
@@ -548,26 +563,59 @@ If you simply want to test that @code{ggadt} is running properly, you can simply
 src/ggadt
 @end example
 
-From the parent directory. This will solve a test case, which is defined by the following hard-coded default parameters:
+From the parent directory. This will solve a test case, which is defined by the default parameters set by the @code{.defaults} file:
 
 @example
-aeff           = 0.2
-ephot          = 2.0
-grain-axis-x   = 1.0
-grain-axis-y   = 1.0
-grain-axis-z   = 1.0
-ior-re         = -1.920E-4
-ior-im         = 2.807E-5
-grain-geometry = 'sphere'
-euler-angle-mode = 'random'
-euler-angle-file = ''
-ngrain         = 256
-nscatter       = 100
-norientations  = 100
-dtheta         = 10.0
-max-angle      = 3000.
-cluster-file-name = ''
-fftw-optimization = 'estimate'
+# Geometry of grain 
+# | one of: 'sphere','spheres' (or 'agglomerate'), or 'ellipsoid'
+grain-geometry                 = 'ellipsoid'	
+
+# effective radius (radius of sphere with same volume)
+aeff                           = 0.2
+# Number of grid elements (along one dimension) to resolve grain
+ngrain                         = 128
+
+# IF grain-geometery=ellipsoid (these are all ratios)
+grain-axis-x                   = 1.0
+grain-axis-y                   = 1.0
+grain-axis-z                   = 1.0
+
+# IF grain-geometry=agglomerate
+cluster-file-name              = ''
+
+# Grain composition
+# Path to material index file
+material-file                  = "/Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/ggadt/data/materials/index_silD03"
+
+# parameters for differential scattering cross section calculation
+# units: keV
+ephot                          = 2.0
+#  Re(m-1)
+ior-re                         =-1.920E-4
+#  Re(m)
+ior-im                         = 2.807E-5
+# | 
+# | DO NOT define ior-re or ior-im if you also have defined 
+# | a material-file. It will pull m(E) automatically.
+# |
+
+## number of angles to calculate diff. scat. cross section (ntheta) or spacing between them (dtheta)
+# (arcseconds) Choose only one of these parameters 
+dtheta                         = 25.0
+#nscatter                      = 100
+
+## Maximum angle for which the diff. scat. cross section is calculated
+# (arcseconds)
+max-angle                      = 1500.
+
+# IF compiled with --enable-fftw3 
+fftw-optimization              = 'estimate'
+
+#grain_axis_ratio              = 1.0
+
+rotation-axis                  = 'none'     # For ellipsoidal or agglomerate grains
+euler-angle-mode               = 'random'   # Either 'sequential', 'random' or 'custom' 
+                                            # | tells GGADT how to choose orientations over which to 
 @end example
 
 If you would like to plot the output of this code, pipe the standard output of @code{ggadt} to a file of your choice. Then run the python plotting scripts:
@@ -594,7 +642,7 @@ The inset within the plot, on the upper left corner, shows the full 2d grid of t
 
 @image{sample-spheres,5in,5in}
 
-@section Ellipsoids and spheroids --  orientational averages about a principal axis
+@section Ellipsoids and spheroids -- orientational averages about a principal axis
 GGADT allows you to specify a general, ellipsoidal (tri-axial) grain through the input options @code{--grain-axis-x,y,z=}@emph{val}. These specify the relative lengths of the three principal axes of the grain. These axes lengths are then normalized so that the effective radius of the grain is consistent with the @code{--aeff} parameter.
 
 If you wish to calculate orientationally-averaged quantities of a grain @emph{about a principal axis}, GGADT allows you to do this through specifying @code{--rotation-axis=xaxis,yaxis,zaxis,none}. The @code{--rotation-axis} parameter is 'none' by default.
@@ -654,7 +702,9 @@ python scripts/plot.py outputz.dat
 @image{HD09_f3,5in,5in}
 @node FFT comparison
 @chapter FFT comparison
-@strong{FFTW3 NOT supported in current version}: There is currently NO support for FFTW3 at the moment. The FFTW module needs to be reverted to the Fortran 95 standard. At this time, it's not a huge priority. GGADT works just fine, and does not require you to install an external library. Future versions of GGADT will likely include FFTW3 support.
+@strong{FFTW3 NOT supported in current version}: There is currently NO support for FFTW3 at the moment. The FFTW module needs to be reverted to the Fortran 95 standard. At this time, it's not a huge priority. GGADT works just fine, and does not require you to install an external library. Future versions of GGADT will likely include FFTW3 support. 
+
+@strong{Text below this point is for earlier versions of GGADT which supported FFTW3.}
 
 Currently, GGADT allows you to choose between two FFT algorithms: FFTW 3 (@url{http://fftw.org/}), which requires you install the FFTW3 library, and GPFA (Generalized Prime Factor Algorithm)@footnote{Temperton, C. (1992). A Generalized Prime Factor FFT Algorithm for any N=2^p3^q5^r. SIAM Journal on Scientific and Statistical Computing, 13(3), 676-686.}, which is self-contained and included with the GGADT package. GPFA is used by default, and, as shown below, is slightly faster than FFTW in the current version of GGADT. This will change in later versions, since at the moment, we do not take advantage of saving and loading FFTW "wisdom". 
 

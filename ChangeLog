@@ -1,3 +1,21 @@
+* commit 248b1cadef863a0c0e2a10737dca74e56e4d087a
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Fri May 30 18:22:05 2014 -0400
+| 
+|     Edited .defaults.in for spacing
+|  
+* commit ebfc053885ba7112fd5967eedc0712173a6af4d8
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Fri May 30 18:11:50 2014 -0400
+| 
+|     edited .gitignore to untrack data output files.
+|  
+* commit ad75827b3e51ebc1bba4de80b24221fa1a75dce1
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Fri May 30 18:07:54 2014 -0400
+| 
+|     Added some edits to the configure.ac script, added documentation of source files, and edited README.md script.
+|  
 * commit f2bd344e93fcd1ab9e8846a5fa2167c784c5c1e0
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Thu May 29 18:15:58 2014 -0400

@@ -1,15 +1,15 @@
 <html lang="en">
 <head>
-<title>Overview - GGADT 0.9.88</title>
+<title>Overview - GGADT 0.9.90</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="GGADT 0.9.88">
+<meta name="description" content="GGADT 0.9.90">
 <meta name="generator" content="makeinfo 4.8">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="prev" href="index.html#Top" title="Top">
 <link rel="next" href="Installation.html#Installation" title="Installation">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
-This manual is for GGADT (version 0.9.88, 27 May 2014),
+This manual is for GGADT (version 0.9.90, 31 May 2014),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT).
 
@@ -98,17 +98,17 @@ k_y = k(\vecn\cdot\vecy)<br>
 
      <ol type=1 start=1>
 
-     <li>Reads in dust and x-ray parameters
-<li>For each of the <samp><span class="option">nangle</span></samp> orientations (and <samp><span class="option">nephots</span></samp> photon energies, if the total cross section is being calculated),
+     <li>Reads in dust and x-ray parameters (from command line or from a parameter file)
+<li>For each of the <samp><span class="option">norientations</span></samp> orientations
           <ol type=1 start=1>
 <li>Calculate the shadow function of the grain on a 2D grid
 <li>If calculating the differential scattering cross section:
                <ul>
 <li>Take the centered FFT of this grid using FFTW
-<li>Normalize this result so that it represents dQ_scat/d\Omega, i.e., the differential scattering cross section divided by \pi a^2. 
+<li>Normalize this result so that it represents the differential scattering cross section
 <li>Add contribution of differential cross-section to orientational average
 </ul>
-          <li>If calculating the total cross sections:
+          <li>If calculating the integrated cross sections:
                <ul>
 <li>Calculate the cross sections from the shadow function for the given orientation (and photon energy)
 <li>Add contribution of this orientation to the average cross section at the given photon energy
