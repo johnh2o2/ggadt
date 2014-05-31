@@ -19,7 +19,7 @@ program ggadt
 
 
     logical :: multiple_compositions
-    real(kind=dp_real) :: xmin, xmax, ymin, ymax, dx, dy, k, l, dk
+    real(kind=dp_real) :: xmin, xmax, ymin, ymax, dx, dy, k, l, dk, norm_const
     real(kind=dp_real), dimension(3) :: eul_ang
     real(kind=dp_real), dimension(3,3) :: rm 
 
@@ -54,16 +54,23 @@ contains
         complex(kind=dp_complex), dimension(10) :: delms
         integer :: i, j
 
+        if (use_efficiencies) then 
+            norm_const = 1.0/(pi*a_eff*a_eff)
+            write(stdout,*) "# [ephot] [Q_scat] [Q_abs] [Q_ext]"
+        else 
+            norm_const = 1.0
+            write(stdout,*) "# [ephot] [sigma_scat] [sigma_abs] [sigma_ext]"
+        end if 
 
-        write(stdout,*) "# [ephot] [sigma_scat] [sigma_abs] [sigma_ext]"
+        
         
         do i=1,nephots
             do j=1,nmaterials
                 delms(j) = CMPLX(ior_res(j,i), ior_ims(j,i))
             end do 
             call get_integrated_cross_sections(ephots(i), delms, sigma_scat, sigma_abs)
-            sigma_scats(i) = sigma_scat
-            sigma_abss(i) = sigma_abs
+            sigma_scats(i) = sigma_scat*norm_const
+            sigma_abss(i) = sigma_abs*norm_const
             write(stderr,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
                     & " percent complete: ", (real(i)/real(nephots))*100.0, "%"
         end do
@@ -249,7 +256,13 @@ contains
         real(kind=dp_real) :: th, sc, dth
         real(kind=dp_real), dimension(10*size(thetax)) :: sc_array, thets
         
-
+        if (use_efficiencies) then 
+            norm_const = 1.0/(pi*a_eff*a_eff)
+            write(stdout,*) "# [thetax] [thetay] [dQ_scat/domega]"
+        else 
+            norm_const = 1.0
+            write(stdout,*) "# [thetax] [thetay] [dsigma_scat/domega]"
+        end if 
 
         if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
             if (verbose_mode) write(stderr,*) " Using analytical ADT for sphere..."
@@ -328,11 +341,11 @@ contains
 
             if (timing_mode) stop 
 
-            write(stdout,*) "# [thetax] [thetay] [dqscat/domega]"
+           
             
             do i=1,size(thetax)
                 do j=1,size(thetay)
-                    write(stdout,*) thetax(i),thetay(j),scatter(j,i)/(pi*a_eff*a_eff)
+                    write(stdout,*) thetax(i),thetay(j),scatter(j,i)*norm_const
                 end do
             end do
             if (verbose_mode) write(stderr,*) "done."
@@ -412,7 +425,7 @@ contains
             if (geometry == 'spheres' .or. geometry .eq. 'agglomerate') then
                 default_ior_i = ior_im
                 default_ior_r = ior_re
-                call read_spheres(cluster_file_name, a_eff, max_dist)
+                call read_spheres(agglom_file_name, a_eff, max_dist)
             else
                 max_dist = a_eff
                 norientations = 1
@@ -800,7 +813,7 @@ contains
         write(i,*) "# parameter_file_name: ",trim(adjustl(parameter_file_name))
         write(i,*) "# fftw_optimization_mode_name: ",trim(adjustl(fftw_optimization_mode_name))
         if (geometry == "spheres" .or. geometry .eq. 'agglomerate') &
-            & write(i,*) "# cluster_file_name: ",trim(adjustl(cluster_file_name))
+            & write(i,*) "# agglom_file_name: ",trim(adjustl(agglom_file_name))
         write(i,*) "# -----------------------------------"
     
 

@@ -1,15 +1,15 @@
 <html lang="en">
 <head>
-<title>Invoking GGADT - GGADT 0.9.90</title>
+<title>Invoking GGADT - GGADT 0.9.91</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="GGADT 0.9.90">
+<meta name="description" content="GGADT 0.9.91">
 <meta name="generator" content="makeinfo 4.8">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="prev" href="Installation.html#Installation" title="Installation">
 <link rel="next" href="Example-usage.html#Example-usage" title="Example usage">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
-This manual is for GGADT (version 0.9.90, 31 May 2014),
+This manual is for GGADT (version 0.9.91, 31 May 2014),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT).
 
@@ -83,23 +83,23 @@ To see usage and all available options for <code>ggadt</code>, simply use the <s
 </pre>
    <p><strong>Warning (1)</strong> One annoying feature of parameter file syntax is this: <strong>you cannot have spaces after a numerical parameter value</strong>. This is somewhat of a low-priority bug for the time being.
 
-   <p><strong>Warning (2)</strong> The <code>cluster-file-name</code> and <code>euler-file-name</code> options must be specified with quotes surrounding their values. In order to make the parameter file portable, you should specify an absolute file path, not a relative one.
+   <p><strong>Warning (2)</strong> The <code>agglom-file-name</code> and <code>euler-file-name</code> options must be specified with quotes surrounding their values. In order to make the parameter file portable, you should specify an absolute file path, not a relative one.
 
    <p>E.g.:
 
-<pre class="example">     cluster-file-name='/absolute/path/to/parameter-file.ini'
+<pre class="example">     agglom-file-name='/absolute/path/to/parameter-file.ini'
 </pre>
    <p>NOT
 
-<pre class="example">     cluster-file-name=/absolute/path/to/parameter-file.ini
+<pre class="example">     agglom-file-name=/absolute/path/to/parameter-file.ini
 </pre>
    <p>or
 
-<pre class="example">     cluster-file-name='../../parameter-file.ini'
+<pre class="example">     agglom-file-name='../../parameter-file.ini'
 </pre>
    <p>Specifying a relative file-path (as in the last example) will work, as long as you always invoke GGADT from the location where the relative file-path is valid. For example, if I am in the parent directory, and my parameter file is in the <code>data/parameter-files</code> directory,
 
-<pre class="example">     cluster-file-name='data/parameter-files/parameter-file.ini'
+<pre class="example">     agglom-file-name='data/parameter-files/parameter-file.ini'
 </pre>
    <p>will work, as long as I <strong>always</strong> run <code>ggadt</code> from the parent directory.
 
@@ -118,7 +118,7 @@ standard output and then exit successfully.
 
      <br><dt><samp><span class="option">--parameter-file-name=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dparameter_002dfile_002dname-22"></a>Path to a correctly formatted parameter file.
 
-     <br><dt><samp><span class="option">--grain-geometry=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dgrain_002dgeometry-23"></a>Geometry of dust grain. Must be one of <code>SPHERE</code>, <code>ELLIPSOID</code>, <code>SPHERES</code>. A <code>SPHERES</code> grain geometry means that your grain is a conglomerate of smaller spheres. If you wish to use this grain geometry, you should supply a file (hereafter called a &ldquo;<em>cluster file</em>", see the next option) that defines the relative positions of the spheres that make up the grain. The sizes of these spheres will be normalized so that the effective radius of the grain is consistent with <samp><span class="option">aeff</span></samp>.
+     <br><dt><samp><span class="option">--grain-geometry=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dgrain_002dgeometry-23"></a>Geometry of dust grain. Must be one of <code>SPHERE</code>, <code>ELLIPSOID</code>, <code>SPHERES</code>. A <code>SPHERES</code> grain geometry means that your grain is a conglomerate of smaller spheres. If you wish to use this grain geometry, you should supply a file (hereafter called a &ldquo;<em>agglomeration file</em>", see the next option) that defines the relative positions of the spheres that make up the grain. The sizes of these spheres will be normalized so that the effective radius of the grain is consistent with <samp><span class="option">aeff</span></samp>.
 
      <br><dt><samp><span class="option">--aeff=</span><var>value</var></samp><dd><a name="index-g_t_002d_002daeff-24"></a>Effective radius of dust grain. The effective radius is defined to be the radius of a sphere with the same volume as the dust grain.
 
@@ -166,7 +166,7 @@ standard output and then exit successfully.
 <h4 class="subsection">3.3.3 Spherical agglomerate grains (single or multiple composition)</h4>
 
      <dl>
-<dt><samp><span class="option">--cluster-file-name=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dcluster_002dfile_002dname-38"></a>Path to a correctly formatted cluster file. Several cluster files are included with the distribution (see <samp><span class="file">data/clusters</span></samp>), and if you wish to create your own, you must mimic exactly the format of these files.
+<dt><samp><span class="option">--agglom-file-name=</span><var>value</var></samp><dd><a name="index-g_t_002d_002dagglom_002dfile_002dname-38"></a>Path to a correctly formatted agglomeration file. Several agglomeration files are included with the distribution (see <samp><span class="file">data/agglomerations</span></samp>), and if you wish to create your own, you must mimic exactly the format of these files.
 
      <br><dt><samp><span class="option">--material-file1=</span><var>value</var><span class="option">, --material-file2=</span><var>value</var><span class="option">, ...</span></samp><dd><a name="index-g_t_002d_002dmaterial_002dfile1_002c-_002d_002dmaterial_002dfile2_002c-_0040dots_007b_007d-39"></a>Path(s) to the index file for material 1, 2, 3, etc.
 

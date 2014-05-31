@@ -1,15 +1,15 @@
 <html lang="en">
 <head>
-<title>Example usage - GGADT 0.9.90</title>
+<title>Example usage - GGADT 0.9.91</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="GGADT 0.9.90">
+<meta name="description" content="GGADT 0.9.91">
 <meta name="generator" content="makeinfo 4.8">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="prev" href="Invoking-GGADT.html#Invoking-GGADT" title="Invoking GGADT">
 <link rel="next" href="Testing-against-previous-results.html#Testing-against-previous-results" title="Testing against previous results">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
-This manual is for GGADT (version 0.9.90, 31 May 2014),
+This manual is for GGADT (version 0.9.91, 31 May 2014),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT).
 
@@ -55,9 +55,19 @@ Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
 </pre>
    <p>From the parent directory. This will solve a test case, which is defined by the default parameters set by the <code>.defaults</code> file:
 
-<pre class="example">     # Geometry of grain
+<pre class="example">     # Default parameters used by GGADT
+     # ================================
+     # Last modified by John Hoffman (May 29, 2014)
+     
+     # Geometry of grain
      # | one of: 'sphere','spheres' (or 'agglomerate'), or 'ellipsoid'
      grain-geometry                 = 'ellipsoid'
+     
+     verbose                        = F
+     use-efficiencies               = T
+     use-padded-fft                 = F
+     integrated                     = F
+     force-numerical                = F
      
      # effective radius (radius of sphere with same volume)
      aeff                           = 0.2
@@ -70,11 +80,12 @@ Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
      grain-axis-z                   = 1.0
      
      # IF grain-geometry=agglomerate
-     cluster-file-name              = ''
+     agglom-file-name               = ''
+     agglom-composition-file        = ''
      
      # Grain composition
      # Path to material index file
-     material-file                  = "/Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/ggadt/data/materials/index_silD03"
+     material-file                  = "(path to GGADT directory)/data/materials/index_silD03"
      
      # parameters for differential scattering cross section calculation
      # units: keV
@@ -104,7 +115,22 @@ Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
      
      rotation-axis                  = 'none'     # For ellipsoidal or agglomerate grains
      euler-angle-mode               = 'random'   # Either 'sequential', 'random' or 'custom'
-                                                 # | tells GGADT how to choose orientations over which to
+                                                 # | tells GGADT how to choose orientations over which to average
+                                                 # | calculations.
+     euler-angle-file               = ''         # If euler-angle-mode='custom'; Path to file listing Euler angles
+                                                 # | over which to average calculations
+                                                 # If euler-angle-mode is NOT 'custom'; number of orientations
+                                                 # | over which to average calcuations
+     norientations                  = 64
+     # For integrated cross section (pass --integrated flag)
+     # number of photon energies to calculate integrated cross sections
+     #nephots                       = 100
+     # | OR define energy spacing
+     dephot                         = 0.1
+     # minimum photon energy
+     ephot-min                      = 0.1
+     # maximum photon energy
+     ephot-max                      = 5.0
 </pre>
    <p>If you would like to plot the output of this code, pipe the standard output of <code>ggadt</code> to a file of your choice. Then run the python plotting scripts:
 

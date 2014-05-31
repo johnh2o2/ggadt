@@ -1,6 +1,6 @@
 GGADT -- General Geometry Anomalous Diffraction Theory
-========
-**Version 0.9.90**
+======================================================
+**Version 0.9.91**
 *John Hoffman and Michael Tarczon*
 
 README last updated: March 27, 2014

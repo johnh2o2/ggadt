@@ -283,32 +283,32 @@ another-parameter   = another-value
 
 @strong{Warning (1)} One annoying feature of parameter file syntax is this: @strong{you cannot have spaces after a numerical parameter value}. This is somewhat of a low-priority bug for the time being.
 
-@strong{Warning (2)} The @code{cluster-file-name} and @code{euler-file-name} options must be specified with quotes surrounding their values. In order to make the parameter file portable, you should specify an absolute file path, not a relative one.
+@strong{Warning (2)} The @code{agglom-file-name} and @code{euler-file-name} options must be specified with quotes surrounding their values. In order to make the parameter file portable, you should specify an absolute file path, not a relative one.
 
 
 
 E.g.:
 
 @example
-cluster-file-name='/absolute/path/to/parameter-file.ini'
+agglom-file-name='/absolute/path/to/parameter-file.ini'
 @end example 
 
 NOT
 
 @example
-cluster-file-name=/absolute/path/to/parameter-file.ini
+agglom-file-name=/absolute/path/to/parameter-file.ini
 @end example 
 
 or
 
 @example
-cluster-file-name='../../parameter-file.ini'
+agglom-file-name='../../parameter-file.ini'
 @end example 
 
 Specifying a relative file-path (as in the last example) will work, as long as you always invoke GGADT from the location where the relative file-path is valid. For example, if I am in the parent directory, and my parameter file is in the @code{data/parameter-files} directory, 
 
 @example
-cluster-file-name='data/parameter-files/parameter-file.ini'
+agglom-file-name='data/parameter-files/parameter-file.ini'
 @end example 
 
 will work, as long as I @strong{always} run @code{ggadt} from the parent directory.
@@ -344,7 +344,7 @@ Path to a correctly formatted parameter file.
 
 @item --grain-geometry=@var{value}
 @opindex --grain-geometry
-Geometry of dust grain. Must be one of @code{SPHERE}, @code{ELLIPSOID}, @code{SPHERES}. A @code{SPHERES} grain geometry means that your grain is a conglomerate of smaller spheres. If you wish to use this grain geometry, you should supply a file (hereafter called a ``@emph{cluster file}", see the next option) that defines the relative positions of the spheres that make up the grain. The sizes of these spheres will be normalized so that the effective radius of the grain is consistent with @option{aeff}.  
+Geometry of dust grain. Must be one of @code{SPHERE}, @code{ELLIPSOID}, @code{SPHERES}. A @code{SPHERES} grain geometry means that your grain is a conglomerate of smaller spheres. If you wish to use this grain geometry, you should supply a file (hereafter called a ``@emph{agglomeration file}", see the next option) that defines the relative positions of the spheres that make up the grain. The sizes of these spheres will be normalized so that the effective radius of the grain is consistent with @option{aeff}.  
 
 @item --aeff=@var{value}
 @opindex --aeff
@@ -430,9 +430,9 @@ For @code{ELLIPSOID} grains, we define the lengths of x, y and z axes.
 
 @table @option
 
-@item --cluster-file-name=@var{value}
-@opindex --cluster-file-name
-Path to a correctly formatted cluster file. Several cluster files are included with the distribution (see @file{data/clusters}), and if you wish to create your own, you must mimic exactly the format of these files.
+@item --agglom-file-name=@var{value}
+@opindex --agglom-file-name
+Path to a correctly formatted agglomeration file. Several agglomeration files are included with the distribution (see @file{data/agglomerations}), and if you wish to create your own, you must mimic exactly the format of these files.
 
 @item --material-file1=@var{value}, --material-file2=@var{value}, @dots{}
 @opindex --material-file1, --material-file2, @dots{}
@@ -566,9 +566,19 @@ src/ggadt
 From the parent directory. This will solve a test case, which is defined by the default parameters set by the @code{.defaults} file:
 
 @example
+# Default parameters used by GGADT
+# ================================
+# Last modified by John Hoffman (May 29, 2014)
+
 # Geometry of grain 
 # | one of: 'sphere','spheres' (or 'agglomerate'), or 'ellipsoid'
 grain-geometry                 = 'ellipsoid'	
+
+verbose                        = F
+use-efficiencies               = T
+use-padded-fft                 = F
+integrated                     = F
+force-numerical                = F
 
 # effective radius (radius of sphere with same volume)
 aeff                           = 0.2
@@ -581,11 +591,12 @@ grain-axis-y                   = 1.0
 grain-axis-z                   = 1.0
 
 # IF grain-geometry=agglomerate
-cluster-file-name              = ''
+agglom-file-name               = ''
+agglom-composition-file        = ''
 
 # Grain composition
 # Path to material index file
-material-file                  = "/Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/ggadt/data/materials/index_silD03"
+material-file                  = "(path to GGADT directory)/data/materials/index_silD03"
 
 # parameters for differential scattering cross section calculation
 # units: keV
@@ -615,7 +626,22 @@ fftw-optimization              = 'estimate'
 
 rotation-axis                  = 'none'     # For ellipsoidal or agglomerate grains
 euler-angle-mode               = 'random'   # Either 'sequential', 'random' or 'custom' 
-                                            # | tells GGADT how to choose orientations over which to 
+                                            # | tells GGADT how to choose orientations over which to average
+                                            # | calculations.
+euler-angle-file               = ''         # If euler-angle-mode='custom'; Path to file listing Euler angles
+                                            # | over which to average calculations
+                                            # If euler-angle-mode is NOT 'custom'; number of orientations
+                                            # | over which to average calcuations
+norientations                  = 64
+# For integrated cross section (pass --integrated flag)
+# number of photon energies to calculate integrated cross sections
+#nephots                       = 100
+# | OR define energy spacing
+dephot                         = 0.1
+# minimum photon energy 		
+ephot-min                      = 0.1
+# maximum photon energy
+ephot-max                      = 5.0
 @end example
 
 If you would like to plot the output of this code, pipe the standard output of @code{ggadt} to a file of your choice. Then run the python plotting scripts:

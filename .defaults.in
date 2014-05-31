@@ -6,6 +6,12 @@
 # | one of: 'sphere','spheres' (or 'agglomerate'), or 'ellipsoid'
 grain-geometry                 = 'ellipsoid'	
 
+verbose                        = F
+use-efficiencies               = T
+use-padded-fft                 = F
+integrated                     = F
+force-numerical                = F
+
 # effective radius (radius of sphere with same volume)
 aeff                           = 0.2
 # Number of grid elements (along one dimension) to resolve grain
@@ -17,7 +23,8 @@ grain-axis-y                   = 1.0
 grain-axis-z                   = 1.0
 
 # IF grain-geometry=agglomerate
-cluster-file-name              = ''
+agglom-file-name               = ''
+agglom-composition-file        = ''
 
 # Grain composition
 # Path to material index file
