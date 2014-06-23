@@ -5,7 +5,9 @@
 ! Copyright (c) 2009, 2012 Christopher N. Gilbreth
 ! Modified : 3/25/2014 -- John Hoffman
 !     + Compatible with F90 (no longer uses define_help_flag.)
-!     + 
+! Modified : 6/22/2014 -- John Hoffman
+!     + Added a "rank" attribute to option datatype. get_option_* and get_flag require that
+!       you send a rank variable to capture the rank of the option.
 !
 ! Permission is hereby granted, free of charge, to any person obtaining a copy
 ! of this software and associated documentation files (the "Software"), to deal
@@ -67,6 +69,7 @@ module options
      character (len=1)         :: abbrev
      character (len=descr_len) :: descr
      logical :: required, found
+     integer :: rank
      integer :: dtype
      character(len=opt_len) :: group
 
@@ -179,23 +182,26 @@ contains
     opt%rval  = default
     opt%rmin  = -huge(1._rk)
     opt%rmax  = huge(1._rk)
+    opt%rank  = 4
 
     if (present(min)) opt%rmin = min
     if (present(max)) opt%rmax = max
   end subroutine define_option_real
 
 
-  subroutine get_option_real(opts,name,val)
+  subroutine get_option_real(opts,name,val,rank)
     ! Status: reviewed
     implicit none
     type(options_t), target, intent(in) :: opts
     character(len=*), intent(in) :: name
     real(rk), intent(out) :: val
+    integer,  intent(out) :: rank
 
     type(opt_t), pointer :: opt
 
     opt => find_opt(opts,name=name,dtype=T_REAL)
     val = opt%rval
+    rank = opt%rank
   end subroutine get_option_real
 
 
@@ -266,6 +272,7 @@ contains
     opt%ival   = default
     opt%imin   = -huge(1_ik)
     opt%imax   = huge(1_ik)
+    opt%rank   = 4
 
     if (present(min)) opt%imin = min
     if (present(max)) opt%imax = max
@@ -273,17 +280,19 @@ contains
 
 
 
-  subroutine get_option_integer(opts,name,val)
+  subroutine get_option_integer(opts,name,val,rank)
     ! Status: reviewed
     implicit none
     type(options_t),  target, intent(in) :: opts
     character(len=*), intent(in)  :: name
     integer(ik),      intent(out) :: val
+    integer,          intent(out) :: rank
 
     type(opt_t), pointer :: opt
 
     opt => find_opt(opts,name=name,dtype=T_INTEGER)
     val = opt%ival
+    rank = opt%rank
   end subroutine get_option_integer
 
 
@@ -358,20 +367,23 @@ contains
 
     opt%dtype = T_LOGICAL
     opt%lval  = default
+    opt%rank  = 4
   end subroutine define_option_logical
 
 
-  subroutine get_option_logical(opts,name,val)
+  subroutine get_option_logical(opts,name,val,rank)
     ! Status: reviewed
     implicit none
     type(options_t),  target, intent(in) :: opts
     character(len=*), intent(in)  :: name
     logical,          intent(out) :: val
+    integer,          intent(out)  :: rank
 
     type(opt_t), pointer :: opt
 
     opt => find_opt(opts,name=name,dtype=T_LOGICAL)
     val = opt%lval
+    rank = opt%rank
   end subroutine get_option_logical
 
 
@@ -432,15 +444,17 @@ contains
 
     opt%dtype = T_STRING
     opt%cval  = default
+    opt%rank  = 4
   end subroutine define_option_string
 
 
-  subroutine get_option_string(opts,name,val)
+  subroutine get_option_string(opts,name,val,rank)
     ! Status: reviewed
     implicit none
     type(options_t),   target, intent(in) :: opts
     character(len=*), intent(in)  :: name
     character(len=*), intent(out) :: val
+    integer,      intent(out) :: rank
 
     type(opt_t), pointer :: opt
 
@@ -451,6 +465,7 @@ contains
        stop
     end if
     val = opt%cval
+    rank = opt%rank
   end subroutine get_option_string
 
 
@@ -504,20 +519,23 @@ contains
 
     opt%dtype = T_FLAG
     opt%lval  = .false.
+    opt%rank  = 4
   end subroutine define_flag
 
 
-  subroutine get_flag(opts,name,val)
+  subroutine get_flag(opts,name,val, rank)
     ! Status: reviewed
     implicit none
     type(options_t),  target, intent(in) :: opts
     character(len=*), intent(in)  :: name
     logical,          intent(out) :: val
+    integer,          intent(out) :: rank
 
     type(opt_t), pointer :: opt
 
     opt => find_opt(opts,name=name,dtype=T_FLAG)
     val = opt%lval
+    rank = opt%rank
   end subroutine get_flag
 
 
@@ -558,7 +576,7 @@ contains
   end subroutine print_option_values
 
 
-  subroutine set_opt(opt,valstr,overwrite,ierr)
+  subroutine set_opt(opt,valstr,overwrite,ierr,rank)
     ! Set the value of an option, given a string representing the value.
     ! If the option has already been set, error out. Otherwise, mark the option
     ! as having been found and set opt%str.
@@ -568,6 +586,7 @@ contains
     implicit none
     type(opt_t),      intent(inout) :: opt
     character(len=*), intent(in) :: valstr
+    integer, intent(in) :: rank
     character(len=*), intent(in) :: overwrite
     integer, intent(out) :: ierr
 
@@ -591,6 +610,8 @@ contains
     end select
 
     opt%found = .true.
+
+    opt%rank = rank
 
     select case (opt%dtype)
     case (T_INTEGER)
@@ -1131,6 +1152,7 @@ contains
     character(len=*), optional, intent(in) :: name
     character(len=1), optional, intent(in) :: abbrev
     integer,          optional, intent(in) :: dtype
+
     logical,          optional, intent(in) :: assert
     character(len=*), optional, intent(in) :: group
 
@@ -1161,6 +1183,7 @@ contains
        else if (present(abbrev)) then
           if (opt%abbrev == abbrev) found = .true.
        end if
+
        ! found <==> opt%name == name .or. (present(abbrev) .and. opt%abbrev == abbrev)
        !            .and. opt%group == group
        if (found .and. present(dtype)) then
@@ -1236,7 +1259,7 @@ contains
   end subroutine getarg_check
 
 
-  subroutine process_command_line(opts,ierr,group)
+  subroutine process_command_line(opts,ierr,group,rank)
     ! Process the command-line arguments for the program, detecting options
     ! passed and storing their values in the options structure.
     ! If group is passed, only options with this group name are processed. All
@@ -1276,6 +1299,7 @@ contains
     implicit none
     type(options_t),  target, intent(inout) :: opts
     integer, intent(out) :: ierr
+    integer, optional, intent(in)  :: rank
     character(len=*), optional, intent(in) :: group
 
     type(opt_t), pointer :: opt
@@ -1283,6 +1307,12 @@ contains
     character(len=1) :: eqlc, a
     integer :: iarg, max, j
     logical :: help
+
+    integer :: m_rank 
+
+    m_rank = 1
+    if (present(rank)) m_rank = rank
+
 
     @IF_IARGC@max = iargc()!command_argument_count()
     @IF_GET_COM_ARG@max = command_argument_count()
@@ -1331,7 +1361,7 @@ contains
              end if
              ! Defined(val) .and. (IsFlag(opt) .or. (j == len_trim(buf))) .and. Defined(opt)
              ! Set the option value
-             call set_opt(opt,val,"YES",ierr) ! Added overwrite option (JAH 5/29/2014)
+             call set_opt(opt,val,"YES",ierr,m_rank) ! Added overwrite option (JAH 5/29/2014). Added rank (JAH 6/22/2014).
              if (ierr .ne. 0) goto 99
              ! IsValid(val,opt)
           end do
@@ -1389,7 +1419,7 @@ contains
           end if
           ! Defined(opt) .and. Defined(val)
           ! Set the option value
-          call set_opt(opt,val,"YES",ierr) !Added overwrite option (JAH 5/29/2014)
+          call set_opt(opt,val,"YES",ierr,m_rank) !Added overwrite option (JAH 5/29/2014). Added rank (JAH 6/22/2014)
           if (ierr .ne. 0) goto 99
           ! IsValid(val,opt) .and. ValueSet(val,opt)
        else if (buf == "--") then
@@ -1693,7 +1723,7 @@ contains
   ! ** INPUT FILE PROCESSING ************************************************* !
 
 
-  subroutine process_input_file(opts,filename,ierr,group,overwrite,delim_char,comment_chars)
+  subroutine process_input_file(opts,filename,ierr,group,overwrite,delim_char,comment_chars,rank)
     ! Read input options from file
     ! Input/output:
     !   opts: Input options structure. Input file is taken from opts%arg1. On
@@ -1707,6 +1737,7 @@ contains
     type(options_t), target, intent(inout) :: opts
     character(len=*), intent(in) :: filename
     integer, intent(out)   :: ierr
+    integer, optional, intent(in)    :: rank
     character(len=*), optional, intent(in) :: group, overwrite
     character(len=1), optional, intent(in) :: delim_char
     character(len=2), optional, intent(in) :: comment_chars
@@ -1719,13 +1750,16 @@ contains
     character(len=1) :: m_delim_char
     character(len=2) :: m_comment_chars
     character(len=8) :: m_overwrite
+    integer          :: m_rank
 
     m_delim_char = ':'
     m_comment_chars = '#!'
     m_overwrite = "ERROR"
+    m_rank = 2
     if (present(delim_char)) m_delim_char = delim_char
     if (present(comment_chars)) m_comment_chars = comment_chars
     if (present(overwrite)) m_overwrite = overwrite
+    if (present(rank)) m_rank = rank
 
     if (is_name_char(m_delim_char)) then
        stop "Error: invalid delim character -- must not be a name character."
@@ -1769,6 +1803,7 @@ contains
 
        ! Lookup & set the option
        opt => find_opt(opts,name=name,assert=.false.,group=group)
+      
        if (.not. associated(opt)) then
           write (stderr,'(3a)',advance='no') 'Error: unknown option "', trim(name), '"'
           if (present(group)) then
@@ -1778,7 +1813,7 @@ contains
           end if
           return
        end if
-       call set_opt(opt,val,m_overwrite,status)
+       call set_opt(opt,val,m_overwrite,status,m_rank) ! added rank option (JAH 6/22/14)
        if (status .ne. 0) return
 
        ! Go to end of line
@@ -1808,6 +1843,7 @@ contains
     !   name: The name of the option
     !   val:  The value
     !   ierr: Upon success, 0. Otherwise 1.
+
     implicit none
     integer,          intent(in) :: unit
     character(len=1), intent(in) :: delim_char

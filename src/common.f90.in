@@ -62,10 +62,7 @@ module common_mod
  !character(len=200)                     ::  material          ! name of predefined material
   character(len=200)                     ::  material_file     ! file that defines ior_re and ior_im for a range of energies
   logical                                ::  integrated_mode          
-                                                               !   integrated cross section mode
-                                                               !   it's better to define a global "mode" variable
-                                                               !   with a default value and then the user only has 
-                                                               !   to specify "--mode='sed'" or something
+                                                              
 !-------
 
   character(len=200), dimension(max_num_mats)           ::  material_files
@@ -82,6 +79,17 @@ module common_mod
   character(len=200)                                    ::  euler_angle_file
   character(len=100)                                    ::  fftw_optimization_mode_name
   character(len=200)                                    ::  agglom_file_name
+
+  integer :: rank_aeff, rank_grain_a1, rank_grain_a2, rank_grain_a3, &
+         rank_ephot, rank_use_padded_fft, rank_force_numerical, &
+         rank_integrated_mode, rank_use_efficiencies, rank_verbose_mode, &
+         rank_timing_mode, rank_ior_re, rank_ior_im, rank_geometry, rank_euler_angle_mode, &
+         rank_rotation_axis, rank_euler_angle_file, rank_ngrain, rank_nscatter, &
+         rank_norientations, rank_dtheta, rank_max_angle, rank_agglom_file_name, &
+         rank_fftw_optimization_mode_name, rank_ephot_min, rank_ephot_max, rank_nephots, &
+         rank_dephot, rank_material_files(max_num_mats), rank_material_tags(max_num_mats), &
+         rank_agglom_composition_file, rank_material_file, rank_asked_for_version, &
+         rank_asked_for_help, rank_parameter_file_name
 
   contains
 
@@ -227,7 +235,7 @@ module common_mod
         &This should only be used for consistency tests.")
 
       ! First read in defaults
-      call process_input_file(opts,defaults_file_name,ierr,delim_char="=")
+      call process_input_file(opts,defaults_file_name,ierr,delim_char="=",rank=3)
       if (ierr .ne. 0) then
         write(stderr,*) "ERROR: Cannot read '",trim(defaults_file_name),"'. Quitting."
         stop
@@ -236,7 +244,7 @@ module common_mod
       ! write(0,*) "Loaded defaults."
 
       ! Now process command line options in order to read
-      call process_command_line(opts,ierr)
+      call process_command_line(opts,ierr,rank=1)
       if (ierr .ne. 0) then
         write (stderr,*) "ERROR in processing command line arguments." 
         stop
@@ -244,9 +252,9 @@ module common_mod
       ! write(stderr,*) "Processed command line arguments (round 1 of 2)."
       
       ! Read parameter file if one is given (overwrite everything)
-      call get_option_string(opts,"parameter-file-name",parameter_file_name)
+      call get_option_string(opts,"parameter-file-name",parameter_file_name,rank_parameter_file_name)
       if (parameter_file_name .ne. "") then
-        call process_input_file(opts,parameter_file_name,ierr,delim_char="=",overwrite="YES")
+        call process_input_file(opts,parameter_file_name,ierr,delim_char="=",overwrite="YES",rank=2)
         ! write(stderr,*) "Processed parameter file."
         if (ierr .ne. 0) then
           write(stderr,*) "ERROR: Cannot read ",parameter_file_name,". Quitting."
@@ -255,7 +263,7 @@ module common_mod
       end if
 
       ! re-read command line arguments (to overwrite parameter file arguments)
-      call process_command_line(opts,ierr)
+      call process_command_line(opts,ierr,rank=1)
       ! write(stderr,*) "Processed command line arguments (round 2 of 2)."
       if (ierr .ne. 0) then
         write (stderr,*) "ERROR in processing command line arguments." 
@@ -263,37 +271,40 @@ module common_mod
       end if
       
 
-      ! Set values
-      call get_option_real(opts,"aeff",a_eff)
-      call get_option_real(opts,"grain-axis-x",grain_a(1))
-      call get_option_real(opts,"grain-axis-y",grain_a(2))
-      call get_option_real(opts,"grain-axis-z",grain_a(3))
-      call get_option_real(opts,"ephot",ephot)
-      call get_flag(opts,"use-padded-fft",use_padded_fft)
-      call get_flag(opts,"force-numerical",force_numerical)
-      call get_flag(opts,"integrated",integrated_mode) 
-      call get_flag(opts,"use-efficiencies",use_efficiencies)  
-      call get_flag(opts,"verbose",verbose_mode)
-      call get_flag(opts,"timing",timing_mode)
-      call get_option_real(opts,"ior-re",ior_re)
-      call get_option_real(opts,"ior-im",ior_im)
-      call get_option_string(opts,"grain-geometry",geometry)
-      call get_option_string(opts,"euler-angle-mode",euler_angle_mode)
-      call get_option_string(opts,"rotation-axis",rotation_axis)
-      call get_option_string(opts,"euler-angle-file",euler_angle_file)
-      call get_option_integer(opts,"ngrain",ngrain)
-      
-      call get_option_integer(opts,"nscatter",nscatter)
-      call get_option_integer(opts,"norientations",norientations)
-      call get_option_real(opts, "dtheta", dtheta)
-      call get_option_real(opts,"max-angle",max_angle)
-      call get_option_string(opts,"agglom-file-name",agglom_file_name)
-      call get_option_string(opts,"fftw-optimization",fftw_optimization_mode_name)
 
-      call get_option_real(opts,"ephot-min", ephot_min)
-      call get_option_real(opts,"ephot-max", ephot_max)
-      call get_option_integer(opts,"nephots", nephots)
-      call get_option_real(opts,"dephot", dephot)
+
+
+      ! Set values
+      call get_option_real(opts,"aeff",a_eff,rank_aeff)
+      call get_option_real(opts,"grain-axis-x",grain_a(1),rank_grain_a1)
+      call get_option_real(opts,"grain-axis-y",grain_a(2),rank_grain_a2)
+      call get_option_real(opts,"grain-axis-z",grain_a(3),rank_grain_a3)
+      call get_option_real(opts,"ephot",ephot,rank_ephot)
+      call get_flag(opts,"use-padded-fft",use_padded_fft,rank_use_padded_fft)
+      call get_flag(opts,"force-numerical",force_numerical,rank_force_numerical)
+      call get_flag(opts,"integrated",integrated_mode, rank_integrated_mode) 
+      call get_flag(opts,"use-efficiencies",use_efficiencies, rank_use_efficiencies)  
+      call get_flag(opts,"verbose",verbose_mode, rank_verbose_mode)
+      call get_flag(opts,"timing",timing_mode, rank_timing_mode)
+      call get_option_real(opts,"ior-re",ior_re, rank_ior_re)
+      call get_option_real(opts,"ior-im",ior_im, rank_ior_im)
+      call get_option_string(opts,"grain-geometry",geometry, rank_geometry)
+      call get_option_string(opts,"euler-angle-mode",euler_angle_mode, rank_euler_angle_mode)
+      call get_option_string(opts,"rotation-axis",rotation_axis, rank_rotation_axis)
+      call get_option_string(opts,"euler-angle-file",euler_angle_file, rank_euler_angle_file)
+      call get_option_integer(opts,"ngrain",ngrain, rank_ngrain)
+      
+      call get_option_integer(opts,"nscatter",nscatter, rank_nscatter)
+      call get_option_integer(opts,"norientations",norientations, rank_norientations)
+      call get_option_real(opts, "dtheta", dtheta, rank_dtheta)
+      call get_option_real(opts,"max-angle",max_angle, rank_max_angle)
+      call get_option_string(opts,"agglom-file-name",agglom_file_name, rank_agglom_file_name)
+      call get_option_string(opts,"fftw-optimization",fftw_optimization_mode_name, rank_fftw_optimization_mode_name)
+
+      call get_option_real(opts,"ephot-min", ephot_min, rank_ephot_min)
+      call get_option_real(opts,"ephot-max", ephot_max, rank_ephot_max)
+      call get_option_integer(opts,"nephots", nephots, rank_nephots)
+      call get_option_real(opts,"dephot", dephot, rank_dephot)
 
       do i=1,max_num_mats
         if (i .gt. 10) then
@@ -302,16 +313,16 @@ module common_mod
           write(optname,'(i1)') i 
         end if 
         
-        call get_option_string(opts,"material-file"//optname,material_files(i))
-        call get_option_string(opts,"material-tag"//optname,material_tags(i))
+        call get_option_string(opts,"material-file"//optname,material_files(i), rank_material_files(i))
+        call get_option_string(opts,"material-tag"//optname,material_tags(i), rank_material_tags(i))
 
       end do 
 
-      call get_option_string(opts,"agglom-composition-file",agglom_composition_file)
-      call get_option_string(opts,"material-file",material_file)
+      call get_option_string(opts,"agglom-composition-file",agglom_composition_file, rank_agglom_composition_file)
+      call get_option_string(opts,"material-file",material_file, rank_material_file)
      
-      call get_flag(opts,"version",asked_for_version)
-      call get_flag(opts,"help",asked_for_help)
+      call get_flag(opts,"version",asked_for_version,rank_asked_for_version)
+      call get_flag(opts,"help",asked_for_help,rank_asked_for_help)
 
 
       if (asked_for_version) then
@@ -352,45 +363,134 @@ module common_mod
         if (option_found(opts,"material-file"//optname)) then
           material_file_specified = .TRUE.
           ! can't mix material-file and material-file1,2,... parameters
-          if (option_found(opts,"material-file")) then 
-            write(stderr,*) "ERROR: Cannot use BOTH --material-file and --material-file(1,2,..) options"
+          if (option_found(opts,"material-file") .and. (rank_material_file .LE. rank_material_files(i))) then 
+            write(stderr,*) "ERROR: Cannot use BOTH --material-file and --material-file1,2,.. options"
             stop
           end if 
           nmaterials = nmaterials + 1
         end if 
       end do
+
+      ! if(material_file_specified) write(stderr,*) "material_file_specified..."
+
+      if ( (option_found(opts,"ior-re") .or. option_found(opts,"ior-im")) .and. material_file_specified) then
+        if (min(rank_ior_re,rank_ior_im) == min(rank_material_file,minval(rank_material_files))) then
+          write(stderr,*) "Warning: you have specified BOTH a manual index of refraction value and "
+          write(stderr,*) "   a material file. We will use the material file by default."
+        else if (min(rank_ior_re,rank_ior_im) < min(rank_material_file,minval(rank_material_files))) then 
+          material_file_specified = .FALSE.
+        end if 
+      end if 
      
 
-
+      ! If multiple compositions specified, but the grain isn't an agglomerate
+      if ( nmaterials .gt. 0 .and. .not. (geometry == "spheres" .or. geometry == "agglomerate")) then
+        write(stderr,*) "Warning: you have specified more than one material file, but the grain"
+        write(stderr,*) "  geometry is ",geometry," not 'spheres'/'agglomerate'. Multiple compositions is"
+        write(stderr,*) "  currently only supported for agglomerate grains."
+      end if 
       ! check that the user didn't forget to provide the agglom-composition-file
       if ( nmaterials .gt. 0 .and. .not. option_found(opts,"agglom-composition-file")) then
         write(stderr, *) "ERROR: agglom-composition-file parameter is not set, but material-file1 and material-tag1 are."
         stop
       end if 
       
-      ! if we're just doing a single composition, 
-      if (nmaterials == 0 .and. option_found(opts,"material-file")) then 
-        material_file_specified = .TRUE.
+      ! Some book keeping if we're just using a single composition
+      if (nmaterials == 0 .and. material_file_specified) then 
         material_files(1) = material_file 
         nmaterials = 1
+      else if (nmaterials == 0) then
+        ! Otherwise use manually supplied index of refraction
+        ! write(stderr,*) "manual ior..."
+        material_file_specified = .FALSE.
+        material_files(1) = ""
+        material_file = ""
+        nmaterials = 1
+
       end if 
 
 
-      ! Let the user know if they specified conflicting parameters
+
+
+      ! Resolve parameter conflicts
+
+
+      ! nscatter and dtheta
       if (option_found(opts,"nscatter") .and. option_found(opts, "dtheta")) then
+        if (rank_nscatter == rank_dtheta) then
           write(stderr,*) "Warning: You have specified BOTH the 'nscatter' and 'dtheta' options."
           write(stderr,*) "We will use your specified value of nscatter:", nscatter
+        else if (rank_dtheta < rank_nscatter .or. rank_nscatter == 4) then
+          nscatter = int(ceiling(real(2*max_angle,dp_real)/dtheta))
+        end if
       else if (option_found(opts,"dtheta")) then
           nscatter = int(ceiling(real(2*max_angle,dp_real)/dtheta))
       end if 
 
+      ! nephots and dephot
       if (option_found(opts,"dephot") .and. option_found(opts, "nephots")) then
+        if (rank_dephot == rank_nephots) then
           write(stderr,*) "Warning: You have specified BOTH the 'nephots' and 'dephot' options."
           write(stderr,*) "We will use your specified value of nephots:", nephots
+        else if (rank_dephot < rank_nephots .or. rank_nephots == 4) then 
+          nephots = int(ceiling((ephot_max - ephot_min)/dephot))
+        else 
+          dephot = (ephot_max - ephot_min)/(nephots - 1)
+        end if 
       else if (option_found(opts,"dephot")) then
           nephots = int(ceiling((ephot_max - ephot_min)/dephot))
       else 
           dephot = (ephot_max - ephot_min)/(nephots - 1)
+      end if 
+
+      ! If index of refraction is defined manually (ior-re and ior-im), and ephot/material-file
+      ! options are also specified, go with the material file.
+      if ((option_found(opts,"ephot") .and. option_found(opts,"material-file")) .and. &
+            & (option_found(opts, "ior-re") .or. option_found(opts,"ior-im") )) then
+
+          if (min(rank_ephot, rank_material_file) == min(rank_ior_re, rank_ior_im) .and. rank_ephot .lt. 4) then
+            write(stderr,*) "Warning: You have specified BOTH 'ephot'/'material-file' and 'ior-re'/'ior-im' parameters."
+            write(stderr,*) "We will pull the index of refraction value from material-file=",material_file
+            write(stderr,*) "at a photon energy of ephot=",ephot,"keV."
+          else if (min(rank_ior_re,rank_ior_im) < min(rank_ephot,rank_material_file)) then
+            material_file_specified = .FALSE.
+            material_file=""
+            material_files(1)=""
+          else 
+            ior_re = 0.0
+            ior_im = 0.0
+          end if 
+      end if 
+
+
+
+      if (.not. integrated_mode) then
+          nephots = 1
+          dephot = 0.0
+
+          if (verbose_mode) then 
+            write(stderr,*) "GGADT will now calculate the DIFFERENTIAL SCATTERING CROSS SECTION"
+            write(stderr,*) "at a single energy for a single dust grain with a geometry of ", geometry
+            write(stderr,*) ""
+            write(stderr,*) "If instead you wish to calculate the energy dependent integrated cross sections,"
+            write(stderr,*) "pass the '--integrated' flag (or set integrated=T in your parameter file)."
+          end if
+      else
+         if (verbose_mode) then 
+            write(stderr,*) "GGADT will now calculate the INTEGRATED (ABS,SCAT,EXT) CROSS SECTIONS"
+            write(stderr,*) "for a single dust grain with a geometry of ", geometry
+            write(stderr,*) "over the energy range ", ephot_min," - ",ephot_max, " keV in ",dephot," keV increments"
+            write(stderr,*) "for a dust grain composed of ",nmaterials," materials:"
+            do i=1,nmaterials
+              write(stderr,*) " + ", material_files(i)
+
+            end do
+            write(stderr,*) 
+            write(stderr,*) ""
+            write(stderr,*) "If instead you wish to calculate the differential scattering cross section,"
+            write(stderr,*) "do not pass the '--integrated' flag (or set integrated=F in your parameter file)."
+          end if
+
       end if 
 
     end subroutine set_parameter_values

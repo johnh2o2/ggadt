@@ -1,5 +1,5 @@
 # Default parameters used by GGADT
-#==================================
+# ================================
 # Last modified by John Hoffman (May 29, 2014)
 
 # Geometry of grain 
@@ -34,12 +34,12 @@ material-file                  = "@abs_top_srcdir@/data/materials/index_silD03"
 # units: keV
 ephot                          = 2.0
 #  Re(m-1)
-ior-re                         =-1.920E-4
+#ior-re                         =-1.920E-4
 #  Re(m)
-ior-im                         = 2.807E-5
+#ior-im                         = 2.807E-5
 # | 
 # | DO NOT define ior-re or ior-im if you also have defined 
-# | a material-file. It will pull m(E) automatically.
+# | a material-file and 'ephot'. It will pull m(E) automatically.
 # |
 
 ## number of angles to calculate diff. scat. cross section (ntheta) or spacing between them (dtheta)
