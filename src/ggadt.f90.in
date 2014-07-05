@@ -5,12 +5,14 @@ program ggadt
     use ellipsoid
     use common_mod
     use constants
+    use interp
+    use custom 
 
     @USE_OMP_LIB@
 
     implicit none
 
-    real(kind=dp_real), allocatable :: x(:), y(:), kx(:), ky(:), thetax(:), thetay(:)
+    real(kind=dp_real), allocatable :: z(:), y(:), kz(:), ky(:), thetaz(:), thetay(:)
 
     complex(kind=dp_complex), allocatable :: sh(:,:), ftsh(:,:), phi_total(:,:)
 
@@ -19,8 +21,8 @@ program ggadt
 
 
     logical :: multiple_compositions
-    real(kind=dp_real) :: xmin, xmax, ymin, ymax, dx, dy, k, l, dk, norm_const
-    real(kind=dp_real), dimension(3) :: eul_ang
+    real(kind=dp_real) :: zmin, zmax, ymin, ymax, dz, dy, k, l, dk, norm_const
+    real(kind=dp_real), dimension(3) :: angles
     real(kind=dp_real), dimension(3,3) :: rm 
 
     integer :: kactual, kmin, kmax, enhancement
@@ -85,6 +87,8 @@ contains
 
     end subroutine calculate_int_cross_sections
 
+    
+
     subroutine get_ior(matfile, iorres, iorims, iorre, iorim)
         implicit none
         character(len=200), intent(in) :: matfile 
@@ -99,7 +103,7 @@ contains
 
         ! if (material .ne. 'custom') then 
         !    write(stderr,*) "ERROR: Do not recognize material", material,". &
-        !        & GGADT does not currently have any built-in materials. &
+        !        & GGADT does not currently have antheta built-in materials. &
         !        & Specify --material='custom' and --material-file='/path/to/file'."
         !    stop 
         !end if 
@@ -148,11 +152,17 @@ contains
                 iorims(i) = linterp(file_ephots,file_ior_im,ephots(i))
                 
             end do 
+        else
+            iorres(1) = iorre
+            iorims(1) = iorim
         end if 
+
        
         close(1)
 
     end subroutine get_ior
+
+
     subroutine get_integrated_cross_sections(energy,delms,sigma_scat,sigma_abs)
         implicit none
         real(kind=dp_real), intent(in) :: energy
@@ -161,7 +171,7 @@ contains
         complex(kind=dp_complex), dimension(10), intent(in) :: delms
 
         real(kind=dp_real) :: kphot,sigma_ext
-        integer :: c1,c2, neul
+        integer :: c1,c2, nangle
 
         delm = delms(1)
 
@@ -177,29 +187,34 @@ contains
         else 
 
             ! loop over orientations        
-            do neul = 1,norientations
+            do nangle = 1,norientations
 
                 ! fetch Euler angles
-                eul_ang = get_new_euler_angles(neul)
+                angles = get_new_angles(nangle)
 
-                ! calculate rotation matrix corresponding to euler angles
-                rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
+                ! calculate rotation matrix corresponding to rotation angles
+
+                ! angles(1) -- beta
+                ! angles(2) -- theta
+                ! angles(3) -- phi
+
+                rm = matmul(matmul(rot_x(angles(1)), rot_z(angles(2))),rot_x(angles(3)))
 
                 if (geometry .eq. 'sphere') then
 
-                    !$omp parallel shared(sh,x,y,kphot,a_eff,delm) 
+                    !$omp parallel shared(sh,z,y,kphot,a_eff,delm) 
                     !$omp do schedule(dynamic) private(c1,c2) 
-                     do c1=1,size(x)
+                     do c1=1,size(z)
                         do c2=1,size(y)
-                            sh(c1,c2) = shadow_sphere(x(c1),y(c2), kphot, a_eff, delm)
-                            phi_total(c1,c2) = phi_sphere(x(c1),y(c2),kphot,a_eff,delm)
+                            sh(c1,c2) = shadow_sphere(z(c1),y(c2), kphot, a_eff, delm)
+                            phi_total(c1,c2) = phi_sphere(z(c1),y(c2),kphot,a_eff,delm)
                         end do
                      end do
                     !$omp end do nowait
                     !$omp end parallel
 
 
-                else if (geometry .eq. 'spheres' .or. geometry .eq. 'agglomerate') then 
+                else if (geometry .eq. 'spheres' .or. geometry .eq. 'agglomeration') then 
                     call rotate_spheres(rm)
                     do c1=1,nspheres
                         if (multiple_compositions) then
@@ -210,10 +225,10 @@ contains
                         ior_i(c1) = AIMAG(delm)
                     end do
                     
-                    phi_total = phi_spheres(x,y,kphot)
+                    phi_total = phi_spheres(z,y,kphot)
                     !$omp parallel shared(sh,phi_total) 
                     !$omp do schedule(dynamic) private(c1,c2) 
-                    do c1=1,size(x)
+                    do c1=1,size(z)
                         do c2=1,size(y)
                             sh(c1,c2) = 1-exp( (0.0,1.0)*phi_total(c1,c2) )
                         end do
@@ -222,27 +237,30 @@ contains
                     !$omp end parallel
                 else if (geometry .eq. 'ellipsoid') then 
 
-                    !$omp parallel shared(sh,phi_total,x,y,kphot,grain_a,delm,rm) 
+                    !$omp parallel shared(sh,phi_total,z,y,kphot,grain_a,delm,rm) 
                     !$omp do schedule(dynamic) private(c1,c2) 
-                    do c1=1,size(x)
+                    do c1=1,size(z)
                         do c2=1,size(y)
-                            sh(c1,c2) = shadow_ellipsoid(x(c1),y(c2), kphot, grain_a, delm, rm)
-                            phi_total(c1,c2) = phi_ellipsoid(x(c1),y(c2),kphot, grain_a, delm,rm )
+                            sh(c1,c2) = shadow_ellipsoid(z(c1),y(c2), kphot, grain_a, delm, rm)
+                            phi_total(c1,c2) = phi_ellipsoid(z(c1),y(c2),kphot, grain_a, delm,rm )
                         
                         end do
                     end do
                     !$omp end do nowait
                     !$omp end parallel
+                else if (geometry .eq. 'custom') then
+                    sh = shadow_custom(z,y,k,rm,ngrain,ephot,ephots,ior_res,ior_ims)
+                    phi_total = phi_custom(z,y,k,rm,ngrain,ephot,ephots,ior_res,ior_ims)
                 else 
                     write(stderr,*) "ERROR: Do not understand geometry=",geometry
                     stop
                 end if
 
                 
-                do c1=1,size(x)
+                do c1=1,size(z)
                     do c2=1,size(y)
-                     sigma_abs = sigma_abs + (1 - exp(-2*AIMAG(phi_total(c1,c2))))*dx*dy 
-                     sigma_scat = sigma_scat + (abs(sh(c1,c2))**2)*dx*dy
+                     sigma_abs = sigma_abs + (1 - exp(-2*AIMAG(phi_total(c1,c2))))*dz*dy 
+                     sigma_scat = sigma_scat + (abs(sh(c1,c2))**2)*dz*dy
                     end do 
                 end do               
             end do
@@ -255,9 +273,9 @@ contains
 
     subroutine diff_scat_cross_sect()
         implicit none 
-        integer :: neul, i, j
+        integer :: nangle, i, j
         real(kind=dp_real) :: th, sc, dth
-        real(kind=dp_real), dimension(10*size(thetax)) :: sc_array, thets
+        real(kind=dp_real), dimension(10*size(thetaz)) :: sc_array, thets
         complex(kind=dp_complex), dimension(10) :: delms
         
         
@@ -270,77 +288,84 @@ contains
 
         if (use_efficiencies) then 
             norm_const = 1.0/(pi*a_eff*a_eff)
-            write(stdout,*) "# [thetax] [thetay] [dQ_scat/domega]"
+            write(stdout,*) "# [thetaz] [thetay] [dQ_scat/domega]"
         else 
             norm_const = 1.0
-            write(stdout,*) "# [thetax] [thetay] [dsigma_scat/domega]"
+            write(stdout,*) "# [thetaz] [thetay] [dsigma_scat/domega]"
         end if 
 
         if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
             if (verbose_mode) write(stderr,*) " Using analytical ADT for sphere..."
 
             ! Make a table of values for S(theta)
-            dth = (1.5*thetax(size(thetax)) - thetax(1))/REAL(size(thets)-1, kind=dp_real)
+            dth = (1.5*thetaz(size(thetaz)) - thetaz(1))/REAL(size(thets)-1, kind=dp_real)
             do i=1,size(thets)
-                thets(i) = thetax(1) + (i-1)*dth
+                thets(i) = thetaz(1) + (i-1)*dth
                 sc_array(i) = scatter_sphere(k,a_eff,thets(i),delm)
             end do 
 
             ! Now output differential scattering cross section
-            write(stdout,*) "# [thetax] [thetay] [dqscat/domega]"
-            do i=1,size(thetax)
+            write(stdout,*) "# [thetaz] [thetay] [dqscat/domega]"
+            do i=1,size(thetaz)
                 do j=1,size(thetay)
-                    th = sqrt(thetax(i)*thetax(i) + thetay(j)*thetay(j))
+                    th = sqrt(thetaz(i)*thetaz(i) + thetay(j)*thetay(j))
                     sc = linterp(thets,sc_array,th)/(pi*a_eff*a_eff)
                    
-                    write(stdout,*) thetax(i),thetay(j), sc
+                    write(stdout,*) thetaz(i),thetay(j), sc
                 end do
             end do
         else 
             ! loop over orientations
-            do neul = 1,norientations
+            do nangle = 1,norientations
 
                 ! fetch Euler angles
-                eul_ang = get_new_euler_angles(neul)
+                angles = get_new_angles(nangle)
 
-                ! calculate rotation matrix corresponding to euler angles
-                rm = matmul(matmul(rot_x(eul_ang(1)), rot_y(eul_ang(2))),rot_z(eul_ang(3)))
+                ! calculate rotation matrix corresponding to rotation angles
+
+                ! angles(1) -- beta
+                ! angles(2) -- theta
+                ! angles(3) -- phi
+                rm = matmul(matmul(rot_x(angles(1)), rot_z(angles(2))),rot_x(angles(3)))
                 
 
                 if (geometry .eq. 'ellipsoid') then 
-                    !$omp parallel shared(sh,x,y,rm,k,delm,grain_a) 
+                    !$omp parallel shared(sh,z,y,rm,k,delm,grain_a) 
                     !$omp do schedule(dynamic) private(i,j)
-                    do i=1,size(x)
+                    do i=1,size(z)
                         do j=1,size(y)
-                            sh(i,j) = shadow_ellipsoid(x(i),y(j),k,grain_a,delm,rm)
+                            sh(i,j) = shadow_ellipsoid(z(i),y(j),k,grain_a,delm,rm)
                         end do
                     end do
                     !$omp end do nowait
                     !$omp end parallel
                 elseif  (geometry .eq. 'sphere') then 
-                    !$omp parallel shared(sh,x,y,rm,k,delm,grain_a)
+                    !$omp parallel shared(sh,z,y,rm,k,delm,grain_a)
                     !$omp do schedule(dynamic) private(i,j)
-                    do i=1,size(x)
+                    do i=1,size(z)
                         do j=1,size(y)
-                            sh(i,j) = shadow_sphere(x(i),y(j), k, a_eff, delm)
+                            sh(i,j) = shadow_sphere(z(i),y(j), k, a_eff, delm)
                         end do
                     end do
                     !$omp end do nowait
                     !$omp end parallel
-                elseif (geometry .eq. 'spheres' .or. geometry .eq. 'agglomerate')    then
+                elseif (geometry .eq. 'spheres' .or. geometry .eq. 'agglomeration')    then
                     call rotate_spheres(rm)
-                    sh = shadow_spheres(x,y,k)
+                    sh = shadow_spheres(z,y,k)
+
+                elseif (geometry .eq. 'custom') then
+                    sh = shadow_custom(z,y,k,rm,ngrain,ephot,ephots,ior_res,ior_ims)
                 else
                     write(stderr,*) "ERROR: Do not understand geometry: ", geometry
                 end if 
                
                 call fft_faster(sh,kmin,kmax,enhancement, ftsh)
 
-                !$omp parallel shared(scatter,ftsh,k,dx,dy,norientations) 
+                !$omp parallel shared(scatter,ftsh,k,dz,dy,norientations) 
                 !$omp do schedule(dynamic) private(i,j)
-                do i=1,size(kx)
+                do i=1,size(kz)
                     do j=1,size(ky)
-                        scatter(i,j) = scatter(i,j) + ((k*dx*dy*abs(ftsh(i,j))/twopi)**2)/real(norientations,kind=dp_real)
+                        scatter(i,j) = scatter(i,j) + ((k*dz*dy*abs(ftsh(i,j))/twopi)**2)/real(norientations,kind=dp_real)
                     end do
                 end do
                 !$omp end do nowait
@@ -348,16 +373,16 @@ contains
 
 
                 write(stderr,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
-                        & " percent complete: ", (real(neul)/real(norientations))*100.0, "%"
+                        & " percent complete: ", (real(nangle)/real(norientations))*100.0, "%"
             end do
 
             if (timing_mode) stop 
 
            
             
-            do i=1,size(thetax)
+            do i=1,size(thetaz)
                 do j=1,size(thetay)
-                    write(stdout,*) thetax(i),thetay(j),scatter(j,i)*norm_const
+                    write(stdout,*) thetaz(i),thetay(j),scatter(j,i)*norm_const
                 end do
             end do
             if (verbose_mode) write(stderr,*) "done."
@@ -399,6 +424,7 @@ contains
             do i=1, nmaterials
                 call get_ior(material_files(i), ior_res(i,:), ior_ims(i,:), ior_res_single_en(i), ior_ims_single_en(i))
             end do 
+
         else
 
             ! otherwise, set the index of refraction to the ior-im and ior-re parameters
@@ -412,8 +438,8 @@ contains
 
         
  
-      ! Set Euler angles -------------------------------
-        if (euler_angle_mode == 'sequential') then
+      ! Set angles -------------------------------
+        if (angle_mode == 'sequential') then
             if (rotation_axis == 'none') then 
                 norientations_new = int(real(norientations)**(1.0/3.0))**3
                 if (norientations /= norientations_new) then
@@ -422,18 +448,18 @@ contains
                     norientations = norientations_new
                 endif
             end if 
-        else if (euler_angle_mode == 'random') then
+        else if (angle_mode == 'random') then
             call init_random_seed()
 
-        else if (euler_angle_mode == 'file') then !check the contents of the euler angle file
-            if (euler_angle_file == "") then
-              write(stderr,*) "ERROR: euler_angle_mode of 'file', but specified file is empty"
+        else if (angle_mode == 'file') then !check the contents of the angle file
+            if (angle_file == "") then
+              write(stderr,*) "ERROR: angle_mode of 'file', but specified file is empty"
               stop
             else
               line = 0
-              open(10,file=euler_angle_file,iostat=status)
+              open(10,file=angle_file,iostat=status)
               if (status .ne. 0)then 
-                write(stderr,*) "ERROR: euler_angle_file of ",euler_angle_file," does not exist."
+                write(stderr,*) "ERROR: angle_file of ",angle_file," does not exist."
                 stop
               else
               do while(status == 0)
@@ -442,11 +468,11 @@ contains
               end do 
               if (line .ne. norientations) then
                 if (line == 0) then
-                    write(stderr,*) "ERROR: No orientations found in ", euler_angle_file,"!"
+                    write(stderr,*) "ERROR: No orientations found in ", angle_file,"!"
                     stop
                 end if 
                 write(stderr,*) "WARNING: norientations set to ",norientations," but there are ",line," orientations in ",&
-                  euler_angle_file,". norientations -> ",line
+                  angle_file,". norientations -> ",line
                 norientations = line 
               end if
 
@@ -459,8 +485,8 @@ contains
 
     ! ---------------------------------------------------
 
-        if ((geometry == 'sphere') .or. (geometry == 'spheres')) then 
-            if (geometry == 'spheres' .or. geometry .eq. 'agglomerate') then
+        if ((geometry == 'sphere') .or. (geometry == 'spheres') .or. (geometry == 'agglomeration') .or. (geometry=='custom')) then 
+            if (geometry == 'spheres' .or. geometry .eq. 'agglomeration') then
                 default_ior_i = ior_im
                 default_ior_r = ior_re
                 call read_spheres(agglom_file_name, a_eff, max_dist)
@@ -529,9 +555,9 @@ contains
    
     ! allocate arrays that depend on ngrid
 
-        ! x , y
-        allocate(x(ngrid),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (x) array ***"
+        ! z , y
+        allocate(z(ngrid),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (z) array ***"
         allocate(y(ngrid),stat = allocatestatus)
             if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (y) array ***"
         ! sh
@@ -548,25 +574,25 @@ contains
     ! ----------------------------------------------------
      
     ! set grid boundaries and spacing in physical coords
-        xmin = -grid_width*a_eff/2.0
+        zmin = -grid_width*a_eff/2.0
         ymin = -grid_width*a_eff/2.0
-        xmax = grid_width*a_eff/2.0
+        zmax = grid_width*a_eff/2.0
         ymax = grid_width*a_eff/2.0
 
-        dx = (xmax-xmin)/(size(x)-1)
+        dz = (zmax-zmin)/(size(z)-1)
         dy = (ymax-ymin)/(size(y)-1)
     ! -------------------------
         
-    ! set x and y arrays
-        do i=1,size(x)
-            x(i) = xmin + (i-1)*dx
+    ! set z and y arrays
+        do i=1,size(z)
+            z(i) = zmin + (i-1)*dz
         end do
         do i=1,size(y)
             y(i) = ymin + (i-1)*dy
         end do
     ! -------------------
       
-        L = x(size(x)) - x(1)  ! length of grid in physical coords
+        L = z(size(z)) - z(1)  ! length of grid in physical coords
         !write(stderr,*) "LENGTH: ",L
 
     ! figures out what kmin, kmax, enhancement and kactual are.
@@ -577,15 +603,15 @@ contains
       
     ! allocate arrays that depend on kactual
 
-        ! kx
-        allocate(kx(kactual),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (kx) array ***"
+        ! kz
+        allocate(kz(kactual),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (kz) array ***"
         ! ky
         allocate(ky(kactual),stat = allocatestatus)
             if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ky) array ***"
-        ! thetax
-        allocate(thetax(kactual),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (thetax) array ***"
+        ! thetaz
+        allocate(thetaz(kactual),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (thetaz) array ***"
         ! thetay
         allocate(thetay(kactual),stat = allocatestatus)
             if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (thetay) array ***"
@@ -597,15 +623,15 @@ contains
             if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (scatter) array ***"
     ! ----------------------------------
 
-        dk = real(kmax-kmin)/real(size(kx) - 1)
+        dk = real(kmax-kmin)/real(size(kz) - 1)
         
-    ! set kx, ky, thetax and thetay arrays
+    ! set kz, ky, thetaz and thetay arrays
     !   + make scatter array all zero
-        do i=1,size(kx)
-            kx(i) = ((i-1)*dk + kmin)*(TWOPI/L)
-            ky(i) = kx(i)
+        do i=1,size(kz)
+            kz(i) = ((i-1)*dk + kmin)*(TWOPI/L)
+            ky(i) = kz(i)
 
-            thetax(i) = asin(kx(i)/k)
+            thetaz(i) = asin(kz(i)/k)
             thetay(i) = asin(ky(i)/k)
             do j=1,size(ky)
                 scatter(i,j) = 0.0
@@ -620,7 +646,7 @@ contains
         if (nmaterials .gt. 1) then 
             multiple_compositions = .TRUE.
 
-            if (geometry .eq. "spheres"  .or. geometry .eq. 'agglomerate') then 
+            if (geometry .eq. "spheres"  .or. geometry .eq. 'agglomeration') then 
                 allocate(agglom_material_tags(nspheres),stat=allocatestatus)
                     if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (agglom_material_tags) array ***"
                 
@@ -639,7 +665,7 @@ contains
         else 
             multiple_compositions = .FALSE.
             if (material_file_specified .and. &
-               & ( geometry .eq. "spheres" .or. geometry .eq. "agglomerate" ) .and. .not. integrated_mode) then 
+               & ( geometry .eq. "spheres" .or. geometry .eq. "agglomeration" ) .and. .not. integrated_mode) then 
                 do i=1,nspheres
                     ior_r(i) = ior_res_single_en(1)
                     ior_i(i) = ior_ims_single_en(1)
@@ -727,95 +753,106 @@ contains
         call random_seed(put=seed)
     end subroutine init_random_seed
 
-    function get_new_euler_angles(i)
-        real(kind=dp_real), dimension(3) :: get_new_euler_angles
+    function get_new_angles(i)
+        real(kind=dp_real), dimension(3) :: get_new_angles
         integer, intent(in) :: i
         integer                :: j 
         character(len=50)    :: junk
         real(kind=dp_real) :: norm
-        integer :: cbrt_norientations, nx, ny, nz, sqrt_norientations
+        integer :: cbrt_norientations, nbeta, ntheta, nphi, sqrt_norientations
 
 
-        if (euler_angle_mode .eq. 'sequential') then 
+        ! Note (JAH, June 26, 2014) -- this function needs to be fixed for rotating
+        !                 about a given axis (check if mstm or ddscat orienation,
+        !                 or better yet, provide a rotation/precession axis option.
+
+        if (angle_mode .eq. 'sequential') then 
             if (rotation_axis == 'none') then 
                 cbrt_norientations = int(norientations**(1.0/3.0))
                 norm = real(cbrt_norientations ,kind=dp_real)**(-1.0)
-                nx = mod(i/(cbrt_norientations*cbrt_norientations),   cbrt_norientations)
-                ny = mod(i/(cbrt_norientations),               cbrt_norientations)
-                nz = mod(i,                             cbrt_norientations) 
-                get_new_euler_angles(1) = (2*pi*(nx-1))*norm
-                get_new_euler_angles(2) = (2*pi*(ny-1))*norm
-                get_new_euler_angles(3) = (2*pi*(nz-1))*norm
+                nbeta = mod(i/(cbrt_norientations*cbrt_norientations),   cbrt_norientations)
+                ntheta = mod(i/(cbrt_norientations),               cbrt_norientations)
+                nphi = mod(i,                             cbrt_norientations) 
+                get_new_angles(1) = (2*pi*(nbeta-1))*norm - pi
+                get_new_angles(2) = (pi*(ntheta-1))*norm
+                get_new_angles(3) = (2*pi*(nphi-1))*norm - pi
             else if ( rotation_axis .eq. 'xaxis' ) then 
                 norm = real(norientations ,kind=dp_real)**(-1.0)
-                get_new_euler_angles(1) =  2*pi*(i-1)*norm
-                get_new_euler_angles(2) = 0.0
-                get_new_euler_angles(3) = 0.0
+                get_new_angles(1) =  2*pi*(i-1)*norm - pi
+                get_new_angles(2) = 0.0
+                get_new_angles(3) = 0.0
             else if ( rotation_axis .eq. 'yaxis' ) then 
-                get_new_euler_angles(1) = 0.0
-                get_new_euler_angles(2) = 2*pi*(i-1)*norm
-                get_new_euler_angles(3) = 0.0
+                get_new_angles(1) = 0.0
+                get_new_angles(2) = pi*(i-1)*norm
+                get_new_angles(3) = 0.0
             else if ( rotation_axis .eq. 'zaxis' ) then 
-                get_new_euler_angles(1) = 0.0
-                get_new_euler_angles(2) = 0.0
-                get_new_euler_angles(3) = 2*pi*(i-1)*norm 
+                get_new_angles(1) = 0.0
+                get_new_angles(2) = 0.0
+                get_new_angles(3) = 2*pi*(i-1)*norm - pi
             else 
-                write(stderr,*) "ERROR (get_new_euler_angles): Do not understand rotation_axis: '",trim(adjustl(rotation_axis)),"'"
+                write(stderr,*) "ERROR (get_new_angles): Do not understand rotation_axis: '",trim(adjustl(rotation_axis)),"'"
             end if 
-        else if ( euler_angle_mode .eq. 'file' ) then
-            open(unit=1,file=euler_angle_file)
+        else if ( angle_mode .eq. 'file' ) then
+            open(unit=1,file=angle_file)
             if (i > 1) then 
                 do j=1,i-1
                     read(1,'(A)') junk
                 end do
             end if 
-            read(1,*) get_new_euler_angles
+            read(1,*) get_new_angles
             close(1)
-        else if ( euler_angle_mode .eq. 'random' ) then
-            call random_number(get_new_euler_angles)
+            if (axes_convention == 'mstm') then
+              call convert_mstm_to_ddscat(get_new_angles)
+            end if 
+        else if ( angle_mode .eq. 'random' ) then
+            call random_number(get_new_angles)
             
+
+
             if (rotation_axis .eq. "none") then 
                 
-                get_new_euler_angles(1) = 2*pi*get_new_euler_angles(1)
-                get_new_euler_angles(2) = 2*pi*get_new_euler_angles(2) 
-                get_new_euler_angles(3) = 2*pi*get_new_euler_angles(3)
+                get_new_angles(1) = 2*pi*get_new_angles(1) - pi
+                get_new_angles(2) = pi*get_new_angles(2) 
+                get_new_angles(3) = 2*pi*get_new_angles(3) - pi
             else if ( rotation_axis .eq. 'xaxis' ) then 
-                get_new_euler_angles(1) = 2*pi*get_new_euler_angles(1)
-                get_new_euler_angles(2) = 0.0
-                get_new_euler_angles(3) = 0.0
+                get_new_angles(1) = 2*pi*get_new_angles(1) - pi
+                get_new_angles(2) = 0.0
+                get_new_angles(3) = 0.0
             else if ( rotation_axis .eq. 'yaxis' ) then 
-                get_new_euler_angles(1) = 0.0
-                get_new_euler_angles(2) = 2*pi*get_new_euler_angles(2)
-                get_new_euler_angles(3) = 0.0
+                get_new_angles(1) = 0.0
+                get_new_angles(2) = pi*get_new_angles(2)
+                get_new_angles(3) = 0.0
             else if ( rotation_axis .eq. 'zaxis' ) then 
-                get_new_euler_angles(1) = 0.0
-                get_new_euler_angles(2) = 0.0
-                get_new_euler_angles(3) = 2*pi*get_new_euler_angles(3)
+                get_new_angles(1) = 0.0
+                get_new_angles(2) = 0.0
+                get_new_angles(3) = 2*pi*get_new_angles(3) - pi
             else 
-                write(stderr,*) "ERROR (get_new_euler_angles): Do not understand rotation_axis: '",trim(adjustl(rotation_axis)),"'"
+                write(stderr,*) "ERROR (get_new_angles): Do not understand rotation_axis: '",trim(adjustl(rotation_axis)),"'"
             end if 
         else 
-            write(stderr, *) "ERROR (get_new_euler_angles): Do not understand&
-            & euler_angle_mode '",trim(adjustl(euler_angle_mode)),"'."
+            write(stderr, *) "ERROR (get_new_angles): Do not understand&
+            & angle_mode '",trim(adjustl(angle_mode)),"'."
             stop 
 
         endif
-    end function get_new_euler_angles
+
+        
+    end function get_new_angles
 
     subroutine cleanup()
         implicit none 
         integer :: deallocatestatus
-        deallocate(x,stat=deallocatestatus)
+        deallocate(z,stat=deallocatestatus)
         deallocate(y,stat=deallocatestatus)
-        deallocate(kx,stat=deallocatestatus)
+        deallocate(kz,stat=deallocatestatus)
         deallocate(ky,stat=deallocatestatus)
-        deallocate(thetax,stat=deallocatestatus)
+        deallocate(thetaz,stat=deallocatestatus)
         deallocate(thetay,stat=deallocatestatus)
         deallocate(sh,stat=deallocatestatus)
         deallocate(ftsh,stat=deallocatestatus)
         deallocate(scatter,stat=deallocatestatus)
         
-        if (geometry .eq. 'spheres'  .or. geometry .eq. 'agglomerate')    then
+        if (geometry .eq. 'spheres'  .or. geometry .eq. 'agglomeration')    then
             deallocate(pos)
             deallocate(pos_rot)
             deallocate(radii)
@@ -844,18 +881,18 @@ contains
             write(i,*) "# Material file: '",trim(adjustl(material_file)),"'"
         end if 
         write(i,*) "# geometry: ", trim(adjustl(geometry))
-        write(i,*) "# euler_angle_mode: ",trim(adjustl(euler_angle_mode))
-        if (euler_angle_mode == "file") write(i,*) "# euler_angle_file: ", trim(adjustl(euler_angle_file))
+        write(i,*) "# angle_mode: ",trim(adjustl(angle_mode))
+        if (angle_mode == "file") write(i,*) "# angle_file: ", trim(adjustl(angle_file))
         write(i,*) "# ngrain: ",ngrain
         write(i,*) "# norientations: ",norientations
-        write(i,*) "# grain-axis-x: ",grain_a(1)
+        write(i,*) "# grain-axis-z: ",grain_a(1)
         write(i,*) "# grain-axis-y: ",grain_a(2)
         write(i,*) "# grain-axis-z: ",grain_a(3)
         write(i,*) "# rotation-axis: ",rotation_axis
         write(i,*) "# use_padded_fft: ",use_padded_fft
         write(i,*) "# parameter_file_name: ",trim(adjustl(parameter_file_name))
         write(i,*) "# fftw_optimization_mode_name: ",trim(adjustl(fftw_optimization_mode_name))
-        if (geometry == "spheres" .or. geometry .eq. 'agglomerate') &
+        if (geometry == "spheres" .or. geometry .eq. 'agglomeration') &
             & write(i,*) "# agglom_file_name: ",trim(adjustl(agglom_file_name))
         write(i,*) "# -----------------------------------"
     

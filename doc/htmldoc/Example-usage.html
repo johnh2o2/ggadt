@@ -1,15 +1,15 @@
 <html lang="en">
 <head>
-<title>Example usage - GGADT 0.9.91</title>
+<title>Example usage - GGADT 0.9.93</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="GGADT 0.9.91">
+<meta name="description" content="GGADT 0.9.93">
 <meta name="generator" content="makeinfo 4.8">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="prev" href="Invoking-GGADT.html#Invoking-GGADT" title="Invoking GGADT">
 <link rel="next" href="Testing-against-previous-results.html#Testing-against-previous-results" title="Testing against previous results">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
-This manual is for GGADT (version 0.9.91, 31 May 2014),
+This manual is for GGADT (version 0.9.93, 5 July 2014),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT).
 
@@ -45,7 +45,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
 
 <h2 class="chapter">4 Example usage</h2>
 
-<p><a name="index-sample-output-52"></a><a name="index-examples-53"></a>
+<p><a name="index-sample-output-53"></a><a name="index-examples-54"></a>
 
 <h3 class="section">4.1 Default case</h3>
 
@@ -57,7 +57,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
 
 <pre class="example">     # Default parameters used by GGADT
      # ================================
-     # Last modified by John Hoffman (May 29, 2014)
+     # Last modified by John Hoffman (June 26, 2014)
      
      # Geometry of grain
      # | one of: 'sphere','spheres' (or 'agglomerate'), or 'ellipsoid'
@@ -68,6 +68,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
      use-padded-fft                 = F
      integrated                     = F
      force-numerical                = F
+     axes-convention                = 'ddscat'
      
      # effective radius (radius of sphere with same volume)
      aeff                           = 0.2
@@ -80,23 +81,23 @@ Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
      grain-axis-z                   = 1.0
      
      # IF grain-geometry=agglomerate
-     agglom-file-name               = ''
+     agglom-file                    = ''
      agglom-composition-file        = ''
      
      # Grain composition
      # Path to material index file
-     material-file                  = "(path to GGADT directory)/data/materials/index_silD03"
+     material-file                  = "(top source directory)/data/materials/index_silD03"
      
      # parameters for differential scattering cross section calculation
      # units: keV
      ephot                          = 2.0
      #  Re(m-1)
-     ior-re                         =-1.920E-4
+     #ior-re                         =-1.920E-4
      #  Re(m)
-     ior-im                         = 2.807E-5
+     #ior-im                         = 2.807E-5
      # |
      # | DO NOT define ior-re or ior-im if you also have defined
-     # | a material-file. It will pull m(E) automatically.
+     # | a material-file and 'ephot'. It will pull m(E) automatically.
      # |
      
      ## number of angles to calculate diff. scat. cross section (ntheta) or spacing between them (dtheta)
@@ -114,14 +115,14 @@ Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
      #grain_axis_ratio              = 1.0
      
      rotation-axis                  = 'none'     # For ellipsoidal or agglomerate grains
-     euler-angle-mode               = 'random'   # Either 'sequential', 'random' or 'custom'
+     angle-mode                     = 'random'   # Either 'sequential', 'random' or 'file'
                                                  # | tells GGADT how to choose orientations over which to average
                                                  # | calculations.
-     euler-angle-file               = ''         # If euler-angle-mode='custom'; Path to file listing Euler angles
+     angle-file                     = ''         # If angle-mode='file'; Path to file listing angles
                                                  # | over which to average calculations
-                                                 # If euler-angle-mode is NOT 'custom'; number of orientations
-                                                 # | over which to average calcuations
      norientations                  = 64
+     											# If angle-mode is NOT 'file'; number of orientations
+                                                 # | over which to average calcuations
      # For integrated cross section (pass --integrated flag)
      # number of photon energies to calculate integrated cross sections
      #nephots                       = 100
@@ -157,19 +158,19 @@ Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
 
 <h3 class="section">4.3 Ellipsoids and spheroids &ndash; orientational averages about a principal axis</h3>
 
-<p>GGADT allows you to specify a general, ellipsoidal (tri-axial) grain through the input options <code>--grain-axis-x,y,z=</code><em>val</em>. These specify the relative lengths of the three principal axes of the grain. These axes lengths are then normalized so that the effective radius of the grain is consistent with the <code>--aeff</code> parameter.
+<p><strong>WARNING &ndash; this section is obselete, and the rotation-axis parameter should be avoided. Spinning grains will be handled in future versions of GGADT.</strong>
+
+   <p>GGADT allows you to specify a general, ellipsoidal (tri-axial) grain through the input options <code>--grain-axis-x,y,z=</code><em>val</em>. These specify the relative lengths of the three principal axes of the grain. These axes lengths are then normalized so that the effective radius of the grain is consistent with the <code>--aeff</code> parameter.
 
    <p>If you wish to calculate orientationally-averaged quantities of a grain <em>about a principal axis</em>, GGADT allows you to do this through specifying <code>--rotation-axis=xaxis,yaxis,zaxis,none</code>. The <code>--rotation-axis</code> parameter is 'none' by default.
 
-<h4 class="subsection">4.3.1 Coordinate systems</h4>
-
-<p>The <code>--rotation-axis</code> parameter will work for grain agglomerates as well. The positions of the agglomerates as specified in the agglomerate file define the coordinate system that GGADT works in. Be sure the axis you specify via <code>--rotation-axis</code> is really the axis you want. You'll have to know something about how the coordinate system of the agglomerate file is defined.
+   <p>The <code>--rotation-axis</code> parameter will work for grain agglomerates as well. The positions of the agglomerates as specified in the agglomerate file define the coordinate system that GGADT works in. Be sure the axis you specify via <code>--rotation-axis</code> is really the axis you want. You'll have to know something about how the coordinate system of the agglomerate file is defined.
 
    <p>If you are using an <code>ELLIPSOID</code> grain geometry, the coordinate system is such that the z-axis points towards the observer (i.e. the incident photons' direction of propagation), and the x and y directions are defined by the <code>--grain-axis-x,y,z</code> input parameters.
 
    <p>Currently, there is no option to specify a custom rotation axis about which to orient the grain. If this is something you would like added to GGADT, let John Hoffman know.
 
-<h4 class="subsection">4.3.2 Example runs for a prolate spheroid</h4>
+<h4 class="subsection">4.3.1 Example runs for a prolate spheroid</h4>
 
 <p>Below are the results from running GGADT on a prolate spheroid (with axes ratios 2:1:1), with the grain's x-axis being the longest.
 

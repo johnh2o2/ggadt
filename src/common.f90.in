@@ -5,6 +5,7 @@ module common_mod
   use options
   use constants
 
+
   implicit none
 
   public
@@ -23,7 +24,7 @@ module common_mod
   real(dp_real)                          ::  ephot 
 
   character(len=50)                      ::  geometry  
-  character(len=50)                      ::  euler_angle_mode
+  character(len=50)                      ::  angle_mode
   character(len=50)                      ::  rotation_axis
 
 
@@ -68,6 +69,7 @@ module common_mod
   character(len=200), dimension(max_num_mats)           ::  material_files
   character(len=200), dimension(max_num_mats)           ::  material_tags
   character(len=200)                                    ::  agglom_composition_file
+  character(len=200)                                    ::  axes_convention
   integer, allocatable                                  ::  agglom_material_tags(:)
   integer                                               ::  nmaterials
   real(dp_real), dimension(max_num_mats)                ::  matfracs
@@ -76,20 +78,20 @@ module common_mod
 
 
 
-  character(len=200)                                    ::  euler_angle_file
+  character(len=200)                                    ::  angle_file
   character(len=100)                                    ::  fftw_optimization_mode_name
   character(len=200)                                    ::  agglom_file_name
 
   integer :: rank_aeff, rank_grain_a1, rank_grain_a2, rank_grain_a3, &
          rank_ephot, rank_use_padded_fft, rank_force_numerical, &
          rank_integrated_mode, rank_use_efficiencies, rank_verbose_mode, &
-         rank_timing_mode, rank_ior_re, rank_ior_im, rank_geometry, rank_euler_angle_mode, &
-         rank_rotation_axis, rank_euler_angle_file, rank_ngrain, rank_nscatter, &
+         rank_timing_mode, rank_ior_re, rank_ior_im, rank_geometry, rank_angle_mode, &
+         rank_rotation_axis, rank_angle_file, rank_ngrain, rank_nscatter, &
          rank_norientations, rank_dtheta, rank_max_angle, rank_agglom_file_name, &
          rank_fftw_optimization_mode_name, rank_ephot_min, rank_ephot_max, rank_nephots, &
          rank_dephot, rank_material_files(max_num_mats), rank_material_tags(max_num_mats), &
          rank_agglom_composition_file, rank_material_file, rank_asked_for_version, &
-         rank_asked_for_help, rank_parameter_file_name
+         rank_asked_for_help, rank_parameter_file_name, rank_axes_convention
 
   contains
 
@@ -121,7 +123,7 @@ module common_mod
         "force-numerical",&
         description="Forces GGADT to use a numerical, rather than an analytical, solution for spherical grains.")
       call define_option_string(opts,&
-        "parameter-file-name","",&
+        "parameter-file","",&
         description="Path to parameter file")
 
 
@@ -148,16 +150,16 @@ module common_mod
 
       call define_option_string(opts,&
         "agglom-composition-file","",&
-        description="File matching each sphere in an agglomerate with a material tag")
+        description="File matching each agglomerate with a material tag")
 
 
 
       call define_option_string(opts,&
         "grain-geometry",default_grain_geometry,&
-        description="SPHERES (or AGGLOMERATE), ELLIPSOID, SPHERE")
+        description="SPHERES (or AGGLOMERATION), ELLIPSOID, SPHERE, or CUSTOM")
       call define_option_string(opts,&
-        "agglom-file-name",default_agglom_file_name,&
-        description="Path to file that defines a grain made up of an agglomeration of spheres")
+        "agglom-file",default_agglom_file_name,&
+        description="Path to file that defines agglomeration of spheres")
 
       call define_option_real(opts,&
         "aeff",default_aeff,&
@@ -196,16 +198,23 @@ module common_mod
         "norientations",default_norientations,&
         description="Number of orientations to average over")
       call define_option_string(opts,&
-        "euler-angle-mode",default_euler_angle_mode,&
+        "angle-mode",default_angle_mode,&
         description="How to choose Euler angles (sequential, random, file)")
       call define_option_string(opts,&
         "rotation-axis",default_rotation_axis,&
         description="Sampled orientations will be rotations about this axis (none, xaxis, yaxis, zaxis)")
 
       call define_option_string(opts,&
-        "euler-angle-file",default_euler_angle_file,&
+        "axes-convention",default_axes_convention,&
+        description="'ddscat' (beta,theta,phi) or 'mstm' (alpha,beta,gamma). See documentation for more details.")
+
+
+      call define_option_string(opts,&
+        "angle-file",default_angle_file,&
         description="Path to a text file containing a list of orientations")
       
+
+
       call define_option_real(opts,&
         "ephot-min", default_ephot_min,&
         description="Minimum photon energy for which to calculate the cross sections")
@@ -252,7 +261,7 @@ module common_mod
       ! write(stderr,*) "Processed command line arguments (round 1 of 2)."
       
       ! Read parameter file if one is given (overwrite everything)
-      call get_option_string(opts,"parameter-file-name",parameter_file_name,rank_parameter_file_name)
+      call get_option_string(opts,"parameter-file",parameter_file_name,rank_parameter_file_name)
       if (parameter_file_name .ne. "") then
         call process_input_file(opts,parameter_file_name,ierr,delim_char="=",overwrite="YES",rank=2)
         ! write(stderr,*) "Processed parameter file."
@@ -288,17 +297,19 @@ module common_mod
       call get_flag(opts,"timing",timing_mode, rank_timing_mode)
       call get_option_real(opts,"ior-re",ior_re, rank_ior_re)
       call get_option_real(opts,"ior-im",ior_im, rank_ior_im)
+
       call get_option_string(opts,"grain-geometry",geometry, rank_geometry)
-      call get_option_string(opts,"euler-angle-mode",euler_angle_mode, rank_euler_angle_mode)
+      call get_option_string(opts,"axes-convention",axes_convention, rank_axes_convention)
+      call get_option_string(opts,"angle-mode",angle_mode, rank_angle_mode)
       call get_option_string(opts,"rotation-axis",rotation_axis, rank_rotation_axis)
-      call get_option_string(opts,"euler-angle-file",euler_angle_file, rank_euler_angle_file)
+      call get_option_string(opts,"angle-file",angle_file, rank_angle_file)
       call get_option_integer(opts,"ngrain",ngrain, rank_ngrain)
       
       call get_option_integer(opts,"nscatter",nscatter, rank_nscatter)
       call get_option_integer(opts,"norientations",norientations, rank_norientations)
       call get_option_real(opts, "dtheta", dtheta, rank_dtheta)
       call get_option_real(opts,"max-angle",max_angle, rank_max_angle)
-      call get_option_string(opts,"agglom-file-name",agglom_file_name, rank_agglom_file_name)
+      call get_option_string(opts,"agglom-file",agglom_file_name, rank_agglom_file_name)
       call get_option_string(opts,"fftw-optimization",fftw_optimization_mode_name, rank_fftw_optimization_mode_name)
 
       call get_option_real(opts,"ephot-min", ephot_min, rank_ephot_min)
@@ -338,9 +349,10 @@ module common_mod
 
       ! Set to lower case
       fftw_optimization_mode_name = strlowcase(fftw_optimization_mode_name)
-      euler_angle_mode = strlowcase(euler_angle_mode)
+      angle_mode = strlowcase(angle_mode)
       rotation_axis = strlowcase(rotation_axis)
       geometry = strlowcase(geometry)
+      axes_convention = strlowcase(axes_convention)
 
       material_file_specified = option_found(opts,"material-file")
       ! make sure all material files have a corresponding material tag and count number of materials
@@ -462,8 +474,20 @@ module common_mod
           end if 
       end if 
 
+      ! make sure the axes_convention is an allowable value
+
+      if (.not. (axes_convention == 'ddscat' .or. axes_convention == 'mstm')) then
+        write(stderr, *) "ERROR: '",axes_convention,"' is not one of 'ddscat' or 'mstm'"
+        stop
+      end if 
 
 
+      ! TEMPORARY warning about rotation-axis option
+
+      if (.not. (rotation_axis == 'none')) then
+        write(stderr, *) "WARNING: the current implementation of the rotation-axis option is faulty."
+        write(stderr, *) "    Future versions will have rotation and precession axis options."
+      end if 
       if (.not. integrated_mode) then
           nephots = 1
           dephot = 0.0
@@ -507,69 +531,69 @@ module common_mod
     end subroutine print_help
 
 
-    function rot_matrix(eul_ang)
+    function rot_matrix(angles)
       ! Rotation matrix for a set of Euler angles -- for some reason this function does not work!
       ! (We use rot_x*rot_y*rot_z instead.) It's a low-priority bug.
       implicit none
-      real(dp_real), dimension(3), intent(in) :: eul_ang
+      real(dp_real), dimension(3), intent(in) :: angles
       real(dp_real), dimension(3,3) :: rot_matrix
-      rot_matrix(1,1) =  cos(eul_ang(2))*cos(eul_ang(3))
-      rot_matrix(1,2) = -cos(eul_ang(1))*sin(eul_ang(3))-sin(eul_ang(1))*sin(eul_ang(2))*cos(eul_ang(3))
-      rot_matrix(1,3) =  sin(eul_ang(1))*sin(eul_ang(3))-cos(eul_ang(1))*sin(eul_ang(2))*sin(eul_ang(3))
+      rot_matrix(1,1) =  cos(angles(2))*cos(angles(3))
+      rot_matrix(1,2) = -cos(angles(1))*sin(angles(3))-sin(angles(1))*sin(angles(2))*cos(angles(3))
+      rot_matrix(1,3) =  sin(angles(1))*sin(angles(3))-cos(angles(1))*sin(angles(2))*sin(angles(3))
 
-      rot_matrix(2,1) =  cos(eul_ang(2))*sin(eul_ang(3))
-      rot_matrix(2,2) =  cos(eul_ang(1))*cos(eul_ang(3))-sin(eul_ang(1))*sin(eul_ang(2))*sin(eul_ang(3))
-      rot_matrix(2,3) = -sin(eul_ang(1))*cos(eul_ang(3))-cos(eul_ang(1))*sin(eul_ang(2))*sin(eul_ang(3))
+      rot_matrix(2,1) =  cos(angles(2))*sin(angles(3))
+      rot_matrix(2,2) =  cos(angles(1))*cos(angles(3))-sin(angles(1))*sin(angles(2))*sin(angles(3))
+      rot_matrix(2,3) = -sin(angles(1))*cos(angles(3))-cos(angles(1))*sin(angles(2))*sin(angles(3))
 
-      rot_matrix(3,1) =  sin(eul_ang(2))
-      rot_matrix(3,2) =  sin(eul_ang(1))*cos(eul_ang(2))
-      rot_matrix(3,3) =  cos(eul_ang(1))*cos(eul_ang(2))
+      rot_matrix(3,1) =  sin(angles(2))
+      rot_matrix(3,2) =  sin(angles(1))*cos(angles(2))
+      rot_matrix(3,3) =  cos(angles(1))*cos(angles(2))
     end function rot_matrix
 
-    function rot_x(eul_ang)
+    function rot_x(angles)
       implicit none
-      real(dp_real), intent(in) :: eul_ang
+      real(dp_real), intent(in) :: angles
       real(dp_real), dimension(3,3) :: rot_x
       rot_x(1,1) = 1.0
       rot_x(1,2) = 0.0
       rot_x(1,3) = 0.0
 
       rot_x(2,1) =  0.0
-      rot_x(2,2) =  cos(eul_ang)
-      rot_x(2,3) = -sin(eul_ang)
+      rot_x(2,2) =  cos(angles)
+      rot_x(2,3) = -sin(angles)
 
       rot_x(3,1) =  0.0
-      rot_x(3,2) =  sin(eul_ang)
-      rot_x(3,3) =  cos(eul_ang)
+      rot_x(3,2) =  sin(angles)
+      rot_x(3,3) =  cos(angles)
     end function rot_x 
 
-    function rot_y(eul_ang)
+    function rot_y(angles)
       implicit none
-      real(dp_real), intent(in) :: eul_ang
+      real(dp_real), intent(in) :: angles
       real(dp_real), dimension(3,3) :: rot_y
-      rot_y(1,1) =  cos(eul_ang)
+      rot_y(1,1) =  cos(angles)
       rot_y(1,2) =  0.0
-      rot_y(1,3) =  sin(eul_ang)
+      rot_y(1,3) =  sin(angles)
 
       rot_y(2,1) =  0.0
       rot_y(2,2) =  1.0
       rot_y(2,3) =  0.0
 
-      rot_y(3,1) = -sin(eul_ang)
+      rot_y(3,1) = -sin(angles)
       rot_y(3,2) =  0.0
-      rot_y(3,3) =  cos(eul_ang)
+      rot_y(3,3) =  cos(angles)
     end function rot_y
 
-    function rot_z(eul_ang)
+    function rot_z(angles)
       implicit none
-      real(dp_real), intent(in) :: eul_ang
+      real(dp_real), intent(in) :: angles
       real(dp_real), dimension(3,3) :: rot_z
-      rot_z(1,1) = cos(eul_ang)
-      rot_z(1,2) = sin(eul_ang)
+      rot_z(1,1) = cos(angles)
+      rot_z(1,2) = sin(angles)
       rot_z(1,3) = 0.0
 
-      rot_z(2,1) = -sin(eul_ang)
-      rot_z(2,2) =  cos(eul_ang)
+      rot_z(2,1) = -sin(angles)
+      rot_z(2,2) =  cos(angles)
       rot_z(2,3) =  0.0
 
       rot_z(3,1) = 0.0
@@ -577,6 +601,7 @@ module common_mod
       rot_z(3,3) = 1.0
     end function rot_z
 
+    
     function strlowcase(input_string) 
         character(*),parameter :: lower_case = 'abcdefghijklmnopqrstuvwxyz' 
         character(*),parameter :: upper_case =  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'  
@@ -613,7 +638,7 @@ module common_mod
         complex(kind=dp_complex), allocatable :: working_fft(:,:)
         complex(kind=dp_complex), dimension(size(f(:,1)), size(f(1,:))) :: new_grid
         integer :: i,j,a,b,norig, fsize, fftsize, ix, iy
-        real(dp_real) :: deltax, deltay
+        real(dp_real) :: deltaz, deltay
 
         f = kspace_shift(f,real(kmin,dp_real),real(kmin,dp_real)) ! shift the input function so that the k-space origin is at (kmin,kmin)
         norig = kmax - kmin 
@@ -640,10 +665,10 @@ module common_mod
         
 
         do i=1,enhancement+1
-            deltax = real(i-1)/real(enhancement)
+            deltaz = real(i-1)/real(enhancement)
             do j=1,enhancement+1
                 deltay = real(j-1)/real(enhancement)
-                new_grid = kspace_shift(f,deltax,deltay)
+                new_grid = kspace_shift(f,deltaz,deltay)
                 working_fft = fft_firstk(new_grid,norig)
                 do a=1,norig
                     do b=1,norig
@@ -673,8 +698,8 @@ module common_mod
         end do 
     end function fft_center
 
-    function kspace_shift(f,shiftx,shifty)
-        real(dp_real),  intent(in) :: shiftx,shifty
+    function kspace_shift(f,shiftz,shifty)
+        real(dp_real),  intent(in) :: shiftz,shifty
         complex(kind=dp_complex), intent(in) :: f(:,:)
         complex(kind=dp_complex), dimension(size(f(:,1)),size(f(1,:))) :: kspace_shift
         integer :: i, j, n
@@ -683,45 +708,44 @@ module common_mod
 
         do i=1,n
             do j=1,n
-                kspace_shift(i,j) = f(i,j)*exp(ISIGN*CMPLX(0,1.0, kind=dp_complex)*twopi*(shiftx*(i-1)+shifty*(j-1))/real(n))
+                kspace_shift(i,j) = f(i,j)*exp(ISIGN*CMPLX(0,1.0, kind=dp_complex)*twopi*(shiftz*(i-1)+shifty*(j-1))/real(n))
             end do
         end do
     end function kspace_shift
-    function linterp(x,y,xval)
-        ! Linear interpolation of a function defined as a set of (x_i,y_i) points
-        ! evaluated at x=xval.
 
-
-        implicit none 
-        real(dp_real), intent(in) :: x(:), y(:), xval
-        real(dp_real) :: linterp
-        integer :: i 
-        real(dp_real) :: a,b
-
-        if ( xval < x(1) ) then
-            write(stderr,*) "ERROR: (linterp) requested value at x=",xval," however, &
-                & this is below the minimum value of x=",x(1)
-            stop 
-        else if ( xval > x(size(x)) ) then 
-            write(stderr,*) "ERROR: (linterp) requested value at x=",xval," however, &
-                & this is above the maximum value of x=",x(size(x))
-            stop 
-        end if 
-
-
-        i=1
-        do while( (x(i) < xval) )
-            i = i + 1
-        end do 
 
     
-        a = xval - x(i-1)
-        b = x(i) - x(i-1)
 
-        linterp = y(i-1) + (a/b)*( y(i) - y(i-1) )
+    subroutine convert_mstm_to_ddscat(angles)
+     implicit none
+     real(dp_real), dimension(3), intent(inout) :: angles
+     real(dp_real), dimension(3) :: mstm
+
+     mstm(:) = angles(:)
+
+     if (cos(mstm(1))*sin(mstm(2)) == -1.) then 
+      angles(1) = mstm(3)
+      angles(2) = pi 
+      angles(3) = pi/2.0
+     else if (cos(mstm(1))*sin(mstm(2)) == 1.) then 
+      angles(1) = -mstm(3)
+      angles(2) = 0.0
+      angles(3) = pi/2.0
+     else 
+      angles(2) = acos(cos(mstm(1))*sin(mstm(2)))
+      angles(1) = acos(-sin(mstm(1))*sin(mstm(2))/sin(angles(2)))
+      angles(3) = acos((cos(mstm(1))*cos(mstm(2))*cos(mstm(3)) - sin(mstm(1))*sin(mstm(3)))/sin(angles(2)))
+      if (cos(mstm(2)) < 0) then 
+        angles(1) = -angles(1)
+      end if 
+      if (cos(mstm(1))*cos(mstm(2))*sin(mstm(3)) + sin(mstm(1))*cos(mstm(3)) < 0.0) then
+        angles(3) = -angles(3)
+      end if 
+     end if 
+     
 
 
-    end function linterp
+    end subroutine convert_mstm_to_ddscat
 
 
 end module common_mod

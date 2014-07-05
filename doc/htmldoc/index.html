@@ -1,13 +1,13 @@
 <html lang="en">
 <head>
-<title>GGADT 0.9.91</title>
+<title>GGADT 0.9.93</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="GGADT 0.9.91">
+<meta name="description" content="GGADT 0.9.93">
 <meta name="generator" content="makeinfo 4.8">
 <link title="Top" rel="start" href="#Top">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
-This manual is for GGADT (version 0.9.91, 31 May 2014),
+This manual is for GGADT (version 0.9.93, 5 July 2014),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT).
 
@@ -32,7 +32,7 @@ medium by using anomalous diffraction theory (ADT).
 --></style>
 </head>
 <body>
-<h1 class="settitle">GGADT 0.9.91</h1>
+<h1 class="settitle">GGADT 0.9.93</h1>
 <div class="contents">
 <h2>Table of Contents</h2>
 <ul>
@@ -59,16 +59,23 @@ medium by using anomalous diffraction theory (ADT).
 <ul>
 <li><a href="Invoking-GGADT.html#Invoking-GGADT">3.3.1 General options</a>
 <li><a href="Invoking-GGADT.html#Invoking-GGADT">3.3.2 Ellipsoidal grains</a>
-<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.3.3 Spherical agglomerate grains (single or multiple composition)</a>
+<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.3.3 Agglomerations of spherical particles (single or multiple composition)</a>
 <li><a href="Invoking-GGADT.html#Invoking-GGADT">3.3.4 Differential scattering cross section</a>
-<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.3.5 Energy-dependent scattering and absorption cross sections (<code>sed</code> mode)</a>
+<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.3.5 Using your own customized grain geometry</a>
+<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.3.6 Energy-dependent scattering and absorption cross sections (<code>integrated</code> mode)</a>
 </li></ul>
 <li><a href="Invoking-GGADT.html#Invoking-GGADT">3.4 Default parameter values</a>
-<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.5 Future goals</a>
-<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.6 Getting the accuracy you want</a>
+<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.5 Axes conventions</a>
 <ul>
-<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.6.1 Differential scattering cross section calculations</a>
-<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.6.2 Scattering and absorption cross-section calculations</a>
+<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.5.1 Agglomerations</a>
+<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.5.2 DDSCAT conventions</a>
+<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.5.3 MSTM conventions</a>
+</li></ul>
+<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.6 Future goals</a>
+<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.7 Getting the accuracy you want</a>
+<ul>
+<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.7.1 Differential scattering cross section calculations</a>
+<li><a href="Invoking-GGADT.html#Invoking-GGADT">3.7.2 Scattering and absorption cross-section calculations</a>
 </li></ul>
 </li></ul>
 <li><a name="toc_Example-usage" href="Example-usage.html#Example-usage">4 Example usage</a>
@@ -77,8 +84,7 @@ medium by using anomalous diffraction theory (ADT).
 <li><a href="Example-usage.html#Example-usage">4.2 Using <code>make_sample_plots.py</code></a>
 <li><a href="Example-usage.html#Example-usage">4.3 Ellipsoids and spheroids &ndash; orientational averages about a principal axis</a>
 <ul>
-<li><a href="Example-usage.html#Example-usage">4.3.1 Coordinate systems</a>
-<li><a href="Example-usage.html#Example-usage">4.3.2 Example runs for a prolate spheroid</a>
+<li><a href="Example-usage.html#Example-usage">4.3.1 Example runs for a prolate spheroid</a>
 </li></ul>
 </li></ul>
 <li><a name="toc_Testing-against-previous-results" href="Testing-against-previous-results.html#Testing-against-previous-results">5 Testing against previous results</a>
@@ -116,7 +122,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="../index.html#dir">(dir)</a>
 
 <h2 class="unnumbered">GGADT</h2>
 
-<p>This manual is for GGADT (version 0.9.91, 31 May 2014),
+<p>This manual is for GGADT (version 0.9.93, 5 July 2014),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT).
 

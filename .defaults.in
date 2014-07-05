@@ -1,6 +1,6 @@
 # Default parameters used by GGADT
 # ================================
-# Last modified by John Hoffman (May 29, 2014)
+# Last modified by John Hoffman (June 26, 2014)
 
 # Geometry of grain 
 # | one of: 'sphere','spheres' (or 'agglomerate'), or 'ellipsoid'
@@ -11,6 +11,7 @@ use-efficiencies               = T
 use-padded-fft                 = F
 integrated                     = F
 force-numerical                = F
+axes-convention                = 'ddscat'
 
 # effective radius (radius of sphere with same volume)
 aeff                           = 0.2
@@ -23,7 +24,7 @@ grain-axis-y                   = 1.0
 grain-axis-z                   = 1.0
 
 # IF grain-geometry=agglomerate
-agglom-file-name               = ''
+agglom-file                    = ''
 agglom-composition-file        = ''
 
 # Grain composition
@@ -57,14 +58,14 @@ fftw-optimization              = 'estimate'
 #grain_axis_ratio              = 1.0
 
 rotation-axis                  = 'none'     # For ellipsoidal or agglomerate grains
-euler-angle-mode               = 'random'   # Either 'sequential', 'random' or 'custom' 
+angle-mode                     = 'random'   # Either 'sequential', 'random' or 'file' 
                                             # | tells GGADT how to choose orientations over which to average
                                             # | calculations.
-euler-angle-file               = ''         # If euler-angle-mode='custom'; Path to file listing Euler angles
-                                            # | over which to average calculations
-                                            # If euler-angle-mode is NOT 'custom'; number of orientations
-                                            # | over which to average calcuations
+angle-file                     = ''         # If angle-mode='file'; Path to file listing angles
+                                            # | over which to average calculations      
 norientations                  = 64
+											# If angle-mode is NOT 'file'; number of orientations
+                                            # | over which to average calcuations
 # For integrated cross section (pass --integrated flag)
 # number of photon energies to calculate integrated cross sections
 #nephots                       = 100

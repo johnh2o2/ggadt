@@ -1,3 +1,9 @@
+* commit af616709c2ce95a19b88e65f2e69418f90d691a0
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Sun Jun 22 20:57:10 2014 -0400
+| 
+|     Hopefully resolved conflicts between parameterfiles/default files/command line input. A 'rank' attribute was added to the options datatype in the options module. The selected value for a parameter is chosen from the (1) command line (2) specified parameter file (3) default file (4) hard-coded default value. Some additional checks to the parameter reading section of the code were added. Still needs to be robustly tested to make sure the parameter selection works the way it is supposed to and that all conflicts are resolved appropriately.
+|  
 * commit bf8a56e807454072174247d63d1719aed8db51b1
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Sat May 31 19:42:24 2014 -0400

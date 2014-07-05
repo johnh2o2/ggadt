@@ -1,4 +1,7 @@
-AC_INIT([ggadt], [0.9.91], [jah5@princeton.edu])
+# Don't edit this file unless you know what you're doing!
+# Autoconf configuration script.
+
+AC_INIT([ggadt], [0.9.93], [jah5@princeton.edu])
 AC_PREREQ([2.69]) 
 #AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/sphere.f90])

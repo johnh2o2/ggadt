@@ -8,7 +8,8 @@ module spheres
     save
     integer :: nspheres, nrots, ok, n
     integer :: MIGRATE, ISEED, NS
-    real(kind=dp_real) :: ALPHA(3), VTOT, A_1(3), A_2(3)
+    real(kind=dp_real) :: ALPHA(3), VTOT, A_mat(3,3)
+
     real(kind=dp_real) :: default_ior_r, default_ior_i
     real(kind=dp_real), allocatable :: radii(:), ior_r(:), ior_i(:)
     real(kind=dp_real), allocatable :: pos(:,:), pos_rot(:,:)
@@ -41,6 +42,41 @@ module spheres
 
     end subroutine read_spheres_composition
 
+    function det(mat)
+        implicit none
+        real(kind=dp_real) :: det
+        real(kind=dp_real), intent(in) :: mat(3,3)
+        integer :: i,j
+
+        det = mat(1,1)*(mat(2,2)*mat(3,3) - mat(3,2)*mat(2,3)) &
+            - mat(1,2)*(mat(2,1)*mat(3,3) - mat(3,1)*mat(2,3)) &
+            + mat(1,3)*(mat(2,1)*mat(3,2) - mat(3,1)*mat(2,2))
+
+    end function det
+
+
+    function inverse(mat)
+        implicit none
+        real(kind=dp_real), dimension(3,3), intent(in) :: mat
+        real(kind=dp_real), dimension(3,3) :: inverse
+        real(kind=dp_real) :: detm
+
+        detm = det(mat)
+
+        inverse(1,1) = (mat(2,2)*mat(3,3) - mat(3,2)*mat(2,3))/detm
+        inverse(1,2) = (mat(1,3)*mat(3,2) - mat(3,3)*mat(1,2))/detm
+        inverse(1,3) = (mat(1,2)*mat(2,3) - mat(2,2)*mat(1,3))/detm
+
+        inverse(2,1) = (mat(2,3)*mat(3,1) - mat(3,3)*mat(2,1))/detm
+        inverse(2,2) = (mat(1,1)*mat(3,3) - mat(3,1)*mat(1,3))/detm
+        inverse(2,3) = (mat(1,3)*mat(2,1) - mat(2,3)*mat(1,1))/detm
+
+        inverse(3,1) = (mat(2,1)*mat(3,2) - mat(3,1)*mat(2,2))/detm
+        inverse(3,2) = (mat(1,2)*mat(3,1) - mat(3,2)*mat(1,1))/detm
+        inverse(3,3) = (mat(1,1)*mat(2,2) - mat(2,1)*mat(1,2))/detm
+
+    end function inverse
+
 
     subroutine read_spheres(cluster_file_name,a_eff,max_dist)
         implicit none
@@ -49,15 +85,31 @@ module spheres
         character(len=200), intent(in) :: cluster_file_name
         real(kind=dp_real), intent(in) :: a_eff
         real(kind=dp_real), intent(out) :: max_dist
+        real(kind=dp_real), dimension(3,3) :: rm
 
         open(unit=1,file=cluster_file_name) ! open sphere file.
 
         ! Read header
         read(1,'(52X,i2,7X,i4)') MIGRATE,ISEED
         read(1,'(i9,f12.2,3f11.6)') NS, VTOT, ALPHA(1), ALPHA(2), ALPHA(3)
-        read(1,'(3f10.6,13X)') A_1(1), A_1(2), A_1(3)
-        read(1,'(3f10.6,13X)') A_2(1), A_2(2), A_2(3)
+        read(1,'(3f10.6,13X)') A_mat(1,1), A_mat(2,1), A_mat(3,1)
+        read(1,'(3f10.6,13X)') A_mat(1,2), A_mat(2,2), A_mat(3,2)
         read(1,'(A)') junk
+
+        A_mat(1,3) = A_mat(2,1)*A_mat(3,2) - A_mat(2,2)*A_mat(3,1)
+        A_mat(2,3) = A_mat(1,2)*A_mat(3,1) - A_mat(1,1)*A_mat(3,2)
+        A_mat(3,3) = A_mat(1,1)*A_mat(2,2) - A_mat(1,2)*A_mat(2,1)
+
+
+        rm = inverse(A_mat)
+
+        !write(stderr,*) matmul(rm,inverse(rm))
+
+
+
+        ! Alpha and a_i are defined such that |a_i| = 1, and a_i are eigenvectors
+        ! of the moment of inertia tensor. Alpha_i are normalized values for I_i,
+        ! and alpha_1 >= alpha_2 >= alpha_3
 
         !DEBUGGING -- print header information
         !write(0,*) "DEBUG: SPHERES HEADER"
@@ -85,7 +137,11 @@ module spheres
         ! read in spheres
        
         do i=1,nspheres
-            read(1, *) n, pos(i,1), pos(i,2), pos(i,3), radii(i) 
+            read(1, *) n, pos(i,1), pos(i,2), pos(i,3), radii(i)
+
+            ! orient grain so that the A_1 vector is in the direction of propagation
+            pos(i,:) = matmul(rm,pos(i,:))
+
             ior_r(i) = default_ior_r
             ior_i(i) = default_ior_i
             radii(i) = radii(i)/2.0

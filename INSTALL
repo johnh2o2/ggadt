@@ -1,6 +1,30 @@
 Installation Instructions
 *************************
 
+(For Mac and Linux systems)
+
+QUICK INSTALL
+=============
+
+Here's the short version of this file: 
+
+[ note, replace ggadt-(version) with the appropriate name ]
+
+  tar xvf ggadt-(version).tar
+  cd ggadt-(version)
+  ./configure --enable-openmp
+  make
+
+After this, the "ggadt" binary should be located in the 'src' directory.
+
+For more information, consult the HTML documentation by opening
+'doc/htmldoc/index.html' in a browser of your choice.
+
+The rest of this file is a generic instruction manual provided by
+the Free Software Foundation. 
+
+************************************************************************
+
 Copyright (C) 1994-1996, 1999-2002, 2004-2013 Free Software Foundation,
 Inc.
 
@@ -12,8 +36,8 @@ without warranty of any kind.
 Basic Installation
 ==================
 
-   Briefly, the shell commands `./configure; make; make install' should
-configure, build, and install this package.  The following
+   Briefly, the shell commands `./configure; make' should
+configure and build GGADT.  The following
 more-detailed instructions are generic; see the `README' file for
 instructions specific to this package.  Some packages provide this
 `INSTALL' file but do not implement all of the features documented
@@ -50,7 +74,7 @@ of `autoconf'.
 
    The simplest way to compile this package is:
 
-  1. `cd' to the directory containing the package's source code and type
+  1. `cd' to the package's parent directory and type
      `./configure' to configure the package for your system.
 
      Running `configure' might take a while.  While running, it prints
@@ -58,17 +82,20 @@ of `autoconf'.
 
   2. Type `make' to compile the package.
 
-  3. Optionally, type `make check' to run any self-tests that come with
-     the package, generally using the just-built uninstalled binaries.
+  3. [ignore this for GGADT] Optionally, type `make check' to 
+     run any self-tests that come with the package, generally using the 
+     just-built uninstalled binaries.
 
-  4. Type `make install' to install the programs and any data files and
-     documentation.  When installing into a prefix owned by root, it is
+  4. [ignore this for GGADT] Type `make install' to install 
+     the programs and any data files and documentation.  
+     When installing into a prefix owned by root, it is
      recommended that the package be configured and built as a regular
      user, and only the `make install' phase executed with root
      privileges.
 
-  5. Optionally, type `make installcheck' to repeat any self-tests, but
-     this time using the binaries in their final installed location.
+  5. [ignore this for GGADT] Optionally, type `make installcheck' to 
+     repeat any self-tests, but this time using the binaries in their 
+     final installed location.
      This target does not install anything.  Running this target as a
      regular user, particularly if the prior `make install' required
      root privileges, verifies that the installation completed
