@@ -1,3 +1,9 @@
+* commit c010a82ed4fd1008a7f4e7fea64670929402e839
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Wed Aug 20 16:22:46 2014 -0400
+| 
+|     Modified sphere.f90 to be consistent with Bruce Draine's 'adt.f' code. Catches a zero-valued real component of m-1, and uses an approximation for when rho << 1.
+|  
 * commit 6e1d4620b67433e058181f17c172af6f1199adaa
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Sat Jul 5 19:05:02 2014 -0400

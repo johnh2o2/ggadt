@@ -112,10 +112,10 @@ module sphere
         rho0 = REAL(ABS(rho),kind=dp_real)
         rho1 = REAL(rho,kind=dp_real)
 
-        if (rho1 == arho) then
+        if (rho1 == rho0) then
             rho2 = 0
         else
-            rho2 = sqrt(arho*arho - rho1*rho1)
+            rho2 = sqrt(rho0*rho0 - rho1*rho1)
         end if
 
         if (ABS(rho1) .gt. 0.) then
@@ -131,7 +131,7 @@ module sphere
         if (rho0 .lt. 1.0D-3) then
             qext = (4.0/3.0)*rho2 + 0.5*(rho1**2 - rho2**2)
             qabs = (4.0/3.0)*rho2 - rho2**2
-            qsca = 0.5*rho0**2
+            qscat = 0.5*rho0**2
 
         else
             fac = exp(-rho2)
