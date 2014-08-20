@@ -41,13 +41,13 @@ module custom
         !
         !          a                   The effective radius of the grain
         !
-        !      the ephots and ior_res/ior_ims arrays are organized such that 
+        ! note: the ephots and ior_res/ior_ims arrays are organized such that 
         !        
-        !           m - 1 = ior_res(i,j) + sqrt(-1) * ior_ims(i,j) 
+        !                   m - 1 = ior_res(i,j) + sqrt(-1) * ior_ims(i,j) 
         !
-        !      is the index of refraction (minus one) for material number "i" at a photon
-        !      energy of ephots(j). Linear interpolation can be used to obtain m-1 for arbitrary 
-        !      photon energies.
+        !       is the index of refraction (minus one) for material number "i" at a photon
+        !       energy of ephots(j). Linear interpolation can be used to obtain m-1 for arbitrary 
+        !       photon energies.
 
         real(kind=dp_real), intent(in) :: a 
         

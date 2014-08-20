@@ -110,7 +110,7 @@ contains
         open(unit=1,file=matfile) ! open sphere file.
 
         ! Read header
-        read(1,'(i3,a8,a64)') ICOMP, junk, mat
+        read(1,'(i2,a8,a64)') ICOMP, junk, mat
         if (verbose_mode) write(stderr,*) "# Material file: '",trim(adjustl(matfile)),"'"
         if (verbose_mode) write(stderr,*) "# Material: '",trim(adjustl(mat)),"'"
         
@@ -206,8 +206,9 @@ contains
                     !$omp do schedule(dynamic) private(c1,c2) 
                      do c1=1,size(z)
                         do c2=1,size(y)
-                            sh(c1,c2) = shadow_sphere(z(c1),y(c2), kphot, a_eff, delm)
+                            
                             phi_total(c1,c2) = phi_sphere(z(c1),y(c2),kphot,a_eff,delm)
+                            sh(c1,c2) = 1-exp( (0.0,1.0)*phi_total(c1,c2) )
                         end do
                      end do
                     !$omp end do nowait
@@ -241,9 +242,9 @@ contains
                     !$omp do schedule(dynamic) private(c1,c2) 
                     do c1=1,size(z)
                         do c2=1,size(y)
-                            sh(c1,c2) = shadow_ellipsoid(z(c1),y(c2), kphot, grain_a, delm, rm)
+                            
                             phi_total(c1,c2) = phi_ellipsoid(z(c1),y(c2),kphot, grain_a, delm,rm )
-                        
+                            sh(c1,c2) = 1-exp( (0.0,1.0)*phi_total(c1,c2) )
                         end do
                     end do
                     !$omp end do nowait

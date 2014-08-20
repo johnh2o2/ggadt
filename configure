@@ -4249,7 +4249,7 @@ if test "${enable_single+set}" = set; then :
   *) as_fn_error $? "bad value ${enableval} for --enable-double" "$LINENO" 5 ;;
 esac
 else
-  use_double=false
+  use_double=true
 fi
 
  if test x$use_double = xfalse; then
@@ -4403,7 +4403,7 @@ USE_FFTW=
 
 DOUBLE_UNCOMMENT="!"
 SINGLE_UNCOMMENT=
-if test $use_double = true
+if test x$use_double = xtrue
   then
   DOUBLE_UNCOMMENT=
   SINGLE_UNCOMMENT="!"

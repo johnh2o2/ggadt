@@ -47,7 +47,7 @@ AC_ARG_ENABLE([single],
   yes) use_double=false ;; 
   no)  use_double=true ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-double]) ;;
-esac],[use_double=false])
+esac],[use_double=true])
 AM_CONDITIONAL([SINGLE], [test x$use_double = xfalse])
 
 #specify that you want to use the FFTW3 algorithm for your FFT's
@@ -124,7 +124,7 @@ USE_FFTW=
 
 DOUBLE_UNCOMMENT="!"
 SINGLE_UNCOMMENT=
-if test $use_double = true
+if test x$use_double = xtrue
   then
   DOUBLE_UNCOMMENT=
   SINGLE_UNCOMMENT="!"

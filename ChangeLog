@@ -1,3 +1,9 @@
+* commit 6e1d4620b67433e058181f17c172af6f1199adaa
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Sat Jul 5 19:05:02 2014 -0400
+| 
+|     Added 'custom' module for users to program their own grain geometry. Added documentation to support the custom module.
+|  
 * commit af616709c2ce95a19b88e65f2e69418f90d691a0
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Sun Jun 22 20:57:10 2014 -0400

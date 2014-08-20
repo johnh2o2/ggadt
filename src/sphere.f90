@@ -105,22 +105,40 @@ module sphere
         real(kind=dp_real), intent(out) :: qabs,qscat,qext
         complex(kind=dp_complex), intent(in) :: delta_m
 
-        real(kind=dp_real) :: x, rho1, rho2, beta, arho
+        real(kind=dp_real) :: x, rho0, rho1, rho2, beta, fac
         complex(kind=dp_complex) :: rho
 
         rho = 2*k*aeff*delta_m
-        arho = REAL(ABS(rho),kind=dp_real)
+        rho0 = REAL(ABS(rho),kind=dp_real)
         rho1 = REAL(rho,kind=dp_real)
+
         if (rho1 == arho) then
             rho2 = 0
         else
             rho2 = sqrt(arho*arho - rho1*rho1)
         end if
-        beta = atan(rho2/rho1)
 
-        qext = 2 + (4./(arho**2))*(cos(2*beta) - exp(-rho2)*(cos(rho1 - 2*beta) - arho*sin(rho1 - beta)))
-        qabs = 1 + exp(-2*rho2)/rho2 + (exp(-2*rho2) - 1)/(2*rho2*rho2)
-        qscat = qext - qabs
+        if (ABS(rho1) .gt. 0.) then
+            beta = atan(rho2/rho1)
+        else
+            if (rho2 .gt. 0.0) then
+                beta = 0.5*pi 
+            else
+                beta = -0.5*pi
+            endif
+        end if
+
+        if (rho0 .lt. 1.0D-3) then
+            qext = (4.0/3.0)*rho2 + 0.5*(rho1**2 - rho2**2)
+            qabs = (4.0/3.0)*rho2 - rho2**2
+            qsca = 0.5*rho0**2
+
+        else
+            fac = exp(-rho2)
+            qext = 2 + (4./(rho0**2))*(cos(2*beta) - fac*(cos(rho1 - 2*beta) - rho0*sin(rho1 - beta)))
+            qabs = 1 + fac**2/rho2 + (fac**2 - 1)/(2*rho2*rho2)
+            qscat = qext - qabs
+        end if
 
     end subroutine q_sphere
 
