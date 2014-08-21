@@ -105,7 +105,7 @@ module sphere
         real(kind=dp_real), intent(out) :: qabs,qscat,qext
         complex(kind=dp_complex), intent(in) :: delta_m
 
-        real(kind=dp_real) :: x, rho0, rho1, rho2, beta, fac
+        real(kind=dp_real) :: x, rho0, rho1, rho2, beta, fac, fac2, sgnfac
         complex(kind=dp_complex) :: rho
 
         rho = 2*k*aeff*delta_m
@@ -134,9 +134,14 @@ module sphere
             qscat = 0.5*rho0**2
 
         else
+            sgnfac = 1.0
+            if (ABS(rho1) > 0.0) then 
+                sgnfac = -1.0
+            endif
             fac = exp(-rho2)
-            qext = 2 + (4./(rho0**2))*(cos(2*beta) - fac*(cos(rho1 - 2*beta) - rho0*sin(rho1 - beta)))
-            qabs = 1 + fac**2/rho2 + (fac**2 - 1)/(2*rho2*rho2)
+            fac2 = fac*fac
+            qext = 2 + (4./(rho0**2))*(cos(2*beta) - fac*(cos(rho1 - 2*beta) - sgnfac*rho0*sin(rho1 - beta)))
+            qabs = 1 + fac2/rho2 + (fac2 - 1)/(2*rho2*rho2)
             qscat = qext - qabs
         end if
 
