@@ -134,8 +134,9 @@ module sphere
             qscat = 0.5*rho0**2
 
         else
+            
             sgnfac = 1.0
-            if (ABS(rho1) > 0.0) then 
+            if (rho1 > 0.0) then 
                 sgnfac = -1.0
             endif
             fac = exp(-rho2)

@@ -1,3 +1,9 @@
+* commit 2817e39e49d81bcf4b81a148fa569cea744d6c09
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Thu Aug 21 18:45:34 2014 -0400
+| 
+|     Edited sphere.f90 module to reflect a discovered mistake in equation (16) (extinction efficiency for spheres) from Draine & Allaf-Akbari 2006. When Re(m-1) > 0, the old expression produced physically implausible results (i.e., negative efficiencies, efficiencies greater than 2). By changing the sign of |rho|sin(Re(rho) - beta) when Re(m-1) > 0, the result is consistent with Mie theory. Derivations of the correct formula are in progress.
+|  
 * commit 895f7383bd35717e4d59ec73c0a0fef18cbb46af
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Wed Aug 20 16:24:53 2014 -0400
