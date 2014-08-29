@@ -111,7 +111,8 @@ def load_sed_data(fname):
 	dt_sed = np.dtype([
 			('ephot',np.float_),
 			('sig_scat',np.float_),
-			('sig_abs',np.float_)
+			('sig_abs',np.float_),
+			('sig_ext',np.float_)
 			])
 	return np.loadtxt(fname,dtype=dt_sed)
 

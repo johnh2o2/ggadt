@@ -531,24 +531,26 @@ module common_mod
     end subroutine print_help
 
 
-    function rot_matrix(angles)
+    function rotation_matrix(beta,theta,phi)
       ! Rotation matrix for a set of Euler angles -- for some reason this function does not work!
       ! (We use rot_x*rot_y*rot_z instead.) It's a low-priority bug.
+      ! 8.28.14 -- jah updated this function. Should work now! Has not been tested.
       implicit none
-      real(dp_real), dimension(3), intent(in) :: angles
-      real(dp_real), dimension(3,3) :: rot_matrix
-      rot_matrix(1,1) =  cos(angles(2))*cos(angles(3))
-      rot_matrix(1,2) = -cos(angles(1))*sin(angles(3))-sin(angles(1))*sin(angles(2))*cos(angles(3))
-      rot_matrix(1,3) =  sin(angles(1))*sin(angles(3))-cos(angles(1))*sin(angles(2))*sin(angles(3))
+      real(dp_real), intent(in) :: beta,theta,phi
+      real(dp_real), dimension(3,3) :: rotation_matrix
 
-      rot_matrix(2,1) =  cos(angles(2))*sin(angles(3))
-      rot_matrix(2,2) =  cos(angles(1))*cos(angles(3))-sin(angles(1))*sin(angles(2))*sin(angles(3))
-      rot_matrix(2,3) = -sin(angles(1))*cos(angles(3))-cos(angles(1))*sin(angles(2))*sin(angles(3))
+      rotation_matrix(1,1) = cos(theta)
+      rotation_matrix(1,2) = -cos(beta)*sin(theta)
+      rotation_matrix(1,3) =  sin(beta)*sin(theta)
 
-      rot_matrix(3,1) =  sin(angles(2))
-      rot_matrix(3,2) =  sin(angles(1))*cos(angles(2))
-      rot_matrix(3,3) =  cos(angles(1))*cos(angles(2))
-    end function rot_matrix
+      rotation_matrix(2,1) =  cos(phi)*sin(theta)
+      rotation_matrix(2,2) =  cos(beta)*cos(phi)*cos(theta) - sin(beta)*sin(phi)
+      rotation_matrix(2,3) = -cos(phi)*cos(theta)*sin(beta) - cos(beta)*sin(phi)
+
+      rotation_matrix(3,1) = sin(phi)*sin(theta)
+      rotation_matrix(3,2) = cos(phi)*sin(beta) + cos(beta)*cos(theta)*sin(phi)
+      rotation_matrix(3,3) = cos(beta)*cos(phi) - cos(theta)*sin(beta)*sin(phi)
+    end function rotation_matrix
 
     function rot_x(angles)
       implicit none

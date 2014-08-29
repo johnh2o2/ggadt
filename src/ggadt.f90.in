@@ -198,7 +198,7 @@ contains
                 ! angles(2) -- theta
                 ! angles(3) -- phi
 
-                rm = matmul(matmul(rot_x(angles(1)), rot_z(angles(2))),rot_x(angles(3)))
+                rm = rotation_matrix(angles(1),angles(2),angles(3))
 
                 if (geometry .eq. 'sphere') then
 
@@ -237,13 +237,13 @@ contains
                     !$omp end do nowait
                     !$omp end parallel
                 else if (geometry .eq. 'ellipsoid') then 
-
+                    call set_constants(angles(1),angles(2),angles(3),grain_a)
                     !$omp parallel shared(sh,phi_total,z,y,kphot,grain_a,delm,rm) 
                     !$omp do schedule(dynamic) private(c1,c2) 
                     do c1=1,size(z)
                         do c2=1,size(y)
                             
-                            phi_total(c1,c2) = phi_ellipsoid(z(c1),y(c2),kphot, grain_a, delm,rm )
+                            phi_total(c1,c2) = phi_ellipsoid(z(c1),y(c2),kphot, grain_a, delm )
                             sh(c1,c2) = 1-exp( (0.0,1.0)*phi_total(c1,c2) )
                         end do
                     end do
@@ -327,15 +327,16 @@ contains
                 ! angles(1) -- beta
                 ! angles(2) -- theta
                 ! angles(3) -- phi
-                rm = matmul(matmul(rot_x(angles(1)), rot_z(angles(2))),rot_x(angles(3)))
+                rm = rotation_matrix(angles(1),angles(2),angles(3))
                 
 
                 if (geometry .eq. 'ellipsoid') then 
+                    call set_constants(angles(1),angles(2),angles(3),grain_a)
                     !$omp parallel shared(sh,z,y,rm,k,delm,grain_a) 
                     !$omp do schedule(dynamic) private(i,j)
                     do i=1,size(z)
                         do j=1,size(y)
-                            sh(i,j) = shadow_ellipsoid(z(i),y(j),k,grain_a,delm,rm)
+                            sh(i,j) = shadow_ellipsoid(z(i),y(j),k,grain_a,delm)
                         end do
                     end do
                     !$omp end do nowait

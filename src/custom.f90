@@ -4,6 +4,10 @@ module custom
     use interp
     ! use omp_lib ! uncomment "use omp_lib" to activate openmp tags for faster (parallel) execution
 
+    ! TODO: add rotation matrix speedup; for each orientation, set the inverse rotation matrix in here so
+    ! you don't have to recalculate it all the time
+
+    ! Also, hardcode the inverse rotation matrix in terms of the rotation angles -- that should be faster to compute.
 
     contains
 
