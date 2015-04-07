@@ -1,76 +1,107 @@
-<html lang="en">
-<head>
-<title>FFT comparison - GGADT 0.9.93</title>
-<meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="GGADT 0.9.93">
-<meta name="generator" content="makeinfo 4.8">
-<link title="Top" rel="start" href="index.html#Top">
-<link rel="prev" href="Testing-against-previous-results.html#Testing-against-previous-results" title="Testing against previous results">
-<link rel="next" href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License" title="GNU Free Documentation License">
-<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
-<!--
-This manual is for GGADT (version 0.9.93, 5 July 2014),
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for GGADT (version 0.9.94, 5 July 2014),
 which calculates scattering properties of dust grains in the interstellar
-medium by using anomalous diffraction theory (ADT).
+medium by using anomalous diffraction theory (ADT). 
 
-     Permission is granted to copy, distribute and/or modify this
-     document under the terms of the GNU Free Documentation License,
-     Version 1.3 or any later version published by the Free Software
-     Foundation; with no Invariant Sections, with no Front-Cover Texts,
-     and with no Back-Cover Texts.  A copy of the license is included
-     in the section entitled ``GNU Free Documentation License''.
-   -->
-<meta http-equiv="Content-Style-Type" content="text/css">
-<style type="text/css"><!--
-  pre.display { font-family:inherit }
-  pre.format  { font-family:inherit }
-  pre.smalldisplay { font-family:inherit; font-size:smaller }
-  pre.smallformat  { font-family:inherit; font-size:smaller }
-  pre.smallexample { font-size:smaller }
-  pre.smalllisp    { font-size:smaller }
-  span.sc    { font-variant:small-caps }
-  span.roman { font-family:serif; font-weight:normal; } 
-  span.sansserif { font-family:sans-serif; font-weight:normal; } 
---></style>
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the section entitled
+"GNU Free Documentation License". -->
+<!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>GGADT 0.9.94: FFT comparison</title>
+
+<meta name="description" content="GGADT 0.9.94: FFT comparison">
+<meta name="keywords" content="GGADT 0.9.94: FFT comparison">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="index.html#Top" rel="up" title="Top">
+<link href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License" rel="next" title="GNU Free Documentation License">
+<link href="Testing-against-previous-results.html#Testing-against-previous-results" rel="prev" title="Testing against previous results">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.indentedblock {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smallindentedblock {margin-left: 3.2em; font-size: smaller}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style:oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nocodebreak {white-space:nowrap}
+span.nolinebreak {white-space:nowrap}
+span.roman {font-family:serif; font-weight:normal}
+span.sansserif {font-family:sans-serif; font-weight:normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
 </head>
-<body>
-<div class="node">
-<p>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
 <a name="FFT-comparison"></a>
-Next:&nbsp;<a rel="next" accesskey="n" href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License">GNU Free Documentation License</a>,
-Previous:&nbsp;<a rel="previous" accesskey="p" href="Testing-against-previous-results.html#Testing-against-previous-results">Testing against previous results</a>,
-Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<div class="header">
+<p>
+Next: <a href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License" accesskey="n" rel="next">GNU Free Documentation License</a>, Previous: <a href="Testing-against-previous-results.html#Testing-against-previous-results" accesskey="p" rel="prev">Testing against previous results</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
 <hr>
+<a name="FFT-comparison-1"></a>
+<h2 class="chapter">6 FFT comparison</h2>
+<p><strong>FFTW3 NOT supported in current version</strong>: There is currently NO support for FFTW3 at the moment. The FFTW module needs to be reverted to the Fortran 95 standard. At this time, it&rsquo;s not a huge priority. GGADT works just fine, and does not require you to install an external library. Future versions of GGADT will likely include FFTW3 support. 
+</p>
+<p><strong>Text below this point is for earlier versions of GGADT which supported FFTW3.</strong>
+</p>
+<p>Currently, GGADT allows you to choose between two FFT algorithms: FFTW 3 (<a href="http://fftw.org/">http://fftw.org/</a>), which requires you install the FFTW3 library, and GPFA (Generalized Prime Factor Algorithm)<a name="DOCF10" href="#FOOT10"><sup>10</sup></a>, which is self-contained and included with the GGADT package. GPFA is used by default, and, as shown below, is slightly faster than FFTW in the current version of GGADT. This will change in later versions, since at the moment, we do not take advantage of saving and loading FFTW &quot;wisdom&quot;. 
+</p>
+<p>Earlier versions of GGADT, which did FFT&rsquo;s in a different way (only did padded FFT&rsquo;s, but utilized FFTW wisdom), had FFTW being about 20 percent faster than GPFA.
+</p>
+<p>If you wish to use the FFTW3 version of GGADT, you will need to install FFTW 3.3.x (we have only tested 3.3.3, but GGADT should in principal be compatible with all 3.x.x versions). GPFA will not currently work with FFTW 2.x, as the two interfaces are different, but plans to include FFTW 2.x support are in the works. 
+</p>
+<p>If you have a particular FFT library that you would like to see implemented, please send an e-mail to jah5 (at) princeton.edu. It will likely be faster if you simply write your own module to attach to GGADT. This module must provide the function <code>fft_firstk(arr,K)</code> where <code>arr</code> is an N by N array, and <code>K</code> is an integer less than N. The function must return a <code>K</code> by <code>K</code> array, containing the first <code>K</code> values of the FFT of <code>arr</code>. The complexity of this algorithm should scale as (N*N)log(<code>K</code>*<code>K</code>), instead of the (N*N)log(N*N) complexity of the standard two-dimensional FFT.
+</p>
+<p>For information about how to construct this algorithm, see the instructions for FFTW at <a href="http://www.fftw.org/pruned.html">http://www.fftw.org/pruned.html</a>.
+</p>
+<p>If you are successful at porting your FFT algorithm, let us know, and we will do our best to test it and include it with future releases.
+</p>
+<a name="Timing"></a>
+<h3 class="section">6.1 Timing</h3>
+<img src="timing_actual_time.png" alt="timing_actual_time">
+<img src="timing_relative_to_gpfa.png" alt="timing_relative_to_gpfa">
+
+<div class="footnote">
+<hr>
+<h4 class="footnotes-heading">Footnotes</h4>
+
+<h3><a name="FOOT10" href="#DOCF10">(10)</a></h3>
+<p>Temperton, C. (1992). A Generalized Prime Factor FFT Algorithm for any N=2^p3^q5^r. SIAM Journal on Scientific and Statistical Computing, 13(3), 676-686.</p>
+</div>
+<hr>
+<div class="header">
+<p>
+Next: <a href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License" accesskey="n" rel="next">GNU Free Documentation License</a>, Previous: <a href="Testing-against-previous-results.html#Testing-against-previous-results" accesskey="p" rel="prev">Testing against previous results</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 
-<h2 class="chapter">6 FFT comparison</h2>
 
-<p><strong>FFTW3 NOT supported in current version</strong>: There is currently NO support for FFTW3 at the moment. The FFTW module needs to be reverted to the Fortran 95 standard. At this time, it's not a huge priority. GGADT works just fine, and does not require you to install an external library. Future versions of GGADT will likely include FFTW3 support.
 
-   <p><strong>Text below this point is for earlier versions of GGADT which supported FFTW3.</strong>
-
-   <p>Currently, GGADT allows you to choose between two FFT algorithms: FFTW 3 (<a href="http://fftw.org/">http://fftw.org/</a>), which requires you install the FFTW3 library, and GPFA (Generalized Prime Factor Algorithm)<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>, which is self-contained and included with the GGADT package. GPFA is used by default, and, as shown below, is slightly faster than FFTW in the current version of GGADT. This will change in later versions, since at the moment, we do not take advantage of saving and loading FFTW "wisdom".
-
-   <p>Earlier versions of GGADT, which did FFT's in a different way (only did padded FFT's, but utilized FFTW wisdom), had FFTW being about 20 percent faster than GPFA.
-
-   <p>If you wish to use the FFTW3 version of GGADT, you will need to install FFTW 3.3.x (we have only tested 3.3.3, but GGADT should in principal be compatible with all 3.x.x versions). GPFA will not currently work with FFTW 2.x, as the two interfaces are different, but plans to include FFTW 2.x support are in the works.
-
-   <p>If you have a particular FFT library that you would like to see implemented, please send an e-mail to jah5 (at) princeton.edu. It will likely be faster if you simply write your own module to attach to GGADT. This module must provide the function <code>fft_firstk(arr,K)</code> where <code>arr</code> is an N by N array, and <code>K</code> is an integer less than N. The function must return a <code>K</code> by <code>K</code> array, containing the first <code>K</code> values of the FFT of <code>arr</code>. The complexity of this algorithm should scale as (N*N)log(<code>K</code>*<code>K</code>), instead of the (N*N)log(N*N) complexity of the standard two-dimensional FFT.
-
-   <p>For information about how to construct this algorithm, see the instructions for FFTW at <a href="http://www.fftw.org/pruned.html">http://www.fftw.org/pruned.html</a>.
-
-   <p>If you are successful at porting your FFT algorithm, let us know, and we will do our best to test it and include it with future releases.
-
-<h3 class="section">6.1 Timing</h3>
-
-<div class="block-image"><img src="timing_actual_time.png" alt="timing_actual_time.png"></div>
-<img src="timing_relative_to_gpfa.png" alt="timing_relative_to_gpfa.png">
-
-   <div class="footnote">
-<hr>
-<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> Temperton, C. (1992). A Generalized Prime Factor FFT Algorithm for any N=2^p3^q5^r. SIAM Journal on Scientific and Statistical Computing, 13(3), 676-686.</p>
-
-   <p><hr></div>
-
-   </body></html>
-
+</body>
+</html>

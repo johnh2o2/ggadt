@@ -59,27 +59,7 @@ contains
         complex(kind=dp_complex), dimension(10) :: delms
         integer :: i, j
 
-        if (use_efficiencies) then 
-            norm_const = 1.0/(pi*a_eff*a_eff)
-            write(stdout,*) "# [ephot] [Q_scat] [Q_abs] [Q_ext]"
-        else 
-            norm_const = 1.0
-            write(stdout,*) "# [ephot] [sigma_scat] [sigma_abs] [sigma_ext]"
-        end if 
-
-        
-        
-        do i=1,nephots
-            do j=1,nmaterials
-                delms(j) = CMPLX(ior_res(j,i), ior_ims(j,i))
-            end do 
-            call get_integrated_cross_sections(ephots(i), delms, sigma_scat, sigma_abs)
-            sigma_scats(i) = sigma_scat*norm_const
-            sigma_abss(i) = sigma_abs*norm_const
-            write(stderr,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
-                    & " percent complete: ", (real(i)/real(nephots))*100.0, "%"
-        end do
-        
+        call get_integrated_cross_sections(sigma_scats, sigma_abss)
         do i=1,nephots
             write(stdout,*) ephots(i), sigma_scats(i), sigma_abss(i), sigma_scats(i) + sigma_abss(i) 
         end do
@@ -163,44 +143,68 @@ contains
     end subroutine get_ior
 
 
-    subroutine get_integrated_cross_sections(energy,delms,sigma_scat,sigma_abs)
+    subroutine get_integrated_cross_sections(sigma_scats,sigma_abss)
         implicit none
-        real(kind=dp_real), intent(in) :: energy
-        real(kind=dp_real), intent(out) :: sigma_abs, sigma_scat
+        real(kind=dp_real) :: sigma_scat, sigma_abs, energy
+        real(kind=dp_real), dimension(size(ephots)), intent(out) :: sigma_scats, sigma_abss
         complex(kind=dp_complex) :: delm
-        complex(kind=dp_complex), dimension(10), intent(in) :: delms
+        complex(kind=dp_complex), dimension(10) :: delms
 
-        real(kind=dp_real) :: kphot,sigma_ext
-        integer :: c1,c2, nangle
+        real(kind=dp_real) :: kphot, sigma_ext
+        integer :: c1,c2, nangle, i, j
 
-        delm = delms(1)
+        ! initialize to zero.
+        do i=1,nephots
+            sigma_scats(i) = 0.0
+            sigma_abss(i) = 0.0
+        end do 
 
-        kphot = TWOPI*(energy/0.001239842)
-
-        sigma_scat = 0.0
-        sigma_abs = 0.0
-
-        if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
-            call q_sphere(kphot,a_eff,delm,sigma_abs,sigma_scat,sigma_ext)
-            sigma_abs = sigma_abs*(pi*a_eff*a_eff)
-            sigma_scat = sigma_scat*(pi*a_eff*a_eff)
+        if (use_efficiencies) then 
+            norm_const = 1.0/(pi*a_eff*a_eff)
+            write(stdout,*) "# [ephot] [Q_scat] [Q_abs] [Q_ext]"
         else 
+            norm_const = 1.0
+            write(stdout,*) "# [ephot] [sigma_scat] [sigma_abs] [sigma_ext]"
+        end if 
 
-            ! loop over orientations        
-            do nangle = 1,norientations
 
-                ! fetch Euler angles
-                angles = get_new_angles(nangle)
 
-                ! calculate rotation matrix corresponding to rotation angles
+        ! loop over orientations        
+        do nangle = 1,norientations
+            ! fetch Euler angles
+            angles = get_new_angles(nangle)
 
-                ! angles(1) -- beta
-                ! angles(2) -- theta
-                ! angles(3) -- phi
+            ! calculate rotation matrix corresponding to rotation angles
 
-                rm = rotation_matrix(angles(1),angles(2),angles(3))
+            ! angles(1) -- beta
+            ! angles(2) -- theta
+            ! angles(3) -- phi
 
-                if (geometry .eq. 'sphere') then
+            ! rotate!
+            rm = rotation_matrix(angles(1),angles(2),angles(3))
+            if (geometry .eq. 'spheres' .or. geometry .eq. 'agglomeration') then 
+                call rotate_spheres(rm)
+            else if (geometry .eq. 'ellipsoid') then
+                call set_constants(angles(1),angles(2),angles(3),grain_a)
+            end if
+
+            
+            do i=1,nephots
+                energy = ephots(i)
+                sigma_scat = 0.0
+                sigma_abs = 0.0
+                do j=1,nmaterials
+                    delms(j) = CMPLX(ior_res(j,i), ior_ims(j,i))
+                end do 
+                delm = delms(1)
+                kphot = TWOPI*(1000*energy/hc)
+                if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
+                   
+                    call q_sphere(kphot,a_eff,delm,sigma_abs,sigma_scat,sigma_ext)
+                    sigma_abss(i) = sigma_abs*(pi*a_eff*a_eff)
+                    sigma_scats(i) = sigma_scat*(pi*a_eff*a_eff)
+                    
+                else if (geometry .eq. 'sphere') then
 
                     !$omp parallel shared(sh,z,y,kphot,a_eff,delm) 
                     !$omp do schedule(dynamic) private(c1,c2) 
@@ -216,7 +220,6 @@ contains
 
 
                 else if (geometry .eq. 'spheres' .or. geometry .eq. 'agglomeration') then 
-                    call rotate_spheres(rm)
                     do c1=1,nspheres
                         if (multiple_compositions) then
                             c2 = agglom_material_tags(c1)
@@ -231,20 +234,20 @@ contains
                     !$omp do schedule(dynamic) private(c1,c2) 
                     do c1=1,size(z)
                         do c2=1,size(y)
-                            sh(c1,c2) = 1-exp( (0.0,1.0)*phi_total(c1,c2) )
+                            sh(c1,c2) = 1.0D0-exp( (0.0D0,1.0D0)*phi_total(c1,c2) )
                         end do
                      end do
                     !$omp end do nowait
                     !$omp end parallel
                 else if (geometry .eq. 'ellipsoid') then 
-                    call set_constants(angles(1),angles(2),angles(3),grain_a)
+                    
                     !$omp parallel shared(sh,phi_total,z,y,kphot,grain_a,delm,rm) 
                     !$omp do schedule(dynamic) private(c1,c2) 
                     do c1=1,size(z)
                         do c2=1,size(y)
                             
                             phi_total(c1,c2) = phi_ellipsoid(z(c1),y(c2),kphot, grain_a, delm )
-                            sh(c1,c2) = 1-exp( (0.0,1.0)*phi_total(c1,c2) )
+                            sh(c1,c2) = 1.0 -exp( (0.0,1.0)*phi_total(c1,c2) )
                         end do
                     end do
                     !$omp end do nowait
@@ -260,15 +263,26 @@ contains
                 
                 do c1=1,size(z)
                     do c2=1,size(y)
-                     sigma_abs = sigma_abs + (1 - exp(-2*AIMAG(phi_total(c1,c2))))*dz*dy 
+                     sigma_abs = sigma_abs + (1.0D0 - exp(-2.0D0*AIMAG(phi_total(c1,c2))))*dz*dy 
                      sigma_scat = sigma_scat + (abs(sh(c1,c2))**2)*dz*dy
                     end do 
                 end do               
+                sigma_scats(i) = sigma_scats(i) +  sigma_scat*norm_const/norientations
+                sigma_abss(i) = sigma_abss(i) + sigma_abs*norm_const/norientations
+                if (.not. geometry .eq. 'sphere' .or. force_numerical) then
+                    write(stderr,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
+                        & " percent complete: ", (real(i + (nangle-1)*nephots)/real(nephots*norientations))*100.0, "%"
+                end if
             end do
-        
-            sigma_scat = sigma_scat/norientations
-            sigma_abs = sigma_abs/norientations
-        end if 
+            if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
+                sigma_scats(i) = sigma_scats(i) * norientations
+                sigma_abss(i) = sigma_abss(i) * norientations
+                EXIT
+            end if
+        end do
+        !do i=1,nephots
+        !    write(stderr, *) ephots(i), sigma_abss(i), sigma_scats(i), sigma_scats(i) + sigma_abss(i)
+        !end do
 
     end subroutine get_integrated_cross_sections
 
@@ -288,10 +302,10 @@ contains
         delm = delms(1)
 
         if (use_efficiencies) then 
-            norm_const = 1.0/(pi*a_eff*a_eff)
+            norm_const = 1.0D0/(pi*a_eff*a_eff)
             write(stdout,*) "# [thetaz] [thetay] [dQ_scat/domega]"
         else 
-            norm_const = 1.0
+            norm_const = 1.0D0
             write(stdout,*) "# [thetaz] [thetay] [dsigma_scat/domega]"
         end if 
 
@@ -299,7 +313,7 @@ contains
             if (verbose_mode) write(stderr,*) " Using analytical ADT for sphere..."
 
             ! Make a table of values for S(theta)
-            dth = (1.5*thetaz(size(thetaz)) - thetaz(1))/REAL(size(thets)-1, kind=dp_real)
+            dth = (1.5D0*thetaz(size(thetaz)) - thetaz(1))/REAL(size(thets)-1, kind=dp_real)
             do i=1,size(thets)
                 thets(i) = thetaz(1) + (i-1)*dth
                 sc_array(i) = scatter_sphere(k,a_eff,thets(i),delm)
@@ -522,7 +536,7 @@ contains
         
         
         max_angle = max_angle/arcseconds_per_radian ! convert max_angle from arcseconds to radians
-        k = (2*pi/1.239842)*1000*ephot
+        k = (2*pi/hc)*1000*ephot
         
         ngrid = ngrain ! Start with no padding 
 
@@ -576,10 +590,10 @@ contains
     ! ----------------------------------------------------
      
     ! set grid boundaries and spacing in physical coords
-        zmin = -grid_width*a_eff/2.0
-        ymin = -grid_width*a_eff/2.0
-        zmax = grid_width*a_eff/2.0
-        ymax = grid_width*a_eff/2.0
+        zmin = -grid_width*a_eff/2.0D0
+        ymin = -grid_width*a_eff/2.0D0
+        zmax = grid_width*a_eff/2.0D0
+        ymax = grid_width*a_eff/2.0D0
 
         dz = (zmax-zmin)/(size(z)-1)
         dy = (ymax-ymin)/(size(y)-1)

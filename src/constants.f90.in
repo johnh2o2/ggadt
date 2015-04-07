@@ -23,15 +23,15 @@ module constants
   real(dp_real), parameter                 ::  ARCSECONDS_PER_RADIAN          = (360.0D0*60.0D0*60.0D0)/(2.0D0*pi)
   integer, parameter                       ::  MAX_NGRID                      = 2048
 
-
-  real(dp_real), parameter                 ::  default_aeff                   = 0.2
-  real(dp_real), parameter                 ::  default_ephot                  = 2.0
-  real(dp_real), parameter                 ::  default_grain_a1               = 1.0
-  real(dp_real), parameter                 ::  default_grain_a2               = 1.0
-  real(dp_real), parameter                 ::  default_grain_a3               = 1.0
-  real(dp_real), parameter                 ::  default_ior_re                 = -1.920E-4
-  real(dp_real), parameter                 ::  default_ior_im                 = 2.807E-5
-  real(dp_real), parameter                 ::  default_grain_axis_ratio       = 1.0
+  real(dp_real), parameter                 ::  hc                             = 1.23984193D0
+  real(dp_real), parameter                 ::  default_aeff                   = 2.0D-1
+  real(dp_real), parameter                 ::  default_ephot                  = 2.0D0
+  real(dp_real), parameter                 ::  default_grain_a1               = 1.0D0
+  real(dp_real), parameter                 ::  default_grain_a2               = 1.0D0
+  real(dp_real), parameter                 ::  default_grain_a3               = 1.0D0
+  real(dp_real), parameter                 ::  default_ior_re                 = -1.920D-4
+  real(dp_real), parameter                 ::  default_ior_im                 = 2.807D-5
+  real(dp_real), parameter                 ::  default_grain_axis_ratio       = 1.0D0
   character(len=200), parameter            ::  default_grain_geometry         = 'sphere'
   character(len=50), parameter             ::  default_angle_mode       = 'random'
   character(len=50), parameter             ::  default_rotation_axis          = 'none'
@@ -39,8 +39,8 @@ module constants
   integer, parameter                       ::  default_ngrain                 = 256
   integer, parameter                       ::  default_nscatter               = 100
   integer, parameter                       ::  default_norientations          = 100
-  real(dp_real), parameter                 ::  default_dtheta                 = 10.0
-  real(dp_real), parameter                 ::  default_max_angle              = 3000.
+  real(dp_real), parameter                 ::  default_dtheta                 = 10.0D0
+  real(dp_real), parameter                 ::  default_max_angle              = 3000.D0
   character(len=200), parameter            ::  default_agglom_file_name       = ''
   character(len=200), parameter            ::  default_axes_convention        = 'ddscat'
   character(len=100), parameter            ::  default_fftw_opt_name          = 'estimate'
@@ -49,11 +49,11 @@ module constants
 
 ! New defaults for sed variables
   integer, parameter                       ::  default_nephots                = 100
-  real(dp_real), parameter                 ::  default_ephot_min              = 0.1
-  real(dp_real), parameter                 ::  default_ephot_max              = 5.0
+  real(dp_real), parameter                 ::  default_ephot_min              = 1.0D-1
+  real(dp_real), parameter                 ::  default_ephot_max              = 5.0D0
   character(len=200), parameter            ::  default_material               = "custom"
   character(len=200), parameter            ::  default_material_file          = ""
-  real(dp_real), parameter                 ::  default_dephot                 = 0.1
+  real(dp_real), parameter                 ::  default_dephot                 = 1.0D-1
   character(len=200), parameter ::  defaults_file_name &
     &=  "@abs_top_srcdir@/.defaults"
      

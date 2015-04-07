@@ -1,3 +1,9 @@
+* commit 7ae21bdda23e67da4221e35134cfd514f88e52db
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Thu Aug 28 20:21:42 2014 -0400
+| 
+|     Added a working 'rotation_matrix' function that avoids doing matrix products. Have not tested it with 2d scattering function to see if the wierd streaks are present as was the problem with the original function. ALSO added an improved way to do calculations for ellipsoidal grains (much faster; not sure how much faster...). This removes the rotation matrix parameter for the ellipsoidal function calls, and for each orientation does the bulk of the number crunching ONE time, and stores 4 constants for future use for that orientation. This means that an additional function call 'set_constants' is needed after each orientation change.
+|  
 * commit ede336df860acf7cde2b485fe7c860244540fd9c
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Wed Aug 27 15:33:01 2014 -0400

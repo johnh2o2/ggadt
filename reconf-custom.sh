@@ -10,7 +10,7 @@ git log --pretty --graph > ChangeLog
 aclocal -I./m4
 autoconf
 automake -a
-./configure || exit
+./configure --enable-openmp || exit
 make html || exit
 cp doc/ggadt.html/* doc/htmldoc
 

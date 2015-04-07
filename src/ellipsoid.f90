@@ -27,7 +27,7 @@ module ellipsoid
 
 
         do i=1,6
-            cc(i) = 0.0
+            cc(i) = 0.0D0
         end do 
 
         rinv(1,1) = cos(theta)
@@ -59,7 +59,7 @@ module ellipsoid
         cc(5) = 2*cc(5)
 
 
-        q(1) = 4./cc(1)
+        q(1) = 4.0D0/cc(1)
         q(2) = (cc(2)/cc(1))**2 - 4*cc(4)/cc(1)
         q(3) = (cc(3)/cc(1))**2 - 4*cc(6)/cc(1)
         q(4) = 2*cc(2)*cc(3)/(cc(1)**2) - 4*cc(5)/cc(1)
@@ -79,7 +79,7 @@ module ellipsoid
     
 
         if (d .lt. 0.0) then
-            chord_ellipsoid = 0.0
+            chord_ellipsoid = 0.0D0
         else
             chord_ellipsoid = sqrt(d)
         end if
@@ -107,7 +107,7 @@ module ellipsoid
         real(kind=dp_real),  dimension(3), intent(in) :: grain_a
         complex(kind=dp_complex) :: shadow_ellipsoid
 
-        shadow_ellipsoid = 1.0-exp( (0.0,1.0)*phi_ellipsoid(x,y,k,grain_a,delm) )
+        shadow_ellipsoid = 1.0D0 -exp( (0.0D0,1.0D0)*phi_ellipsoid(x,y,k,grain_a,delm) )
         
     end function shadow_ellipsoid
 

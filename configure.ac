@@ -42,7 +42,7 @@ AM_CONDITIONAL([OMP], [test x$openmp = xtrue])
 
 #Enable user to choose single precision
 AC_ARG_ENABLE([single],
-[  --enable-single   Use single precision (not recommended) ],
+[  --enable-single    Use single precision (not recommended) ],
 [case "${enableval}" in
   yes) use_double=false ;; 
   no)  use_double=true ;;
@@ -128,6 +128,7 @@ if test x$use_double = xtrue
   then
   DOUBLE_UNCOMMENT=
   SINGLE_UNCOMMENT="!"
+  AC_MSG_WARN([Using double precision])
 fi
 
 GPFA_UNCOMMENT="!"
