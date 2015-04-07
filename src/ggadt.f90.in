@@ -201,8 +201,8 @@ contains
                 if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
                    
                     call q_sphere(kphot,a_eff,delm,sigma_abs,sigma_scat,sigma_ext)
-                    sigma_abss(i) = sigma_abs*(pi*a_eff*a_eff)
-                    sigma_scats(i) = sigma_scat*(pi*a_eff*a_eff)
+                    sigma_abs = sigma_abs*(pi*a_eff*a_eff)
+                    sigma_scat = sigma_scat*(pi*a_eff*a_eff)
                     
                 else if (geometry .eq. 'sphere') then
 
@@ -260,13 +260,14 @@ contains
                     stop
                 end if
 
-                
-                do c1=1,size(z)
-                    do c2=1,size(y)
-                     sigma_abs = sigma_abs + (1.0D0 - exp(-2.0D0*AIMAG(phi_total(c1,c2))))*dz*dy 
-                     sigma_scat = sigma_scat + (abs(sh(c1,c2))**2)*dz*dy
-                    end do 
-                end do               
+                if (.not. geometry .eq. 'sphere' .or. force_numerical) then
+                    do c1=1,size(z)
+                        do c2=1,size(y)
+                         sigma_abs = sigma_abs + (1.0D0 - exp(-2.0D0*AIMAG(phi_total(c1,c2))))*dz*dy 
+                         sigma_scat = sigma_scat + (abs(sh(c1,c2))**2)*dz*dy
+                        end do 
+                    end do
+                end if               
                 sigma_scats(i) = sigma_scats(i) +  sigma_scat*norm_const/norientations
                 sigma_abss(i) = sigma_abss(i) + sigma_abs*norm_const/norientations
                 if (.not. geometry .eq. 'sphere' .or. force_numerical) then

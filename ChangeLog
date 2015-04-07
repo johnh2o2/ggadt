@@ -1,3 +1,9 @@
+* commit b47c4ff9dc6213ca388d088c5f3ae92efac86f04
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Apr 6 21:54:50 2015 -0400
+| 
+|     Changed 'for nephot; for norientations' 'for norientations; for nephot' because otherwise you get tons of jitter for non-spherical grains. This needs to be retested. A new bug has been discovered -- the analytic formula for spherical grains appears to be only 1 pct accurate when it should be like 10-3 -- 10-4; a problem for another commit
+|  
 * commit 7ae21bdda23e67da4221e35134cfd514f88e52db
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Thu Aug 28 20:21:42 2014 -0400
