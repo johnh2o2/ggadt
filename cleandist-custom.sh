@@ -11,7 +11,7 @@ rm  -f config.log
 rm -f Makefile
 rm -f *png
 rm -f testdat.dat
-rm -f doc/Makefile.in
+#rm -f doc/Makefile.in
 rm -f doc/Makefile
 rm -f doc/stamp-vti
 rm -f doc/version.texi
@@ -22,7 +22,7 @@ rm -f test_output.dat
 rm -f src/ggadt
 rm -f src/*o
 rm -f src/*mod
-rm -f src/Makefile.in
+#rm -f src/Makefile.in
 rm -f src/Makefile
 
 rm -f src/ggadt.f90
