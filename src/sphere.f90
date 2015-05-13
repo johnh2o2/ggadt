@@ -28,7 +28,7 @@ module sphere
         !gr_a = sqrt(sum(grain_a*grain_a))
         r = sqrt(x*x + y*y)
         l = sqrt(gr_a*gr_a - r*r)
-        phi_sphere = (0,0)
+        phi_sphere = (0.0D0,0.0D0)
 
         if (r < gr_a) then 
                 phi_sphere = k*delta_m*(2*l)
@@ -40,37 +40,38 @@ module sphere
         real(kind=dp_real), intent(in) :: x,y,k,gr_a
         complex(kind=dp_complex), intent(in) :: delta_m
         complex(kind=dp_complex) :: shadow_sphere
-        shadow_sphere = 1-exp( (0.0,1.0)*phi_sphere(x,y,k,gr_a,delta_m) )
+        shadow_sphere = 1-exp( (0.0D0,1.0D0)*phi_sphere(x,y,k,gr_a,delta_m) )
         
     end function shadow_sphere
 
-    function func1(x,rho)
+    function scat_integral(x,rho)
         ! Performs the integral necessary to calculate the scattering matrix
         ! for a spherical grain in ADT (see Draine & Allaf-Akbari 2006)
         implicit none
         real(kind=dp_real), intent(in) :: x
         complex(kind=dp_complex), intent(in) :: rho
-        complex(kind=dp_complex) :: func1, val1, val2
+        complex(kind=dp_complex) :: scat_integral, val1, val2, A
         real(kind=dp_real) :: umin, umax, du, u
         integer :: i 
 
-        umin = 0.0
-        umax = PI/2.0
+        umin = 0.0D0
+        umax = PI/2.0D0
         du = (umax - umin)/nu_sphere
 
-        func1 = 0.0
-        val1 = 0.0
-        val2 = 0.0
+        scat_integral = 0.0D0
+        val1 = 0.0D0
+        val2 = 0.0D0
 
         do i=0,(nu_sphere-1)
             u = umin + i*du
-            val1 = val1 + du*exp(-(0.0,1.0)*rho*sin(u))*BesJ0(x*cos(u))*sin(u)*cos(u)
-            val2 = val2 + du*BesJ0(x*cos(u))*sin(u)*cos(u)
+            A = BesJ0(x*cos(u))*sin(u)*cos(u)
+            val1 = val1 + du*exp(-(0.0D0,1.0D0)*rho*sin(u))*A
+            val2 = val2 + du*A
         end do
 
-        func1 = val2 - val1
+        scat_integral = val2 - val1
 
-    end function func1
+    end function scat_integral
 
     function scatter_sphere(k,aeff,theta,delta_m)
         ! Calculates the differential scattering amplitude for a spherical grain
@@ -90,9 +91,9 @@ module sphere
 
         rho = 2*k*aeff*delta_m
         x = k*aeff*theta
-        sc = k*k*aeff*aeff*func1(x,rho)
+        sc = k*k*aeff*aeff*scat_integral(x,rho)
 
-        scatter_sphere = REAL(ABS(sc),kind=dp_real)*REAL(ABS(sc),kind=dp_real)/(k*k)
+        scatter_sphere = ABS(sc * sc)/(k*k)
         
 
     end function scatter_sphere
@@ -109,17 +110,12 @@ module sphere
         complex(kind=dp_complex) :: rho
 
         rho = 2*k*aeff*delta_m
-        rho0 = REAL(ABS(rho),kind=dp_real)
-        rho1 = REAL(rho,kind=dp_real)
-
-        if (rho1 == rho0) then
-            rho2 = 0
-        else
-            rho2 = sqrt(rho0*rho0 - rho1*rho1)
-        end if
-
+        rho1 = REAL(rho, kind=dp_real)
+        rho2 = DIMAG(rho)
+        rho0 = dsqrt(rho1 * rho1 + rho2 * rho2)
+        
         if (ABS(rho1) .gt. 0.) then
-            beta = atan(rho2/rho1)
+            beta = DATAN(rho2/rho1) ! double version of atan
         else
             if (rho2 .gt. 0.0) then
                 beta = 0.5*pi 
@@ -141,7 +137,7 @@ module sphere
             endif
             fac = exp(-rho2)
             fac2 = fac*fac
-            qext = 2 + (4./(rho0**2))*(cos(2*beta) - fac*(cos(rho1 - 2*beta) - sgnfac*rho0*sin(rho1 - beta)))
+            qext = 2 + (4./(rho0**2))*(dcos(2*beta) - fac*(dcos(rho1 - 2*beta) - sgnfac*rho0*dsin(rho1 - beta)))
             qabs = 1 + fac2/rho2 + (fac2 - 1)/(2*rho2*rho2)
             qscat = qext - qabs
         end if

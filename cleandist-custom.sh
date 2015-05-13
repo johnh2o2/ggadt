@@ -7,7 +7,7 @@ rm -f *npy
 rm -f config.status
 rm  -f config.log
 #rm  -f configure
-rm  -f Makefile.in
+#rm  -f Makefile.in
 rm -f Makefile
 rm -f *png
 rm -f testdat.dat

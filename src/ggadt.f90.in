@@ -314,97 +314,114 @@ contains
             if (verbose_mode) write(stderr,*) " Using analytical ADT for sphere..."
 
             ! Make a table of values for S(theta)
-            dth = (1.5D0*thetaz(size(thetaz)) - thetaz(1))/REAL(size(thets)-1, kind=dp_real)
-            do i=1,size(thets)
-                thets(i) = thetaz(1) + (i-1)*dth
-                sc_array(i) = scatter_sphere(k,a_eff,thets(i),delm)
-            end do 
+            !dth = (1.5D0*thetaz(size(thetaz)) - thetaz(1))/REAL(size(thets)-1, kind=dp_real)
+            !do i=1,size(thets)
+            !    thets(i) = thetaz(1) + (i-1)*dth
+            !    sc_array(i) = scatter_sphere(k,a_eff,thets(i),delm)
+            !end do 
 
             ! Now output differential scattering cross section
-            write(stdout,*) "# [thetaz] [thetay] [dqscat/domega]"
+            
             do i=1,size(thetaz)
                 do j=1,size(thetay)
                     th = sqrt(thetaz(i)*thetaz(i) + thetay(j)*thetay(j))
-                    sc = linterp(thets,sc_array,th)/(pi*a_eff*a_eff)
+                    scatter(i,j) = scatter_sphere(k, a_eff, th, delm)
+                    !sc = linterp(thets,sc_array,th)/(pi*a_eff*a_eff)
                    
-                    write(stdout,*) thetaz(i),thetay(j), sc
+                    !write(stdout,*) thetaz(i),thetay(j), sc
                 end do
             end do
-        else 
-            ! loop over orientations
-            do nangle = 1,norientations
 
-                ! fetch Euler angles
-                angles = get_new_angles(nangle)
-
-                ! calculate rotation matrix corresponding to rotation angles
-
-                ! angles(1) -- beta
-                ! angles(2) -- theta
-                ! angles(3) -- phi
-                rm = rotation_matrix(angles(1),angles(2),angles(3))
-                
-
-                if (geometry .eq. 'ellipsoid') then 
-                    call set_constants(angles(1),angles(2),angles(3),grain_a)
-                    !$omp parallel shared(sh,z,y,rm,k,delm,grain_a) 
-                    !$omp do schedule(dynamic) private(i,j)
-                    do i=1,size(z)
-                        do j=1,size(y)
-                            sh(i,j) = shadow_ellipsoid(z(i),y(j),k,grain_a,delm)
-                        end do
+        else
+            if (geometry .eq. 'sphere') then
+                !$omp parallel shared(sh,z,y,rm,k,delm,grain_a)
+                !$omp do schedule(dynamic) private(i,j)
+                do i=1,size(z)
+                    do j=1,size(y)
+                        sh(i,j) = shadow_sphere(z(i),y(j), k, a_eff, delm)
                     end do
-                    !$omp end do nowait
-                    !$omp end parallel
-                elseif  (geometry .eq. 'sphere') then 
-                    !$omp parallel shared(sh,z,y,rm,k,delm,grain_a)
-                    !$omp do schedule(dynamic) private(i,j)
-                    do i=1,size(z)
-                        do j=1,size(y)
-                            sh(i,j) = shadow_sphere(z(i),y(j), k, a_eff, delm)
-                        end do
-                    end do
-                    !$omp end do nowait
-                    !$omp end parallel
-                elseif (geometry .eq. 'spheres' .or. geometry .eq. 'agglomeration')    then
-                    call rotate_spheres(rm)
-                    sh = shadow_spheres(z,y,k)
-
-                elseif (geometry .eq. 'custom') then
-                    sh = shadow_custom(z,y,k,rm,ngrain,ephot,ephots,ior_res,ior_ims)
-                else
-                    write(stderr,*) "ERROR: Do not understand geometry: ", geometry
-                end if 
-               
+                end do
+                !$omp end do nowait
+                !$omp end parallel 
                 call fft_faster(sh,kmin,kmax,enhancement, ftsh)
 
                 !$omp parallel shared(scatter,ftsh,k,dz,dy,norientations) 
                 !$omp do schedule(dynamic) private(i,j)
                 do i=1,size(kz)
                     do j=1,size(ky)
-                        scatter(i,j) = scatter(i,j) + ((k*dz*dy*abs(ftsh(i,j))/twopi)**2)/real(norientations,kind=dp_real)
+                        scatter(i,j) = (k*dz*dy*abs(ftsh(i,j))/twopi)**2
                     end do
                 end do
                 !$omp end do nowait
                 !$omp end parallel
-
-
-                write(stderr,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
-                        & " percent complete: ", (real(nangle)/real(norientations))*100.0, "%"
-            end do
-
-            if (timing_mode) stop 
-
-           
+            else 
             
-            do i=1,size(thetaz)
-                do j=1,size(thetay)
-                    write(stdout,*) thetaz(i),thetay(j),scatter(j,i)*norm_const
-                end do
-            end do
-            if (verbose_mode) write(stderr,*) "done."
+                ! loop over orientations
 
-        endif 
+                do nangle = 1,norientations
+
+                    ! fetch Euler angles
+                    angles = get_new_angles(nangle)
+
+                    ! calculate rotation matrix corresponding to rotation angles
+
+                    ! angles(1) -- beta
+                    ! angles(2) -- theta
+                    ! angles(3) -- phi
+                    rm = rotation_matrix(angles(1),angles(2),angles(3))
+                    
+
+                    if (geometry .eq. 'ellipsoid') then 
+                        call set_constants(angles(1),angles(2),angles(3),grain_a)
+                        !$omp parallel shared(sh,z,y,rm,k,delm,grain_a) 
+                        !$omp do schedule(dynamic) private(i,j)
+                        do i=1,size(z)
+                            do j=1,size(y)
+                                sh(i,j) = shadow_ellipsoid(z(i),y(j),k,grain_a,delm)
+                            end do
+                        end do
+                        !$omp end do nowait
+                        !$omp end parallel
+                    elseif (geometry .eq. 'spheres' .or. geometry .eq. 'agglomeration')    then
+                        call rotate_spheres(rm)
+                        sh = shadow_spheres(z,y,k)
+
+                    elseif (geometry .eq. 'custom') then
+                        sh = shadow_custom(z,y,k,rm,ngrain,ephot,ephots,ior_res,ior_ims)
+                    else
+                        write(stderr,*) "ERROR: Do not understand geometry: ", geometry
+                    end if 
+                   
+                    call fft_faster(sh,kmin,kmax,enhancement, ftsh)
+
+                    !$omp parallel shared(scatter,ftsh,k,dz,dy,norientations) 
+                    !$omp do schedule(dynamic) private(i,j)
+                    do i=1,size(kz)
+                        do j=1,size(ky)
+                            scatter(i,j) = scatter(i,j) + ((k*dz*dy*abs(ftsh(i,j))/twopi)**2)/real(norientations,kind=dp_real)
+                        end do
+                    end do
+                    !$omp end do nowait
+                    !$omp end parallel
+
+
+                    write(stderr,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
+                            & " percent complete: ", (real(nangle)/real(norientations))*100.0, "%"
+                end do
+            endif 
+        endif
+
+        if (timing_mode) stop 
+
+       
+        
+        do i=1,size(thetaz)
+            do j=1,size(thetay)
+                write(stdout,*) thetaz(i),thetay(j),scatter(i,j)*norm_const
+            end do
+        end do
+        if (verbose_mode) write(stderr,*) "done."
+
     end subroutine diff_scat_cross_sect
 
     subroutine initialize_and_allocate_vars()
