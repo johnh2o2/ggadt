@@ -16,7 +16,7 @@ Quick install instructions
 
 **Recommended reading**: 
 
-* The HTML documentation for GGADT, available on-line [here](johnh2o2.github.io/ggadt)
+* The HTML documentation for GGADT, available on-line [here](http://johnh2o2.github.io/ggadt)
 * the INSTALL file (which is a general-use file provided by GNU and may not be 100% applicable to GGADT)
 
 Do the following from a terminal
