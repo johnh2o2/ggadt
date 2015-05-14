@@ -1,3 +1,15 @@
+* commit 99d8b40e616d739307fd781b0176afd256a1740a
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Wed May 13 14:14:04 2015 -0400
+| 
+|     NOW it should work from github
+|  
+* commit e10c9c4d6feb97b66007c3ad1f0abacbad324b53
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Wed May 13 13:49:11 2015 -0400
+| 
+|     ...cannot remember what's changed in this commit...but this now includes the Makefile.in file. hopefully you can just do the configure-make-make install from the cloned github repository
+|  
 * commit dda2d467046124f1f256e1601644c42af42f6092
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Mon Apr 6 22:10:31 2015 -0400
