@@ -49,7 +49,7 @@ program ggadt
 
     call cleanup()
 
-    write(stderr,*) "Done."
+    if (verbose_mode) write(stderr,*) "Done."
 contains
 
     subroutine calculate_int_cross_sections()
@@ -291,7 +291,7 @@ contains
         implicit none 
         integer :: nangle, i, j
         real(kind=dp_real) :: th, sc, dth
-        real(kind=dp_real), dimension(10*size(thetaz)) :: sc_array, thets
+        real(kind=dp_real), dimension(2*size(thetaz)) :: sc_array, thets
         complex(kind=dp_complex), dimension(10) :: delms
         
         
@@ -313,38 +313,48 @@ contains
         if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
             if (verbose_mode) write(stderr,*) " Using analytical ADT for sphere..."
 
-            ! Make a table of values for S(theta)
-            !dth = (1.5D0*thetaz(size(thetaz)) - thetaz(1))/REAL(size(thets)-1, kind=dp_real)
-            !do i=1,size(thets)
-            !    thets(i) = thetaz(1) + (i-1)*dth
-            !    sc_array(i) = scatter_sphere(k,a_eff,thets(i),delm)
-            !end do 
+            dth = thetaz(2) - thetaz(1)
 
-            ! Now output differential scattering cross section
-            
+            !$omp parallel shared(sc_array,thets,a_eff,k,delm, dth)
+            !$omp do schedule(dynamic) private(i)
+            do i=1,size(thets)
+                thets(i) = - sqrt(2.0)*max_angle + (i-1)*dth
+                sc_array(i) = scatter_sphere(k, a_eff, thets(i), delm)
+            end do
+            !$omp end do nowait
+            !$omp end parallel 
+
+
+            !$omp parallel shared(scatter,thetaz,thetay,a_eff,k,delm, thets, sc_array)
+            !$omp do schedule(dynamic) private(i,j, th)
             do i=1,size(thetaz)
-                do j=1,size(thetay)
+                do j=1, size(thetay)
                     th = sqrt(thetaz(i)*thetaz(i) + thetay(j)*thetay(j))
-                    scatter(i,j) = scatter_sphere(k, a_eff, th, delm)
-                    !sc = linterp(thets,sc_array,th)/(pi*a_eff*a_eff)
-                   
-                    !write(stdout,*) thetaz(i),thetay(j), sc
+                    scatter(i,j) = linterp(thets, sc_array, th)
                 end do
             end do
+            !$omp end do nowait
+            !$omp end parallel 
+
 
         else
             if (geometry .eq. 'sphere') then
-                !$omp parallel shared(sh,z,y,rm,k,delm,grain_a)
+                
+
+                !$omp parallel shared(sh,z,y,rm,k,delm,grain_a, a_eff)
                 !$omp do schedule(dynamic) private(i,j)
                 do i=1,size(z)
                     do j=1,size(y)
                         sh(i,j) = shadow_sphere(z(i),y(j), k, a_eff, delm)
+                        
                     end do
                 end do
                 !$omp end do nowait
                 !$omp end parallel 
-                call fft_faster(sh,kmin,kmax,enhancement, ftsh)
 
+                
+                call fft_faster(sh,kmin,kmax,enhancement, ftsh)
+                
                 !$omp parallel shared(scatter,ftsh,k,dz,dy,norientations) 
                 !$omp do schedule(dynamic) private(i,j)
                 do i=1,size(kz)
@@ -420,15 +430,15 @@ contains
                 write(stdout,*) thetaz(i),thetay(j),scatter(i,j)*norm_const
             end do
         end do
-        if (verbose_mode) write(stderr,*) "done."
+        
 
     end subroutine diff_scat_cross_sect
 
     subroutine initialize_and_allocate_vars()
       implicit none 
 
-      integer :: line, status, next, ng, n, allocatestatus, i, j, norientations_new
-      real(kind=dp_real) :: ds, max_dist, scale
+      integer :: line, status, next, ng, n, allocatestatus, i, j, norientations_new, closest_ngrid
+      real(kind=dp_real) :: ds, max_dist, scale, lambda
       character(len=100) :: junk
 
         
@@ -450,11 +460,11 @@ contains
         else
             ephots(1) = ephot
         end if 
+        lambda = 0.00123984193 / ephots(1) ! max(hc/E) = hc/min(E)
 
       
         ! if we have defined material files, read them
         if (material_file_specified) then 
-            
             do i=1, nmaterials
                 call get_ior(material_files(i), ior_res(i,:), ior_ims(i,:), ior_res_single_en(i), ior_ims_single_en(i))
             end do 
@@ -535,6 +545,8 @@ contains
             ! make the grid a little larger to accomodate furthest part of grain
             grid_width = 2.05*max_dist/a_eff
 
+            
+
         else if (geometry == 'ellipsoid') then
             scale = a_eff/((grain_a(1)*grain_a(2)*grain_a(3))**(1.0/3.0))
             ! normalize so that grain_a(1), (2), (3) produce an ellipse with an effective
@@ -550,28 +562,43 @@ contains
             stop
         end if 
 
-        
+        if (grid_width*a_eff < lambda) then
+            write(stderr, *) "WARNING: a_eff >> lambda is violated. ADT is not valid here!"
+            grid_width = 2.05 * lambda / a_eff
+        end if
         
         
         max_angle = max_angle/arcseconds_per_radian ! convert max_angle from arcseconds to radians
         k = (2*pi/hc)*1000*ephot
         
+
         ngrid = ngrain ! Start with no padding 
+
+        ! ensure that ngrid is of the form (2**i)(3**j)(5**k)
+
+        closest_ngrid = allowed_ngrids(1)
+        i=1
+        do while (allowed_ngrids(i) < ngrid .and. i < size(allowed_ngrids))
+            i = i + 1
+            closest_ngrid = allowed_ngrids(i)
+        end do
+        ngrid = closest_ngrid
 
         ! Add padding if use_padded_fft is asked for.
         if (use_padded_fft) then  
-            ds = grid_width*a_eff/real(ngrain - 1)
+            ds = grid_width*a_eff/real(ngrain)
             next = 0
             ng = ngrid
-            L = (ng-1)*ds 
+            L = ng*ds 
             n = int(ceiling(asin(max_angle)*L*k/(2*pi)))
             do while(n < nscatter .and. ng < max_ngrid)
-                next = next + 1
-                ng = ngrid + next
-                L = (ng-1)*ds 
+                i = i + 1
+                ng = allowed_ngrids(i)
+                next = ng - ngrid
+                L = ng*ds 
                 n = int(ceiling(asin(max_angle)*L*k/(2*pi)))
             end do
-            grid_width = ng*ds/a_eff
+            grid_width = L/a_eff
             ngrid = ng 
             if (n < nscatter) then
                 write(stderr,*) "Warning: your request for an nscatter of ",&
@@ -627,13 +654,12 @@ contains
     ! -------------------
       
         L = z(size(z)) - z(1)  ! length of grid in physical coords
-        !write(stderr,*) "LENGTH: ",L
 
     ! figures out what kmin, kmax, enhancement and kactual are.
     
         call get_fft_vals(-max_angle,max_angle,nscatter,kmin,kmax,enhancement,kactual)   
-
-     
+        !write(stderr, *) "max_angle = ", max_angle, "kmin,kmax,enh = ", kmin, kmax, enhancement
+        !write(stderr, *) "L, 2pi/L = ", L, (TWOPI/L), "k=",k
       
     ! allocate arrays that depend on kactual
 
@@ -664,7 +690,7 @@ contains
         do i=1,size(kz)
             kz(i) = ((i-1)*dk + kmin)*(TWOPI/L)
             ky(i) = kz(i)
-
+            !write(stderr, *) "kz/k, asin() = ", kz(i)/k, asin(kz(i)/k)
             thetaz(i) = asin(kz(i)/k)
             thetay(i) = asin(ky(i)/k)
             do j=1,size(ky)
@@ -672,9 +698,6 @@ contains
             end do 
         end do
     ! -----------------------------------
-
-        !write(stderr, *) " going to "
-        
         
 
         if (nmaterials .gt. 1) then 
@@ -717,19 +740,21 @@ contains
         real(kind=dp_real), intent(in) :: thetamin, thetamax
         integer, intent(in) :: Kask
         integer, intent(out) :: kmin,kmax,enhancement, Kout
+        integer :: i
 
-        enhancement = 1
-
+        enhancement = 0
+        !write(stderr, *) "thetamin, sin(thetamin), k, L, prod = ",thetamin, sin(thetamin), k, L, k*sin(thetamin)*(L/TWOPI)
         kmin = int(floor(k*sin(thetamin)*(L/TWOPI)))
         kmax = int(ceiling(k*sin(thetamax)*(L/TWOPI)))
 
         Kout = kmax - kmin
-
-        do while (enhancement*Kout + 1 < Kask) 
-            enhancement = enhancement+1
+        i = 1
+        do while ( (enhancement + 1) * Kout < Kask) 
+            enhancement = allowed_ngrids(i) - 1
+            i = i + 1
         end do 
 
-        Kout = enhancement*Kout + 1
+        Kout = (enhancement + 1)*Kout
 
     end subroutine get_fft_vals
 

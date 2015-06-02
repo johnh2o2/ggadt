@@ -9,6 +9,7 @@ module gpfa
 contains
 
     function fft(f)
+        ! May 2015 -- JAH -- this might only work for square f(:,:) ( i.e. size(f(1,:)) = size(f(:,1)) )
         complex(kind=dp_complex), intent(in)                            :: f(:,:)
         complex(kind=dp_complex), dimension(size(f(:,1)),size(f(1,:)))  :: fft
         integer                                                         :: i, j, Nx, Ny, JUMP, LOT, INC
@@ -17,17 +18,18 @@ contains
         real, dimension(2*size(f(:,1)))                                 :: trigs_x
         real, dimension(2*size(f(1,:)))                                 :: trigs_y
         real                                                            :: f_gpfa(2*size(f(:,1))*size(f(1,:)))
-      
+        
         Nx = size(f(:,1))
         Ny = size(f(1,:))
 
+
         call SETGPFA(trigs_x, Nx)
         call SETGPFA(trigs_y, Ny)
-
+        
         do i=1,Nx
         	do j=1,Ny
-        		f_gpfa(1+2*((i-1)+(j-1)*Ny)) = REAL(f(i,j))
-        		f_gpfa(2+2*((i-1)+(j-1)*Ny)) = IMAG(f(i,j))
+        		f_gpfa(1+2*((i-1)+(j-1)*Ny)) = REAL(f(i,j))  
+        		f_gpfa(2+2*((i-1)+(j-1)*Ny)) = IMAG(f(i,j))  
         	end do 
         end do
 
@@ -35,16 +37,16 @@ contains
         INC=2
         JUMP=2*Nx
         LOT=Ny
-
+        
         call GPFA_FFT(f_gpfa(1),f_gpfa(2),trigs_y,INC,JUMP,Ny,LOT,ISIGN)
- 
+        
         ! Do columns
         INC=2*Nx
         JUMP=2
         LOT=Nx
-
+        
         call GPFA_FFT(f_gpfa(1),f_gpfa(2),trigs_x,INC,JUMP,Nx,LOT,ISIGN)
-
+        
         ! write results to output vector.
         
         !npoints = 0
@@ -133,7 +135,7 @@ contains
                 do l=0,(NFFT-1)
                     do m=0,(NFFT-1)
                         twids(1 + i + l*Keff, 1 + j + m*Keff ) &
-                            & = exp(CMPLX(0,1)*ISIGN*twopi*(real(i*l+j*m))/real(N))
+                            & = zexp(CMPLX(0,1)*ISIGN*twopi*(real(i*l+j*m))/real(N))
                     end do 
                 end do 
             end do 

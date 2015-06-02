@@ -33,6 +33,8 @@ module constants
   real(dp_real), parameter                 ::  default_ior_im                 = 2.807D-5
   real(dp_real), parameter                 ::  default_grain_axis_ratio       = 1.0D0
   character(len=200), parameter            ::  default_grain_geometry         = 'sphere'
+  character(len=200), parameter            ::  allowed_ngrid_values_filename &
+    & = '@abs_top_srcdir@/.allowed_ngrid_values'
   character(len=50), parameter             ::  default_angle_mode       = 'random'
   character(len=50), parameter             ::  default_rotation_axis          = 'none'
   character(len=200), parameter            ::  default_angle_file       = ''

@@ -1,10 +1,12 @@
 bin_PROGRAMS = ggadt
 
 
+
 ggadt_SOURCES = constants.f90 options.f90 interp.f90
 
 if USING_FFTW
 ggadt_SOURCES += fftwmod.f90
+AM_FCFLAGS = -I$(fftw3_inc_dir)
 else
 ggadt_SOURCES += gpfa.f90 gpfamod.f90
 endif

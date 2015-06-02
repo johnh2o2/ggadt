@@ -37,6 +37,9 @@ module common_mod
   integer                                ::  norientations 
   integer                                ::  ierr
 
+  integer, allocatable                   ::  allowed_ngrids(:) ! this 
+
+
   real(dp_real)                          ::  grid_width  
   real(dp_real)                          ::  dtheta
   real(dp_real)                          ::  ior_im        
@@ -95,13 +98,29 @@ module common_mod
 
   contains
 
+    subroutine set_allowed_ngrids()
+      implicit none
+      integer i, nallowed_gridpoints, allocate_status
 
+      open(unit=file_unit,file=allowed_ngrid_values_filename)
+
+      read(file_unit, *) nallowed_gridpoints
+
+      allocate(allowed_ngrids(nallowed_gridpoints), stat=allocate_status)
+
+      do i=1, nallowed_gridpoints
+        read(file_unit, *) allowed_ngrids(i)
+      end do
+
+    end subroutine set_allowed_ngrids
 
     subroutine set_parameter_values()
       implicit none
       character(len=100) :: optname
-      integer :: i
+      integer :: i, p, q, r
+      call set_allowed_ngrids()
      
+
 
       call define_flag(opts,"help",abbrev='h',description="Print this help message.")
       call define_flag(opts, &
@@ -501,7 +520,7 @@ module common_mod
           end if
       else
          if (verbose_mode) then 
-            write(stderr,*) "GGADT will now calculate the INTEGRATED (ABS,SCAT,EXT) CROSS SECTIONS"
+            write(stderr,*) "GGADT will now calculate the INTEGRATED (ABS,SCA,EXT) CROSS SECTIONS"
             write(stderr,*) "for a single dust grain with a geometry of ", geometry
             write(stderr,*) "over the energy range ", ephot_min," - ",ephot_max, " keV in ",dephot," keV increments"
             write(stderr,*) "for a dust grain composed of ",nmaterials," materials:"
@@ -630,8 +649,8 @@ module common_mod
         ! Astrophysical applications of ADT for x-ray scattering of dust
         !   typically care about small angle scattering, which corresponds to
         !   small values of K in the fourier transform. To get better resolution,
-        !   one can either pad the FFT, OR, one can do a series of off-set FFT's.
-        !   The latter approach takes about a 10th of the time.
+        !   one can either pad the FFT, OR, one can do a series of offset FFT's.
+        !   The latter approach takes about a 10th of the time as the former approach.
         
         integer, intent(in) :: kmin, kmax, enhancement
         
@@ -642,49 +661,75 @@ module common_mod
         integer :: i,j,a,b,norig, fsize, fftsize, ix, iy
         real(dp_real) :: deltaz, deltay
 
-        f = kspace_shift(f,real(kmin,dp_real),real(kmin,dp_real)) ! shift the input function so that the k-space origin is at (kmin,kmin)
-        norig = kmax - kmin 
         fsize = size(f(:,1))
-        fftsize = norig*enhancement + 1
-        
-        if (fftsize .ne. size(fft_output(1,:))) then
-          write(stderr,*) "ERROR: (fft_faster) fft_output size is ",size(fft_output(1,:)),&
-                          ", but fftsize = norig*enhancement + 1 = ",fftsize
-          stop
-        end if 
+        ! allocate(fft_output(fsize, fsize))
 
-        if (fsize < norig) then
-            write(stderr,*) "ERROR"
-            write(stderr,*) "Your chosen value for ngrain is too low to obtain &
-                    &high resolution features within the scattering region &
-                    &that you've specified. &
-                    &Choose an ngrain value of at least",norig
-            stop
-        end if 
-        ! allocate memory
-        allocate( working_fft(  norig   ,   norig   ))
-        !allocate( fft_output(   fftsize ,   fftsize ))
-        
+        ! shift the input function so that the k-space origin is at (kmin,kmin)
+        f = kspace_shift(f,real(kmin,dp_real),real(kmin,dp_real)) 
 
-        do i=1,enhancement+1
-            deltaz = real(i-1)/real(enhancement)
-            do j=1,enhancement+1
-                deltay = real(j-1)/real(enhancement)
-                new_grid = kspace_shift(f,deltaz,deltay)
-                working_fft = fft_firstk(new_grid,norig)
-                do a=1,norig
-                    do b=1,norig
-                        ix = i + (a-1)*enhancement
-                        iy = j + (b-1)*enhancement
-                        if ((ix <= fftsize) .and. (iy <= fftsize)) then
-                            fft_output(ix, iy) = working_fft(a,b)
-                        end if 
-                    end do
-                end do 
+        ! do a vanilla FFT if enhancement is 0
+        if (enhancement .eq. 0) then
+          allocate(working_fft(size(f(1,:)), size(f(:,1))))
+          working_fft = fft(f)
+
+          !fft_output = fft_firstk(f, size(fft_output(:,1)))
+          !write(stderr, *) fsize, size(fft_output(:,1))
+          do i=1,size(fft_output(1,:))
+            do j=1, size(fft_output(:,1))
+              fft_output(i, j) = working_fft(i, j)
             end do
-        end do 
+          end do
+        else
+          norig = kmax - kmin 
           
-        f = kspace_shift(f,real(-kmin,dp_real),real(-kmin,dp_real)) ! shift the input function back.
+          fftsize = norig*(enhancement + 1)
+
+          if (fftsize .ne. size(fft_output(1,:))) then
+            write(stderr,*) "ERROR: (fft_faster) fft_output size is ",size(fft_output(1,:)),&
+                            ", but fftsize = norig*(enhancement + 1) = ",fftsize
+            stop
+          end if 
+
+          if (fsize < norig) then
+              write(stderr,*) "ERROR"
+              write(stderr,*) "Your chosen value for ngrain is too low to obtain &
+                      &high resolution features within the scattering region &
+                      &that you've specified. &
+                      &Choose an ngrain value of at least",norig
+              stop
+          end if 
+
+          ! allocate memory
+          allocate( working_fft(  norig   ,   norig   ))
+          
+          ! Do offset FFTs
+          do i=0,enhancement
+              deltaz = real(i)/real(enhancement + 1)
+              do j=0,enhancement
+                  deltay = real(j)/real(enhancement + 1)
+                  
+                  new_grid = kspace_shift(f,deltaz,deltay)
+                  
+                  working_fft = fft_firstk(new_grid,norig)
+                  
+                  do a=1,norig
+                      do b=1,norig
+                          ix = i + (a-1)*(enhancement + 1) + 1
+                          iy = j + (b-1)*(enhancement + 1) + 1
+                        
+                          if ((ix <= fftsize) .and. (iy <= fftsize)) then
+                              fft_output(ix, iy) = working_fft(a,b)
+                          end if 
+                      end do
+                  end do 
+              end do
+          end do 
+            
+          
+        end if
+
+        ! shift the input function back.
+        f = kspace_shift(f,real(-kmin,dp_real),real(-kmin,dp_real)) 
     end subroutine fft_faster
 
     function fft_center(f)

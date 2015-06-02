@@ -1,10 +1,12 @@
 module fftw
     @USE_OMP_LIB@
+
     use constants
     use, intrinsic :: iso_c_binding
-       include '@fftw3_inc_dir@/fftw3.f03'
+       include '@fftw3_inc_dir@/fftw3.f'
+       !include '@srcdir@/f77_wisdom.f'
     logical :: first_time = .true.
-    type(c_ptr) :: plan
+    integer(8) :: plan
     integer ::  mode = fftw_estimate
     character(len=100) :: mode_name
     character(len=100) :: plan_filename
@@ -54,19 +56,18 @@ contains
         @OMP_UNCOMMENT@    numthreads = omp_get_max_threads()
         @OMP_UNCOMMENT@endif
         @OMP_UNCOMMENT@call fftw_plan_with_nthreads(numthreads)
-        if (first_time) then
-            error = fftw_import_wisdom_from_filename(trim(adjustl(plan_filename)))
-            if (error == 0) then
-                plan = fftw_plan_dft_2d(ny, nx, f ,fft, fftw_backward,mode)
-                error = fftw_export_wisdom_to_filename(plan_filename)
-            else
-                plan = fftw_plan_dft_2d(ny, nx, f ,fft, fftw_backward,mode)
-            end if
-            first_time = .false.
-        end if
-        !write (0,*) "about to do fft"
-        !plan = fftw_plan_dft_2d(ny, nx, f ,fft, fftw_backward,fftw_patient)
-        call fftw_execute_dft(plan, f, fft)
+        !if (first_time) then
+        !    error = import_wisdom_from_filename(trim(adjustl(plan_filename)))
+        !    if (error == 0) then
+        !        call dfftw_plan_dft_2d(plan, ny, nx, f ,fft, fftw_backward,mode)
+         !       call export_wisdom_to_filename(error, plan_filename)
+         !   else
+         !       call dfftw_plan_dft_2d(plan, ny, nx, f ,fft, fftw_backward,mode)
+         !   end if
+          !  first_time = .false.
+        !end if
+        call dfftw_plan_dft_2d(plan, ny, nx, f ,fft, fftw_backward,mode)
+        call dfftw_execute_dft(plan, f, fft)
     end function fft
 
     function fft_firstk(f,K)
@@ -86,10 +87,10 @@ contains
 
         integer, intent(in) :: K
         integer :: lentwids, keff, allocation_status
-        type(c_ptr) :: localplan
-        complex(c_double_complex), intent(inout) :: f(:,:)
-        complex(c_double_complex), dimension(K,K) :: fft_firstk 
-        complex(c_double_complex), allocatable :: small_fft(:,:), twids(:,:), fft_firstk_working(:,:)
+        integer(8) :: localplan
+        complex(8), intent(inout) :: f(:,:)
+        complex(8), dimension(K,K) :: fft_firstk 
+        complex(8), allocatable :: small_fft(:,:), twids(:,:), fft_firstk_working(:,:)
 
         integer  :: N, NFFT, i,j,l,m 
 
@@ -148,7 +149,7 @@ contains
                 do l=0,(NFFT-1)
                     do m=0,(NFFT-1)
                         twids(1 + i + l*Keff, 1 + j + m*Keff ) &
-                            & = exp(CMPLX(0,1)*ISIGN*twopi*(real(i*l+j*m))/real(N))
+                            & = zexp(CMPLX(0,1)*ISIGN*twopi*(real(i*l+j*m))/real(N))
                     end do 
                 end do 
             end do 
@@ -157,10 +158,10 @@ contains
         do l=1,NFFT
             do m=1,NFFT
                 ! plan
-                localplan = fftw_plan_dft_2d(Keff, Keff, f(l:N:NFFT,m:N:NFFT) ,small_fft, fftw_backward,mode)
+                call dfftw_plan_dft_2d(localplan, Keff, Keff, f(l:N:NFFT,m:N:NFFT) ,small_fft, fftw_backward,mode)
 
                 ! execute plan
-                call fftw_execute_dft(localplan, f(l:N:NFFT,m:N:NFFT), small_fft)
+                call dfftw_execute_dft(localplan, f(l:N:NFFT,m:N:NFFT), small_fft)
 
                 ! transfer results to master array
                 do i=1,Keff
@@ -170,7 +171,7 @@ contains
                 end do 
 
                 ! clean up
-                call fftw_destroy_plan(localplan)
+                call dfftw_destroy_plan(localplan)
             end do 
         end do
         

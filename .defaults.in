@@ -29,7 +29,7 @@ agglom-composition-file        = ''
 
 # Grain composition
 # Path to material index file
-material-file                  = "@abs_top_srcdir@/data/materials/index_silD03"
+# material-file                  = "@abs_top_srcdir@/data/materials/index_silD03"
 
 # parameters for differential scattering cross section calculation
 # units: keV

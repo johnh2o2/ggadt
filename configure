@@ -4889,7 +4889,7 @@ done
 	fftw3_fortran_header=NO
 	for x in /usr/local/include /usr/include ${ac_srcdir} ${ac_prefix}/include $macports_include
 	do
-		for y in "fftw3.f03"
+		for y in "fftw3.f"
 		do
 			if test -r "$x/$y"
 			then
@@ -4902,26 +4902,26 @@ done
 
 
 
-  if test -f "${macports_include}/fftw3.f03"
+  if test -f "${macports_include}/fftw3.f"
   then
     { $as_echo "$as_me:${as_lineno-$LINENO}: Found fftw3.f03 file in ${macports_include}. Will use this directory for fortran header files." >&5
 $as_echo "$as_me: Found fftw3.f03 file in ${macports_include}. Will use this directory for fortran header files." >&6;}
     fftw3_inc_dir="${macports_include}"
-  elif test -f "${fftw3_inc_dir}/fftw3.f03"
+  elif test -f "${fftw3_inc_dir}/fftw3.f"
   then
   	{ $as_echo "$as_me:${as_lineno-$LINENO}: Found fftw3.f03 file in ${fftw3_inc_dir}. Will use this directory for fortran header files." >&5
 $as_echo "$as_me: Found fftw3.f03 file in ${fftw3_inc_dir}. Will use this directory for fortran header files." >&6;}
-  elif test -f "/usr/local/include/fftw3.f03"
+  elif test -f "/usr/local/include/fftw3.f"
   then
   	{ $as_echo "$as_me:${as_lineno-$LINENO}: Found fftw3.f03 file in /usr/local/include. Will use this directory for fortran header files." >&5
 $as_echo "$as_me: Found fftw3.f03 file in /usr/local/include. Will use this directory for fortran header files." >&6;}
   	fftw3_inc_dir="/usr/local/include"
-  elif test -f "/usr/include/fftw3.f03"
+  elif test -f "/usr/include/fftw3.f"
   then
   	{ $as_echo "$as_me:${as_lineno-$LINENO}: Found fftw3.f03 file in /usr/include. Will use this directory for fortran header files." >&5
 $as_echo "$as_me: Found fftw3.f03 file in /usr/include. Will use this directory for fortran header files." >&6;}
   	fftw3_inc_dir="/usr/include"
-  elif test -f "${ac_prefix}/include/fftw3.f03"
+  elif test -f "${ac_prefix}/include/fftw3.f"
   then
   	{ $as_echo "$as_me:${as_lineno-$LINENO}: Found fftw3.f03 file in ${ac_prefix}. Will use this directory for fortran header files." >&5
 $as_echo "$as_me: Found fftw3.f03 file in ${ac_prefix}. Will use this directory for fortran header files." >&6;}
@@ -4930,7 +4930,7 @@ $as_echo "$as_me: Found fftw3.f03 file in ${ac_prefix}. Will use this directory 
   	as_fn_error $? "Cannot find fftw3 fortran headers!" "$LINENO" 5
   fi
 
-  INC="$INC -I$fftw3_inc_dir"
+  #INC="$INC -I$fftw3_inc_dir"
   # Where to put the FFTW plans -- ideally we should figure out how to work
   # with the standard GNU datadir variable.
   data_dir="${HOME}/.ggadt"
@@ -5553,6 +5553,7 @@ fi
 
 
 ac_config_files="$ac_config_files Makefile src/Makefile doc/Makefile src/fftwmod.f90 src/spheres.f90 src/common.f90 src/constants.f90 src/options.f90 src/ggadt.f90 scripts/installation_vars.py .defaults"
+
 
 
 

@@ -148,24 +148,24 @@ if test $using_fftw3 = true
   #Try to find the fftw3.f03 headers
 
   fftw3_inc_dir=${ac_srcdir}
-  AC_FIND_FILE("fftw3.f03",  /usr/local/include /usr/include ${ac_srcdir} ${ac_prefix}/include $macports_include , fftw3_fortran_header)
+  AC_FIND_FILE("fftw3.f",  /usr/local/include /usr/include ${ac_srcdir} ${ac_prefix}/include $macports_include , fftw3_fortran_header)
 
-  if test -f "${macports_include}/fftw3.f03"
+  if test -f "${macports_include}/fftw3.f"
   then 
     AC_MSG_NOTICE([Found fftw3.f03 file in ${macports_include}. Will use this directory for fortran header files.])
     fftw3_inc_dir="${macports_include}"
-  elif test -f "${fftw3_inc_dir}/fftw3.f03"
+  elif test -f "${fftw3_inc_dir}/fftw3.f"
   then 
   	AC_MSG_NOTICE([Found fftw3.f03 file in ${fftw3_inc_dir}. Will use this directory for fortran header files.])
-  elif test -f "/usr/local/include/fftw3.f03"
+  elif test -f "/usr/local/include/fftw3.f"
   then 
   	AC_MSG_NOTICE([Found fftw3.f03 file in /usr/local/include. Will use this directory for fortran header files.])
   	fftw3_inc_dir="/usr/local/include"
-  elif test -f "/usr/include/fftw3.f03"
+  elif test -f "/usr/include/fftw3.f"
   then 
   	AC_MSG_NOTICE([Found fftw3.f03 file in /usr/include. Will use this directory for fortran header files.])
   	fftw3_inc_dir="/usr/include"
-  elif test -f "${ac_prefix}/include/fftw3.f03"
+  elif test -f "${ac_prefix}/include/fftw3.f"
   then 
   	AC_MSG_NOTICE([Found fftw3.f03 file in ${ac_prefix}. Will use this directory for fortran header files.])
   	fftw3_inc_dir="${ac_prefix}/include"
@@ -173,7 +173,7 @@ if test $using_fftw3 = true
   	AC_MSG_ERROR([Cannot find fftw3 fortran headers!])
   fi
 
-  INC="$INC -I$fftw3_inc_dir"
+  #INC="$INC -I$fftw3_inc_dir"
   # Where to put the FFTW plans -- ideally we should figure out how to work
   # with the standard GNU datadir variable.
   data_dir="${HOME}/.ggadt"
@@ -411,6 +411,7 @@ AC_SUBST(USE_OMP_LIB)
 AC_SUBST(OMP_COMMENT)
 AC_SUBST(OMP_UNCOMMENT)
 AC_SUBST(FFTW3_UNCOMMENT)
+AC_SUBST(fftw3_inc_dir)
 AC_SUBST(FFTW3_COMMENT)
 AC_SUBST(USE_FFTW)
 AC_SUBST(USING_FFTW)

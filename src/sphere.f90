@@ -40,7 +40,8 @@ module sphere
         real(kind=dp_real), intent(in) :: x,y,k,gr_a
         complex(kind=dp_complex), intent(in) :: delta_m
         complex(kind=dp_complex) :: shadow_sphere
-        shadow_sphere = 1-exp( (0.0D0,1.0D0)*phi_sphere(x,y,k,gr_a,delta_m) )
+
+        shadow_sphere = (1.0D0, 0.0D0) - zexp( (0.0D0,1.0D0)*phi_sphere(x,y,k,gr_a,delta_m) )
         
     end function shadow_sphere
 
@@ -65,7 +66,7 @@ module sphere
         do i=0,(nu_sphere-1)
             u = umin + i*du
             A = BesJ0(x*cos(u))*sin(u)*cos(u)
-            val1 = val1 + du*exp(-(0.0D0,1.0D0)*rho*sin(u))*A
+            val1 = val1 + du*zexp(-(0.0D0,1.0D0)*rho*sin(u))*A
             val2 = val2 + du*A
         end do
 
