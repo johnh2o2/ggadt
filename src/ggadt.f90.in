@@ -14,9 +14,9 @@ program ggadt
 
     real(kind=dp_real), allocatable :: z(:), y(:), kz(:), ky(:), thetaz(:), thetay(:)
 
-    complex(kind=dp_complex), allocatable :: sh(:,:), ftsh(:,:), phi_total(:,:)
+    complex(kind=dp_complex), allocatable :: sh(:,:), ftsh(:,:), phi_total(:,:), gsh(:), gftsh(:)
 
-    real(kind=dp_real), allocatable :: scatter(:,:)
+    real(kind=dp_real), allocatable :: scatter(:,:), gscatter(:)
     real(kind=dp_real), allocatable :: ephots(:), ior_res(:,:), ior_ims(:,:)
 
 
@@ -27,10 +27,10 @@ program ggadt
 
     integer :: kactual, kmin, kmax, enhancement
 
-
+    !write(stderr, *) "about to set_parameter_values()"
     call set_parameter_values()
 
-    
+    !write(stderr, *) "about to initialize and allocate vars"
     call initialize_and_allocate_vars()
    
     
@@ -281,11 +281,47 @@ contains
                 EXIT
             end if
         end do
+        write(stderr, *) ""
         !do i=1,nephots
         !    write(stderr, *) ephots(i), sigma_abss(i), sigma_scats(i), sigma_scats(i) + sigma_abss(i)
         !end do
 
     end subroutine get_integrated_cross_sections
+
+    subroutine set_gftsh()
+        implicit none
+        integer :: i, j
+
+        !$omp parallel shared(sh, z, y, gsh, a_eff)
+        !$omp do schedule(dynamic) private(i)
+        do i=1,size(z)
+            do j=1, size(y)
+                gsh(i) = gsh(i) + sh(i, j)
+            end do
+            gsh(i) = gsh(i) * grid_width * a_eff / size(y)
+        end do
+        !$omp end do nowait
+        !$omp end parallel
+        
+        call fft1d_faster(gsh, kmin, kmax, enhancement, gftsh)
+
+    end subroutine set_gftsh
+
+    function get_gscatter()
+        implicit none
+        integer i
+        complex(kind=dp_complex), dimension(size(gscatter)) :: get_gscatter
+
+        !$omp parallel shared(gscatter,gftsh,k,dy) 
+        !$omp do schedule(dynamic) private(i)
+        do i=1, size(kz)
+            get_gscatter(i) = ( k * dy *abs(gftsh(i))/twopi)**2
+        end do
+        !$omp end do nowait
+        !$omp end parallel
+
+
+    end function get_gscatter
 
     subroutine diff_scat_cross_sect()
         implicit none 
@@ -294,7 +330,7 @@ contains
         real(kind=dp_real), dimension(2*size(thetaz)) :: sc_array, thets
         complex(kind=dp_complex), dimension(10) :: delms
         
-        
+        !write(stderr, *) "diff_scat_cross_sect"
 
         do i=1,nmaterials
             delms(i) = CMPLX(ior_res_single_en(i), ior_ims_single_en(i))
@@ -352,18 +388,25 @@ contains
                 !$omp end do nowait
                 !$omp end parallel 
 
-                
-                call fft_faster(sh,kmin,kmax,enhancement, ftsh)
-                
-                !$omp parallel shared(scatter,ftsh,k,dz,dy,norientations) 
-                !$omp do schedule(dynamic) private(i,j)
-                do i=1,size(kz)
-                    do j=1,size(ky)
-                        scatter(i,j) = (k*dz*dy*abs(ftsh(i,j))/twopi)**2
+                if (super_fast_fft_mode) then
+                    
+                    call set_gftsh()
+
+                    gscatter(:) = get_gscatter()
+
+                else 
+                    call fft_faster(sh,kmin,kmax,enhancement, ftsh)
+                    
+                    !$omp parallel shared(scatter,ftsh,k,dz,dy) 
+                    !$omp do schedule(dynamic) private(i,j)
+                    do i=1,size(kz)
+                        do j=1,size(ky)
+                            scatter(i,j) = (k*dz*dy*abs(ftsh(i,j))/twopi)**2
+                        end do
                     end do
-                end do
-                !$omp end do nowait
-                !$omp end parallel
+                    !$omp end do nowait
+                    !$omp end parallel
+                end if
             else 
             
                 ! loop over orientations
@@ -402,34 +445,57 @@ contains
                         write(stderr,*) "ERROR: Do not understand geometry: ", geometry
                     end if 
                    
-                    call fft_faster(sh,kmin,kmax,enhancement, ftsh)
 
-                    !$omp parallel shared(scatter,ftsh,k,dz,dy,norientations) 
-                    !$omp do schedule(dynamic) private(i,j)
-                    do i=1,size(kz)
-                        do j=1,size(ky)
-                            scatter(i,j) = scatter(i,j) + ((k*dz*dy*abs(ftsh(i,j))/twopi)**2)/real(norientations,kind=dp_real)
+                    if (super_fast_fft_mode) then
+
+                        
+                        call set_gftsh()
+
+
+                        !$omp parallel shared(gscatter,gftsh,k,dy, norientations) 
+                        !$omp do schedule(dynamic) private(i)
+                        do i=1, size(kz)
+                            gscatter(i) = gscatter(i) + ( k * dy *abs(gftsh(i))/twopi)**2/real(norientations,kind=dp_real)
                         end do
-                    end do
-                    !$omp end do nowait
-                    !$omp end parallel
+                        !$omp end do nowait
+                        !$omp end parallel
 
+                    else 
 
+                        !write(stderr, *) "gonna call fft_faster"
+                        call fft_faster(sh,kmin,kmax,enhancement, ftsh)
+                        
+                        !$omp parallel shared(scatter,ftsh,k,dz,dy, norientations) 
+                        !$omp do schedule(dynamic) private(i,j)
+                        do i=1,size(kz)
+                            do j=1,size(ky)
+                                scatter(i,j) = scatter(i,j) +  (k*dz*dy*abs(ftsh(i,j))/twopi)**2/real(norientations,kind=dp_real)
+                            end do
+                        end do
+                        !$omp end do nowait
+                        !$omp end parallel
+                    end if
                     write(stderr,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
                             & " percent complete: ", (real(nangle)/real(norientations))*100.0, "%"
                 end do
             endif 
         endif
+        write(stderr, *) ""
 
         if (timing_mode) stop 
 
-       
-        
-        do i=1,size(thetaz)
-            do j=1,size(thetay)
-                write(stdout,*) thetaz(i),thetay(j),scatter(i,j)*norm_const
+        ! for the fast fft mode, we ASSUME isotropy, so just 1d
+        if (super_fast_fft_mode .and. .not. (geometry .eq. "sphere" .and. .not. force_numerical)) then 
+            do i=1,size(thetaz)
+                write(stdout,*) thetaz(i),gscatter(i)*norm_const
             end do
-        end do
+        else
+            do i=1,size(thetaz)
+                do j=1,size(thetay)
+                    write(stdout,*) thetaz(i),thetay(j),scatter(i,j)*norm_const
+                end do
+            end do
+        end if
         
 
     end subroutine diff_scat_cross_sect
@@ -567,7 +633,7 @@ contains
             grid_width = 2.05 * lambda / a_eff
         end if
         
-        
+        !write(stderr, * ) "  HERE"
         max_angle = max_angle/arcseconds_per_radian ! convert max_angle from arcseconds to radians
         k = (2*pi/hc)*1000*ephot
         
@@ -624,6 +690,12 @@ contains
         ! sh
         allocate(sh(ngrid,ngrid),stat = allocatestatus)
             if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (sh) array ***"
+
+        ! gsh = integral(f(x, y)dy)
+        if (super_fast_fft_mode) then
+            allocate(gsh(ngrid), stat=allocatestatus)
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (gsh) array ***"
+        end if
         if (integrated_mode) then
          !   allocate(phi1(ngrid,ngrid),stat = allocatestatus)
          !       if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi1) array ***"
@@ -652,6 +724,11 @@ contains
             y(i) = ymin + (i-1)*dy
         end do
     ! -------------------
+        if (super_fast_fft_mode) then
+            do i=1,size(z)
+                gsh(i) = 0.0D0
+            end do
+        end if 
       
         L = z(size(z)) - z(1)  ! length of grid in physical coords
 
@@ -681,6 +758,13 @@ contains
         ! scatter
         allocate(scatter(kactual,kactual),stat = allocatestatus)
             if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (scatter) array ***"
+       
+        if (super_fast_fft_mode) then
+            allocate(gftsh(kactual),stat = allocatestatus)
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (gftsh) array ***"
+            allocate(gscatter(kactual),stat = allocatestatus)
+                if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (gscatter) array ***"
+        end if 
     ! ----------------------------------
 
         dk = real(kmax-kmin)/real(size(kz) - 1)
@@ -693,8 +777,13 @@ contains
             !write(stderr, *) "kz/k, asin() = ", kz(i)/k, asin(kz(i)/k)
             thetaz(i) = asin(kz(i)/k)
             thetay(i) = asin(ky(i)/k)
+            if (super_fast_fft_mode) then 
+                gscatter(i) = 0.0D0
+            end if 
+
             do j=1,size(ky)
-                scatter(i,j) = 0.0
+                scatter(i,j) = 0.0D0
+
             end do 
         end do
     ! -----------------------------------

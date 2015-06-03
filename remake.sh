@@ -11,7 +11,7 @@ aclocal -I./m4
 autoconf
 automake -a
 
-#./configure --enable-openmp || exit
+./configure --enable-openmp || exit
 #./configure --enable-fftw3 || exit
-./configure || exit
+#./configure || exit
 make

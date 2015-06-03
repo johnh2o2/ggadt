@@ -1,3 +1,9 @@
+* commit d75a99468fa4e541c2a930636ff842bfa72e1c7a
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jun 2 15:13:28 2015 -0400
+| 
+|     Several changes. One, FFT module has been edited and will hopefully soon be close to working. Two, GGADT wasn't ensuring that the grid size was an allowed multiple of 2, 3 and 5 (needed for GPFA); a python script and hidden file have been added containing all of these numbers. GGADT now checks that a specified grid size is OK. Also, commented out the material file specification in the defaults file. Reason being that specifying ephot and ior-re/ior-im throws an error and GGADT would just go to the material file instead of using the ior-im/ior-re values. Also, the conventions for the offset FFTs (the enhancement variable, etc.) was confusing. I cleaned up the language to hopefully make things a bit clearer. Fixed the --use-padded-fft problem -- now completely avoids using fft_firstk function. Also sped up the numerical sphere section of ggadt.f90 by using a linear interpolation of a previously prepared 1-d S(theta). The OpenMP version of the numerical sphere was also wrong; this has been fixed. Added warning when ADT validity conditions are violated, and GGADT will still calculate things for very small grains. There is STILL a bug in the analytical implementation of dQsca/dOmega for spherical grains.
+|  
 * commit 583bdd77cdcb5bb091506c3f9dcf30bfb44762e3
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Thu May 14 11:25:19 2015 -0400
