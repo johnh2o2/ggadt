@@ -41,7 +41,7 @@ module sphere
         complex(kind=dp_complex), intent(in) :: delta_m
         complex(kind=dp_complex) :: shadow_sphere
 
-        shadow_sphere = (1.0D0, 0.0D0) - zexp( (0.0D0,1.0D0)*phi_sphere(x,y,k,gr_a,delta_m) )
+        shadow_sphere = (1.0D0, 0.0D0) - exp( (0.0D0,1.0D0)*phi_sphere(x,y,k,gr_a,delta_m) )
         
     end function shadow_sphere
 
@@ -51,28 +51,27 @@ module sphere
         implicit none
         real(kind=dp_real), intent(in) :: x
         complex(kind=dp_complex), intent(in) :: rho
-        complex(kind=dp_complex) :: scat_integral, val1, val2, A
+        complex(kind=dp_complex) :: scat_integral, val, I
         real(kind=dp_real) :: umin, umax, du, u
-        integer :: i 
+        integer :: j
 
         umin = 0.0D0
         umax = PI/2.0D0
         du = (umax - umin)/nu_sphere
 
         scat_integral = 0.0D0
-        val1 = 0.0D0
-        val2 = 0.0D0
+        val = 0.0D0
+        I = CMPLX(0.0D0,1.0D0)
 
-        do i=0,(nu_sphere-1)
-            u = umin + i*du
-            A = BesJ0(x*cos(u))*sin(u)*cos(u)
-            val1 = val1 + du*zexp(-(0.0D0,1.0D0)*rho*sin(u))*A
-            val2 = val2 + du*A
+        do j=0,(nu_sphere-1)
+            u = umin + j*du
+            val = val + du *( exp(I*rho*sin(u)) - 1  ) * BesJ0( x*cos(u) ) * sin(u)*cos(u)
+            ! ^ Draine & Allaf-Akbari 2006 is WRONG!!! This is the correct expression.
         end do
-
-        scat_integral = val2 - val1
+        scat_integral = val
 
     end function scat_integral
+
 
     function scatter_sphere(k,aeff,theta,delta_m)
         ! Calculates the differential scattering amplitude for a spherical grain
@@ -88,13 +87,17 @@ module sphere
         complex(kind=dp_complex), intent(in) :: delta_m
 
         complex(kind=dp_complex) :: sc, rho
-        real(kind=dp_real) :: x, scatter_sphere
+        real(kind=dp_real) :: scatter_sphere, ktilda 
 
         rho = 2*k*aeff*delta_m
-        x = k*aeff*theta
-        sc = k*k*aeff*aeff*scat_integral(x,rho)
-
-        scatter_sphere = ABS(sc * sc)/(k*k)
+        
+        !x = k*aeff*theta
+        ktilda = k*aeff*sin(theta)
+    
+        !sc = k*k*aeff*aeff*scat_integral(x,rho)
+        sc = k*k*aeff*aeff*scat_integral(ktilda,rho)
+        
+        scatter_sphere = ABS(sc)*ABS(sc)/(k*k)
         
 
     end function scatter_sphere

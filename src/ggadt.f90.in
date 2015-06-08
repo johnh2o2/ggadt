@@ -47,7 +47,7 @@ program ggadt
         call diff_scat_cross_sect()
     end if 
 
-    call cleanup()
+    !call cleanup()
 
     if (verbose_mode) write(stderr,*) "Done."
 contains
@@ -210,12 +210,13 @@ contains
                     !$omp do schedule(dynamic) private(c1,c2) 
                      do c1=1,size(z)
                         do c2=1,size(y)
-                            
+                            !-$OMP CRITICAL
                             phi_total(c1,c2) = phi_sphere(z(c1),y(c2),kphot,a_eff,delm)
                             sh(c1,c2) = 1-exp( (0.0,1.0)*phi_total(c1,c2) )
+                            !-$OMP END CRITICAL
                         end do
                      end do
-                    !$omp end do nowait
+                    !$omp end do 
                     !$omp end parallel
 
 
@@ -234,10 +235,12 @@ contains
                     !$omp do schedule(dynamic) private(c1,c2) 
                     do c1=1,size(z)
                         do c2=1,size(y)
+                            !-$OMP CRITICAL
                             sh(c1,c2) = 1.0D0-exp( (0.0D0,1.0D0)*phi_total(c1,c2) )
+                            !-$OMP END CRITICAL
                         end do
                      end do
-                    !$omp end do nowait
+                    !$omp end do 
                     !$omp end parallel
                 else if (geometry .eq. 'ellipsoid') then 
                     
@@ -245,12 +248,13 @@ contains
                     !$omp do schedule(dynamic) private(c1,c2) 
                     do c1=1,size(z)
                         do c2=1,size(y)
-                            
+                            !-$OMP CRITICAL
                             phi_total(c1,c2) = phi_ellipsoid(z(c1),y(c2),kphot, grain_a, delm )
                             sh(c1,c2) = 1.0 -exp( (0.0,1.0)*phi_total(c1,c2) )
+                            !-$OMP END CRITICAL
                         end do
                     end do
-                    !$omp end do nowait
+                    !$omp end do 
                     !$omp end parallel
                 else if (geometry .eq. 'custom') then
                     sh = shadow_custom(z,y,k,rm,ngrain,ephot,ephots,ior_res,ior_ims)
@@ -270,7 +274,7 @@ contains
                 end if               
                 sigma_scats(i) = sigma_scats(i) +  sigma_scat*norm_const/norientations
                 sigma_abss(i) = sigma_abss(i) + sigma_abs*norm_const/norientations
-                if (.not. geometry .eq. 'sphere' .or. force_numerical) then
+                if (.not. quiet_mode .and. (.not. geometry .eq. 'sphere' .or. force_numerical)) then
                     write(stderr,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
                         & " percent complete: ", (real(i + (nangle-1)*nephots)/real(nephots*norientations))*100.0, "%"
                 end if
@@ -281,7 +285,9 @@ contains
                 EXIT
             end if
         end do
-        write(stderr, *) ""
+        if (.not. quiet_mode) then 
+            write(stderr, *) ""
+        end if 
         !do i=1,nephots
         !    write(stderr, *) ephots(i), sigma_abss(i), sigma_scats(i), sigma_scats(i) + sigma_abss(i)
         !end do
@@ -293,14 +299,16 @@ contains
         integer :: i, j
 
         !$omp parallel shared(sh, z, y, gsh, a_eff)
-        !$omp do schedule(dynamic) private(i)
+        !$omp do schedule(dynamic) private(i,j)
         do i=1,size(z)
             do j=1, size(y)
+                !-$OMP CRITICAL
                 gsh(i) = gsh(i) + sh(i, j)
+                !-$OMP END CRITICAL
             end do
             gsh(i) = gsh(i) * grid_width * a_eff / size(y)
         end do
-        !$omp end do nowait
+        !$omp end do 
         !$omp end parallel
         
         call fft1d_faster(gsh, kmin, kmax, enhancement, gftsh)
@@ -315,9 +323,11 @@ contains
         !$omp parallel shared(gscatter,gftsh,k,dy) 
         !$omp do schedule(dynamic) private(i)
         do i=1, size(kz)
+            !-$OMP CRITICAL
             get_gscatter(i) = ( k * dy *abs(gftsh(i))/twopi)**2
+            !-$OMP END CRITICAL
         end do
-        !$omp end do nowait
+        !$omp end do 
         !$omp end parallel
 
 
@@ -349,27 +359,31 @@ contains
         if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
             if (verbose_mode) write(stderr,*) " Using analytical ADT for sphere..."
 
-            dth = thetaz(2) - thetaz(1)
+            dth = 2 * sqrt(2. + 1.0D-12)* thetaz(size(thetaz)) / (size(thets) - 1)
 
-            !$omp parallel shared(sc_array,thets,a_eff,k,delm, dth)
+            !$omp parallel shared(thets, dth, thetaz, sc_array, k, a_eff, delm)
             !$omp do schedule(dynamic) private(i)
             do i=1,size(thets)
-                thets(i) = - sqrt(2.0)*max_angle + (i-1)*dth
+                !-$OMP CRITICAL
+                thets(i) = - sqrt(2.0 + 1.0D-12)* thetaz(size(thetaz)) + (i-1)*dth
                 sc_array(i) = scatter_sphere(k, a_eff, thets(i), delm)
+                !-$OMP END CRITICAL
             end do
-            !$omp end do nowait
-            !$omp end parallel 
+            !$omp end do 
+            !$omp end parallel
+            
 
-
-            !$omp parallel shared(scatter,thetaz,thetay,a_eff,k,delm, thets, sc_array)
+            !$omp parallel shared(scatter,thetaz,thetay, thets, sc_array)
             !$omp do schedule(dynamic) private(i,j, th)
             do i=1,size(thetaz)
                 do j=1, size(thetay)
                     th = sqrt(thetaz(i)*thetaz(i) + thetay(j)*thetay(j))
+                    !-$OMP CRITICAL
                     scatter(i,j) = linterp(thets, sc_array, th)
+                    !-$OMP END CRITICAL
                 end do
             end do
-            !$omp end do nowait
+            !$omp end do 
             !$omp end parallel 
 
 
@@ -381,31 +395,35 @@ contains
                 !$omp do schedule(dynamic) private(i,j)
                 do i=1,size(z)
                     do j=1,size(y)
+                        !-$OMP CRITICAL
                         sh(i,j) = shadow_sphere(z(i),y(j), k, a_eff, delm)
-                        
+                        !-$OMP END CRITICAL
                     end do
                 end do
-                !$omp end do nowait
+                !$omp end do 
                 !$omp end parallel 
 
-                if (super_fast_fft_mode) then
+                if (do_full_2d_fft) then
                     
-                    call set_gftsh()
-
-                    gscatter(:) = get_gscatter()
-
-                else 
-                    call fft_faster(sh,kmin,kmax,enhancement, ftsh)
+                    call fft2d_faster(sh,kmin,kmax,enhancement, ftsh)
                     
                     !$omp parallel shared(scatter,ftsh,k,dz,dy) 
                     !$omp do schedule(dynamic) private(i,j)
                     do i=1,size(kz)
                         do j=1,size(ky)
+                            !-$OMP CRITICAL
                             scatter(i,j) = (k*dz*dy*abs(ftsh(i,j))/twopi)**2
+                            !-$OMP END CRITICAL
                         end do
                     end do
-                    !$omp end do nowait
+                    !$omp end do 
                     !$omp end parallel
+
+                else 
+                    call set_gftsh()
+
+                    gscatter(:) = get_gscatter()
+                    
                 end if
             else 
             
@@ -430,10 +448,12 @@ contains
                         !$omp do schedule(dynamic) private(i,j)
                         do i=1,size(z)
                             do j=1,size(y)
+                                !-$OMP CRITICAL
                                 sh(i,j) = shadow_ellipsoid(z(i),y(j),k,grain_a,delm)
+                                !-$OMP END CRITICAL
                             end do
                         end do
-                        !$omp end do nowait
+                        !$omp end do 
                         !$omp end parallel
                     elseif (geometry .eq. 'spheres' .or. geometry .eq. 'agglomeration')    then
                         call rotate_spheres(rm)
@@ -446,46 +466,54 @@ contains
                     end if 
                    
 
-                    if (super_fast_fft_mode) then
-
+                    if (do_full_2d_fft) then
+                        call fft2d_faster(sh,kmin,kmax,enhancement, ftsh)
                         
+                        !$omp parallel shared(scatter,ftsh,k,dz,dy, norientations) 
+                        !$omp do schedule(dynamic) private(i,j)
+                        do i=1,size(kz)
+                            do j=1,size(ky)
+                                !-$OMP CRITICAL
+                                scatter(i,j) = scatter(i,j) +  (k*dz*dy*abs(ftsh(i,j))/twopi)**2/real(norientations,kind=dp_real)
+                                !-$OMP END CRITICAL
+                            end do
+                        end do
+                        !$omp end do
+                        !$omp end parallel
+                        
+                        
+
+                    else 
                         call set_gftsh()
 
 
                         !$omp parallel shared(gscatter,gftsh,k,dy, norientations) 
                         !$omp do schedule(dynamic) private(i)
                         do i=1, size(kz)
+                            !-$OMP CRITICAL
                             gscatter(i) = gscatter(i) + ( k * dy *abs(gftsh(i))/twopi)**2/real(norientations,kind=dp_real)
+                            !-$OMP END CRITICAL
                         end do
-                        !$omp end do nowait
+                        !$omp end do
                         !$omp end parallel
-
-                    else 
-
-                        !write(stderr, *) "gonna call fft_faster"
-                        call fft_faster(sh,kmin,kmax,enhancement, ftsh)
                         
-                        !$omp parallel shared(scatter,ftsh,k,dz,dy, norientations) 
-                        !$omp do schedule(dynamic) private(i,j)
-                        do i=1,size(kz)
-                            do j=1,size(ky)
-                                scatter(i,j) = scatter(i,j) +  (k*dz*dy*abs(ftsh(i,j))/twopi)**2/real(norientations,kind=dp_real)
-                            end do
-                        end do
-                        !$omp end do nowait
-                        !$omp end parallel
                     end if
-                    write(stderr,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
+                    if (.not. quiet_mode) then 
+                        write(stderr,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
                             & " percent complete: ", (real(nangle)/real(norientations))*100.0, "%"
+                    end if
                 end do
+                if (.not. quiet_mode) then 
+                    write(stderr, *) ""
+                end if
             endif 
         endif
-        write(stderr, *) ""
+       
 
         if (timing_mode) stop 
 
         ! for the fast fft mode, we ASSUME isotropy, so just 1d
-        if (super_fast_fft_mode .and. .not. (geometry .eq. "sphere" .and. .not. force_numerical)) then 
+        if (.not. do_full_2d_fft .and. .not. (geometry .eq. "sphere" .and. .not. force_numerical)) then 
             do i=1,size(thetaz)
                 write(stdout,*) thetaz(i),gscatter(i)*norm_const
             end do
@@ -648,6 +676,10 @@ contains
             i = i + 1
             closest_ngrid = allowed_ngrids(i)
         end do
+        if (closest_ngrid .ne. ngrid) then
+                write(stderr,*) "Warning: your requested value of ngrain,",&
+                    ngrid,", is not of the form (2**i)(3**j)(5**k). Changing ngrain to ",closest_ngrid
+        end if
         ngrid = closest_ngrid
 
         ! Add padding if use_padded_fft is asked for.
@@ -670,7 +702,7 @@ contains
                 write(stderr,*) "Warning: your request for an nscatter of ",&
                     nscatter," required too large a grid. Changing nscatter to ",n 
             else if (n > nscatter) then
-                write(stderr,*) "Warning: your request for an nscatter of ",&
+                write(stderr,*) "Note: your request for an nscatter of ",&
                     nscatter," is already exceeded by a non-padded grid. Changing nscatter to",n
             end if 
 
@@ -692,7 +724,7 @@ contains
             if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (sh) array ***"
 
         ! gsh = integral(f(x, y)dy)
-        if (super_fast_fft_mode) then
+        if (.not. do_full_2d_fft) then
             allocate(gsh(ngrid), stat=allocatestatus)
                 if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (gsh) array ***"
         end if
@@ -724,7 +756,7 @@ contains
             y(i) = ymin + (i-1)*dy
         end do
     ! -------------------
-        if (super_fast_fft_mode) then
+        if (.not. do_full_2d_fft) then
             do i=1,size(z)
                 gsh(i) = 0.0D0
             end do
@@ -759,7 +791,7 @@ contains
         allocate(scatter(kactual,kactual),stat = allocatestatus)
             if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (scatter) array ***"
        
-        if (super_fast_fft_mode) then
+        if (.not. do_full_2d_fft) then
             allocate(gftsh(kactual),stat = allocatestatus)
                 if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (gftsh) array ***"
             allocate(gscatter(kactual),stat = allocatestatus)
@@ -777,7 +809,7 @@ contains
             !write(stderr, *) "kz/k, asin() = ", kz(i)/k, asin(kz(i)/k)
             thetaz(i) = asin(kz(i)/k)
             thetay(i) = asin(ky(i)/k)
-            if (super_fast_fft_mode) then 
+            if (.not. do_full_2d_fft) then 
                 gscatter(i) = 0.0D0
             end if 
 
@@ -1006,6 +1038,12 @@ contains
             deallocate(radii)
             deallocate(ior_r)
             deallocate(ior_i)
+        end if
+
+        if (.not. do_full_2d_fft) then
+            deallocate(gsh)
+            deallocate(gftsh)
+            deallocate(gscatter)
         end if
 
     end subroutine cleanup

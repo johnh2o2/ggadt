@@ -1,21 +1,43 @@
 module fftw
     @USE_OMP_LIB@
 
+    ! SEVERAL NOTES!
+    ! ==============
+    ! Note: WISDOM is not implemented here. Need to add --enable-fftw-wisdom flag in the configure.ac file, and
+    !       test that the f77_wisdom.f works.
+    !
+    ! Note: There are several annoying hurdles for implementing openmp version of FFTW3 library.
+    !   1) lfftw3_omp is NOT installed with standard port install fftw3.
+    !   2) using lfftw3_threads and incluing -pthreads in the FCFLAGS generates a failure
+    !       when the dfftw_init_threads() is called. No idea why this is. In addition, even if
+    !       we can get fftw3 to cooperate with openmp/pthreads, there are different FCFLAGS 
+    !       commands for pthreads depending on the compiler, and the only m4 script I can find
+    !       for this targets C compilers. Maybe that's sufficient? I don't know.
+    !   If may make sense to either 
+    !           a) abandon FFTW altogether, 
+    !           b) only install openmp FFTW under very stringent conditions (i.e. no macports, only with lfftw3_omp)
+    !           c) Just have a serial version of FFTW...Maybe one that implements wisdom for some sort of advantage?
+    !    
+
     use constants
     use, intrinsic :: iso_c_binding
        include '@fftw3_inc_dir@/fftw3.f'
-       !include '@srcdir@/f77_wisdom.f'
-    logical :: first_time = .true.
+    logical :: first_time_1d = .true., first_time_2d = .true., use_wisdom = .true., quiet=.true.
     integer(8) :: plan
     integer ::  mode = fftw_estimate
-    character(len=100) :: mode_name
-    character(len=100) :: plan_filename
+    integer ::  NTHREADS = 4
+    character(len=10) :: mode_name = 'estimate'
+    
+
     
 contains
+    include '@srcdir@/f95_wisdom.f90'
 
     subroutine set_optimization_mode(mode_name_in)
-        character(len=100), intent(in) :: mode_name_in
-
+        character(len=10), intent(in) :: mode_name_in
+        if (.not. quiet) then
+            write(stderr, *) "    fftw: setting optimization mode to ", mode_name_in
+        end if 
         mode_name = mode_name_in
 
         select case (mode_name)
@@ -32,155 +54,133 @@ contains
         end select
     end subroutine set_optimization_mode
 
-
-
-    function fft(f,x,y)
+    function fft1d(f)
         
-        real(kind=dp_real),  intent(in) :: x(:), y(:)
-        complex(c_double_complex), intent(inout) :: f(:,:)
-        complex(c_double_complex), dimension(size(x),size(y)) :: fft
-        integer :: nx, ny
-        integer :: error
+        complex(c_double_complex), intent(inout) :: f(:)
+        complex(c_double_complex), dimension(size(f)) :: fft1d
+        integer :: n, threaderror, error, numthreads
+        character(len=5) :: nval
+        character(len=400) :: plan_filename
+
+        n = size(f)
+        write(nval, '(I0.5)') n
 
 
-        nx = size(x)
-        ny = size(y)
-        @OMP_UNCOMMENT@threaderror = fftw_init_threads()
-        @OMP_UNCOMMENT@if (threaderror == 0) then
-        @OMP_UNCOMMENT@    write (0,*) "------------------------------"
-        @OMP_UNCOMMENT@    write (0,*) "Error initializing multiple threads. Program will attempt to proceed"
-        @OMP_UNCOMMENT@    write (0,*) "using 1 thread."
-        @OMP_UNCOMMENT@    write (0,*) "------------------------------"
-        @OMP_UNCOMMENT@    numthreads = 1
-        @OMP_UNCOMMENT@else
-        @OMP_UNCOMMENT@    numthreads = omp_get_max_threads()
+        plan_filename = "@plan_dir@/fftw_plan_cob"//&
+            &trim(adjustl(nval))//"_"//trim(adjustl(mode_name))//".plan"
+        
+        @OMP_UNCOMMENT@if (first_time_1d) then
+        @OMP_UNCOMMENT@    call dfftw_init_threads(threaderror)
+        @OMP_UNCOMMENT@    if (threaderror == 0) then
+        @OMP_UNCOMMENT@        write (0,*) "------------------------------"
+        @OMP_UNCOMMENT@        write (0,*) "Error initializing multiple threads. Program will attempt to proceed"
+        @OMP_UNCOMMENT@        write (0,*) "using 1 thread."
+        @OMP_UNCOMMENT@        write (0,*) "------------------------------"
+        @OMP_UNCOMMENT@        numthreads = 1
+        @OMP_UNCOMMENT@    else
+        @OMP_UNCOMMENT@        numthreads = NTHREADS
+        @OMP_UNCOMMENT@        call omp_set_num_threads(numthreads)
+        @OMP_UNCOMMENT@        !write(stderr, *) numthreads, OMP_NUM_THREADS, omp_get_num_threads(),  omp_get_max_threads()
+        @OMP_UNCOMMENT@    end if
         @OMP_UNCOMMENT@endif
-        @OMP_UNCOMMENT@call fftw_plan_with_nthreads(numthreads)
-        !if (first_time) then
-        !    error = import_wisdom_from_filename(trim(adjustl(plan_filename)))
-        !    if (error == 0) then
-        !        call dfftw_plan_dft_2d(plan, ny, nx, f ,fft, fftw_backward,mode)
-         !       call export_wisdom_to_filename(error, plan_filename)
-         !   else
-         !       call dfftw_plan_dft_2d(plan, ny, nx, f ,fft, fftw_backward,mode)
-         !   end if
-          !  first_time = .false.
+        @OMP_UNCOMMENT@call dfftw_plan_with_nthreads(numthreads)
+        !WISDOM ----
+        if (use_wisdom) then
+            if (first_time_1d) then       
+                error= import_wisdom_from_filename( trim(adjustl(plan_filename)))
+                if (error == 0) then
+                    if (.not. quiet) then
+                        write(stderr, *) "    fftw: did not successfully import wisdom; planning now."
+                    end if 
+                    call dfftw_plan_dft_1d(plan, n, f ,fft1d, fftw_backward,mode)
+                    call export_wisdom_to_filename(trim(adjustl(plan_filename)))
+                else
+                    if (.not. quiet) then
+                        write(stderr, *) "    fftw: LOADED wisdom!!"
+                    end if 
+
+                    call dfftw_plan_dft_1d(plan, n, f ,fft1d, fftw_backward,mode)
+                end if
+                first_time_1d = .false.
+            end if
+        else
+            if (first_time_1d) then    
+                call dfftw_plan_dft_1d(plan, n, f ,fft1d, fftw_backward,mode)
+                first_time_1d = .false.
+            end if
+        end if 
+        ! ---- WISDOM
+        call dfftw_execute_dft(plan, f, fft1d)
+        !@OMP_UNCOMMENT@call dfftw_cleanup_threads()
+    end function fft1d
+
+
+
+    function fft2d(f)
+
+        
+        !real(kind=dp_real),  intent(in) :: x(:), y(:)
+        complex(c_double_complex), intent(inout) :: f(:,:)
+        complex(c_double_complex), dimension(size(f(:,1)),size(f(1,:))) :: fft2d
+        integer :: nx, ny, threaderror, error, numthreads
+        character(len=10) :: nval
+        character(len=400) :: plan_filename
+
+        nx = size(f(:,1))
+        ny = size(f(1,:))
+
+        ! I'm being sloppy here -- most of the code assumes nx = ny.
+        write(nval, '(I0.5)') nx
+
+        plan_filename = "@plan_dir@/fftw_plan_cob"//trim(adjustl(nval))&
+            &//"x"//trim(adjustl(nval))//"_"//trim(adjustl(mode_name))//".plan"
+
+        !if (.not. quiet) then
+        !    write(stderr, *) "   fftw: plan name = '",trim(adjustl(plan_filename)),"'"
         !end if
-        call dfftw_plan_dft_2d(plan, ny, nx, f ,fft, fftw_backward,mode)
-        call dfftw_execute_dft(plan, f, fft)
-    end function fft
-
-    function fft_firstk(f,K)
-        ! How this calculation works:
-        !   Say I have 15 data points, in one dimension, for which I only care about the first 5 values of its FFT.
-        !
-        !   We can calculate these first five k values by doing 15/5 = 3 FFT's of length 5.
-        !
-        !       Original data: dddddddddddddddd
-        !
-        !       FFT1 = FFT( d--d--d--d--d--d )
-        !       FFT2 = FFT( -d--d--d--d--d-- )
-        !       FFT3 = FFT( --d--d--d--d--d- )
-        !
-        !       FFT(orig)(k) = sum_i(FFTi(k))*twid_factor(k)
-        ! 
-
-        integer, intent(in) :: K
-        integer :: lentwids, keff, allocation_status
-        integer(8) :: localplan
-        complex(8), intent(inout) :: f(:,:)
-        complex(8), dimension(K,K) :: fft_firstk 
-        complex(8), allocatable :: small_fft(:,:), twids(:,:), fft_firstk_working(:,:)
-
-        integer  :: N, NFFT, i,j,l,m 
-
-        keff = k
-        N = size(f(:,1))
-        NFFT = N/Keff
-
-        ! Make sure N is divisible by K.
-        !    if not, we take the first K+n values of the FFT 
-        !    and throw away n of them (n is the smallest integer such that K+n | N)
-        do while ((.not. keff*NFFT .eq. N) .and. keff < N )
-            keff = keff + 1
-            NFFT = N/Keff 
-        end do 
-
-        lentwids = N
-
-        ! allocate twids, small_fft and fft_firstk_working arrays
-        !   twids               -- contain twiddle factors needed to combine the different fft calculations
-        !   small_fft           -- the array in which each fft is temporarily stored
-        !   fft_firstk_working  --
-
-        allocate(twids(lentwids, lentwids), stat = allocation_status)
-        if (allocation_status/=0) then
-            write (0,*) " **ERROR! Cannot allocate twids array (fftwmod)"
-            stop
-        end if 
-        allocate(small_fft(keff, keff), stat = allocation_status)
-        if (allocation_status/=0) then
-            write (0,*) " **ERROR! Cannot allocate small_fft array (fftwmod)"
-            stop
-        end if 
-        allocate(fft_firstk_working(keff, keff), stat = allocation_status)
-        if (allocation_status/=0) then
-            write (0,*) " **ERROR! Cannot allocate fft_firstk_working array (fftwmod)"
-            stop
-        end if 
-
-        do i=1,keff
-            do j=1,keff
-                fft_firstk_working(i,j) = 0.0D0
-            end do 
-        end do 
-
-        if (Keff*NFFT .ne. N) then
-            write(0,*) "ERROR: NFFT = ",NFFT," and K = ",K,", but NFFT*K = ",NFFT*K," != ",N
-            stop 
-        endif
-
         
+        @OMP_UNCOMMENT@if (first_time_2d) then
+        @OMP_UNCOMMENT@    call dfftw_init_threads(threaderror)
+        @OMP_UNCOMMENT@    if (threaderror == 0) then
+        @OMP_UNCOMMENT@        write (0,*) "------------------------------"
+        @OMP_UNCOMMENT@        write (0,*) "Error initializing multiple threads. Program will attempt to proceed"
+        @OMP_UNCOMMENT@        write (0,*) "using 1 thread."
+        @OMP_UNCOMMENT@        write (0,*) "------------------------------"
+        @OMP_UNCOMMENT@        numthreads = 1
+        @OMP_UNCOMMENT@    else
+        @OMP_UNCOMMENT@        numthreads = NTHREADS
+        @OMP_UNCOMMENT@        call omp_set_num_threads(numthreads)
+        @OMP_UNCOMMENT@        !write(stderr, *) numthreads, OMP_NUM_THREADS, omp_get_num_threads(),  omp_get_max_threads()
+        @OMP_UNCOMMENT@    end if
+        @OMP_UNCOMMENT@endif
+        @OMP_UNCOMMENT@call dfftw_plan_with_nthreads(numthreads)
+        if (use_wisdom) then
+            if (first_time_2d) then
+                error = import_wisdom_from_filename(trim(adjustl(plan_filename)))
+                if (error == 0) then
+                    if (.not. quiet) then
+                        write(stderr, *) "    fftw: did not successfully import wisdom; planning now."
+                    end if 
+                    call dfftw_plan_dft_2d(plan, ny, nx, f ,fft2d, fftw_backward,mode)
+                    call export_wisdom_to_filename( trim(adjustl(plan_filename)))
+                else
+                    if (.not. quiet) then
+                        write(stderr, *) "    fftw: LOADED wisdom!!"
+                    end if 
 
-        ! Calculate twiddle factors
+                    call dfftw_plan_dft_2d(plan, ny, nx, f ,fft2d, fftw_backward,mode)
+                end if
+                first_time_2d = .false.
+            end if
+        else 
+            if (first_time_2d) then
+                call dfftw_plan_dft_2d(plan, ny, nx, f ,fft2d, fftw_backward,mode)
+                first_time_2d = .false.
+            end if 
+        end if
+        call dfftw_execute_dft(plan, f, fft2d)
+        !@OMP_UNCOMMENT@call dfftw_cleanup_threads()
+    end function fft2d
 
-        do i=0,(keff-1)
-            do j=0,(keff-1)
-                do l=0,(NFFT-1)
-                    do m=0,(NFFT-1)
-                        twids(1 + i + l*Keff, 1 + j + m*Keff ) &
-                            & = zexp(CMPLX(0,1)*ISIGN*twopi*(real(i*l+j*m))/real(N))
-                    end do 
-                end do 
-            end do 
-        end do
-
-        do l=1,NFFT
-            do m=1,NFFT
-                ! plan
-                call dfftw_plan_dft_2d(localplan, Keff, Keff, f(l:N:NFFT,m:N:NFFT) ,small_fft, fftw_backward,mode)
-
-                ! execute plan
-                call dfftw_execute_dft(localplan, f(l:N:NFFT,m:N:NFFT), small_fft)
-
-                ! transfer results to master array
-                do i=1,Keff
-                    do j=1,Keff 
-                        fft_firstk_working(i,j) = fft_firstk_working(i,j) + small_fft(i,j)*twids( i+(l-1)*Keff , j+(m-1)*Keff )
-                    end do 
-                end do 
-
-                ! clean up
-                call dfftw_destroy_plan(localplan)
-            end do 
-        end do
-        
-        ! only get the K values that we care about
-        fft_firstk = fft_firstk_working(:K,:K)
-
-        deallocate(twids)
-        deallocate(small_fft)
-        deallocate(fft_firstk_working)
-    end function fft_firstk
 
 end module fftw

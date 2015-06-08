@@ -1,3 +1,9 @@
+* commit 5f4b3eddaab31cd883ed8dbdc5fc5c44c4b8bd7d
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jun 2 22:51:59 2015 -0400
+| 
+|     MAJOR speed improvement (another order of magnitude). The reason for this will be explained more thoroughly in the documentation, but the main point is that we can avoid doing a 2d FFT altogether by simply averaging the shadow function along one of the axes. This is equivalent to assuming that phi=0, which is WLOG because we're averaging over orientations anyway.
+|  
 * commit d75a99468fa4e541c2a930636ff842bfa72e1c7a
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Tue Jun 2 15:13:28 2015 -0400

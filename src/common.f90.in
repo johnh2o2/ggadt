@@ -55,7 +55,8 @@ module common_mod
   logical                                ::  timing_mode
   logical                                ::  material_file_specified
   logical                                ::  force_numerical
-  logical                                ::  super_fast_fft_mode
+  logical                                ::  do_full_2d_fft
+  logical                                ::  quiet_mode
   character(len=200)                     ::  parameter_file_name
 
 
@@ -83,7 +84,7 @@ module common_mod
 
 
   character(len=200)                                    ::  angle_file
-  character(len=100)                                    ::  fftw_optimization_mode_name
+  character(len=10)                                     ::  fftw_optimization_mode_name
   character(len=200)                                    ::  agglom_file_name
 
   integer :: rank_aeff, rank_grain_a1, rank_grain_a2, rank_grain_a3, &
@@ -95,7 +96,7 @@ module common_mod
          rank_fftw_optimization_mode_name, rank_ephot_min, rank_ephot_max, rank_nephots, &
          rank_dephot, rank_material_files(max_num_mats), rank_material_tags(max_num_mats), &
          rank_agglom_composition_file, rank_material_file, rank_asked_for_version, &
-         rank_asked_for_help, rank_parameter_file_name, rank_axes_convention, rank_super_fast_fft
+         rank_asked_for_help, rank_parameter_file_name, rank_axes_convention, rank_do_full_2d_fft, rank_quiet_mode
 
   contains
 
@@ -145,8 +146,11 @@ module common_mod
         "force-numerical",&
         description="Forces GGADT to use a numerical, rather than an analytical, solution for spherical grains.")
       call define_flag(opts, &
-        "super-fast-fft",&
-        description="Experimental feature. Should be extremely fast!")
+        "quiet",abbrev='q',&
+        description="Quiet mode; do not print progress")
+      call define_flag(opts, &
+        "do-full-2d-fft",&
+        description="Do not assume axisymmetry (dQ/dOmega is a function of phi)")
       call define_option_string(opts,&
         "parameter-file","",&
         description="Path to parameter file")
@@ -320,7 +324,8 @@ module common_mod
       call get_flag(opts,"use-efficiencies",use_efficiencies, rank_use_efficiencies)  
       call get_flag(opts,"verbose",verbose_mode, rank_verbose_mode)
       call get_flag(opts,"timing",timing_mode, rank_timing_mode)
-      call get_flag(opts,"super-fast-fft",super_fast_fft_mode, rank_super_fast_fft)
+      call get_flag(opts,"do-full-2d-fft",do_full_2d_fft, rank_do_full_2d_fft)
+      call get_flag(opts,"quiet",quiet_mode, rank_quiet_mode)
       call get_option_real(opts,"ior-re",ior_re, rank_ior_re)
       call get_option_real(opts,"ior-im",ior_im, rank_ior_im)
 
@@ -709,8 +714,11 @@ module common_mod
 
           ! allocate memory
           allocate( working_fft1d(  norig   ))
-          !write(stderr, *) "about to do offset ffts!", enhancement
+
           ! Do offset fft1ds
+
+          !-$omp parallel shared(fft1d_output, enhancement, norig, fft1dsize)
+          !-$omp do schedule(dynamic) private(i, delta, new_grid, working_fft1d, a, ix)
           do i=0,enhancement
               delta = real(i)/real(enhancement + 1)
               !write(stderr,*) i, delta
@@ -724,17 +732,117 @@ module common_mod
                 
               
                 if (ix <= fft1dsize) then
+                    !-$OMP CRITICAL
                     fft1d_output(ix) = working_fft1d(a)
+                    !-$OMP END CRITICAL 
                 end if  
               end do 
           end do 
+          !-$omp end do
+          !-$omp end parallel 
         end if
+        
 
         ! shift the input function back.
         f = kspace_shift_1d(f,real(-kmin,dp_real)) 
     end subroutine fft1d_faster
+    function fft1d_firstk(f,K)
+        ! How this calculation works:
+        !   Say I have 15 data points, in one dimension, for which I only care about the first 5 values of its fft1d.
+        !
+        !   We can calculate these first five k values by doing 15/5 = 3 fft1d's of length 5.
+        !
+        !       Original data: dddddddddddddddd
+        !
+        !       fft1d1 = fft1d( d--d--d--d--d--d )
+        !       fft1d2 = fft1d( -d--d--d--d--d-- )
+        !       fft1d3 = fft1d( --d--d--d--d--d- )
+        !
+        !       fft1d(orig)(k) = sum_i(fft1di(k))*twid_factor(k)
+        ! 
+
+        integer, intent(in)                                 :: K
+        integer                                             :: lentwids, keff, allocation_status
+        complex(kind=dp_complex), intent(inout)             :: f(:)
+        complex(kind=dp_complex), dimension(K)              :: fft1d_firstk 
+        complex(kind=dp_complex), allocatable               :: small_fft1d(:), twids(:), fft1d_firstk_working(:)
+
+        integer                                             :: N, Nfft1d, i,l
+
+        keff    = k
+        N       = size(f)
+        Nfft1d    = N/Keff
+
+        ! Make sure N is divisible by K.
+        !    if not, we take the first K+n values of the fft1d 
+        !    and throw away n of them (n is the smallest integer such that K+n | N)
+        do while ((.not. keff*Nfft1d .eq. N) .and. keff < N )
+            keff = keff + 1
+            Nfft1d = N/Keff 
+        end do 
+
+        lentwids = N
+
+        ! allocate twids, small_fft1d and fft1d_firstk_working arrays
+        !   twids               -- contain twiddle factors needed to combine the different fft1d calculations
+        !   small_fft1d           -- the array in which each fft1d is temporarily stored
+        !   fft1d_firstk_working  -- array of length Keff >~ K to which FFT values are stored.
+
+        allocate(twids(lentwids), stat = allocation_status)
+        if (allocation_status/=0) then
+            write (0,*) "ERROR: Cannot allocate twids array (fft1dwmod)"
+            stop
+        end if 
+        allocate(small_fft1d(keff), stat = allocation_status)
+        if (allocation_status/=0) then
+            write (0,*) "ERROR: Cannot allocate small_fft1d array (fft1dwmod)"
+            stop
+        end if 
+        allocate(fft1d_firstk_working(keff), stat = allocation_status)
+        if (allocation_status/=0) then
+            write (0,*) "ERROR: Cannot allocate fft1d_firstk_working array (fft1dwmod)"
+            stop
+        end if 
+
+        ! Initialize to zero
+        do i=1,keff
+            fft1d_firstk_working(i) = 0.0D0 
+        end do 
+
+        ! 
+        if (Keff*Nfft1d .ne. N) then
+            write(0,*) "ERROR: Nfft1d = ",Nfft1d," and K = ",K,", but Nfft1d*K = ",Nfft1d*K," != ",N
+            stop 
+        endif
+
+        ! Calculate twiddle factors
+        do i=0,(keff-1)
+            do l=0,(Nfft1d-1)    
+                twids(1 + i + l*Keff) = zexp(CMPLX(0,1)*ISIGN*twopi*(real(i*l))/real(N))
+            end do 
+        end do
+
+        do l=1,Nfft1d
+            ! execute plan
+            ! write(stderr, *) "about to do fft1d() call.", l, N, Nfft1d
+            small_fft1d = fft1d(f(l:N:Nfft1d))
+            ! transfer results to master array
+            do i=1,Keff
+                fft1d_firstk_working(i) = fft1d_firstk_working(i) + small_fft1d(i)*twids( i+(l-1)*Keff )
+            end do 
+        end do
+        
+        ! only get the K values that we care about
+        fft1d_firstk = fft1d_firstk_working(:K)
+
+        deallocate(twids)
+        deallocate(small_fft1d)
+        deallocate(fft1d_firstk_working)
+    end function fft1d_firstk
 
     function fft1d_center(f)
+        ! Multiplies a 1d array by a series of twiddle factors so that 
+        !        \hat{f*twids}_0, \hat{f*twids}_{last} ~ \hat{f}(-K), \hat{f}(K)
         complex(kind=dp_complex), intent(in) :: f(:)
         complex(kind=dp_complex), dimension(size(f)) :: fft1d_center
         integer :: i, j, n
@@ -746,6 +854,7 @@ module common_mod
     end function fft1d_center
 
     function kspace_shift_1d(f,shift)
+        ! Multiplies a 1d array by a series of twiddle factors so that \hat{f*twids}_m = \hat{f}_{m + shift}
         real(dp_real),  intent(in) :: shift
         complex(kind=dp_complex), intent(in) :: f(:)
         complex(kind=dp_complex), dimension(size(f)) :: kspace_shift_1d
@@ -760,7 +869,7 @@ module common_mod
 
 
 
-    subroutine fft_faster(f,kmin,kmax,enhancement, fft_output)
+    subroutine fft2d_faster(f,kmin,kmax,enhancement, fft2d_output)
         ! Performs an efficient series of FFT's to suit our needs
         ! Astrophysical applications of ADT for x-ray scattering of dust
         !   typically care about small angle scattering, which corresponds to
@@ -771,38 +880,38 @@ module common_mod
         integer, intent(in) :: kmin, kmax, enhancement
       
         complex(kind=dp_complex), intent(inout) :: f(:,:)
-        complex(kind=dp_complex), intent(out) :: fft_output(:,:)
-        complex(kind=dp_complex), allocatable :: working_fft(:,:)
+        complex(kind=dp_complex), intent(out) :: fft2d_output(:,:)
+        complex(kind=dp_complex), allocatable :: working_fft2d(:,:)
         complex(kind=dp_complex), dimension(size(f(:,1)), size(f(1,:))) :: new_grid
-        integer :: i,j,a,b,norig, fsize, fftsize, ix, iy
+        integer :: i,j,a,b,norig, fsize, fft2dsize, ix, iy
         real(dp_real) :: deltaz, deltay
-        !write(stderr, *) "in fft_faster (the old 2d one)"
+        
         fsize = size(f(:,1))
-        ! allocate(fft_output(fsize, fsize))
 
         ! shift the input function so that the k-space origin is at (kmin,kmin)
-        f = kspace_shift(f,real(kmin,dp_real),real(kmin,dp_real)) 
+        f = kspace_shift_2d(f,real(kmin,dp_real),real(kmin,dp_real)) 
 
         ! do a vanilla FFT if enhancement is 0
         if (enhancement .eq. 0) then
-          allocate(working_fft(size(f(1,:)), size(f(:,1))))
-          working_fft = fft2d(f)
+          allocate(working_fft2d(size(f(1,:)), size(f(:,1))))
+          working_fft2d = fft2d(f)
 
           !fft_output = fft_firstk(f, size(fft_output(:,1)))
           !write(stderr, *) fsize, size(fft_output(:,1))
-          do i=1,size(fft_output(1,:))
-            do j=1, size(fft_output(:,1))
-              fft_output(i, j) = working_fft(i, j)
+
+          do i=1,size(fft2d_output(1,:))
+            do j=1, size(fft2d_output(:,1))
+              fft2d_output(i, j) = working_fft2d(i, j)
             end do
           end do
         else
           norig = kmax - kmin 
           
-          fftsize = norig*(enhancement + 1)
+          fft2dsize = norig*(enhancement + 1)
 
-          if (fftsize .ne. size(fft_output(1,:))) then
-            write(stderr,*) "ERROR: (fft_faster) fft_output size is ",size(fft_output(1,:)),&
-                            ", but fftsize = norig*(enhancement + 1) = ",fftsize
+          if (fft2dsize .ne. size(fft2d_output(1,:))) then
+            write(stderr,*) "ERROR: (fft_faster) fft_output size is ",size(fft2d_output(1,:)),&
+                            ", but fftsize = norig*(enhancement + 1) = ",fft2dsize
             stop
           end if 
 
@@ -816,17 +925,21 @@ module common_mod
           end if 
 
           ! allocate memory
-          allocate( working_fft(  norig   ,   norig   ))
+          allocate( working_fft2d(  norig   ,   norig   ))
           
           ! Do offset FFTs
+
+          ! TODO: Parallelize!! 
+          !-$omp parallel shared(fft2d_output, enhancement, norig, fft2dsize)
+          !-$omp do schedule(dynamic) private(i,j, deltaz, deltay, new_grid, working_fft2d, a, b, ix, iy)
           do i=0,enhancement
               deltaz = real(i)/real(enhancement + 1)
               do j=0,enhancement
                   deltay = real(j)/real(enhancement + 1)
                   
-                  new_grid = kspace_shift(f,deltaz,deltay)
+                  new_grid = kspace_shift_2d(f,deltaz,deltay)
                   !write(stderr, *) "about to do fft2d_firstk!!"
-                  working_fft = fft2d_firstk(new_grid,norig)
+                  working_fft2d = fft2d_firstk(new_grid,norig)
                   !write(stderr, *) "done!"
                   
                   do a=1,norig
@@ -834,49 +947,183 @@ module common_mod
                           ix = i + (a-1)*(enhancement + 1) + 1
                           iy = j + (b-1)*(enhancement + 1) + 1
                         
-                          if ((ix <= fftsize) .and. (iy <= fftsize)) then
-                              fft_output(ix, iy) = working_fft(a,b)
+                          if ((ix <= fft2dsize) .and. (iy <= fft2dsize)) then
+                              !-$OMP CRITICAL
+                              fft2d_output(ix, iy) = working_fft2d(a,b)
+                              !-$OMP END CRITICAL
                           end if 
                       end do
                   end do 
               end do
           end do 
-            
+          !-$omp end do
+          !-$omp end parallel 
+
           
         end if
 
         ! shift the input function back.
-        f = kspace_shift(f,real(-kmin,dp_real),real(-kmin,dp_real)) 
-    end subroutine fft_faster
+        f = kspace_shift_2d(f,real(-kmin,dp_real),real(-kmin,dp_real)) 
+    end subroutine fft2d_faster
+    function fft2d_firstk(f,K)
+        ! How this calculation works:
+        !   Say I have 15 data points, in one dimension, for which I only care about the first 5 values of its (1d) fft.
+        !
+        !   We can calculate these first five k values by doing 15/5 = 3 fft's of length 5.
+        !
+        !       Original data: dddddddddddddddd
+        !
+        !       fft2d1 = fft2d( d--d--d--d--d--d )
+        !       fft2d2 = fft2d( -d--d--d--d--d-- )
+        !       fft2d3 = fft2d( --d--d--d--d--d- )
+        !
+        !       fft2d(orig)(k) = sum_i(fft2di(k))*twid_factor(k)
+        ! 
 
-    function fft_center(f)
+        integer, intent(in)                                 :: K
+        integer                                             :: lentwids, keff, allocation_status
+        complex(kind=dp_complex), intent(inout)             :: f(:,:)
+        complex(kind=dp_complex), dimension(K,K)            :: fft2d_firstk 
+        complex(kind=dp_complex), allocatable               :: small_fft2d(:,:), twids(:,:), fft2d_firstk_working(:,:)
+
+        integer                                             :: N, Nfft2d, i,j,l,m 
+
+        keff    = k
+        N       = size(f(:,1))
+        Nfft2d    = N/Keff
+
+        ! Make sure N is divisible by K.
+        !    if not, we take the first K+n values of the fft2d 
+        !    and throw away n of them (n is the smallest integer such that K+n | N)
+        do while ((.not. keff*Nfft2d .eq. N) .and. keff < N )
+            keff = keff + 1
+            Nfft2d = N/Keff 
+        end do 
+
+        lentwids = N
+
+        ! allocate twids, small_fft2d and fft2d_firstk_working arrays
+        !   twids               -- contain twiddle factors needed to combine the different fft2d calculations
+        !   small_fft2d           -- the array in which each fft2d is temporarily stored
+        !   fft2d_firstk_working  --
+
+        allocate(twids(lentwids, lentwids), stat = allocation_status)
+        if (allocation_status/=0) then
+            write (0,*) "ERROR: Cannot allocate twids array (fft2dwmod)"
+            stop
+        end if 
+         
+        allocate(fft2d_firstk_working(keff, keff), stat = allocation_status)
+        if (allocation_status/=0) then
+            write (0,*) "ERROR: Cannot allocate fft2d_firstk_working array (fft2dwmod)"
+            stop
+        end if 
+
+        do i=1,keff
+            do j=1,keff
+                fft2d_firstk_working(i,j) = 0.0D0
+            end do 
+        end do 
+
+        if (Keff*Nfft2d .ne. N) then
+            write(0,*) "ERROR: Nfft2d = ",Nfft2d," and K = ",K,", but Nfft2d*K = ",Nfft2d*K," != ",N
+            stop 
+        endif
+
+        
+
+        ! Calculate twiddle factors
+
+        !$omp parallel shared(keff, Nfft2d, twids, N)
+        !$omp do schedule(dynamic) private(i,j, l, m)
+        do i=0,(keff-1)
+            do j=0,(keff-1)
+                do l=0,(Nfft2d-1)
+                    do m=0,(Nfft2d-1)
+                        !-$OMP CRITICAL
+                        twids(1 + i + l*Keff, 1 + j + m*Keff ) &
+                            & = zexp(CMPLX(0,1)*ISIGN*twopi*(real(i*l+j*m))/real(N))
+                        !-$OMP END CRITICAL
+                    end do 
+                end do 
+            end do 
+        end do
+        !$omp end do
+        !$omp end parallel 
+        
+
+        ! TODO: Parallelize this loop and the similar one in fft1d_firstk
+        !       (This has been giving me a whole bunch of grief and I don't know why!!)
+
+        !-$omp parallel do schedule(static) &
+        !-$omp shared(Nfft2d,N, f, Keff, fft2d_firstk_working, twids) &
+        !-$omp private(l, m, i, j, small_fft2d, allocation_status)
+        do l=1,Nfft2d
+            allocate(small_fft2d(Keff, Keff), stat = allocation_status)
+            if (allocation_status/=0) then
+                write (0,*) "ERROR: Cannot allocate small_fft2d array (fft2dwmod)"
+                stop
+            end if
+            do m=1,Nfft2d
+
+                ! execute plan
+                small_fft2d = fft2d(f(l:N:Nfft2d,m:N:Nfft2d))
+
+                ! transfer results to master array
+                do i=1,Keff
+                    do j=1,Keff 
+                        !-$OMP CRITICAL
+                        fft2d_firstk_working(i,j) = fft2d_firstk_working(i,j) &
+                                            & + small_fft2d(i,j)*twids( i+(l-1)*Keff , j+(m-1)*Keff )
+                        !-OMP END CRITICAL
+                    end do 
+                end do 
+            end do 
+            deallocate(small_fft2d)
+        end do
+        !-$omp end parallel do
+        
+        ! only get the K values that we care about
+        fft2d_firstk = fft2d_firstk_working(:K,:K)
+
+        deallocate(twids)
+        deallocate(fft2d_firstk_working)
+    end function fft2d_firstk
+
+    function fft2d_center(f)
         complex(kind=dp_complex), intent(in) :: f(:,:)
-        complex(kind=dp_complex), dimension(size(f(:,1)),size(f(1,:))) :: fft_center
+        complex(kind=dp_complex), dimension(size(f(:,1)),size(f(1,:))) :: fft2d_center
         integer :: i, j, n
 
         n = size(f(:,1))
         do i=1,n
             do j=1,n
-                fft_center(i,j) = f(i,j)*(-1)**(i+j)
+                fft2d_center(i,j) = f(i,j)*(-1)**(i+j)
             end do
         end do 
-    end function fft_center
+    end function fft2d_center
 
-    function kspace_shift(f,shiftz,shifty)
+    function kspace_shift_2d(f,shiftz,shifty)
         real(dp_real),  intent(in) :: shiftz,shifty
         complex(kind=dp_complex), intent(in) :: f(:,:)
-        complex(kind=dp_complex), dimension(size(f(:,1)),size(f(1,:))) :: kspace_shift
+        complex(kind=dp_complex), dimension(size(f(:,1)),size(f(1,:))) :: kspace_shift_2d
         integer :: i, j, n
 
         n = size(f(:,1))
-
+        !-$OMP PARALLEL SHARED(kspace_shift_2d, f, shiftz, shifty, n)
+        !-$OMP DO SCHEDULE(DYNAMIC) PRIVATE(i, j)
         do i=1,n
             do j=1,n
-                kspace_shift(i,j) = f(i,j)*exp(ISIGN*CMPLX(0,1.0, kind=dp_complex)*twopi*(shiftz*(i-1)+shifty*(j-1))/real(n))
+                !-$OMP CRITICAL
+                kspace_shift_2d(i,j) = f(i,j)*exp(ISIGN*CMPLX(0,1.0, kind=dp_complex)*twopi*(shiftz*(i-1)+shifty*(j-1))/real(n))
+                !-$OMP END CRITICAL
             end do
         end do
-    end function kspace_shift
+        !-$omp end do
+        !-$omp end parallel 
 
+    end function kspace_shift_2d
+    
 
     
 

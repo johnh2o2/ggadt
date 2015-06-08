@@ -1,9 +1,9 @@
 GGADT -- General Geometry Anomalous Diffraction Theory
 ======================================================
-**Version 0.9.91**
+**Version 1.0.0**
 *John Hoffman and Michael Tarczon*
 
-README last updated: March 27, 2014
+README last updated: June 3, 2015
 
 GGADT is a set of Fortran 95 routines that calculate the x-ray scattering and absorption properties of dust grains using anomalous diffraction theory (valid when the grain is large compared to the wavelength of incident light).
 

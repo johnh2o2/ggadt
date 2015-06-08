@@ -21,7 +21,7 @@ module constants
   real(dp_real), parameter                 ::  twopi                          = 2*3.14159265358979323846
   real(dp_real), parameter                 ::  HUGE_NUMBER                    = 1.0D20
   real(dp_real), parameter                 ::  ARCSECONDS_PER_RADIAN          = (360.0D0*60.0D0*60.0D0)/(2.0D0*pi)
-  integer, parameter                       ::  MAX_NGRID                      = 2048
+  integer, parameter                       ::  MAX_NGRID                      = 4096
 
   real(dp_real), parameter                 ::  hc                             = 1.23984193D0
   real(dp_real), parameter                 ::  default_aeff                   = 2.0D-1
