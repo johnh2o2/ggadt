@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<!-- This manual is for GGADT (version 0.9.95, 5 July 2014),
+<!-- This manual is for GGADT (version 1.0.0, 8 June 2015),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT). 
 
@@ -12,10 +12,10 @@ Texts.  A copy of the license is included in the section entitled
 "GNU Free Documentation License". -->
 <!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>GGADT 0.9.95: Invoking GGADT</title>
+<title>GGADT 1.0.0: Invoking GGADT</title>
 
-<meta name="description" content="GGADT 0.9.95: Invoking GGADT">
-<meta name="keywords" content="GGADT 0.9.95: Invoking GGADT">
+<meta name="description" content="GGADT 1.0.0: Invoking GGADT">
+<meta name="keywords" content="GGADT 1.0.0: Invoking GGADT">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
@@ -88,7 +88,7 @@ Next: <a href="Example-usage.html#Example-usage" accesskey="n" rel="next">Exampl
 <pre class="example">ggadt <var>option</var> &hellip;
 </pre></div>
 
-<p>With no options, <code>ggadt</code> runs calculations on a set of default grain parameters. By default GGADT will calculate the differential scattering cross section as a function of scattering angle. To calculate the integrated scattering and absorption cross sections for a range of energies, add the <code>--integrated</code> flag as a command-line argument.
+<p>With no options, <code>ggadt</code> runs calculations on a set of default grain parameters (specified in the <code>.defaults</code> file). By default GGADT will calculate the differential scattering cross section as a function of scattering angle. To calculate the integrated scattering and absorption cross sections for a range of energies, add the <code>--integrated</code> flag as a command-line argument.
 </p>
 <p>Parameters may be specified as command-line arguments, 
 </p>
@@ -183,6 +183,46 @@ another-parameter   = another-value
 standard output and then exit successfully.
 </p>
 </dd>
+<dt><samp>--verbose</samp></dt>
+<dt><samp>-d</samp></dt>
+<dd><a name="index-_002d_002dverbose"></a>
+<a name="index-_002dd"></a>
+<p>Be extra loud (useful for debugging)
+</p>
+
+</dd>
+<dt><samp>--quiet</samp></dt>
+<dt><samp>-q</samp></dt>
+<dd><a name="index-_002d_002dquiet"></a>
+<a name="index-_002dq"></a>
+<p>Do not print progress. GGADT by default will print out a <code>percent complete: XX.X%</code> statement during runtime; this option suppresses that.
+</p>
+</dd>
+<dt><samp>--timing</samp></dt>
+<dt><samp>-t</samp></dt>
+<dd><a name="index-_002d_002dtiming"></a>
+<a name="index-_002dt"></a>
+<p>Do not output data. No I/O is useful if you care about measuring the runtime of GGADT.
+</p>
+</dd>
+<dt><samp>--use-padded-fft</samp></dt>
+<dt><samp>-s</samp></dt>
+<dd><a name="index-_002d_002duse_002dpadded_002dfft"></a>
+<a name="index-_002ds"></a>
+<p>This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by <code>nscatter</code>), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.
+</p>
+
+</dd>
+<dt><samp>--force-numerical</samp></dt>
+<dd><a name="index-_002d_002dforce_002dnumerical"></a>
+<p>This will force GGADT to use a numerical calculation of the differential scattering cross section for spherical grains (an analytical Anomalous Diffraction Theory solution is implemented by default).
+</p>
+</dd>
+<dt><samp>--do-full-2d-fft</samp></dt>
+<dd><a name="index-_002d_002ddo_002dfull_002d2d_002dfft"></a>
+<p>Do not utilize the fact that you can make a 2d FFT a 1d FFT if you only care about the orientationally averaged value of dÏ/dÎ©(Î¸)
+</p>
+</dd>
 <dt><samp>--parameter-file=<var>value</var></samp></dt>
 <dd><a name="index-_002d_002dparameter_002dfile"></a>
 <p>Path to a correctly formatted parameter file.
@@ -216,19 +256,6 @@ standard output and then exit successfully.
 <dt><samp>--fftw-optimization=<var>value</var></samp></dt>
 <dd><a name="index-_002d_002dfftw_002doptimization"></a>
 <p>Must be one of <code>ESTIMATE</code>, <code>MEASURE</code>, <code>PATIENT</code> or <code>EXHAUSTIVE</code>. For more information about what these tags mean and about FFTW wisdom, see <a href="http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans">http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans</a>.
-</p>
-</dd>
-<dt><samp>--use-padded-fft</samp></dt>
-<dt><samp>-s</samp></dt>
-<dd><a name="index-_002d_002duse_002dpadded_002dfft"></a>
-<a name="index-_002ds"></a>
-<p>This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by <code>nscatter</code>), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.
-</p>
-
-</dd>
-<dt><samp>--force-numerical</samp></dt>
-<dd><a name="index-_002d_002dforce_002dnumerical"></a>
-<p>This will force GGADT to use a numerical calculation of the differential scattering cross section for spherical grains (an analytical Anomalous Diffraction Theory solution is implemented by default).
 </p>
 </dd>
 <dt><samp>--angle-mode=<var>value</var></samp></dt>
@@ -430,14 +457,14 @@ make
 <h4 class="subsection">3.5.2 DDSCAT conventions</h4>
 <img src="ddscat_orientations.png" alt="ddscat_orientations">
 
-<p>The <code>ddscat</code> option uses the axes conventions defined by the DDSCAT<a name="DOCF8" href="#FOOT8"><sup>8</sup></a> code, which uses the discrete-dipole approximation to obtain the optical scattering and absorption properties of grains with arbitrary geometry. 
+<p>The <code>ddscat</code> option uses the axes conventions defined by the DDSCAT<a name="DOCF9" href="#FOOT9"><sup>9</sup></a> code, which uses the discrete-dipole approximation to obtain the optical scattering and absorption properties of grains with arbitrary geometry. 
 </p>
 
 <a name="MSTM-conventions"></a>
 <h4 class="subsection">3.5.3 MSTM conventions</h4>
 <img src="mackowski_orientations.png" alt="mackowski_orientations">
 
-<p>The <code>mstm</code> option uses the axes conventions defined by the Multiple Sphere T-Matrix<a name="DOCF9" href="#FOOT9"><sup>9</sup></a> code.
+<p>The <code>mstm</code> option uses the axes conventions defined by the Multiple Sphere T-Matrix<a name="DOCF10" href="#FOOT10"><sup>10</sup></a> code.
 </p>
 <a name="Future-goals"></a>
 <h3 class="section">3.6 Future goals</h3>
@@ -483,9 +510,9 @@ make
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h3><a name="FOOT8" href="#DOCF8">(8)</a></h3>
-<p>Draine and Flatau: <a href="https://code.google.com/p/ddscat/">https://code.google.com/p/ddscat/</a></p>
 <h3><a name="FOOT9" href="#DOCF9">(9)</a></h3>
+<p>Draine and Flatau: <a href="https://code.google.com/p/ddscat/">https://code.google.com/p/ddscat/</a></p>
+<h3><a name="FOOT10" href="#DOCF10">(10)</a></h3>
 <p>Mackowski: <a href="http://www.eng.auburn.edu/~dmckwski/scatcodes/">http://www.eng.auburn.edu/~dmckwski/scatcodes/</a></p>
 </div>
 <hr>

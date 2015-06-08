@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<!-- This manual is for GGADT (version 0.9.95, 5 July 2014),
+<!-- This manual is for GGADT (version 1.0.0, 8 June 2015),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT). 
 
@@ -12,10 +12,10 @@ Texts.  A copy of the license is included in the section entitled
 "GNU Free Documentation License". -->
 <!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>GGADT 0.9.95: Overview</title>
+<title>GGADT 1.0.0: Overview</title>
 
-<meta name="description" content="GGADT 0.9.95: Overview">
-<meta name="keywords" content="GGADT 0.9.95: Overview">
+<meta name="description" content="GGADT 1.0.0: Overview">
+<meta name="keywords" content="GGADT 1.0.0: Overview">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
@@ -71,7 +71,7 @@ Next: <a href="Installation.html#Installation" accesskey="n" rel="next">Installa
 <a name="index-greetings"></a>
 <a name="index-overview"></a>
 
-<p>GGADT stands for General Geometry Anomalous Diffraction Theory, and is Fortran 95 compliant. GGADT allows a user to specify a custom dust geometry (either a spheroid, sphere, or an agglomerate of spheres), and calculates either the differential scattering cross section as a function of scattering angle, or the energy-dependent absorption and scattering cross sections. Anomalous diffraction theory is valid when <em>ka_{eff} \lesssim 1</em>, where <em>k</em> is the wavenumber of the incident photon, and <em>a_{eff}</em> is the &ldquo;effective radius&quot; of the grain, defined to be the radius of a sphere that has the same volume as the grain.
+<p>GGADT stands for General Geometry Anomalous Diffraction Theory, and is Fortran 95 compliant. GGADT allows a user to specify a custom dust geometry (either a spheroid, sphere, an agglomeration of spherical monomers, or a custom user-defined grain geometry), and calculates either the differential scattering cross section as a function of scattering angle, or the energy-dependent absorption and scattering cross sections. Anomalous diffraction theory is valid when <em>ka_{eff} \gg 1</em>, where <em>k</em> is the wavenumber of the incident photon, and <em>a_{eff}</em> is the &ldquo;effective radius&quot; of the grain, defined to be the radius of a sphere that has the same volume as the grain.
 </p>
 <a name="index-authors"></a>
 <a name="index-Hoffman_002c-John"></a>
@@ -93,7 +93,7 @@ Next: <a href="Installation.html#Installation" accesskey="n" rel="next">Installa
 </p>
 <p>One area of active research in ISM physics is determining the size distribution and composition of interstellar dust. One way to probe the size distributions and dust composition is by measuring how ISM dust interacts with x-ray radiation.<a name="DOCF2" href="#FOOT2"><sup>2</sup></a><a name="DOCF3" href="#FOOT3"><sup>3</sup></a><a name="DOCF4" href="#FOOT4"><sup>4</sup></a> When looking at an x-ray source through interstellar dust, the scattering properties of the intermediate dust create an x-ray &ldquo;halo&rdquo; around the source.<a name="DOCF5" href="#FOOT5"><sup>5</sup></a>.
 </p>
-<p>GGADT is designed to be a tool to test dust models against observations of x-ray halos. Since the size of a typical dust grain (0.1 micrometers) is large compared to typical x-ray wavelengths (1 nanometer), an approximation known as Anomalous Diffraction Theory (ADT)<a name="DOCF6" href="#FOOT6"><sup>6</sup></a> can be used to calculate the absorption and scattering properties of dust grains<a name="DOCF7" href="#FOOT7"><sup>7</sup></a>.
+<p>GGADT is designed to be a tool to test dust models against observations of x-ray halos and x-ray attenuation. Since the size of a typical dust grain (0.1 Âµm) is large compared to typical x-ray wavelengths (1 nm), an approximation known as Anomalous Diffraction Theory (ADT)<a name="DOCF6" href="#FOOT6"><sup>6</sup></a> can be used to calculate the absorption and scattering properties of dust grains<a name="DOCF7" href="#FOOT7"><sup>7</sup></a>.
 </p>
 <a name="Anomalous-Diffraction-Theory-_0028ADT_0029"></a>
 <h4 class="subsection">1.1.2 Anomalous Diffraction Theory (ADT)</h4>
@@ -134,24 +134,14 @@ Next: <a href="Installation.html#Installation" accesskey="n" rel="next">Installa
 <p>GGADT does the following:
 </p>
 <ol>
-<li> Reads in dust and x-ray parameters (from command line or from a parameter file)
+<li> Reads in dust parameters and photon energy (from command line or from a parameter file)
 </li><li> For each of the <samp>norientations</samp> orientations
 <ol>
 <li> Calculate the shadow function of the grain on a 2D grid
-</li><li> If calculating the differential scattering cross section:
-<ul>
-<li> Take the centered FFT of this grid using FFTW
-</li><li> Normalize this result so that it represents the differential scattering cross section
-</li><li> Add contribution of differential cross-section to orientational average
-</li></ul>
-</li><li> If calculating the integrated cross sections:
-<ul>
-<li> Calculate the cross sections from the shadow function for the given orientation (and photon energy)
-</li><li> Add contribution of this orientation to the average cross section at the given photon energy
-</li></ul>
+</li><li> Calculate either Ï(E) or dÏ/dÎ©(Î¸x,Î¸y) for this orientation
 </li></ol>
-
-</li><li> Output orientationally averaged grid (if calculating differential scattering cross section) or the energy dependent absorption and scattering cross sections.
+</li><li> Averages calculation over all orientations
+</li><li> Output orientationally dÏ/dÎ©(Î¸x,Î¸y) (if calculating full 2d differential scattering cross section) or dÏ/dÎ©(Î¸) (if axisymmetry is assumed, as is the case in the limit where <samp>norientations</samp> goes to infinity) or the energy dependent absorption and scattering cross sections (Ï(E,abs), Ï(E,sca))
 
 </li></ol>
 
