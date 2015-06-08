@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<!-- This manual is for GGADT (version 0.9.95, 5 July 2014),
+<!-- This manual is for GGADT (version 1.0.0, 8 June 2015),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT). 
 
@@ -12,10 +12,10 @@ Texts.  A copy of the license is included in the section entitled
 "GNU Free Documentation License". -->
 <!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>GGADT 0.9.95: FFT comparison</title>
+<title>GGADT 1.0.0: FFT comparison</title>
 
-<meta name="description" content="GGADT 0.9.95: FFT comparison">
-<meta name="keywords" content="GGADT 0.9.95: FFT comparison">
+<meta name="description" content="GGADT 1.0.0: FFT comparison">
+<meta name="keywords" content="GGADT 1.0.0: FFT comparison">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
@@ -67,32 +67,33 @@ Next: <a href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-Licens
 <hr>
 <a name="FFT-comparison-1"></a>
 <h2 class="chapter">6 FFT comparison</h2>
-<p><strong>FFTW3 NOT supported in current version</strong>: There is currently NO support for FFTW3 at the moment. The FFTW module needs to be reverted to the Fortran 95 standard. At this time, it&rsquo;s not a huge priority. GGADT works just fine, and does not require you to install an external library. Future versions of GGADT will likely include FFTW3 support. 
+
+<p>Currently, GGADT allows you to choose between two FFT algorithms: FFTW 3 (<a href="http://fftw.org/">http://fftw.org/</a>), which requires you install the FFTW3 library, and GPFA (Generalized Prime Factor Algorithm)<a name="DOCF11" href="#FOOT11"><sup>11</sup></a>, which is self-contained and included with the GGADT package. GPFA is used by default, and, as shown below, is slightly faster than FFTW in the current version of GGADT. 
 </p>
-<p><strong>Text below this point is for earlier versions of GGADT which supported FFTW3.</strong>
-</p>
-<p>Currently, GGADT allows you to choose between two FFT algorithms: FFTW 3 (<a href="http://fftw.org/">http://fftw.org/</a>), which requires you install the FFTW3 library, and GPFA (Generalized Prime Factor Algorithm)<a name="DOCF10" href="#FOOT10"><sup>10</sup></a>, which is self-contained and included with the GGADT package. GPFA is used by default, and, as shown below, is slightly faster than FFTW in the current version of GGADT. This will change in later versions, since at the moment, we do not take advantage of saving and loading FFTW &quot;wisdom&quot;. 
-</p>
-<p>Earlier versions of GGADT, which did FFT&rsquo;s in a different way (only did padded FFT&rsquo;s, but utilized FFTW wisdom), had FFTW being about 20 percent faster than GPFA.
-</p>
-<p>If you wish to use the FFTW3 version of GGADT, you will need to install FFTW 3.3.x (we have only tested 3.3.3, but GGADT should in principal be compatible with all 3.x.x versions). GPFA will not currently work with FFTW 2.x, as the two interfaces are different, but plans to include FFTW 2.x support are in the works. 
-</p>
-<p>If you have a particular FFT library that you would like to see implemented, please send an e-mail to jah5 (at) princeton.edu. It will likely be faster if you simply write your own module to attach to GGADT. This module must provide the function <code>fft_firstk(arr,K)</code> where <code>arr</code> is an N by N array, and <code>K</code> is an integer less than N. The function must return a <code>K</code> by <code>K</code> array, containing the first <code>K</code> values of the FFT of <code>arr</code>. The complexity of this algorithm should scale as (N*N)log(<code>K</code>*<code>K</code>), instead of the (N*N)log(N*N) complexity of the standard two-dimensional FFT.
-</p>
-<p>For information about how to construct this algorithm, see the instructions for FFTW at <a href="http://www.fftw.org/pruned.html">http://www.fftw.org/pruned.html</a>.
-</p>
-<p>If you are successful at porting your FFT algorithm, let us know, and we will do our best to test it and include it with future releases.
+<p>If you wish to use the FFTW3 version of GGADT, you will need to install FFTW 3.3.x (we have only tested 3.3.3, but GGADT should in principal be compatible with all 3.x.x versions). GGADT will not work with FFTW 2.x, as the two interfaces are different.
 </p>
 <a name="Timing"></a>
 <h3 class="section">6.1 Timing</h3>
 <img src="timing_actual_time.png" alt="timing_actual_time">
 <img src="timing_relative_to_gpfa.png" alt="timing_relative_to_gpfa">
 
+<a name="Efficient-calculation-of-dI_002fdI_00a9_0028I_002c_0029"></a>
+<h3 class="section">6.2 Efficient calculation of dÏ/dÎ©(Î¸)</h3>
+
+<p>Though S(Î¸,Ï) is in principle determined by a 2d FFT of the shadow function, if you only care about the orientational average of dÏ/dÎ©(Î¸,Ï), you can assume axisymmetry and take Ï=0. When you do this, you can integrate along one axis of the shadow function to take f(x,y) &ndash;&gt; g(x) = â«f(x,y)dy. 
+</p>
+<p>In addition, to avoid padding, we can do several (smaller) FFT&rsquo;s of g(n,Î´), where g(n,Î´) = exp(-2ÏiÎ´(n/N))g(n); and take only the first K values that we care about (small k values correspond to small scattering angles). These two tricks speed things up tremendously (2-3 orders of magnitude). In general, the computational time of the old padded, 2dFFT method and GGADT is:
+</p>
+<p>t_naive ~ (N/(xÎ´Î¸))^2 log(N/(xÎ´Î¸))
+t_GGADT ~ (1/(xÎ´Î¸)) log (x(Î¸max/2Ï)) +  Î²N^2
+</p>
+<p>More information about this can be found in Hoffman and Draine (2015) (in prep).
+</p>
 <div class="footnote">
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
-<h3><a name="FOOT10" href="#DOCF10">(10)</a></h3>
+<h3><a name="FOOT11" href="#DOCF11">(11)</a></h3>
 <p>Temperton, C. (1992). A Generalized Prime Factor FFT Algorithm for any N=2^p3^q5^r. SIAM Journal on Scientific and Statistical Computing, 13(3), 676-686.</p>
 </div>
 <hr>

@@ -3,7 +3,7 @@ GGADT -- General Geometry Anomalous Diffraction Theory
 **Version 1.0.0**
 *John Hoffman and Michael Tarczon*
 
-README last updated: June 3, 2015
+README last updated: June 8, 2015
 
 GGADT is a set of Fortran 95 routines that calculate the x-ray scattering and absorption properties of dust grains using anomalous diffraction theory (valid when the grain is large compared to the wavelength of incident light).
 
@@ -17,6 +17,7 @@ Quick install instructions
 **Recommended reading**: 
 
 * The HTML documentation for GGADT, available on-line [here](http://johnh2o2.github.io/ggadt)
+	* As of June 8, 2015, this is a bit out of date. Documentation will be updated ASAP.
 * the INSTALL file (which is a general-use file provided by GNU and may not be 100% applicable to GGADT)
 
 Do the following from a terminal
@@ -38,3 +39,19 @@ Some features:
 
 A word of caution: GGADT has **not been tested on Windows**. If you own a Windows machine and get GGADT to compile and run, let us know what you did and we'll try to relay that information. If you try and *fail* to get GGADT to run, and you'd like to use it on a Windows machine, let us know and we'll try to help.
 
+TODO list for future updates:
+-----------------------------
+
+* Parallelize the fft-firstk functions
+* Update documentation
+	* Add timing information
+	* Add new options
+	* Add detailed install instructions
+* Fix the annoying aclocal/automake complaints that occur when you clone the git repo and try to do ./configure; make.
+	* If you do make; make clean; make dist, you get a distro that installs on metis without a problem.
+* Find out if there's a compelling reason for the disagreement between the minima of dQsca/dOmega for numerical vs analytical case of spherical scatterers.
+	* It's not obvious to me that the minima can be predicted analytically. I don't know an intuitive reason for the numerical offsets...They do become smaller with higher grid resolution, and you're integrating over them anyway, so who cares?
+* Wrap GGADT in python
+* Add --nthreads option to arguments
+* Add --use-wisdom option to arguments
+* Add option to define custom list of energies for which to calculate σ(E)

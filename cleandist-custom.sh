@@ -1,6 +1,6 @@
 #!/bin/bash
-rm -f aclocal.m4
-rm -r -f autom4te.cache/
+#rm -f aclocal.m4
+#rm -r -f autom4te.cache/
 rm  -f *o
 rm  -f *mod
 rm -f *npy

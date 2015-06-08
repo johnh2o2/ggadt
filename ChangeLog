@@ -1,3 +1,31 @@
+* commit db263990e8033c957f845392e45982edd66733ba
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Jun 8 12:05:14 2015 +0300
+| 
+|     ...the last changes weren't added to the commit...woops
+|  
+* commit fa6708475017ec77bdf9e5053a1bea2f723db35f
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Jun 8 11:43:31 2015 +0300
+| 
+|     Major update. FFTW should now be fully operational; uses wisdom and
+|     should work with openmp. Configure.ac has been updated so it doesn't
+|     crash when you don't have FFTW installed with macports. You can now give
+|     configure an argument called macports_prefix=... to specify where
+|     macports resides, otherwise it assumes /opt. TODO (I forgot to test
+|     this): there might still be a problem when you search for fftw3.f -- it
+|     searches in the macports_prefix/local/include directory, but if /opt
+|     doesnt exist (because, e.g., the user is on Linux or something), it
+|     might crash. The FFTW wisdom implementation for Fortran 95 has been
+|     added to f95_wisdom.f90. Added foo.f90, which should test the usability
+|     of lfftw3_threads or lfftw3_omp; it doesnt do anything at the
+|     moment...Added --quiet and --do-full-2d-fft flags to GGADT (now uses 1d
+|     fft speedup by default). --quiet flag suppresses the progress output.
+|     Took fft(1d,2d)_firstk out of the fftw/gpfa modules and put them into
+|     the common module. TODO: cleanup sphere.f90 and add more documentation.
+|     Try to parallelize the section of fftw_firstk that has been giving you
+|     so much trouble. Update the documentation (which is ancient by now...)
+|  
 * commit 5f4b3eddaab31cd883ed8dbdc5fc5c44c4b8bd7d
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Tue Jun 2 22:51:59 2015 -0400

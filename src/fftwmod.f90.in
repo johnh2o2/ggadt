@@ -25,7 +25,7 @@ module fftw
     logical :: first_time_1d = .true., first_time_2d = .true., use_wisdom = .true., quiet=.true.
     integer(8) :: plan
     integer ::  mode = fftw_estimate
-    integer ::  NTHREADS = 4
+    integer ::  NTHREADS = 8
     character(len=10) :: mode_name = 'estimate'
     
 

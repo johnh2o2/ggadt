@@ -3,7 +3,7 @@
 
 AC_INIT([ggadt], [1.0.0], [jah5@princeton.edu])
 AC_PREREQ([2.69]) 
-#AC_CONFIG_MACRO_DIRS([m4])
+AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/sphere.f90])
 
 

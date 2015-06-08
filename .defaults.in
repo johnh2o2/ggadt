@@ -11,6 +11,7 @@ use-efficiencies               = T
 use-padded-fft                 = F
 integrated                     = F
 force-numerical                = F
+do-full-2d-fft                 = F
 axes-convention                = 'ddscat'
 
 # effective radius (radius of sphere with same volume)

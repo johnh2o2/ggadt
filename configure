@@ -2269,7 +2269,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-#AC_CONFIG_MACRO_DIRS([m4])
+
 
 
 
@@ -5064,7 +5064,7 @@ $as_echo "$as_me: Found fftw3.f file in ${ac_prefix}. Will use this directory fo
   plan_dir="$data_dir/plans"
 
   mkdir -p $data_dir
-  #mkdir -p $plan_dir
+  mkdir -p $plan_dir
   { $as_echo "$as_me:${as_lineno-$LINENO}: using $plan_dir as the directory to store FFTW plans" >&5
 $as_echo "$as_me: using $plan_dir as the directory to store FFTW plans" >&6;}
 elif test $using_gpfa = true
