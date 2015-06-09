@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<!-- This manual is for GGADT (version 1.0.0, 8 June 2015),
+<!-- This manual is for GGADT (version 1.0.0, 9 June 2015),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT). 
 
@@ -87,13 +87,14 @@ make
 </p>
 <p>If you did do <code>make install</code>, you can undo it by running <code>make uninstall</code>. To clean and remake GGADT, simply do <code>make clean</code> and then <code>make</code>.
 </p>
-<p>We haven&rsquo;t tested any speed improvements, but it might be advantageous to also add compiler optimization to the compilation, e.g. 
+<p>It should give you a slight (5 - 10%) speed advantage to use <code>-O3</code> optimization. We tried using <code>-Ofast</code>, but this produced a segfault for moderately large 2d grid sizes, and we didn&rsquo;t spend too much time trying to figure out why. So, you can use <code>-Ofast</code> for a little extra <em>oomph</em>, but just know that things might break unexpectedly (the normal, 1d case worked fine for us).
 </p>
 <div class="example">
 <pre class="example">./configure FCFLAGS=&quot;-O3&quot; [--enable-openmp] [--enable-fftw3] &hellip;
 </pre></div>
 
-
+<p>Note
+</p>
 <a name="Package-dependencies"></a>
 <h3 class="section">2.2 Package dependencies</h3>
 
@@ -109,8 +110,10 @@ make
 
 </li><li> Though FFTW is widely used and highly optimized, we find that GPFA beats FFTW in almost every case, and has the advantage that it&rsquo;s much simpler to use than FFTW (which has <em>wisdom</em> files to keep track of and additional installation headaches). 
 
-</li><li> <strong>Parallel FFTW3</strong> If you would like to utilize parallelized FFTW, you must pass either <code>--enable-threads</code> and/or <code>--enable-openmp</code> to the <code>configure</code> script of your FFTW3 installation. We haven&rsquo;t had a problem on our system (Mac OS X v10.9.5, gfortran 4.9.2_1 installed with Macports), but this is a potential source of problems; some systems don&rsquo;t have OpenMP and instead require the use of the <code>pthreads</code> (or some other) library, and our configuration script does <em>not</em> handle this. You&rsquo;re on your own if this is the case. The good news is that FFTW gives at best a negligible increase in speed, and openmp/parallelization does not increase the speed dramatically. In almost every case, you should be perfectly happy with a serial setup.
-</li></ul>
+</li><li> <strong>Parallel FFTW3</strong> If you would like to utilize parallelized FFTW, you must pass either <code>--enable-threads</code> and/or <code>--enable-openmp</code> to the <code>configure</code> script of your FFTW3 installation. 
+
+<p>We haven&rsquo;t had a problem on our system (Mac OS X v10.9.5, gfortran 4.9.2_1 installed with Macports), but this is a potential source of problems; some systems may not have OpenMP support for FFTW3 and instead require the use of the <code>pthreads</code> (or some other) library, and our configuration script does <em>not</em> handle this. You&rsquo;re on your own if this is the case. The good news is that FFTW gives at best a negligible increase in speed, and openmp/parallelization does not increase the speed dramatically. In almost every case, you should be perfectly happy with a serial setup.
+</p></li></ul>
 
 <ul class="no-bullet">
 <li>- <em>Location of the FFTW3 headers</em>: In order for GGADT to find the Fortran headers for FFTW3, they must be in the standard location (<code>/usr/local/include</code> or <code>usr/include</code>) or in <code>$prefix/include</code> where <code>$prefix</code> is defined by doing <code>./configure --prefix=&lt;prefix&gt;</code> at the configuration step for <code>ggadt</code>. If you have FFTW3 installed with MacPorts, the configure script should be able to find it for you. However, if you have MacPorts installed in a non-standard location (i.e. not <code>/opt</code>), it would behoove you to pass the <code>macports_prefix=...</code> argument to the <code>configure</code> script.
