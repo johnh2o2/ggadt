@@ -65,36 +65,47 @@ ul.no-bullet {list-style: none}
 Next: <a href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License" accesskey="n" rel="next">GNU Free Documentation License</a>, Previous: <a href="Testing-against-previous-results.html#Testing-against-previous-results" accesskey="p" rel="prev">Testing against previous results</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="FFT-comparison-1"></a>
+<script type="text/javascript"
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script><a name="FFT-comparison-1"></a>
 <h2 class="chapter">6 FFT comparison</h2>
 
 <p>Currently, GGADT allows you to choose between two FFT algorithms: FFTW 3 (<a href="http://fftw.org/">http://fftw.org/</a>), which requires you install the FFTW3 library, and GPFA (Generalized Prime Factor Algorithm)<a name="DOCF11" href="#FOOT11"><sup>11</sup></a>, which is self-contained and included with the GGADT package. GPFA is used by default, and, as shown below, is slightly faster than FFTW in the current version of GGADT. 
 </p>
 <p>If you wish to use the FFTW3 version of GGADT, you will need to install FFTW 3.3.x (we have only tested 3.3.3, but GGADT should in principal be compatible with all 3.x.x versions). GGADT will not work with FFTW 2.x, as the two interfaces are different.
 </p>
-<a name="Timing"></a>
-<h3 class="section">6.1 Timing</h3>
-<img src="timing_actual_time.png" alt="timing_actual_time">
-<img src="timing_relative_to_gpfa.png" alt="timing_relative_to_gpfa">
+<a name="Efficient-calculation-of-_005c_0028d_005csigma_002fd_005cOmega_0028_005ctheta_0029_005c_0029"></a>
+<h3 class="section">6.1 Efficient calculation of \(d\sigma/d\Omega(\theta)\)</h3>
 
-<a name="Efficient-calculation-of-dI_002fdI_00a9_0028I_002c_0029"></a>
-<h3 class="section">6.2 Efficient calculation of dÏ/dÎ©(Î¸)</h3>
+<p>Though \(S(\theta,\phi)\) is in principle determined by a 2d FFT of the shadow function, if you only care about the orientational average of \(d\sigma/d\Omega(\theta,\phi)\), you can assume axisymmetry and take \(\phi=0\). When you do this, you can integrate along one axis of the shadow function to take 
+</p>
+<p>\[ g(x) \equiv \int_{-\infty}^{\infty}f(x,y)dy \]
+</p>
+<p>In addition, to avoid padding, we can do several (smaller) FFT&rsquo;s of \(g^\delta_n\), where \(g^\delta_n = \sum e^{-2\pi i\delta(n/N)}g_n\); and take only the first K values that we care about (small \(k\) values correspond to small scattering angles). These two tricks speed things up tremendously (2-3 orders of magnitude). In general, the computational time of the old padded, 2d FFT method and GGADT is:
+</p>
+<p>\[
+t_{\rm naive}\propto \left(\frac{N\pi}{x\delta\theta}\right)^2\log\left(\frac{N\pi}{x\delta\theta}\right).
+\]
+</p>
+<p>Utilizing mutliple FFT&rsquo;s (\(N_{\rm FFT} = (\theta_{\rm max}/\delta\theta) / K\)) of length \(K = N k\Delta x(\theta_{\rm max}/2\pi) = x(\theta_{\rm max}/\pi)\), requires a computational time that scales as
+</p>
+<p>\[
+t_{\rm GGADT} \propto \left(\frac{\pi}{x\delta\theta}\right)\log\left(x\frac{\theta_{\rm max}}{2\pi}\right) + \beta N^2.
+\]
+</p>
 
-<p>Though S(Î¸,Ï) is in principle determined by a 2d FFT of the shadow function, if you only care about the orientational average of dÏ/dÎ©(Î¸,Ï), you can assume axisymmetry and take Ï=0. When you do this, you can integrate along one axis of the shadow function to take f(x,y) &ndash;&gt; g(x) = â«f(x,y)dy. 
-</p>
-<p>In addition, to avoid padding, we can do several (smaller) FFT&rsquo;s of g(n,Î´), where g(n,Î´) = exp(-2ÏiÎ´(n/N))g(n); and take only the first K values that we care about (small k values correspond to small scattering angles). These two tricks speed things up tremendously (2-3 orders of magnitude). In general, the computational time of the old padded, 2dFFT method and GGADT is:
-</p>
-<p>t_naive ~ (N/(xÎ´Î¸))^2 log(N/(xÎ´Î¸))
-t_GGADT ~ (1/(xÎ´Î¸)) log (x(Î¸max/2Ï)) +  Î²N^2
-</p>
 <p>More information about this can be found in Hoffman and Draine (2015) (in prep).
 </p>
+<img src="timing_actual_time.png" height=400>
+<br/>
+<img src="timing_relative_to_gpfa.png" height=400>
+
 <div class="footnote">
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
 
 <h3><a name="FOOT11" href="#DOCF11">(11)</a></h3>
-<p>Temperton, C. (1992). A Generalized Prime Factor FFT Algorithm for any N=2^p3^q5^r. SIAM Journal on Scientific and Statistical Computing, 13(3), 676-686.</p>
+<p>Temperton, C. (1992). A Generalized Prime Factor FFT Algorithm for any \(N=2^p3^q5^r\). SIAM Journal on Scientific and Statistical Computing, 13(3), 676-686.</p>
 </div>
 <hr>
 <div class="header">
