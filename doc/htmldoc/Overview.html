@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<!-- This manual is for GGADT (version 1.0.0, 8 June 2015),
+<!-- This manual is for GGADT (version 1.0.0, 9 June 2015),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT). 
 
@@ -65,13 +65,15 @@ ul.no-bullet {list-style: none}
 Next: <a href="Installation.html#Installation" accesskey="n" rel="next">Installation</a>, Previous: <a href="index.html#Top" accesskey="p" rel="prev">Top</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Overview-1"></a>
+<script type="text/javascript"
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script><a name="Overview-1"></a>
 <h2 class="chapter">1 Overview</h2>
 
 <a name="index-greetings"></a>
 <a name="index-overview"></a>
 
-<p>GGADT stands for General Geometry Anomalous Diffraction Theory, and is Fortran 95 compliant. GGADT allows a user to specify a custom dust geometry (either a spheroid, sphere, an agglomeration of spherical monomers, or a custom user-defined grain geometry), and calculates either the differential scattering cross section as a function of scattering angle, or the energy-dependent absorption and scattering cross sections. Anomalous diffraction theory is valid when <em>ka_{eff} \gg 1</em>, where <em>k</em> is the wavenumber of the incident photon, and <em>a_{eff}</em> is the &ldquo;effective radius&quot; of the grain, defined to be the radius of a sphere that has the same volume as the grain.
+<p>GGADT stands for General Geometry Anomalous Diffraction Theory, and is Fortran 95 compliant. GGADT allows a user to specify a custom dust geometry (either a spheroid, sphere, an agglomeration of spherical monomers, or a custom user-defined grain geometry), and calculates either the differential scattering cross section as a function of scattering angle, or the energy-dependent absorption and scattering cross sections. Anomalous diffraction theory is valid when \(ka \gg 1\), where \(k\) is the wavenumber of the incident photon, and \(a\) is the &ldquo;effective radius&quot; of the grain, defined to be the radius of a sphere that has the same volume as the grain.
 </p>
 <a name="index-authors"></a>
 <a name="index-Hoffman_002c-John"></a>
@@ -93,7 +95,7 @@ Next: <a href="Installation.html#Installation" accesskey="n" rel="next">Installa
 </p>
 <p>One area of active research in ISM physics is determining the size distribution and composition of interstellar dust. One way to probe the size distributions and dust composition is by measuring how ISM dust interacts with x-ray radiation.<a name="DOCF2" href="#FOOT2"><sup>2</sup></a><a name="DOCF3" href="#FOOT3"><sup>3</sup></a><a name="DOCF4" href="#FOOT4"><sup>4</sup></a> When looking at an x-ray source through interstellar dust, the scattering properties of the intermediate dust create an x-ray &ldquo;halo&rdquo; around the source.<a name="DOCF5" href="#FOOT5"><sup>5</sup></a>.
 </p>
-<p>GGADT is designed to be a tool to test dust models against observations of x-ray halos and x-ray attenuation. Since the size of a typical dust grain (0.1 Âµm) is large compared to typical x-ray wavelengths (1 nm), an approximation known as Anomalous Diffraction Theory (ADT)<a name="DOCF6" href="#FOOT6"><sup>6</sup></a> can be used to calculate the absorption and scattering properties of dust grains<a name="DOCF7" href="#FOOT7"><sup>7</sup></a>.
+<p>GGADT is designed to be a tool to test dust models against observations of x-ray halos and x-ray attenuation. Since the size of a typical dust grain (0.1 \(\mu\)m) is large compared to typical x-ray wavelengths (1 nm), an approximation known as Anomalous Diffraction Theory (ADT)<a name="DOCF6" href="#FOOT6"><sup>6</sup></a> can be used to calculate the absorption and scattering properties of dust grains<a name="DOCF7" href="#FOOT7"><sup>7</sup></a>.
 </p>
 <a name="Anomalous-Diffraction-Theory-_0028ADT_0029"></a>
 <h4 class="subsection">1.1.2 Anomalous Diffraction Theory (ADT)</h4>
@@ -101,31 +103,39 @@ Next: <a href="Installation.html#Installation" accesskey="n" rel="next">Installa
 <p>The mathematics of what GGADT does is best explained in Draine and Allaf-Akbari 2006; we include a portion of that paper below.
 </p><blockquote>
 
-<p>At X-ray energies materials have refractive indices very close to unity (|m - 1| &lt;&lt; 1), and the dust grains responsible for most of the scattering are usually much larger than the wavelength of the incoming radiation (ka &gt;&gt; 1 [k is the wavenumber of the incident radiation, a is the effective radius of the grain]). In this regime, the scattering and absorption of X-rays can be calculated using an approximation first developed by van de Hulst (1957) and known as anomalous diffraction theory (ADT). ADT is a combination of ray-tracing optics (applicable because k*a &gt;&gt; 1) and Huygens&rsquo; principle of propagation of a scalar field, applied to cases in which the electromagnetic wave can enter and propagate through the grain with essentially no reflection or refraction (|m - 1| &lt;&lt; 1).
+<p>At X-ray energies materials have refractive indices very close to unity (\(|m - 1| \ll 1\)), and the dust grains responsible for most of the scattering are usually much larger than the wavelength of the incoming radiation (\(ka \gg 1\) [\(k\) is the wavenumber of the incident radiation, a is the effective radius of the grain]). In this regime, the scattering and absorption of X-rays can be calculated using an approximation first developed by van de Hulst (1957) and known as anomalous diffraction theory (ADT). ADT is a combination of ray-tracing optics (applicable because \(ka \gg 1\) and Huygens&rsquo; principle of propagation of a scalar field, applied to cases in which the electromagnetic wave can enter and propagate through the grain with essentially no reflection or refraction (\(|m - 1| \ll 1\)).
 </p>
-<p>Consider an incident plane wave <em>U_{inc} = U_0\exp(ikz)</em>, propagating in the z-direction. Under the conditions above, the plane wave, once reaching a plane V located just beyond the grain and normal to the direction of the propagation of the incident wave, will have changed by a fractional amount that we refer to as the <em>shadow function</em>, <em>f(x,y)</em>: 
-</p>
-<p><em>f(x,y) = 1-\phi(x,y)</em>
+<p>Consider an incident plane wave \(U_{inc} = U_0\exp(ikz)\), propagating in the \(\hat{z}\)-direction. Under the conditions above, the plane wave, once reaching a plane \(V\) located just beyond the grain and normal to the direction of the propagation of the incident wave, will have changed by a fractional amount that we refer to as the <em>shadow function</em>, \(f(x,y)\): 
+\[
+f(x,y) = 1-\phi(x,y)
+\]
 </p>
 <p>where the complex phase function phi is 
 </p>
-<p><em>\phi(x,y) = k\int_{-\infty}^{\infty}[1-m(x,y,z)]dz</em>
+<p>\[
+\phi(x,y) = k\int_{-\infty}^{\infty}[1-m(x,y,z)]dz
+\]
 </p>
-<p>where <em>m(x,y,z)</em> is the refractive index at the point <em>(x,y,z)</em>.
+<p>where \(m(x,y,z)\) is the refractive index at the point \((x,y,z)\).
 </p>
-<p>Once the shadow function is known, Huygens&rsquo; principle allows the amplitude of the scattered part of the wave, in the radiation zone, to be calculated as a Fourier transform of the shadow function over the plane V: 
+<p>Once the shadow function is known, Huygens&rsquo; principle allows the amplitude of the scattered part of the wave, in the radiation zone, to be calculated as a Fourier transform of the shadow function over the plane \(V\): 
 </p>
-
-<p><em>U_{sca}(r\vec{n}) = U_0\frac{\exp{(ikr)}}{kr}S(\vec{n})</em><br>
-<em>S(\vec{n}) = S(k_x, k_y) = \frac{k^2}{2\pi}\int \exp{[i(k_xx+k_yy)]}f(x,y)dxdy</em><br>
-<em>k_x = k(\vec{n}\cdot\vec{x})</em><br>
-<em>k_y = k(\vec{n}\cdot\vec{y})</em><br>
+<p>\[
+U_{sca}(r\hat{n}) = U_0\frac{\exp{(ikr)}}{kr}S(\hat{n})
+\]
+\[
+S(\hat{n}) = S(k_x, k_y) = \frac{k^2}{2\pi}\int \exp{[i(k_xx+k_yy)]}f(x,y)dxdy
+\]
+\[
+k_x = k(\hat{n}\cdot\vec{x}),~k_y = k(\hat{n}\cdot\vec{y})
+\]
 </p>
-<p>The scattering properties of the grain can be obtained from <em>S(\vec{n})</em>, with the differential scattering cross section given by 
+<p>The scattering properties of the grain can be obtained from \(S(\hat{n}\), with the differential scattering cross section given by 
 </p>
-<p><em>\frac{d\sigma_{sca}}{d\Omega}(\vec{n}) = \frac{|S(\vec{n})|^2}{k^2}</em>
-</p>
-</blockquote>
+<p>\[
+\frac{d\sigma_{sca}}{d\Omega}(\hat{n}) = \frac{|S(\hat{n})|^2}{k^2}
+\]
+ </p></blockquote>
 <div align="center">&mdash; <em>Draine and Allaf-Akbari 2006</em>
 </div>
 <a name="Basic-GGADT-logic-outline"></a>
@@ -138,10 +148,10 @@ Next: <a href="Installation.html#Installation" accesskey="n" rel="next">Installa
 </li><li> For each of the <samp>norientations</samp> orientations
 <ol>
 <li> Calculate the shadow function of the grain on a 2D grid
-</li><li> Calculate either Ï(E) or dÏ/dÎ©(Î¸x,Î¸y) for this orientation
+</li><li> Calculate either σ(E) or dσ/dΩ(θx,θy) for this orientation
 </li></ol>
 </li><li> Averages calculation over all orientations
-</li><li> Output orientationally dÏ/dÎ©(Î¸x,Î¸y) (if calculating full 2d differential scattering cross section) or dÏ/dÎ©(Î¸) (if axisymmetry is assumed, as is the case in the limit where <samp>norientations</samp> goes to infinity) or the energy dependent absorption and scattering cross sections (Ï(E,abs), Ï(E,sca))
+</li><li> Output orientationally dσ/dΩ(θx,θy) (if calculating full 2d differential scattering cross section) or dσ/dΩ(θ) (if axisymmetry is assumed, as is the case in the limit where <samp>norientations</samp> goes to infinity) or the energy dependent absorption and scattering cross sections (σ(E,abs), σ(E,sca))
 
 </li></ol>
 

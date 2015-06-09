@@ -1,6 +1,7 @@
 \input texinfo @c -*-texinfo-*-
 @c %**start of header
 @setfilename ggadt.info
+@documentencoding UTF-8
 @include version.texi
 @settitle GGADT @value{VERSION}
 
@@ -10,7 +11,11 @@
 @c concept index).
 @syncodeindex op cp
 @c %**end of header
-
+@html
+<script type="text/javascript"
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+@end html
 @copying
 This manual is for GGADT (version @value{VERSION}, @value{UPDATED}),
 which calculates scattering properties of dust grains in the interstellar
@@ -49,6 +54,7 @@ Texts.  A copy of the license is included in the section entitled
 @ifnottex
 
 @node Top
+
 @top GGADT
 This manual is for GGADT (version @value{VERSION}, @value{UPDATED}),
 which calculates scattering properties of dust grains in the interstellar
@@ -68,12 +74,17 @@ medium by using anomalous diffraction theory (ADT).
 
 
 @node Overview
+@html
+<script type="text/javascript"
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+@end html
 @chapter Overview
 
 @cindex greetings
 @cindex overview
 
-GGADT stands for General Geometry Anomalous Diffraction Theory, and is Fortran 95 compliant. GGADT allows a user to specify a custom dust geometry (either a spheroid, sphere, an agglomeration of spherical monomers, or a custom user-defined grain geometry), and calculates either the differential scattering cross section as a function of scattering angle, or the energy-dependent absorption and scattering cross sections. Anomalous diffraction theory is valid when @math{ka_{eff} \gg 1}, where @math{k} is the wavenumber of the incident photon, and @math{a_{eff}} is the ``effective radius" of the grain, defined to be the radius of a sphere that has the same volume as the grain.
+GGADT stands for General Geometry Anomalous Diffraction Theory, and is Fortran 95 compliant. GGADT allows a user to specify a custom dust geometry (either a spheroid, sphere, an agglomeration of spherical monomers, or a custom user-defined grain geometry), and calculates either the differential scattering cross section as a function of scattering angle, or the energy-dependent absorption and scattering cross sections. Anomalous diffraction theory is valid when \(ka \gg 1\), where \(k\) is the wavenumber of the incident photon, and \(a\) is the ``effective radius" of the grain, defined to be the radius of a sphere that has the same volume as the grain.
 
 @cindex authors
 @cindex Hoffman, John
@@ -93,37 +104,46 @@ The interstellar medium (ISM) refers to everything that occupies the space betwe
 
 One area of active research in ISM physics is determining the size distribution and composition of interstellar dust. One way to probe the size distributions and dust composition is by measuring how ISM dust interacts with x-ray radiation.@footnote{Overbeck, J.W. 1965, ApJ, 141, 864}@footnote{Hayakawa, S. 1970, Prog. Theor. Phys., 43, 1224}@footnote{Martin, P.G. 1970, MNRAS, 149, 221} When looking at an x-ray source through interstellar dust, the scattering properties of the intermediate dust create an x-ray ``halo'' around the source.@footnote{Draine, B.T. 2003, ApJ, 598, 1026}.
 
-GGADT is designed to be a tool to test dust models against observations of x-ray halos and x-ray attenuation. Since the size of a typical dust grain (0.1 µm) is large compared to typical x-ray wavelengths (1 nm), an approximation known as Anomalous Diffraction Theory (ADT)@footnote{van de Hulst H., Light scattering by small particles, 1957, J.Wiley & Sons, NY.} can be used to calculate the absorption and scattering properties of dust grains@footnote{Draine, B.T. and Allaf-Akbari, K. 2006, ApJ, 652, 1318}.
+GGADT is designed to be a tool to test dust models against observations of x-ray halos and x-ray attenuation. Since the size of a typical dust grain (0.1 \(\mu\)m) is large compared to typical x-ray wavelengths (1 nm), an approximation known as Anomalous Diffraction Theory (ADT)@footnote{van de Hulst H., Light scattering by small particles, 1957, J.Wiley & Sons, NY.} can be used to calculate the absorption and scattering properties of dust grains@footnote{Draine, B.T. and Allaf-Akbari, K. 2006, ApJ, 652, 1318}.
 
 @subsection Anomalous Diffraction Theory (ADT)
 
 The mathematics of what GGADT does is best explained in Draine and Allaf-Akbari 2006; we include a portion of that paper below.
 @quotation
 
-At X-ray energies materials have refractive indices very close to unity (|m - 1| << 1), and the dust grains responsible for most of the scattering are usually much larger than the wavelength of the incoming radiation (ka >> 1 [k is the wavenumber of the incident radiation, a is the effective radius of the grain]). In this regime, the scattering and absorption of X-rays can be calculated using an approximation first developed by van de Hulst (1957) and known as anomalous diffraction theory (ADT). ADT is a combination of ray-tracing optics (applicable because k*a >> 1) and Huygens' principle of propagation of a scalar field, applied to cases in which the electromagnetic wave can enter and propagate through the grain with essentially no reflection or refraction (|m - 1| << 1).
+At X-ray energies materials have refractive indices very close to unity (\(|m - 1| \ll 1\)), and the dust grains responsible for most of the scattering are usually much larger than the wavelength of the incoming radiation (\(ka \gg 1\) [\(k\) is the wavenumber of the incident radiation, a is the effective radius of the grain]). In this regime, the scattering and absorption of X-rays can be calculated using an approximation first developed by van de Hulst (1957) and known as anomalous diffraction theory (ADT). ADT is a combination of ray-tracing optics (applicable because \(ka \gg 1\) and Huygens' principle of propagation of a scalar field, applied to cases in which the electromagnetic wave can enter and propagate through the grain with essentially no reflection or refraction (\(|m - 1| \ll 1\)).
 
-Consider an incident plane wave @math{U_{inc} = U_0\exp(ikz)}, propagating in the z-direction. Under the conditions above, the plane wave, once reaching a plane V located just beyond the grain and normal to the direction of the propagation of the incident wave, will have changed by a fractional amount that we refer to as the @emph{shadow function}, @math{f(x,y)}: 
-
-@math{f(x,y) = 1-\phi(x,y)}
+Consider an incident plane wave \(U_@{inc@} = U_0\exp(ikz)\), propagating in the \(\hat@{z@}\)-direction. Under the conditions above, the plane wave, once reaching a plane \(V\) located just beyond the grain and normal to the direction of the propagation of the incident wave, will have changed by a fractional amount that we refer to as the @emph{shadow function}, \(f(x,y)\): 
+\[
+f(x,y) = 1-\phi(x,y)
+\]
 
 where the complex phase function phi is 
 
-@math{\phi(x,y) = k\int_{-\infty}^{\infty}[1-m(x,y,z)]dz}
+\[
+\phi(x,y) = k\int_@{-\infty@}^@{\infty@}[1-m(x,y,z)]dz
+\]
 
-where @math{m(x,y,z)} is the refractive index at the point @math{(x,y,z)}.
+where \(m(x,y,z)\) is the refractive index at the point \((x,y,z)\).
 
-Once the shadow function is known, Huygens' principle allows the amplitude of the scattered part of the wave, in the radiation zone, to be calculated as a Fourier transform of the shadow function over the plane V: 
+Once the shadow function is known, Huygens' principle allows the amplitude of the scattered part of the wave, in the radiation zone, to be calculated as a Fourier transform of the shadow function over the plane \(V\): 
 
+@set nhat \hat@{n@}
+\[
+U_@{sca@}(r@value{nhat}) = U_0\frac@{\exp@{(ikr)@}@}@{kr@}S(@value{nhat})
+\]
+\[
+S(@value{nhat}) = S(k_x, k_y) = \frac@{k^2@}@{2\pi@}\int \exp@{[i(k_xx+k_yy)]@}f(x,y)dxdy
+\]
+\[
+k_x = k(@value{nhat}\cdot\vec@{x@}),~k_y = k(@value{nhat}\cdot\vec@{y@})
+\]
 
-@math{U_{sca}(r\vec{n}) = U_0\frac{\exp{(ikr)}}{kr}S(\vec{n})}@*
-@math{S(\vec{n}) = S(k_x, k_y) = \frac{k^2}{2\pi}\int \exp{[i(k_xx+k_yy)]}f(x,y)dxdy}@*
-@math{k_x = k(\vec{n}\cdot\vec{x})}@*
-@math{k_y = k(\vec{n}\cdot\vec{y})}@*
+The scattering properties of the grain can be obtained from \(S(@value{nhat}\), with the differential scattering cross section given by 
 
-The scattering properties of the grain can be obtained from @math{S(\vec{n})}, with the differential scattering cross section given by 
-
-@math{\frac{d\sigma_{sca}}{d\Omega}(\vec{n}) = \frac{|S(\vec{n})|^2}{k^2}}
-
+\[
+\frac@{d\sigma_@{sca@}@}@{d\Omega@}(@value{nhat}) = \frac@{|S(@value{nhat})|^2@}@{k^2@}
+\]
  @author Draine and Allaf-Akbari 2006
 @end quotation
 
@@ -166,12 +186,13 @@ The @code{ggadt} binary is now located in the @code{src} directory. An optional 
 
 If you did do @code{make install}, you can undo it by running @code{make uninstall}. To clean and remake GGADT, simply do @code{make clean} and then @code{make}.
 
-We haven't tested any speed improvements, but it might be advantageous to also add compiler optimization to the compilation, e.g. 
+It should give you a slight (5 - 10%) speed advantage to use @code{-O3} optimization. We tried using @code{-Ofast}, but this produced a segfault for moderately large 2d grid sizes, and we didn't spend too much time trying to figure out why. So, you can use @code{-Ofast} for a little extra @emph{oomph}, but just know that things might break unexpectedly (the normal, 1d case worked fine for us).
 
 @example
 ./configure FCFLAGS="-O3" [--enable-openmp] [--enable-fftw3] @dots{}
 @end example
 
+Note
 
 @section Package dependencies
 
@@ -189,7 +210,9 @@ If you would like to use a particular Fortran compiler, you may specify one by a
 
 @item Though FFTW is widely used and highly optimized, we find that GPFA beats FFTW in almost every case, and has the advantage that it's much simpler to use than FFTW (which has @emph{wisdom} files to keep track of and additional installation headaches). 
 
-@item @strong{Parallel FFTW3} If you would like to utilize parallelized FFTW, you must pass either @code{--enable-threads} and/or @code{--enable-openmp} to the @code{configure} script of your FFTW3 installation. We haven't had a problem on our system (Mac OS X v10.9.5, gfortran 4.9.2_1 installed with Macports), but this is a potential source of problems; some systems don't have OpenMP and instead require the use of the @code{pthreads} (or some other) library, and our configuration script does @emph{not} handle this. You're on your own if this is the case. The good news is that FFTW gives at best a negligible increase in speed, and openmp/parallelization does not increase the speed dramatically. In almost every case, you should be perfectly happy with a serial setup.
+@item @strong{Parallel FFTW3} If you would like to utilize parallelized FFTW, you must pass either @code{--enable-threads} and/or @code{--enable-openmp} to the @code{configure} script of your FFTW3 installation. 
+
+We haven't had a problem on our system (Mac OS X v10.9.5, gfortran 4.9.2_1 installed with Macports), but this is a potential source of problems; some systems may not have OpenMP support for FFTW3 and instead require the use of the @code{pthreads} (or some other) library, and our configuration script does @emph{not} handle this. You're on your own if this is the case. The good news is that FFTW gives at best a negligible increase in speed, and openmp/parallelization does not increase the speed dramatically. In almost every case, you should be perfectly happy with a serial setup.
 @end itemize
 
 @itemize @minus
@@ -595,32 +618,36 @@ The @code{mstm} option uses the axes conventions defined by the Multiple Sphere 
 @item A possible future code that would substantially borrow from GGADT for doing calculations over full grain-size distribution and a user-defined spatial grain distribution in 3D. This will be useful for understanding, for instance, x-ray observations of sources that have been scattered/absorbed by intermediate grain distributions.
 @end itemize
 
-@section Getting the accuracy you want
-
-
-@subsection Differential scattering cross section calculations 
-
-GGADT solves for either the differential scattering cross section as a function of scattering angle, or the total scattering and absorption cross sections as a function of photon energy, and must do so on a 2D numerical grid. The accuracy of the solution provided by GGADT depends on the resolution of these grids. The accuracy also depends on the number of orientations over which the calculation is averaged.
-
-An exception this are spherical grains: an analytical solution (in the context of Anomalous Diffraction Theory) is implemented for spherical grains. 
-
-The input parameters that determine accuracy are:
-
-@itemize
-@item @code{ngrain} -- The number of grid elements (along one dimension) for which the grain is defined.
-@item @code{nscatter} (or equivalently @code{dtheta}) -- The number of grid points - along one dimension - over which the differential cross section is defined, or, if using @code{dtheta}, the width of the grid elements (in arcseconds).
-@item @code{norientations} -- The number of grain orientations over which to average the calculation.
-@end itemize
-
-We've done some sample runs for a spherical grain (using a numerical grid solution and NOT the analytical solution),
-
-@image{RMS_ngrain_nscatter,5in,5in}
-
-@subsection Scattering and absorption cross-section calculations 
-
-Accuracy results for TOTAL cross section calculations to come soon...
+@c TODO: put in accuracy section!
+@c @section Getting the accuracy you want
+@c 
+@c 
+@c @subsection Differential scattering cross section calculations 
+@c 
+@c GGADT solves for either the differential scattering cross section as a function of scattering angle, or the total scattering and absorption cross sections as a function of photon energy, and must do so on a 2D numerical grid. The accuracy of the solution provided by GGADT depends on the resolution of these grids. The accuracy also depends on the number of orientations over which the calculation is averaged.
+@c 
+@c An exception this are spherical grains: an analytical solution (in the context of Anomalous Diffraction Theory) is implemented for spherical grains. 
+@c 
+@c The input parameters that determine accuracy are:
+@c 
+@c @itemize
+@c @item @code{ngrain} -- The number of grid elements (along one dimension) for which the grain is defined.
+@c @item @code{nscatter} (or equivalently @code{dtheta}) -- The number of grid points - along one dimension - over which the differential cross section is defined, or, if using @code{dtheta}, the width of the grid elements (in arcseconds).
+@c @item @code{norientations} -- The number of grain orientations over which to average the calculation.
+@c @end itemize
+@c 
+@c We've done some sample runs for a spherical grain (using a numerical grid solution and NOT the analytical solution),
+@c 
+@c @image{RMS_ngrain_nscatter,5in,5in}
+@c 
+@c @subsection Scattering and absorption cross-section calculations 
+@c 
+@c Accuracy results for TOTAL cross section calculations to come soon...
 
 @node Example usage
+<style>
+img @{text-align:center;@}
+</style>
 @chapter Example usage
 
 @cindex sample output
@@ -733,12 +760,11 @@ We have made a small python script (@code{scripts/make_sample_plots.py}) that ru
 The python script runs GGADT for a grain with an effective radius of 0.2 microns, composed of MgFeSiO_4 silicate, with an incident photon energy of 2.0 keV, and with @code{ngrain} of 256 and a @code{nscatter} of 100. 
 
 The inset within the plot, on the upper left corner, shows the full 2d grid of the scattering cross section efficiency.
-
-@image{sample-sphere,5in,5in}
-
-@image{sample-ellipsoid,5in,5in}
-
-@image{sample-spheres,5in,5in}
+@html
+<img src="sample-sphere.png" height=400><br/>
+<img src="sample-ellipsoid.png" height=400><br/>
+<img src="sample-spheres.png" height=400><br/>
+@end html
 
 @section Ellipsoids and spheroids -- orientational averages about a principal axis
 
@@ -764,63 +790,112 @@ Below are the results from running GGADT on a prolate spheroid (with axes ratios
 src/ggadt --grain-axis-y=0.5 --grain-axis-z=0.5 --grain-geometry=ellipsoid --rotation-axis=xaxis > outputx.dat
 python scripts/plot.py outputx.dat
 @end example
-@image{spheroid_rot_xaxis,5in,5in}
-
+@html
+<img src="spheroid_rot_xaxis.png" height=400>
+@end html
 @strong{Orientation-averaged differential scattering efficiency about the y-axis}
 @example
 src/ggadt --grain-axis-y=0.5 --grain-axis-z=0.5 --grain-geometry=ellipsoid --rotation-axis=yaxis > outputy.dat
 python scripts/plot.py outputy.dat
 @end example
-@image{spheroid_rot_yaxis,5in,5in}
+@html
+<img src="spheroid_rot_yaxis.png" height=400>
+@end html
 
 @strong{Orientation-averaged differential scattering efficiency about the z-axis}
 @example
 src/ggadt --grain-axis-y=0.5 --grain-axis-z=0.5 --grain-geometry=ellipsoid --rotation-axis=zaxis > outputz.dat
 python scripts/plot.py outputz.dat
 @end example
-@image{spheroid_rot_zaxis,5in,5in}
+@html
+<img src="spheroid_rot_zaxis.png" height=400>
+@end html
 
 @node Testing against previous results
+@html
+<style>
+img @{text-align:center;@}
+</style>
+@end html
 @chapter Testing against previous results
 
 @section Spherical case (ADT/Mie theory)
 @subsection GGADT
-@image{DA06_f1_spheres,4in,4in}
+@html
+<img src = "DA06_f1_spheres.png" height=400>
+</br
+@end html
 @subsection Actual (Figure 1) from Draine & Allaf-Akbari 2006
-@image{da06_spheres_actual,3in,3in}
+
+@html
+<img src = "da06_spheres_actual.png" height=400>
+</br>
+@end html
+
 
 @section Ellipsoidal case (Draine and Allaf-Akbari 2006)
 
 @subsection GGADT
-@image{DA06_f2_ellipsoids,3in,3in}
-
+@html
+<img src = "DA06_f2_ellipsoids.png" height=400>
+</br>
+@end html
 @subsection Actual (Figure 2) from Draine & Allaf-Akbari 2006
-@image{da06_ellipsoids_actual,4in,4in}
+
+@html
+<img src = "da06_ellipsoids_actual.png" height=400>
+</br>
+@end html
+
+
 
 @section Agglomeration of spheres (Heng & Draine 2009)
+@html
+<img src = "da06_ellipsoids_actual.png" height=400>
+<img src = "HD09_f3.png" height=400>
+</br>
+@end html
 
-@image{HD09_f3,5in,5in}
 @node FFT comparison
+@html
+<script type="text/javascript"
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+@end html
 @chapter FFT comparison
 
-Currently, GGADT allows you to choose between two FFT algorithms: FFTW 3 (@url{http://fftw.org/}), which requires you install the FFTW3 library, and GPFA (Generalized Prime Factor Algorithm)@footnote{Temperton, C. (1992). A Generalized Prime Factor FFT Algorithm for any N=2^p3^q5^r. SIAM Journal on Scientific and Statistical Computing, 13(3), 676-686.}, which is self-contained and included with the GGADT package. GPFA is used by default, and, as shown below, is slightly faster than FFTW in the current version of GGADT. 
+Currently, GGADT allows you to choose between two FFT algorithms: FFTW 3 (@url{http://fftw.org/}), which requires you install the FFTW3 library, and GPFA (Generalized Prime Factor Algorithm)@footnote{Temperton, C. (1992). A Generalized Prime Factor FFT Algorithm for any \(N=2^p3^q5^r\). SIAM Journal on Scientific and Statistical Computing, 13(3), 676-686.}, which is self-contained and included with the GGADT package. GPFA is used by default, and, as shown below, is slightly faster than FFTW in the current version of GGADT. 
 
 If you wish to use the FFTW3 version of GGADT, you will need to install FFTW 3.3.x (we have only tested 3.3.3, but GGADT should in principal be compatible with all 3.x.x versions). GGADT will not work with FFTW 2.x, as the two interfaces are different.
 
-@section Timing
-@image{timing_actual_time,5in,5in}
-@image{timing_relative_to_gpfa,5in,5in}
+@section Efficient calculation of \(d\sigma/d\Omega(\theta)\)
 
-@section Efficient calculation of dσ/dΩ(θ)
+Though \(S(\theta,\phi)\) is in principle determined by a 2d FFT of the shadow function, if you only care about the orientational average of \(d\sigma/d\Omega(\theta,\phi)\), you can assume axisymmetry and take \(\phi=0\). When you do this, you can integrate along one axis of the shadow function to obtain an effective shadow function, 
 
-Though S(θ,φ) is in principle determined by a 2d FFT of the shadow function, if you only care about the orientational average of dσ/dΩ(θ,φ), you can assume axisymmetry and take φ=0. When you do this, you can integrate along one axis of the shadow function to take f(x,y) --> g(x) = ∫f(x,y)dy. 
+\[ g(x) \equiv \int_@{-\infty@}^@{\infty@}f(x,y)dy \]
 
-In addition, to avoid padding, we can do several (smaller) FFT's of g(n,δ), where g(n,δ) = exp(-2πiδ(n/N))g(n); and take only the first K values that we care about (small k values correspond to small scattering angles). These two tricks speed things up tremendously (2-3 orders of magnitude). In general, the computational time of the old padded, 2dFFT method and GGADT is:
+The calculation of \(d\sigma/d\Omega(\theta)\) then requires that one-dimensional DFT's be taken of \(g(x)\) instead of two-dimensional DFT's of \(f(x,y)\).
 
-t_naive ~ (N/(xδθ))^2 log(N/(xδθ))
-t_GGADT ~ (1/(xδθ)) log (x(θmax/2π)) +  βN^2
+In addition, to avoid padding, we can do several (smaller) FFT's of \(g^\delta_n\), where \(g^\delta_n = \sum e^@{-2\pi i\delta(n/N)@}g_n\); and take only the first K values that we care about (small \(k\) values correspond to small scattering angles). These two tricks speed things up tremendously (2-3 orders of magnitude). In general, the computational time of the old padded, 2d FFT method and GGADT is:
+
+\[
+t_@{\rm naive@}\propto \left(\frac@{N@}@{x@}\frac@{\pi@}@{\delta\theta@}\right)^2\log\left(\frac@{N@}@{x@}\frac@{\pi@}@{\delta\theta@}\right).
+\]
+
+Utilizing mutliple FFT's (\(N_@{\rm FFT@} = (\theta_@{\rm max@}/\delta\theta) / K\)) of length \(K = N k\Delta x(\theta_@{\rm max@}/2\pi) = x(\theta_@{\rm max@}/\pi)\), requires a computational time that scales as
+
+\[
+t_@{\rm GGADT@} \propto \left(\frac@{1@}@{x@}\frac@{\pi@}@{\delta\theta@}\right)\log\left[x\left(\frac@{\theta_@{\rm max@}@}@{2\pi@}\right)\right] + \beta N^2.
+\]
+
 
 More information about this can be found in Hoffman and Draine (2015) (in prep).
+
+@html
+<img src="timing_actual_time.png" height=400>
+<img src="timing_relative_to_gpfa.png" height=400>
+@end html
+
 
 @node GNU Free Documentation License
 @appendix GNU Free Documentation License

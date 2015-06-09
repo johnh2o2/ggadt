@@ -9,7 +9,7 @@ git log --pretty --graph > ChangeLog
 
 aclocal -I./m4
 autoconf
-automake -a
+automake --add-missing --force-missing -c
 ./configure --enable-openmp || exit
 #./configure || exit
 make html || exit

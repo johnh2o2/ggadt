@@ -1,3 +1,9 @@
+* commit 1fd3e5b2786a01b612dac7b4f0ebcaf6601d75f4
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Jun 8 17:06:52 2015 +0300
+| 
+|     Documentation update; added aclocal.m4; added line to .defaults
+|  
 * commit db263990e8033c957f845392e45982edd66733ba
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Mon Jun 8 12:05:14 2015 +0300

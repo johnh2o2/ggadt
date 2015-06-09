@@ -10,8 +10,5 @@ batch.sh
 **eps
 TODO.md
 fftw3-custom-portfile
-remake-fftw3.sh
-remake-gpfa.sh
-remake-parallel-gpfa.sh
-remake-parallel-fftw3.sh
-remake-parallel.sh
+remake-*sh
+autom4te.cache/*

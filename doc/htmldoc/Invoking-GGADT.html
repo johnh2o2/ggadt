@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<!-- This manual is for GGADT (version 1.0.0, 8 June 2015),
+<!-- This manual is for GGADT (version 1.0.0, 9 June 2015),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT). 
 
@@ -220,7 +220,7 @@ standard output and then exit successfully.
 </dd>
 <dt><samp>--do-full-2d-fft</samp></dt>
 <dd><a name="index-_002d_002ddo_002dfull_002d2d_002dfft"></a>
-<p>Do not utilize the fact that you can make a 2d FFT a 1d FFT if you only care about the orientationally averaged value of dÏ/dÎ©(Î¸)
+<p>Do not utilize the fact that you can make a 2d FFT a 1d FFT if you only care about the orientationally averaged value of dσ/dΩ(θ)
 </p>
 </dd>
 <dt><samp>--parameter-file=<var>value</var></samp></dt>
@@ -478,34 +478,7 @@ make
 </li><li> A possible future code that would substantially borrow from GGADT for doing calculations over full grain-size distribution and a user-defined spatial grain distribution in 3D. This will be useful for understanding, for instance, x-ray observations of sources that have been scattered/absorbed by intermediate grain distributions.
 </li></ul>
 
-<a name="Getting-the-accuracy-you-want"></a>
-<h3 class="section">3.7 Getting the accuracy you want</h3>
 
-
-<a name="Differential-scattering-cross-section-calculations"></a>
-<h4 class="subsection">3.7.1 Differential scattering cross section calculations</h4>
-
-<p>GGADT solves for either the differential scattering cross section as a function of scattering angle, or the total scattering and absorption cross sections as a function of photon energy, and must do so on a 2D numerical grid. The accuracy of the solution provided by GGADT depends on the resolution of these grids. The accuracy also depends on the number of orientations over which the calculation is averaged.
-</p>
-<p>An exception this are spherical grains: an analytical solution (in the context of Anomalous Diffraction Theory) is implemented for spherical grains. 
-</p>
-<p>The input parameters that determine accuracy are:
-</p>
-<ul>
-<li> <code>ngrain</code> &ndash; The number of grid elements (along one dimension) for which the grain is defined.
-</li><li> <code>nscatter</code> (or equivalently <code>dtheta</code>) &ndash; The number of grid points - along one dimension - over which the differential cross section is defined, or, if using <code>dtheta</code>, the width of the grid elements (in arcseconds).
-</li><li> <code>norientations</code> &ndash; The number of grain orientations over which to average the calculation.
-</li></ul>
-
-<p>We&rsquo;ve done some sample runs for a spherical grain (using a numerical grid solution and NOT the analytical solution),
-</p>
-<img src="RMS_ngrain_nscatter.png" alt="RMS_ngrain_nscatter">
-
-<a name="Scattering-and-absorption-cross_002dsection-calculations"></a>
-<h4 class="subsection">3.7.2 Scattering and absorption cross-section calculations</h4>
-
-<p>Accuracy results for TOTAL cross section calculations to come soon...
-</p>
 <div class="footnote">
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>

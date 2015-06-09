@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<!-- This manual is for GGADT (version 1.0.0, 8 June 2015),
+<!-- This manual is for GGADT (version 1.0.0, 9 June 2015),
 which calculates scattering properties of dust grains in the interstellar
 medium by using anomalous diffraction theory (ADT). 
 
@@ -65,7 +65,10 @@ ul.no-bullet {list-style: none}
 Next: <a href="Testing-against-previous-results.html#Testing-against-previous-results" accesskey="n" rel="next">Testing against previous results</a>, Previous: <a href="Invoking-GGADT.html#Invoking-GGADT" accesskey="p" rel="prev">Invoking GGADT</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Example-usage-1"></a>
+<p>&lt;style&gt;
+img {text-align:center;}
+&lt;/style&gt;
+</p><a name="Example-usage-1"></a>
 <h2 class="chapter">4 Example usage</h2>
 
 <a name="index-sample-output"></a>
@@ -180,13 +183,9 @@ python scripts/plot.py output.dat
 <p>The python script runs GGADT for a grain with an effective radius of 0.2 microns, composed of MgFeSiO_4 silicate, with an incident photon energy of 2.0 keV, and with <code>ngrain</code> of 256 and a <code>nscatter</code> of 100. 
 </p>
 <p>The inset within the plot, on the upper left corner, shows the full 2d grid of the scattering cross section efficiency.
-</p>
-<img src="sample-sphere.png" alt="sample-sphere">
-
-<img src="sample-ellipsoid.png" alt="sample-ellipsoid">
-
-<img src="sample-spheres.png" alt="sample-spheres">
-
+<img src="sample-sphere.png" height=400><br/>
+<img src="sample-ellipsoid.png" height=400><br/>
+<img src="sample-spheres.png" height=400><br/></p>
 <a name="Ellipsoids-and-spheroids-_002d_002d-orientational-averages-about-a-principal-axis"></a>
 <h3 class="section">4.3 Ellipsoids and spheroids &ndash; orientational averages about a principal axis</h3>
 
@@ -213,22 +212,18 @@ python scripts/plot.py output.dat
 <pre class="example">src/ggadt --grain-axis-y=0.5 --grain-axis-z=0.5 --grain-geometry=ellipsoid --rotation-axis=xaxis &gt; outputx.dat
 python scripts/plot.py outputx.dat
 </pre></div>
-<img src="spheroid_rot_xaxis.png" alt="spheroid_rot_xaxis">
-
-<p><strong>Orientation-averaged differential scattering efficiency about the y-axis</strong>
+<img src="spheroid_rot_xaxis.png" height=400><p><strong>Orientation-averaged differential scattering efficiency about the y-axis</strong>
 </p><div class="example">
 <pre class="example">src/ggadt --grain-axis-y=0.5 --grain-axis-z=0.5 --grain-geometry=ellipsoid --rotation-axis=yaxis &gt; outputy.dat
 python scripts/plot.py outputy.dat
 </pre></div>
-<img src="spheroid_rot_yaxis.png" alt="spheroid_rot_yaxis">
-
+<img src="spheroid_rot_yaxis.png" height=400>
 <p><strong>Orientation-averaged differential scattering efficiency about the z-axis</strong>
 </p><div class="example">
 <pre class="example">src/ggadt --grain-axis-y=0.5 --grain-axis-z=0.5 --grain-geometry=ellipsoid --rotation-axis=zaxis &gt; outputz.dat
 python scripts/plot.py outputz.dat
 </pre></div>
-<img src="spheroid_rot_zaxis.png" alt="spheroid_rot_zaxis">
-
+<img src="spheroid_rot_zaxis.png" height=400>
 <hr>
 <div class="header">
 <p>

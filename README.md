@@ -43,6 +43,7 @@ TODO list for future updates:
 -----------------------------
 
 * Parallelize the fft-firstk functions
+* Update the python scripts that you bundle with ggadt
 * Update documentation
 	* Add timing information
 	* Add new options
