@@ -11,11 +11,13 @@
 @c concept index).
 @syncodeindex op cp
 @c %**end of header
+
 @html
 <script type="text/javascript"
   src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 @end html
+
 @copying
 This manual is for GGADT (version @value{VERSION}, @value{UPDATED}),
 which calculates scattering properties of dust grains in the interstellar

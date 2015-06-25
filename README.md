@@ -1,9 +1,9 @@
 GGADT -- General Geometry Anomalous Diffraction Theory
 ======================================================
-**Version 1.0.0**
+**Version 1.1.0**
 *John Hoffman and Michael Tarczon*
 
-README last updated: June 8, 2015
+README last updated: June 25, 2015
 
 GGADT is a set of Fortran 95 routines that calculate the x-ray scattering and absorption properties of dust grains using anomalous diffraction theory (valid when the grain is large compared to the wavelength of incident light).
 
@@ -27,6 +27,42 @@ Do the following from a terminal
 3. Do ```make```
 4. This should compile GGADT (without errors). The GGADT binary is in the "src" folder.
 
+
+How to run GGADT
+----------------
+
+GGADT can be run with parameters set by either command line arguments, or a parameter file, or both. Mixing them isn't recommended, and may prioritize conflicting parameter values in a way that you don't like. It's better to stick with one or the other.
+
+**Running GGADT with a parameter file**
+
+Running ```./ggadt``` without any command line arguments will cause GGADT to look for a file in the parent directory called ```default.params```. You can peruse this file to understand the basics of the parameter file structure.
+
+If you would like to use your own parameter file, you can specify one from the command line via 
+
+```./ggadt --parameter-file=<path/to/parameterfile>```
+
+**Running GGADT with command line arguments**
+
+GGADT can also be run by setting values on the command line:
+
+```./ggadt --parameter1=value1 --parameter2=value2 --flag1 --flag2 ...```
+
+For a list of available parameters and flags, do
+
+```./ggadt -h```
+
+And for more information about what these flags and parameters mean, consult the HTML help file.
+
+GGADT output
+------------
+
+GGADT can calculate either the integrated cross sections (absorption, scattering, extinction) as a function of energy, or it can calculate the differential scattering cross section as a function of scattering angle. 
+
+* To compute the **orientation-averaged differential scattering cross section**, you need not do anything, as this is the default calculation that GGADT will do. 
+	* By default, GGADT will average dQsca/dOmega over random orientations, the number of which is specified by the ```norientations``` parameter.
+	* If you wish to set your own custom orientations, you may do so in a separate file; for more information, consult the full documentation.
+* To compute the **orientation-averaged integrated cross sections**, include the ```--integrated``` flag on the command line or set ```integrated = 'T'``` in a parameter file. 
+* If you wish to calculate the **full dQ/dOmega(theta, phi) function** (i.e. relax the assumption of azimuthal symmetry), then you should set the ```--do-full-2d-fft``` flag.
 
 Some features:
 --------------
