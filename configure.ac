@@ -429,7 +429,7 @@ AC_CONFIG_FILES([ 	Makefile
 
           scripts/installation_vars.py
 
-          .defaults
+          default.params
 				])
 AC_SUBST(fftw3_inc_dir)
 AC_SUBST(plan_dir)

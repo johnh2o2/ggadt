@@ -1,3 +1,9 @@
+* commit 05927183778638e73c48f0271dae886df69c0379
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Tue Jun 9 22:02:03 2015 +0300
+| 
+|     Mathjax update; documentation now renders math (assuming you're connected to the internetz). Fixed a couple of small inconsistencies -- spherical module now just outputs theta, dQ/dOm instead of the 2d grid (and will do the full grid if you specify --do-full-2d-fft). Theta now runs from 0 to max_angle.
+|  
 * commit 1fd3e5b2786a01b612dac7b4f0ebcaf6601d75f4
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Mon Jun 8 17:06:52 2015 +0300

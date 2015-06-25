@@ -1,63 +1,11 @@
 #Contains several useful functions for generating, loading, analyzing and plotting GGADT output.
 #
-# Functions:
-# ----------
-#   + make_data(
-#			params,
-#			fname,
-#			echo=True, 
-#			flags=[]
-#		)
-#   + quick_plots(
-#			fname,
-#			scale='log'
-#		)
-#   + all_zeros(
-#			data
-#		)
-#   + load_data(
-#			fname
-#		)
-#   + load_sed_data(
-#			fname
-#		)
-#
-#   + filter_data(
-#			data,
-#			boundaries=[-2000,2000,-2000,2000],
-#			delta=100
-#		)
-#   + convert_to_arcseconds(
-#			data
-#		)
-#   + add_1d_slice(
-#			ax,
-#			data_function,
-#			phis=[ 0.0, np.pi/2.0 ],
-#			boundaries=[-2000,2000,-2000,2000],
-#			PlotAvg=True,
-#			PlotMinMax=True,
-#			PlotOneSigma=True,
-#			AddLabels=True, 
-#			AddLegend=True, 
-#			colors = [ 'b', 'r', 'c', 'g' ],
-#			linestyles = [ '--', '-.', '..']
-#		)
-#	+ get_1d_slice(
-#			data_function,
-#			phi=0.0,
-#			boundaries=[-2000,2000,-2000,2000]
-#		)
-#	+ get_1d_avg(
-#			data_function,
-#			boundaries=[-2000,2000,-2000,2000]
-#		)
-# [To be continued ... ]
+
 from math import *
 import sys
 import os
 import numpy as np 
-from scipy.interpolate import RectBivariateSpline
+from scipy.interpolate import RectBivariateSpline, interp1d, interp2d
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
@@ -67,17 +15,58 @@ from datetime import timedelta, datetime, tzinfo
 data_dt = np.dtype([('theta', np.float_), ('phi', np.float_), ('f', np.float_)])
 conv = (360*60*60)/(2*np.pi) # convert from radians to arcseconds (a more sensible unit)
 
+#print "IMPORTING PU"
 
-def make_data(params,fname,echo=True, flags=[]):
+def convert_sffft(data):
+	thetas = data['theta']
+	nth = len(thetas)
+	func = interp1d(thetas, data['f'])
+	data_new = np.zeros(nth*nth, dtype=data_dt)
+	I = 0
+	for t1 in thetas:
+		for t2 in thetas:
+			th = sqrt(t1**2 + t2**2)
+			data_new['theta'][I] = t1
+			data_new['phi'][I] = t2
+			if th > thetas[-1]: data_new['f'][I] = 0.
+			else: data_new['f'][I] = func(th)
+			I+=1
+	return data_new
+
+
+failure_file = "ggadt_failed"
+def make_data(params,fname,echo=True, flags=[], binary=ggadt, break_if_failure=True):
 	clargs = " "
 	add = ""
 	for p in params:
 		clargs = clargs + " --"+p+"="+`params[p]`
 	for f in flags:
 		clargs = clargs + " --"+f
-	command = ggadt+clargs+add+" > "+fname
+	#print binary, clargs, add
+	command = binary+clargs+add+" > "+fname
+	if break_if_failure:
+		if os.path.exists(failure_file): os.unlink(failure_file)
+		command = "%s || touch %s"%(command, failure_file)
+		
 	if echo: print command
 	os.system(command)
+	if break_if_failure and os.path.exists(failure_file):
+			os.unlink(failure_file)
+			raise Exception("GGADT failed!!")
+
+def quick_plots2(func,scale='log', boundaries=None):
+	
+	f = plt.figure(1)
+	ax = f.add_subplot(111)
+	add_1d_slice(ax,func)
+
+	f2 = plt.figure(2)
+	ax2 = f2.add_subplot(111)
+	kwargs = dict(scale=scale)
+	if not boundaries is None: kwargs['boundaries'] = boundaries
+	add_2d_heatmap(ax2,func,**kwargs)
+
+	plt.show()
 
 def quick_plots(fname,scale='log'):
 	data = load_data(fname)
@@ -85,16 +74,7 @@ def quick_plots(fname,scale='log'):
 	data = convert_to_arcseconds(data)
 	func = make_data_function(data)
 
-	f = plt.figure(1)
-	ax = f.add_subplot(111)
-	add_1d_slice(ax,func)
-
-
-	f2 = plt.figure(2)
-	ax2 = f2.add_subplot(111)
-	add_2d_heatmap(ax2,func,scale=scale)
-
-	plt.show()
+	quick_plots2(func, scale=scale)
 
 def all_zeros(data):
 	ALL_ZERO = True 
@@ -104,9 +84,22 @@ def all_zeros(data):
 			break
 	return ALL_ZERO
 
-def load_data(fname):
-	return np.loadtxt(fname,dtype=data_dt)
+def load_data(fname, is_sffft=False):
+	if not is_sffft:
+		return np.loadtxt(fname,dtype=data_dt)
+	else:
+		return np.loadtxt(fname, dtype = np.dtype([
+			('theta',np.float_),
+			('f',np.float_)
+			]))
 
+		#return convert_sffft(dat)
+def load_sffft_data(fname):
+	dat = np.loadtxt(fname, dtype = np.dtype([
+			('theta',np.float_),
+			('f',np.float_)
+			]))
+	return dat
 def load_sed_data(fname):
 	dt_sed = np.dtype([
 			('ephot',np.float_),
@@ -144,9 +137,9 @@ def filter_data(data,boundaries=[-2000,2000,-2000,2000],delta=100):
 
 	return data_new
 
-def convert_to_arcseconds(data):
+def convert_to_arcseconds(data, is_sffft=True):
 	data['theta']*=conv
-	data['phi']*=conv 
+	if not is_sffft: data['phi']*=conv 
 	return data 
 
 def make_data_function(data):
@@ -163,8 +156,9 @@ def make_data_function(data):
 	# Interpolate
 	BSPL = RectBivariateSpline(x[:,0],y[0,:],z)
 	data_function = lambda xi,yi : BSPL.ev(xi,yi)
-
-	return data_function
+	#data_function = interp2d(x,y,z)
+	#print "HEY, YOU'RE MAKING A DATA FUNCTION!"
+	return data_function 
 
 def add_1d_slice(ax,data_function,phis=[ 0.0, np.pi/2.0 ],boundaries=[-2000,2000,-2000,2000],PlotAvg=True,PlotMinMax=True,PlotOneSigma=True,AddLabels=True, AddLegend=True, colors = [ 'b', 'r', 'c', 'g' ],linestyles = [ '--', '-.', '..']):
 	xmin = boundaries[0]
@@ -273,7 +267,8 @@ def add_2d_heatmap(ax,data_function,nplot=250,boundaries=[-2000,2000,-2000,2000]
 		for j in range(0,nplot):
 			zplot[i][j] = data_function(xplot[i][j],yplot[i][j])
 			if zplot[i][j] < clip: zplot[i][j] = clip
-			else: zplot[i][j] = log10(zplot[i][j])
+			if scale == 'log': zplot[i][j] = log10(zplot[i][j])
+			
 
 	# Set up color plot
 	levels = MaxNLocator(nbins=40).tick_values(zplot.min(), zplot.max())
@@ -407,7 +402,7 @@ def get_timestamp():
 			return "EST"
 
 	time_now = datetime.now(tz=EST())
-	timestamp = "%s (%s)"%(time_now.ctime(), time_now.tzname())
+	timestamp = "J. Hoffman [%s (%s)]"%(time_now.ctime(), time_now.tzname())
 	return timestamp
 
 def add_timestamp(f):

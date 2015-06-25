@@ -98,7 +98,7 @@ DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_CLEAN_FILES = scripts/installation_vars.py .defaults
+CONFIG_CLEAN_FILES = scripts/installation_vars.py default.params
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -156,7 +156,7 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
-am__DIST_COMMON = $(srcdir)/.defaults.in $(srcdir)/Makefile.in \
+am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/default.params.in \
 	$(top_srcdir)/scripts/installation_vars.py.in AUTHORS COPYING \
 	ChangeLog INSTALL NEWS README compile config.guess config.sub \
 	depcomp install-sh missing
@@ -327,7 +327,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-EXTRA_DIST = configure scripts src doc data
+EXTRA_DIST = configure src doc
 SUBDIRS = src doc 
 all: all-recursive
 
@@ -367,7 +367,7 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 $(am__aclocal_m4_deps):
 scripts/installation_vars.py: $(top_builddir)/config.status $(top_srcdir)/scripts/installation_vars.py.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-.defaults: $(top_builddir)/config.status $(srcdir)/.defaults.in
+default.params: $(top_builddir)/config.status $(srcdir)/default.params.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 # This directory's subdirectories are mostly independent; you can cd

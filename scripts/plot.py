@@ -16,14 +16,13 @@ from scipy.interpolate import RectBivariateSpline
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
+import plot_utilities as pu
 
 LOGPLOT = True
 verbose = False
 
 nplot = 250 # dimension of plotted grid (interpolated)
 delta = 250 # distance above or below theta min/max for interpolation purposes
-
-
 
 conv = (360*60*60)/(2*np.pi) # convert from radians to arcseconds (a more sensible unit)
 

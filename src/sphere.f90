@@ -65,8 +65,10 @@ module sphere
 
         do j=0,(nu_sphere-1)
             u = umin + j*du
-            val = val + du *( exp(I*rho*sin(u)) - 1  ) * BesJ0( x*cos(u) ) * sin(u)*cos(u)
-            ! ^ Draine & Allaf-Akbari 2006 is WRONG!!! This is the correct expression.
+
+            ! val = val + du *( 1 - exp(-I*rho*sin(u)) ) * BesJ0( x*cos(u) ) * sin(u)*cos(u)
+            ! ^ Draine & Allaf-Akbari 2006 is WRONG!!! This is the correct expression:
+            val = val + du *( 1 - exp(I*rho*sin(u))  ) * BesJ0( x*cos(u) ) * sin(u)*cos(u)
         end do
         scat_integral = val
 
@@ -110,21 +112,30 @@ module sphere
         real(kind=dp_real), intent(out) :: qabs,qscat,qext
         complex(kind=dp_complex), intent(in) :: delta_m
 
-        real(kind=dp_real) :: x, rho0, rho1, rho2, beta, fac, fac2, sgnfac
+        real(kind=dp_real) :: x, rho0, rho1, rho2, beta, beta0, fac, fac2, sgnfac
         complex(kind=dp_complex) :: rho
 
         rho = 2*k*aeff*delta_m
         rho1 = REAL(rho, kind=dp_real)
         rho2 = DIMAG(rho)
         rho0 = dsqrt(rho1 * rho1 + rho2 * rho2)
-        
+
         if (ABS(rho1) .gt. 0.) then
-            beta = DATAN(rho2/rho1) ! double version of atan
+            beta0 = DATAN(abs(rho2)/abs(rho1))
+            if (rho1 .lt. 0 .and. rho2 .gt. 0) then
+                beta = pi - beta0
+            else if (rho1 .lt. 0 .and. rho2 .lt. 0) then
+                beta = pi + beta0
+            else if (rho1 .gt. 0 .and. rho2 .lt. 0) then 
+                beta = 2*pi - beta0
+            else 
+                beta = beta0 
+            endif     
         else
             if (rho2 .gt. 0.0) then
                 beta = 0.5*pi 
             else
-                beta = -0.5*pi
+                beta = 1.5*pi
             endif
         end if
 
@@ -135,13 +146,14 @@ module sphere
 
         else
             
-            sgnfac = 1.0
-            if (rho1 > 0.0) then 
-                sgnfac = -1.0
-            endif
+            !sgnfac = 1.0
+            !if (rho1 > 0.0) then 
+            !    sgnfac = -1.0
+            !endif
             fac = exp(-rho2)
             fac2 = fac*fac
-            qext = 2 + (4./(rho0**2))*(dcos(2*beta) - fac*(dcos(rho1 - 2*beta) - sgnfac*rho0*dsin(rho1 - beta)))
+            !qext = 2 + (4./(rho0**2))*(dcos(2*beta) - fac*(dcos(rho1 - 2*beta) - sgnfac*rho0*dsin(rho1 - beta)))
+            qext = 2 + (4./(rho0**2))*(dcos(2*beta) - fac*(dcos(rho1 - 2*beta) + rho0*dsin(rho1 - beta)))
             qabs = 1 + fac2/rho2 + (fac2 - 1)/(2*rho2*rho2)
             qscat = qext - qabs
         end if

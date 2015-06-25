@@ -34,7 +34,7 @@ module constants
   real(dp_real), parameter                 ::  default_grain_axis_ratio       = 1.0D0
   character(len=200), parameter            ::  default_grain_geometry         = 'sphere'
   character(len=200), parameter            ::  allowed_ngrid_values_filename &
-    & = '@abs_top_srcdir@/.allowed_ngrid_values'
+    & = '@abs_top_srcdir@/allowed_ngrid_values.txt'
   character(len=50), parameter             ::  default_angle_mode       = 'random'
   character(len=50), parameter             ::  default_rotation_axis          = 'none'
   character(len=200), parameter            ::  default_angle_file       = ''
@@ -49,7 +49,7 @@ module constants
   integer, parameter                       :: nu_sphere                       = 1000
 
 
-! New defaults for sed variables
+! defaults for integrated cross section calculations
   integer, parameter                       ::  default_nephots                = 100
   real(dp_real), parameter                 ::  default_ephot_min              = 1.0D-1
   real(dp_real), parameter                 ::  default_ephot_max              = 5.0D0
@@ -57,7 +57,7 @@ module constants
   character(len=200), parameter            ::  default_material_file          = ""
   real(dp_real), parameter                 ::  default_dephot                 = 1.0D-1
   character(len=200), parameter ::  defaults_file_name &
-    &=  "@abs_top_srcdir@/.defaults"
+    &=  "@abs_top_srcdir@/default.params"
      
   logical, parameter                        :: options_debug  = .false.
 
