@@ -8,8 +8,8 @@ rm configure
 git log --pretty --graph > ChangeLog
 
 aclocal -I./m4
-autoconf
 automake --add-missing --force-missing -c
+autoconf
 ./configure --enable-openmp || exit
 #./configure || exit
 make html || exit
