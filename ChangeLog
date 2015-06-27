@@ -1,3 +1,9 @@
+* commit cf306a162ef45f90dcad9932e47c08e6f715f542
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Sat Jun 27 17:52:45 2015 -0400
+| 
+|     Added heuristic 1/ngrid correction to the thetax, thetay arrays; added no-sang-correction flag to turn this off
+|  
 * commit b88f93447ca96959d0ec124574e122f8a79259f2
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Sat Jun 27 17:28:37 2015 -0400
