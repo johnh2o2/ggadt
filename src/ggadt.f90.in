@@ -819,9 +819,16 @@ contains
         do i=1,size(kz)
             kz(i) = ((i-1)*dk + kmin)*(TWOPI/L)
             ky(i) = kz(i)
-            !write(stderr, *) "kz/k, asin() = ", kz(i)/k, asin(kz(i)/k)
-            thetaz(i) = asin(kz(i)/k)
-            thetay(i) = asin(ky(i)/k)
+            
+            !
+            ! This 1/ngrid factor is a fudge factor to ensure the alignment of the minima
+            ! its a heuristic for now, unless there's a bug lingering somewhere to explain
+            ! why it works. If you don't use it, the minima shift outward by a factor of ~1/ngrid 
+            ! 
+            thetaz(i) = asin(kz(i)/k)*(1 - 1./ngrid)
+            thetay(i) = asin(ky(i)/k)*(1 - 1./ngrid)
+
+            ! Initialize arrays
             if (.not. do_full_2d_fft) then 
                 gscatter(i) = 0.0D0
             end if 
