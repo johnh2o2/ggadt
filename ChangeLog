@@ -1,3 +1,9 @@
+* commit 2e7a55947ca01f39ff936faf1d43b155b53551d4
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Fri Jun 26 17:12:54 2015 -0400
+| 
+|     Disabled maintainer mode; this hopefully should work...
+|  
 * commit 9ac3e8884684d7d4f7afa6dc5398fd3e5c27aeef
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Fri Jun 26 16:55:07 2015 -0400

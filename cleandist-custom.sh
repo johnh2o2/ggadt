@@ -1,6 +1,7 @@
 #!/bin/bash
 #rm -f aclocal.m4
 #rm -r -f autom4te.cache/
+rm -f default.params
 rm  -f *o
 rm  -f *mod
 rm -f *npy
@@ -13,8 +14,8 @@ rm -f *png
 rm -f testdat.dat
 #rm -f doc/Makefile.in
 rm -f doc/Makefile
-rm -f doc/stamp-vti
-rm -f doc/version.texi
+#rm -f doc/stamp-vti
+#rm -f doc/version.texi
 rm -f doc/ggadt.info
 rm -f -r doc/ggadt.html
 rm -f test_output.dat
