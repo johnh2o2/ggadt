@@ -647,7 +647,7 @@ contains
             grain_a(3) = a_eff
 
             ! make the grid a little larger to accomodate furthest part of grain
-            grid_width = 2.05*max_dist/a_eff
+            grid_width = 2.001*max_dist/a_eff
 
             
 
@@ -660,7 +660,7 @@ contains
             grain_a(3) = grain_a(3)*scale
 
             ! make the grid a little larger than the longest principal axis
-            grid_width = 2.05*max(grain_a(1), grain_a(2), grain_a(3))/a_eff
+            grid_width = 2.001*max(grain_a(1), grain_a(2), grain_a(3))/a_eff
         else
             write(stderr,*) "ERROR: cannot understand ", geometry
             stop
@@ -668,7 +668,7 @@ contains
 
         if (grid_width*a_eff < lambda) then
             write(stderr, *) "WARNING: a_eff >> lambda is violated. ADT is not valid here!"
-            grid_width = 2.05 * lambda / a_eff
+            grid_width = 2.001 * lambda / a_eff
         end if
         
         !write(stderr, * ) "  HERE"
@@ -825,8 +825,13 @@ contains
             ! its a heuristic for now, unless there's a bug lingering somewhere to explain
             ! why it works. If you don't use it, the minima shift outward by a factor of ~1/ngrid 
             ! 
-            thetaz(i) = asin(kz(i)/k)*(1 - 1./ngrid)
-            thetay(i) = asin(ky(i)/k)*(1 - 1./ngrid)
+            if (.not. no_sang_correction) then
+                thetaz(i) = asin((kz(i)/k)*(1 - 1./ngrid))
+                thetay(i) = asin((ky(i)/k)*(1 - 1./ngrid))
+            else 
+                thetaz(i) = asin(kz(i)/k)
+                thetay(i) = asin(ky(i)/k)
+            end if 
 
             ! Initialize arrays
             if (.not. do_full_2d_fft) then 

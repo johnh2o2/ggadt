@@ -49,6 +49,7 @@ module common_mod
 
   logical                                ::  use_padded_fft
   logical                                ::  use_efficiencies
+  logical                                ::  no_sang_correction
   logical                                ::  asked_for_version
   logical                                ::  asked_for_help
   logical                                ::  verbose_mode
@@ -96,7 +97,8 @@ module common_mod
          rank_fftw_optimization_mode_name, rank_ephot_min, rank_ephot_max, rank_nephots, &
          rank_dephot, rank_material_files(max_num_mats), rank_material_tags(max_num_mats), &
          rank_agglom_composition_file, rank_material_file, rank_asked_for_version, &
-         rank_asked_for_help, rank_parameter_file_name, rank_axes_convention, rank_do_full_2d_fft, rank_quiet_mode
+         rank_asked_for_help, rank_parameter_file_name, rank_axes_convention, rank_do_full_2d_fft, &
+         rank_quiet_mode, rank_no_sang_correction
 
   contains
 
@@ -151,6 +153,9 @@ module common_mod
       call define_flag(opts, &
         "do-full-2d-fft",&
         description="Do not assume axisymmetry (dQ/dOmega is a function of phi)")
+      call define_flag(opts, &
+        "no-sang-correction",&
+        description="Do not use a heurstic 1/ngrid correction to the scattering angles")
       call define_option_string(opts,&
         "parameter-file","",&
         description="Path to parameter file")
@@ -326,6 +331,7 @@ module common_mod
       call get_flag(opts,"timing",timing_mode, rank_timing_mode)
       call get_flag(opts,"do-full-2d-fft",do_full_2d_fft, rank_do_full_2d_fft)
       call get_flag(opts,"quiet",quiet_mode, rank_quiet_mode)
+      call get_flag(opts,"no-sang-correction",no_sang_correction, rank_no_sang_correction)
       call get_option_real(opts,"ior-re",ior_re, rank_ior_re)
       call get_option_real(opts,"ior-im",ior_im, rank_ior_im)
 
