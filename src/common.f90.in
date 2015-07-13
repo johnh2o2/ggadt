@@ -35,6 +35,8 @@ module common_mod
   integer                                ::  ngrid
   integer                                ::  nscatter
   integer                                ::  norientations 
+  integer                                ::  nthreads
+  integer                                ::  nphi
   integer                                ::  ierr
 
   integer, allocatable                   ::  allowed_ngrids(:) ! this 
@@ -58,6 +60,10 @@ module common_mod
   logical                                ::  force_numerical
   logical                                ::  do_full_2d_fft
   logical                                ::  quiet_mode
+  logical                                ::  do_phi_averaging
+  logical                                ::  save_shadow_function
+  logical                                ::  save_phi_grid
+
   character(len=200)                     ::  parameter_file_name
 
 
@@ -75,6 +81,7 @@ module common_mod
   character(len=200), dimension(max_num_mats)           ::  material_files
   character(len=200), dimension(max_num_mats)           ::  material_tags
   character(len=200)                                    ::  agglom_composition_file
+  character(len=200)                                    ::  save_file_root, phi_grid_file, shadow_function_file
   character(len=200)                                    ::  axes_convention
   integer, allocatable                                  ::  agglom_material_tags(:)
   integer                                               ::  nmaterials
@@ -98,7 +105,8 @@ module common_mod
          rank_dephot, rank_material_files(max_num_mats), rank_material_tags(max_num_mats), &
          rank_agglom_composition_file, rank_material_file, rank_asked_for_version, &
          rank_asked_for_help, rank_parameter_file_name, rank_axes_convention, rank_do_full_2d_fft, &
-         rank_quiet_mode, rank_no_sang_correction
+         rank_quiet_mode, rank_sang_correction, rank_nthreads, rank_do_phi_averaging, rank_save_shadow_function, &
+         rank_save_phi_grid, rank_save_file_root, rank_nphi
 
   contains
 
@@ -154,13 +162,28 @@ module common_mod
         "do-full-2d-fft",&
         description="Do not assume axisymmetry (dQ/dOmega is a function of phi)")
       call define_flag(opts, &
-        "no-sang-correction",&
-        description="Do not use a heurstic 1/ngrid correction to the scattering angles")
+        "sang-correction",&
+        description="Use a heurstic 1/ngrid correction to the scattering angles")
+
+      call define_flag(opts, &
+        "save-phi-grid",&
+        description="Save phi grid (use save-file-root option)")
+      call define_flag(opts, &
+        "save-shadow-function",&
+        description="Save shadow function (use save-file-root option)")
+
+      call define_flag(opts, &
+        "do-phi-averaging",&
+        description="Assumes --do-full-2d-fft flag is specified; averages over phi to get 1d dsigma_sca/dOmega")
+      
+
       call define_option_string(opts,&
         "parameter-file","",&
         description="Path to parameter file")
+      call define_option_string(opts,&
+        "save-file-root","",&
+        description="Root name of output files (if --save-phi-grid and/or --save-shadow-function flags are used)")
 
-      !write(stderr, *) "defined_flags"
       ! Allow user to specify up to max_num_mats materials:
 
       do i=1,max_num_mats
@@ -222,6 +245,7 @@ module common_mod
       call define_option_real(opts,&
         "dtheta",default_dtheta, &
         description="Angular resolution for dQscatter/dOmega calculation")
+
       call define_option_integer(opts,&
         "ngrain",default_ngrain,&
         description="Number of grid points along 1 dimension with which we should resolve the grain")
@@ -231,6 +255,13 @@ module common_mod
       call define_option_integer(opts,&
         "norientations",default_norientations,&
         description="Number of orientations to average over")
+      call define_option_integer(opts,&
+        "nphi",default_nphi,&
+        description="Number of phi angles to do phi averaging over (see --do-phi-averaging)")
+      call define_option_integer(opts,&
+        "nthreads",default_nthreads,&
+        description="For OpenMP: how many threads are used (-1 is default; uses system-specified number of threads)")
+
       call define_option_string(opts,&
         "angle-mode",default_angle_mode,&
         description="How to choose Euler angles (sequential, random, file)")
@@ -323,6 +354,14 @@ module common_mod
       call get_option_real(opts,"grain-axis-y",grain_a(2),rank_grain_a2)
       call get_option_real(opts,"grain-axis-z",grain_a(3),rank_grain_a3)
       call get_option_real(opts,"ephot",ephot,rank_ephot)
+      call get_option_real(opts, "dtheta", dtheta, rank_dtheta)
+      call get_option_real(opts,"max-angle",max_angle, rank_max_angle)
+      call get_option_real(opts,"ior-re",ior_re, rank_ior_re)
+      call get_option_real(opts,"ior-im",ior_im, rank_ior_im)
+      call get_option_real(opts,"ephot-min", ephot_min, rank_ephot_min)
+      call get_option_real(opts,"ephot-max", ephot_max, rank_ephot_max)
+      call get_option_real(opts,"dephot", dephot, rank_dephot)
+
       call get_flag(opts,"use-padded-fft",use_padded_fft,rank_use_padded_fft)
       call get_flag(opts,"force-numerical",force_numerical,rank_force_numerical)
       call get_flag(opts,"integrated",integrated_mode, rank_integrated_mode) 
@@ -331,28 +370,30 @@ module common_mod
       call get_flag(opts,"timing",timing_mode, rank_timing_mode)
       call get_flag(opts,"do-full-2d-fft",do_full_2d_fft, rank_do_full_2d_fft)
       call get_flag(opts,"quiet",quiet_mode, rank_quiet_mode)
-      call get_flag(opts,"no-sang-correction",no_sang_correction, rank_no_sang_correction)
-      call get_option_real(opts,"ior-re",ior_re, rank_ior_re)
-      call get_option_real(opts,"ior-im",ior_im, rank_ior_im)
+      call get_flag(opts,"sang-correction",sang_correction, rank_sang_correction)
+      call get_flag(opts,"do-phi-averaging",do_phi_averaging, rank_do_phi_averaging)
+      call get_flag(opts,"save-phi-grid",save_phi_grid, rank_save_phi_grid)
+      call get_flag(opts,"save-shadow-function",save_shadow_function, rank_save_shadow_function)
+
 
       call get_option_string(opts,"grain-geometry",geometry, rank_geometry)
       call get_option_string(opts,"axes-convention",axes_convention, rank_axes_convention)
       call get_option_string(opts,"angle-mode",angle_mode, rank_angle_mode)
       call get_option_string(opts,"rotation-axis",rotation_axis, rank_rotation_axis)
       call get_option_string(opts,"angle-file",angle_file, rank_angle_file)
-      call get_option_integer(opts,"ngrain",ngrain, rank_ngrain)
-      
-      call get_option_integer(opts,"nscatter",nscatter, rank_nscatter)
-      call get_option_integer(opts,"norientations",norientations, rank_norientations)
-      call get_option_real(opts, "dtheta", dtheta, rank_dtheta)
-      call get_option_real(opts,"max-angle",max_angle, rank_max_angle)
       call get_option_string(opts,"agglom-file",agglom_file_name, rank_agglom_file_name)
       call get_option_string(opts,"fftw-optimization",fftw_optimization_mode_name, rank_fftw_optimization_mode_name)
+      call get_option_string(opts,"save-file-root",save_file_root, rank_save_file_root)
 
-      call get_option_real(opts,"ephot-min", ephot_min, rank_ephot_min)
-      call get_option_real(opts,"ephot-max", ephot_max, rank_ephot_max)
+
+      call get_option_integer(opts,"ngrain",ngrain, rank_ngrain)
+      call get_option_integer(opts,"nthreads",nthreads, rank_nthreads)
+      call get_option_integer(opts,"nphi",nphi, rank_nphi)
+      call get_option_integer(opts,"nscatter",nscatter, rank_nscatter)
+      call get_option_integer(opts,"norientations",norientations, rank_norientations)
       call get_option_integer(opts,"nephots", nephots, rank_nephots)
-      call get_option_real(opts,"dephot", dephot, rank_dephot)
+
+      
 
       do i=1,max_num_mats
         if (i .gt. 10) then
@@ -390,6 +431,9 @@ module common_mod
       rotation_axis = strlowcase(rotation_axis)
       geometry = strlowcase(geometry)
       axes_convention = strlowcase(axes_convention)
+
+      phi_grid_file = save_file_root//"_phigrid_o"
+      shadow_function_file = save_file_root//"_shadow_function_o"
 
       ! multiply max_angle by sqrt(2) if using super_fast_fft_mode 
       !   we want to calculate out to (thetax, thetay) = (max_angle, max_angle).
@@ -467,6 +511,29 @@ module common_mod
 
 
       ! Resolve parameter conflicts
+
+      ! irrelevant nphi specification
+      if (do_phi_averaging .and. (.not. do_full_2d_fft .or. integrated_mode)) then
+        write(stderr, *) "ERROR: --do-phi-averaging is specified, but not --do-full-2d-fft"
+        stop
+      end if
+
+      ! irrelevant nphi specification
+      if (option_found(opts,'nphi') .and. (.not. do_full_2d_fft .or. integrated_mode)) then
+        if (.not. do_full_2d_fft) then
+          write(stderr, *) "Warning: nphi specified, but --do-full-2d-fft is not. Ignoring nphi."
+        else
+          write(stderr, *) "Warning: nphi specified, but we're doing integrated cross sections! Ignoring nphi."
+        end if
+      end if
+
+      ! output where you're saving the phi_grid and shadow function
+      if (save_phi_grid) then
+        write(stderr, *) "Note: Will be saving phi grid to ", phi_grid_file//"<orientation>.dat"
+      end if
+      if (save_shadow_function) then
+        write(stderr, *) "Note: Will be saving phi grid to ", shadow_function_file//"<orientation>.dat"
+      end if
 
 
       ! nscatter and dtheta

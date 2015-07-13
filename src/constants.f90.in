@@ -46,6 +46,8 @@ module constants
   character(len=200), parameter            ::  default_agglom_file_name       = ''
   character(len=200), parameter            ::  default_axes_convention        = 'ddscat'
   character(len=100), parameter            ::  default_fftw_opt_name          = 'estimate'
+  integer, parameter                       ::  default_nthreads               = -1
+  integer, parameter                       ::  default_nphi                   = 50
   integer, parameter                       :: nu_sphere                       = 1000
 
 
