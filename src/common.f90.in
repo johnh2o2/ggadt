@@ -51,7 +51,7 @@ module common_mod
 
   logical                                ::  use_padded_fft
   logical                                ::  use_efficiencies
-  logical                                ::  no_sang_correction
+  logical                                ::  sang_correction
   logical                                ::  asked_for_version
   logical                                ::  asked_for_help
   logical                                ::  verbose_mode
@@ -165,9 +165,9 @@ module common_mod
         "sang-correction",&
         description="Use a heurstic 1/ngrid correction to the scattering angles")
 
-      call define_flag(opts, &
-        "save-phi-grid",&
-        description="Save phi grid (use save-file-root option)")
+      !call define_flag(opts, &
+      !  "save-phi-grid",&
+      !  description="Save phi grid (use save-file-root option)")
       call define_flag(opts, &
         "save-shadow-function",&
         description="Save shadow function (use save-file-root option)")
@@ -181,8 +181,8 @@ module common_mod
         "parameter-file","",&
         description="Path to parameter file")
       call define_option_string(opts,&
-        "save-file-root","",&
-        description="Root name of output files (if --save-phi-grid and/or --save-shadow-function flags are used)")
+        "save-file-root","output",&
+        description="Root name of output files (if --save-shadow-function flag is used)")
 
       ! Allow user to specify up to max_num_mats materials:
 
@@ -372,7 +372,7 @@ module common_mod
       call get_flag(opts,"quiet",quiet_mode, rank_quiet_mode)
       call get_flag(opts,"sang-correction",sang_correction, rank_sang_correction)
       call get_flag(opts,"do-phi-averaging",do_phi_averaging, rank_do_phi_averaging)
-      call get_flag(opts,"save-phi-grid",save_phi_grid, rank_save_phi_grid)
+      !call get_flag(opts,"save-phi-grid",save_phi_grid, rank_save_phi_grid)
       call get_flag(opts,"save-shadow-function",save_shadow_function, rank_save_shadow_function)
 
 
@@ -394,6 +394,7 @@ module common_mod
       call get_option_integer(opts,"nephots", nephots, rank_nephots)
 
       
+      save_phi_grid = .FALSE.
 
       do i=1,max_num_mats
         if (i .gt. 10) then
@@ -432,8 +433,8 @@ module common_mod
       geometry = strlowcase(geometry)
       axes_convention = strlowcase(axes_convention)
 
-      phi_grid_file = save_file_root//"_phigrid_o"
-      shadow_function_file = save_file_root//"_shadow_function_o"
+      write(phi_grid_file, *) trim(save_file_root)//"_phigrid_o"
+      write(shadow_function_file, *) trim(save_file_root)//"_shadow_function_o"
 
       ! multiply max_angle by sqrt(2) if using super_fast_fft_mode 
       !   we want to calculate out to (thetax, thetay) = (max_angle, max_angle).
@@ -529,10 +530,10 @@ module common_mod
 
       ! output where you're saving the phi_grid and shadow function
       if (save_phi_grid) then
-        write(stderr, *) "Note: Will be saving phi grid to ", phi_grid_file//"<orientation>.dat"
+        write(stderr, *) "Note: Will be saving phi grid to ", trim(phi_grid_file)//"<orientation>.dat"
       end if
       if (save_shadow_function) then
-        write(stderr, *) "Note: Will be saving phi grid to ", shadow_function_file//"<orientation>.dat"
+        write(stderr, *) "Note: Will be saving phi grid to ", trim(shadow_function_file)//"<orientation>.dat"
       end if
 
 

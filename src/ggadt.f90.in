@@ -18,6 +18,7 @@ program ggadt
 
     real(kind=dp_real), allocatable :: scatter(:,:), gscatter(:)
     real(kind=dp_real), allocatable :: ephots(:), ior_res(:,:), ior_ims(:,:)
+    character(len=5) :: orient_char
 
 
     logical :: multiple_compositions
@@ -333,28 +334,37 @@ contains
 
     end function get_gscatter
 
-    function do_phi_averaging(sc)
+    function phi_average(dSigdOm)
         implicit none
         integer i,j
-        complex(kind=dp_complex), dimension(size(gscatter)) :: do_phi_averaging
-        complex(kind=dp_complex), dimension(size(scatter), size(scatter)) :: sc
+        real(kind=dp_complex), dimension(size(gscatter)) :: phi_average
+        real(kind=dp_complex), dimension(size(gscatter), size(gscatter)), intent(in) :: dSigdOm
+        
 
-        real(kind=dp_real) :: phi, scval, 
-        !$omp parallel shared(gscatter,gftsh,k,dy) 
-        !$omp do schedule(dynamic) private(i)
+        real(kind=dp_real) :: ph, th
+        real(kind=dp_complex) :: dsdo_val
+        !$omp parallel shared(thetaz,nphi, dSigdOm, phi_average)
+        !$omp do schedule(dynamic) private(i,j,dsdo_val, th)
         do i=1, size(thetaz)
-            scval = 0.0D0
+
+            dsdo_val = 0.0D0
+            th = thetaz(i)
+
             do j=1, nphi
-                phi = -pi + 2*pi*(real(i) / real(nphi))
-                scval += linterp2d(thetaz, thetaz, sc, thetaz(i) * sin(phi), thetaz(i) * cos(phi))/nphi
+                ph = (0.5*pi)*(real(j) / real(nphi))
+                !write(stderr, *) th, phi, nphi, scval
+                dsdo_val = dsdo_val + linterp2d(thetaz, thetaz, dSigdOm, th * cos(ph), th * sin(ph))
             end do 
-            do_phi_averaging(i) = scval
+            !write(stderr, *) "DONE"
+            phi_average(i) = dsdo_val/nphi
+            !write(stderr, *) i, size(thetaz), th, scval
         end do
         !$omp end do 
         !$omp end parallel
+        !write(stderr,*) "DONE!!"
 
 
-    end function do_phi_averaging
+    end function phi_average
 
     subroutine diff_scat_cross_sect()
         implicit none 
@@ -382,7 +392,7 @@ contains
         if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
             if (verbose_mode) write(stderr,*) " Using analytical ADT for sphere..."
 
-            if (do_full_2d_fft .or. do_phi_averaging) then
+            if (do_full_2d_fft) then
                 dth = 2 * sqrt(2. + 1.0D-5)* thetaz(size(thetaz)) / (size(thets) - 1)
 
                 !$omp parallel shared(thets, dth, thetaz, sc_array, k, a_eff, delm)
@@ -434,7 +444,9 @@ contains
                     end do
                 end do
                 !$omp end do 
-                !$omp end parallel 
+                !$omp end parallel
+
+
 
                 if (do_full_2d_fft) then
                     
@@ -474,7 +486,7 @@ contains
                     ! angles(3) -- phi
                     rm = rotation_matrix(angles(1),angles(2),angles(3))
                     
-
+                    ! Compute shadow function
                     if (geometry .eq. 'ellipsoid') then 
                         call set_constants(angles(1),angles(2),angles(3),grain_a)
                         !$omp parallel shared(sh,z,y,rm,k,delm,grain_a) 
@@ -498,19 +510,32 @@ contains
                         write(stderr,*) "ERROR: Do not understand geometry: ", geometry
                     end if 
                    
-
+                    ! Compute dsigma/dOmega
                     if (do_full_2d_fft) then
                         call fft2d_faster(sh,kmin,kmax,enhancement, ftsh)
                         
 
                         if (do_phi_averaging) then
-                            gftsh(:) = do_phi_averaging(sh)
 
+                            !$omp parallel shared(ftsh,k,dy,dz) 
+                            !$omp do schedule(dynamic) private(i, j)
+                            do i=1, size(kz)
+                                do j=1, size(ky)
+                                    !-$OMP CRITICAL
+                                    scatter(i,j) = ( k*dz*dy*abs(ftsh(i,j))/twopi)**2
+                                    !-$OMP END CRITICAL
+                                end do
+                            end do
+                            !$omp end do
+                            !$omp end parallel
+
+                            gftsh(:) = phi_average(scatter)
                             !$omp parallel shared(gscatter,gftsh,k,dy, norientations) 
                             !$omp do schedule(dynamic) private(i)
                             do i=1, size(kz)
                                 !-$OMP CRITICAL
-                                gscatter(i) = gscatter(i) + ( k * dy *abs(gftsh(i))/twopi)**2/real(norientations,kind=dp_real)
+                                gscatter(i) = gscatter(i) + &
+                                        gftsh(i)/real(norientations,kind=dp_real)
                                 !-$OMP END CRITICAL
                             end do
                             !$omp end do
@@ -522,7 +547,8 @@ contains
                             do i=1,size(kz)
                                 do j=1,size(ky)
                                     !-$OMP CRITICAL
-                                    scatter(i,j) = scatter(i,j) +  (k*dz*dy*abs(ftsh(i,j))/twopi)**2/real(norientations,kind=dp_real)
+                                    scatter(i,j) = scatter(i,j) +  &
+                                             (k*dz*dy*abs(ftsh(i,j))/twopi)**2/real(norientations,kind=dp_real)
                                     !-$OMP END CRITICAL
                                 end do
                             end do
@@ -552,6 +578,18 @@ contains
                         write(stderr,fmt="(a1,a,t21,f6.2,a)",advance="no") achar(13), &
                             & " percent complete: ", (real(nangle)/real(norientations))*100.0, "%"
                     end if
+                    if (save_shadow_function) then
+                        write(orient_char, '(I5.5)') nangle
+                        open(unit=9,file=trim(adjustl(shadow_function_file))//trim(adjustl(orient_char))//".dat")
+                        write(9,*) "# Shadow function for orientation ",nangle,"; angles(1,2,3) = ", angles
+                        
+                        do i=1,size(z)
+                            do j=1,size(y)
+                                write(9, *) z(i), y(j), REAL(sh(i,j)), IMAG(sh(i,j))
+                            end do
+                        end do
+                        close(9)
+                    end if
                 end do
                 if (.not. quiet_mode) then 
                     write(stderr, *) ""
@@ -563,7 +601,7 @@ contains
         if (timing_mode) stop 
 
         ! for the fast fft mode, we ASSUME isotropy, so just 1d
-        if (.not. do_full_2d_fft) then 
+        if ((.not. do_full_2d_fft) .or. do_phi_averaging) then 
             do i=1,size(thetaz)
                 write(stdout,*) thetaz(i),gscatter(i)*norm_const
             end do
@@ -585,7 +623,7 @@ contains
       real(kind=dp_real) :: ds, max_dist, scale, lambda
       character(len=100) :: junk
         @OMP_UNCOMMENT@if (nthreads > 0) then
-        @OMP_UNCOMMENT@    omp_set_num_threads(nthreads)
+        @OMP_UNCOMMENT@    call omp_set_num_threads(nthreads)
         @OMP_UNCOMMENT@end if
         
         ! -- Allocate variables for ephots and index of refraction
@@ -631,12 +669,21 @@ contains
       ! Set angles -------------------------------
         if (angle_mode == 'sequential') then
             if (rotation_axis == 'none') then 
-                norientations_new = int(real(norientations)**(1.0/3.0))**3
-                if (norientations /= norientations_new) then
-                    write(stderr,*) ""
-                    write(stderr,*) "Warning: norientations: ",norientations,"-->",norientations_new
-                    norientations = norientations_new
-                endif
+                if (do_phi_averaging) then
+                    norientations_new = int(real(norientations)**(1.0/2.0))**2
+                    if (norientations /= norientations_new) then
+                        write(stderr,*) ""
+                        write(stderr,*) "Warning: norientations: ",norientations,"-->",norientations_new
+                        norientations = norientations_new
+                    end if
+                else
+                    norientations_new = int(real(norientations)**(1.0/3.0))**3
+                    if (norientations /= norientations_new) then
+                        write(stderr,*) ""
+                        write(stderr,*) "Warning: norientations: ",norientations,"-->",norientations_new
+                        norientations = norientations_new
+                    end if
+                end if
             end if 
         else if (angle_mode == 'random') then
             call init_random_seed()
@@ -1145,6 +1192,12 @@ contains
         end if 
         write(i,*) "# geometry: ", trim(adjustl(geometry))
         write(i,*) "# angle_mode: ",trim(adjustl(angle_mode))
+        if (do_phi_averaging) then
+            write(i,*) "# do-phi-averaging; nphi = ",nphi
+        end if
+        if (do_full_2d_fft) then
+            write(i,*) "# do-full-2d-fft"
+        end if
         if (angle_mode == "file") write(i,*) "# angle_file: ", trim(adjustl(angle_file))
         write(i,*) "# ngrain: ",ngrain
         write(i,*) "# norientations: ",norientations

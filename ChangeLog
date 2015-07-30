@@ -1,3 +1,9 @@
+* commit 908c1a0c9c543a27d661169237292e579f947dac
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Jul 13 14:41:11 2015 -0400
+| 
+|     Added option to do phi averaging and specify the number of openmp threads. Also added command line arguments for saving the phi grid and/or the shadow function, but these are not yet operational.
+|  
 * commit 7fc7b58e3167566ad1d2c9cf8d4d206d2383f255
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Sat Jun 27 17:55:23 2015 -0400
