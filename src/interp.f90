@@ -8,7 +8,7 @@ module interp
         real(dp_real), intent(in) :: x(:), xval
         integer, intent(out)      :: i
 
-        i = int((xval - x(1))*(size(x) - 1)/(x(size(x)) - x(1))) + 1
+        i = int( (xval - x(1))*(size(x) - 1)/(x(size(x)) - x(1)) ) + 1
         
         if (i .eq. 0) then
             i = i + 1
@@ -38,8 +38,18 @@ module interp
         real(dp_real) :: linterp
         integer :: i 
 
-        call get_index(x, xval, i)
-
+        !write(stderr, *) "x = ",x(1), x(2), x(3),"..."
+        !write(stderr, *) "y = ",y(1), y(2), y(3),"..."
+        !call get_index(x, xval, i)
+        !write(stderr, *) "i=", i, "x(i)=",x(i),"xval=", xval, "y(i), y(i+1)=",y(i),",", y(i+1)
+        i = 1
+        do i =1, size(x)
+            if (xval < x(i)) then
+                
+                exit
+            end if 
+        end do
+        i = i - 1
         linterp = y(i) + ((xval - x(i))/(x(i+1) - x(i))) *( y(i+1) - y(i) )
 
     end function linterp

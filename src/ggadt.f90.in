@@ -55,10 +55,8 @@ contains
 
     subroutine calculate_int_cross_sections()
         implicit none
-        real(kind=dp_real) :: sigma_scat, sigma_abs
         real(kind=dp_real),dimension(size(ephots)) :: sigma_scats, sigma_abss
-        complex(kind=dp_complex), dimension(10) :: delms
-        integer :: i, j
+        integer :: i
 
         call get_integrated_cross_sections(sigma_scats, sigma_abss)
         do i=1,nephots
@@ -121,16 +119,21 @@ contains
 
         do i=1,niors
             read(1,*) file_ephots(i), file_ior_re(i), file_ior_im(i), eps, imeps
+            !if (file_ephots(i) > 1.0E3) then
+            !    write(stderr, *) "  from file: ", file_ephots(i), file_ior_re(i), file_ior_im(i), eps, imeps
+            !end if 
             file_ephots(i) = file_ephots(i) / 1000.0 ! convert from eV to keV
         end do
         iorre = linterp(file_ephots,file_ior_re,ephot)
         iorim = linterp(file_ephots,file_ior_im,ephot)
+
 
         if (integrated_mode) then 
 
             do i=1,nephots
                 iorres(i) = linterp(file_ephots,file_ior_re,ephots(i))
                 iorims(i) = linterp(file_ephots,file_ior_im,ephots(i))
+                !write(stderr, *) ephots(i), iorres(i), iorims(i)
                 
             end do 
         else
@@ -197,6 +200,7 @@ contains
                 do j=1,nmaterials
                     delms(j) = CMPLX(ior_res(j,i), ior_ims(j,i))
                 end do 
+                !write(stderr, *) "ephot, delm = ", energy, delms(1)
                 delm = delms(1)
                 kphot = TWOPI*(1000*energy/hc)
                 if (geometry .eq. 'sphere' .and. .not. force_numerical) then 

@@ -15,4 +15,4 @@ automake -a
 ./configure --enable-openmp --enable-maintainer-mode FCFLAGS="-O3" || exit 1
 #./configure || exit
 make || exit 1
-cp src/* ../temp_bins/temp-openmp
+#cp src/* ../temp_bins/temp-openmp

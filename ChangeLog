@@ -1,3 +1,14 @@
+* commit f835763756c1ade9a2ac3b209f62bb45465dd6a9
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Thu Jul 30 15:31:29 2015 -0400
+| 
+|     Ability to save shadow funtion now in place; no ability to save phi
+|     function (at least for now). Removed foo.f90 (tested fft). Working
+|     ability to do phi averaging (or at least it should be working). Changed
+|     the way that angles are chosen for phi averaging so that the most
+|     efficient set of orientations are chosen. Added 1d/2d interpolation
+|     functions that are now faster and can handle complex values.
+|  
 * commit 908c1a0c9c543a27d661169237292e579f947dac
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Mon Jul 13 14:41:11 2015 -0400
