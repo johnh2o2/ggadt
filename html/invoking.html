@@ -6,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Invoking GGADT &mdash; ggadt 1.1.0 documentation</title>
+    <title>Invoking GGADT &mdash; ggadt 1.1.2 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.1.0',
+        VERSION:     '1.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,46 +23,35 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="ggadt 1.1.0 documentation" href="index.html" />
+    <link rel="top" title="ggadt 1.1.2 documentation" href="index.html" />
     <link rel="next" title="Arguments and parameters" href="options.html" />
-    <link rel="prev" title="Quick Example" href="example.html" /> 
+    <link rel="prev" title="Quick Example" href="example.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
   </head>
-  <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="options.html" title="Arguments and parameters"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="example.html" title="Quick Example"
-             accesskey="P">previous</a> |</li>
-        <li><a href="index.html">ggadt 1.1.0 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+  <body role="document">  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="invoking-ggadt">
 <h1>Invoking GGADT<a class="headerlink" href="#invoking-ggadt" title="Permalink to this headline">¶</a></h1>
-<p>To see usage and all available options for ggadt, simply use the <tt class="docutils literal"><span class="pre">-h</span></tt> option:</p>
+<p>To see usage and all available options for ggadt, simply use the <code class="docutils literal"><span class="pre">-h</span></code> option:</p>
 <div class="highlight-python"><div class="highlight"><pre>$ ggadt -h
 </pre></div>
 </div>
-<p>A detailed description of all of the available options are available in the <a class="reference internal" href="options.html#options"><em>Arguments and parameters</em></a> section.</p>
+<p>A detailed description of all of the available options are available in the <a class="reference internal" href="options.html#options"><span>Arguments and parameters</span></a> section.</p>
 <div class="section" id="setting-parameter-values">
 <h2>Setting parameter values<a class="headerlink" href="#setting-parameter-values" title="Permalink to this headline">¶</a></h2>
 <p>The format for running GGADT is:</p>
 <div class="highlight-python"><div class="highlight"><pre>$ ggadt [option]
 </pre></div>
 </div>
-<p>With no options, ggadt runs calculations on a set of default grain parameters (specified in the <tt class="docutils literal"><span class="pre">default.params</span></tt> file). By default GGADT will calculate the differential scattering cross section as a function of scattering angle. To calculate the integrated scattering and absorption cross sections for a range of energies, add the <tt class="docutils literal"><span class="pre">--integrated</span></tt> flag as a command-line argument.</p>
+<p>With no options, ggadt runs calculations on a set of default grain parameters (specified in the <code class="docutils literal"><span class="pre">default.params</span></code> file). By default GGADT will calculate the differential scattering cross section as a function of scattering angle. To calculate the integrated scattering and absorption cross sections for a range of energies, add the <code class="docutils literal"><span class="pre">--integrated</span></code> flag as a command-line argument.</p>
 <p>Parameters may be specified as command-line arguments,:</p>
 <div class="highlight-python"><div class="highlight"><pre>$ ggadt --parameter=value ...
 </pre></div>
@@ -92,7 +81,7 @@
 </div>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p>The <tt class="docutils literal"><span class="pre">agglom-file</span></tt> and <tt class="docutils literal"><span class="pre">angle-file</span></tt> options must be specified with quotes surrounding their values. In order to make the parameter file portable, you should specify an absolute file path, not a relative one.</p>
+<p>The <code class="docutils literal"><span class="pre">agglom-file</span></code> and <code class="docutils literal"><span class="pre">angle-file</span></code> options must be specified with quotes surrounding their values. In order to make the parameter file portable, you should specify an absolute file path, not a relative one.</p>
 <p>E.g.:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">agglom</span><span class="o">-</span><span class="nb">file</span><span class="o">=</span><span class="s">&#39;/absolute/path/to/parameter-file.ini&#39;</span>
 </pre></div>
@@ -118,7 +107,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -128,19 +117,23 @@
 </ul>
 </li>
 </ul>
-
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="example.html"
-                        title="previous chapter">Quick Example</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="options.html"
-                        title="next chapter">Arguments and parameters</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/invoking.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="example.html" title="previous chapter">Quick Example</a></li>
+      <li>Next: <a href="options.html" title="next chapter">Arguments and parameters</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/invoking.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -157,24 +150,20 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="options.html" title="Arguments and parameters"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="example.html" title="Quick Example"
-             >previous</a> |</li>
-        <li><a href="index.html">ggadt 1.1.0 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
     <div class="footer">
-        &copy; Copyright 2015, John Hoffman.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      &copy;2015, John Hoffman, Michael Tarczon.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/invoking.txt"
+          rel="nofollow">Page source</a>
     </div>
+
+    
+
+    
   </body>
 </html>

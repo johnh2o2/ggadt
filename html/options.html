@@ -6,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Arguments and parameters &mdash; ggadt 1.1.0 documentation</title>
+    <title>Arguments and parameters &mdash; ggadt 1.1.2 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.1.0',
+        VERSION:     '1.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,31 +23,20 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="ggadt 1.1.0 documentation" href="index.html" />
+    <link rel="top" title="ggadt 1.1.2 documentation" href="index.html" />
     <link rel="next" title="Differential scattering cross section" href="diffscat.html" />
-    <link rel="prev" title="Invoking GGADT" href="invoking.html" /> 
+    <link rel="prev" title="Invoking GGADT" href="invoking.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
   </head>
-  <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="diffscat.html" title="Differential scattering cross section"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="invoking.html" title="Invoking GGADT"
-             accesskey="P">previous</a> |</li>
-        <li><a href="index.html">ggadt 1.1.0 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+  <body role="document">  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="arguments-and-parameters">
 <span id="options"></span><h1>Arguments and parameters<a class="headerlink" href="#arguments-and-parameters" title="Permalink to this headline">¶</a></h1>
@@ -56,67 +45,67 @@
 <h2>General options<a class="headerlink" href="#general-options" title="Permalink to this headline">¶</a></h2>
 <dl class="option">
 <dt id="cmdoption--help">
-<span id="cmdoption-h"></span><tt class="descname">--help</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-h</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--help" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-h"></span><code class="descname">--help</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">-h</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--help" title="Permalink to this definition">¶</a></dt>
 <dd><p>The &#8220;help&#8221; screen–prints usage information and available options.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--version">
-<span id="cmdoption-v"></span><tt class="descname">--version</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-v</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--version" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-v"></span><code class="descname">--version</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">-v</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print the version number of GGADT on standard output and then exit successfully.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--verbose">
-<span id="cmdoption-d"></span><tt class="descname">--verbose</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-d</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--verbose" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-d"></span><code class="descname">--verbose</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">-d</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--verbose" title="Permalink to this definition">¶</a></dt>
 <dd><p>Be extra loud (useful for debugging)</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--quiet">
-<span id="cmdoption-q"></span><tt class="descname">--quiet</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-q</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--quiet" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-q"></span><code class="descname">--quiet</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">-q</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--quiet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do not print progress. GGADT by default will print out a percent complete: XX.X% statement during runtime; this option suppresses that.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--timing">
-<span id="cmdoption-t"></span><tt class="descname">--timing</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-t</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--timing" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-t"></span><code class="descname">--timing</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">-t</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--timing" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do not output data. No I/O is useful if you care about measuring the runtime of GGADT.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--nthreads">
-<tt class="descname">--nthreads</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--nthreads" title="Permalink to this definition">¶</a></dt>
-<dd><p>You can set the number of threads (for OpenMP); GGADT executes <tt class="docutils literal"><span class="pre">call</span> <span class="pre">omp_set_num_threads(nthreads)</span></tt></p>
+<code class="descname">--nthreads</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--nthreads" title="Permalink to this definition">¶</a></dt>
+<dd><p>You can set the number of threads (for OpenMP); GGADT executes <code class="docutils literal"><span class="pre">call</span> <span class="pre">omp_set_num_threads(nthreads)</span></code></p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--use-padded-fft">
-<span id="cmdoption-s"></span><tt class="descname">--use-padded-fft</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-s</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--use-padded-fft" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-s"></span><code class="descname">--use-padded-fft</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">-s</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--use-padded-fft" title="Permalink to this definition">¶</a></dt>
 <dd><p>This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by nscatter), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--force-numerical">
-<tt class="descname">--force-numerical</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--force-numerical" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--force-numerical</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--force-numerical" title="Permalink to this definition">¶</a></dt>
 <dd><p>This will force GGADT to use a numerical calculation of the differential scattering cross section for spherical grains (an analytical Anomalous Diffraction Theory solution is implemented by default).</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--do-full-2d-fft">
-<tt class="descname">--do-full-2d-fft</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--do-full-2d-fft" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--do-full-2d-fft</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--do-full-2d-fft" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do not utilize the fact that you can make a 2d FFT a 1d FFT if you only care about the orientationally averaged value of dσ/dΩ(θ)</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--save-shadow-function">
-<tt class="descname">--save-shadow-function</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--save-shadow-function" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--save-shadow-function</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--save-shadow-function" title="Permalink to this definition">¶</a></dt>
 <dd><p>You can save a copy of the 2d shadow function of your grain (useful as a sanity check or to make pretty pictures)</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--save-file-root">
-<tt class="descname">--save-file-root</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--save-file-root" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--save-file-root</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--save-file-root" title="Permalink to this definition">¶</a></dt>
 <dd><p>The &#8220;root&#8221; filename that the shadow function is saved to; for each orientation, GGADT saves the shadow function to:</p>
 <div class="highlight-python"><div class="highlight"><pre>[file_root]_shadow_function_o[00001, 00002, ..., N].dat
 </pre></div>
@@ -125,67 +114,67 @@
 
 <dl class="option">
 <dt id="cmdoption--parameter-file">
-<tt class="descname">--parameter-file</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--parameter-file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--parameter-file</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--parameter-file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Path to a correctly formatted parameter file.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--grain-geometry">
-<tt class="descname">--grain-geometry</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--grain-geometry" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--grain-geometry</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--grain-geometry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Geometry of dust grain. Must be one of SPHERE, ELLIPSOID, CUSTOM, SPHERES (or equivalently, AGGLOMERATION). A SPHERES grain geometry means that your grain is a conglomerate of smaller spheres. If you wish to use this grain geometry, you should supply a file (hereafter called a “agglomeration file&#8221;, see the next option) that defines the relative positions of the spheres that make up the grain. The sizes of these spheres will be normalized so that the effective radius of the grain is consistent with aeff.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--aeff">
-<tt class="descname">--aeff</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--aeff" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--aeff</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--aeff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Effective radius of dust grain. The effective radius is defined to be the radius of a sphere with the same volume as the dust grain.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--ngrain">
-<tt class="descname">--ngrain</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--ngrain" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--ngrain</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--ngrain" title="Permalink to this definition">¶</a></dt>
 <dd><p>The (square root) of the number of grid elements with which you would like to resolve your grain. To get accurate results out to about 4000 arcseconds, we’ve found that a value of 64 is good enough.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--norientations">
-<tt class="descname">--norientations</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--norientations" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--norientations</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--norientations" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of grain orientations relative to the incoming X-ray photon over which to average the differential cross-section.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--grid-width">
-<tt class="descname">--grid-width</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--grid-width" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--grid-width</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--grid-width" title="Permalink to this definition">¶</a></dt>
 <dd><p>You can manually set the length of the grid (in microns) with this argument.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--axes-convention">
-<tt class="descname">--axes-convention</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--axes-convention" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--axes-convention</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--axes-convention" title="Permalink to this definition">¶</a></dt>
 <dd><p>The axes convention to use. Must be one of DDSCAT or MSTM. These conventions are explained later in the documentation.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--fftw-optimization">
-<tt class="descname">--fftw-optimization</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--fftw-optimization" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--fftw-optimization</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--fftw-optimization" title="Permalink to this definition">¶</a></dt>
 <dd><p>Must be one of ESTIMATE, MEASURE, PATIENT or EXHAUSTIVE. For more information about what these tags mean and about FFTW wisdom, see <a class="reference external" href="http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans">http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans</a>.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--angle-mode">
-<tt class="descname">--angle-mode</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--angle-mode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--angle-mode</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--angle-mode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Must be one of random, sequential, or file. Specifying random will average over norientations grain orientations, with each angle chosen from a uniform distribution over the domain of orientation angles. Specifying sequential will make GGADT use a set of angles that are evenly spaced over each of the orientation angle domains. Specifying file allows you to give GGADT specific orientation angles to use in orientational averaging. The file mode requires that you also specify &#8211;angle-file=/path/to/angle-file which contains a list of orientation angles.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--angle-file">
-<tt class="descname">--angle-file</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--angle-file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--angle-file</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--angle-file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Path to a file containing a list of orientation angles which GGADT will use to compute orientational averages. Only used when &#8211;angle-mode=file.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--material-file">
-<tt class="descname">--material-file</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--material-file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--material-file</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--material-file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Path to file defining the energy-dependent index of refraction and dielectric constant for the grain material you would like to use. The material files must be formatted in the way that GGADT expects, namely with a two-line header,:</p>
 <div class="highlight-python"><div class="highlight"><pre>17 =ICOMP: amorphous olivine-like astrosilicate
 E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
@@ -206,18 +195,18 @@ E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
 <h2>Ellipsoidal grains<a class="headerlink" href="#ellipsoidal-grains" title="Permalink to this headline">¶</a></h2>
 <dl class="option">
 <dt id="cmdoption--grain-axis-x">
-<tt class="descname">--grain-axis-x</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--grain-axis-x" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--grain-axis-x</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--grain-axis-x" title="Permalink to this definition">¶</a></dt>
 <dd><p>For ELLIPSOID grains, we define the lengths of x, y and z axes.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--grain-axis-y">
-<tt class="descname">--grain-axis-y</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--grain-axis-y" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--grain-axis-y</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--grain-axis-y" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--grain-axis-z">
-<tt class="descname">--grain-axis-z</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--grain-axis-z" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--grain-axis-z</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--grain-axis-z" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -225,25 +214,25 @@ E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
 <h2>Agglomerations of spherical particles (single or multiple composition)<a class="headerlink" href="#agglomerations-of-spherical-particles-single-or-multiple-composition" title="Permalink to this headline">¶</a></h2>
 <dl class="option">
 <dt id="cmdoption--agglom-file">
-<tt class="descname">--agglom-file</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--agglom-file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--agglom-file</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--agglom-file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Path to a correctly formatted agglomeration file. Several agglomeration files are included with the distribution (see data/agglomerations), and if you wish to create your own, you must mimic exactly the format of these files.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--material-file1">
-<span id="cmdoption--material-file2"></span><span id="cmdoption--material-filen"></span><tt class="descname">--material-file1</tt><tt class="descclassname">=value</tt><tt class="descclassname">, </tt><tt class="descname">--material-file2</tt><tt class="descclassname">=value</tt><tt class="descclassname">, </tt><tt class="descname">--material-filen</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--material-file1" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption--material-file2"></span><span id="cmdoption--material-filen"></span><code class="descname">--material-file1</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--material-file2</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--material-filen</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--material-file1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Path(s) to the index file for material 1, 2, 3, etc.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--material-tag1">
-<span id="cmdoption--material-tag2"></span><span id="cmdoption--material-tagn"></span><tt class="descname">--material-tag1</tt><tt class="descclassname">=value</tt><tt class="descclassname">, </tt><tt class="descname">--material-tag2</tt><tt class="descclassname">=value</tt><tt class="descclassname">, </tt><tt class="descname">--material-tagn</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--material-tag1" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption--material-tag2"></span><span id="cmdoption--material-tagn"></span><code class="descname">--material-tag1</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--material-tag2</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--material-tagn</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--material-tag1" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name(s) by which material 1, 2, 3, etc. are referred to in the agglomerate composition file.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--agglom-composition-file">
-<tt class="descname">--agglom-composition-file</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--agglom-composition-file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--agglom-composition-file</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--agglom-composition-file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provides the path to a text file that lists the spherical agglomerates and a material ’tag’ which is associated with an index file.</p>
 <p>The agglomerate composition file is assumed to be formatted with one header line, followed by as many lines as there are agglomerates in the grain, with each line containing the index of an agglomerate and a material &#8216;tag&#8217;:</p>
 <div class="highlight-python"><div class="highlight"><pre>j      material tag
@@ -261,83 +250,83 @@ E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
 <h2>Differential scattering cross section<a class="headerlink" href="#differential-scattering-cross-section" title="Permalink to this headline">¶</a></h2>
 <dl class="option">
 <dt id="cmdoption--nscatter">
-<tt class="descname">--nscatter</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--nscatter" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--nscatter</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--nscatter" title="Permalink to this definition">¶</a></dt>
 <dd><p>The (square root) of the number of grid elements (in theta) with which you would like to resolve the differential scattering cross section.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--dtheta">
-<tt class="descname">--dtheta</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--dtheta" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--dtheta</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--dtheta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alternate to &#8211;nscatter: this defines the spacing of the scattering angles (in arcseconds) that you would like to calculate the differential cross section.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--ephot">
-<tt class="descname">--ephot</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--ephot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--ephot</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--ephot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Energy of the incident X-ray photon in keV.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--ior-re">
-<span id="cmdoption--ior-im"></span><tt class="descname">--ior-re</tt><tt class="descclassname">=value</tt><tt class="descclassname">, </tt><tt class="descname">--ior-im</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--ior-re" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption--ior-im"></span><code class="descname">--ior-re</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--ior-im</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--ior-re" title="Permalink to this definition">¶</a></dt>
 <dd><p>The real and imaginary components of the complex index of refraction, minus one. If &#8211;material-file is specified, these parameters are overwritten by the linearly interpolated value of the index of refraction at E = ephot.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--max-angle">
-<tt class="descname">--max-angle</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--max-angle" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--max-angle</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--max-angle" title="Permalink to this definition">¶</a></dt>
 <dd><p>The maximum scattering angle for which you would like to calculate the differential scattering cross section.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--do-phi-averaging">
-<tt class="descname">--do-phi-averaging</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--do-phi-averaging" title="Permalink to this definition">¶</a></dt>
-<dd><p>If <tt class="docutils literal"><span class="pre">--do-full-2d-fft</span></tt> is set, you have the option of also setting <tt class="docutils literal"><span class="pre">--do-phi-averaging</span></tt>, which averages the resulting <img class="math" src="_images/math/70c3262f2ce0b68e6af81967bfdf208a5b9b7dac.png" alt="dC_{\rm sca}/d\Omega(\theta,\phi)"/> over <img class="math" src="_images/math/10e009bdb83f96c5f47c58b34d5d4b12ef268d5b.png" alt="\phi"/> at each orientation, giving you a 1d result. In certain cases (i.e. for <tt class="docutils literal"><span class="pre">custom</span></tt> geometries), this is faster than doing many 1d FFT&#8217;s.</p>
+<code class="descname">--do-phi-averaging</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--do-phi-averaging" title="Permalink to this definition">¶</a></dt>
+<dd><p>If <code class="docutils literal"><span class="pre">--do-full-2d-fft</span></code> is set, you have the option of also setting <code class="docutils literal"><span class="pre">--do-phi-averaging</span></code>, which averages the resulting <img class="math" src="_images/math/70c3262f2ce0b68e6af81967bfdf208a5b9b7dac.png" alt="dC_{\rm sca}/d\Omega(\theta,\phi)"/> over <img class="math" src="_images/math/10e009bdb83f96c5f47c58b34d5d4b12ef268d5b.png" alt="\phi"/> at each orientation, giving you a 1d result. In certain cases (i.e. for <code class="docutils literal"><span class="pre">custom</span></code> geometries), this is faster than doing many 1d FFT&#8217;s.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--nphi">
-<tt class="descname">--nphi</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--nphi" title="Permalink to this definition">¶</a></dt>
-<dd><p>When <tt class="docutils literal"><span class="pre">--do-phi-averaging</span></tt> is set, you can set the number of <img class="math" src="_images/math/10e009bdb83f96c5f47c58b34d5d4b12ef268d5b.png" alt="\phi"/> values over which you average the 2d differential scattering cross section.</p>
+<code class="descname">--nphi</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--nphi" title="Permalink to this definition">¶</a></dt>
+<dd><p>When <code class="docutils literal"><span class="pre">--do-phi-averaging</span></code> is set, you can set the number of <img class="math" src="_images/math/10e009bdb83f96c5f47c58b34d5d4b12ef268d5b.png" alt="\phi"/> values over which you average the 2d differential scattering cross section.</p>
 </dd></dl>
 
 </div>
 <div class="section" id="energy-dependent-scattering-and-absorption-cross-sections-integrated-mode">
 <h2>Energy-dependent scattering and absorption cross sections (integrated mode)<a class="headerlink" href="#energy-dependent-scattering-and-absorption-cross-sections-integrated-mode" title="Permalink to this headline">¶</a></h2>
-<p>You must also define a <tt class="docutils literal"><span class="pre">--material-file</span></tt> to do this calculation.</p>
+<p>You must also define a <code class="docutils literal"><span class="pre">--material-file</span></code> to do this calculation.</p>
 <dl class="option">
 <dt id="cmdoption--integrated">
-<tt class="descname">--integrated</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--integrated" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--integrated</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--integrated" title="Permalink to this definition">¶</a></dt>
 <dd><p>This flag tells GGADT that you would like to calculate the energy-dependent integrated absorption and scattering cross sections.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--nephots">
-<tt class="descname">--nephots</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--nephots" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--nephots</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--nephots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the number of photon energies to calculate the cross sections between &#8211;ephot-min and &#8211;ephot-max. You can also define the energy spacing directly, via the &#8211;dephot parameter.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--dephot">
-<tt class="descname">--dephot</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--dephot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--dephot</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--dephot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alternate to &#8211;nephots, defines the energy spacing between different photon energies for which the cross sections are calculated.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--ephot-min">
-<tt class="descname">--ephot-min</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--ephot-min" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--ephot-min</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--ephot-min" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the minimum photon energy for which the cross sections are calculated</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--ephot-max">
-<tt class="descname">--ephot-max</tt><tt class="descclassname">=value</tt><a class="headerlink" href="#cmdoption--ephot-max" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--ephot-max</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--ephot-max" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the maximum photon energy for which the cross sections are calculated</p>
 </dd></dl>
 
 <div class="section" id="default-parameter-values">
 <h3>Default parameter values<a class="headerlink" href="#default-parameter-values" title="Permalink to this headline">¶</a></h3>
-<p>Default parameter values are loaded from the <tt class="docutils literal"><span class="pre">.defaults</span></tt> file located in the parent directory of GGADT. You can edit this file, or (as a safer option), edit a copy of this file and pass the path as the value for <tt class="docutils literal"><span class="pre">--parameter-file</span></tt>.</p>
+<p>Default parameter values are loaded from the <code class="docutils literal"><span class="pre">.defaults</span></code> file located in the parent directory of GGADT. You can edit this file, or (as a safer option), edit a copy of this file and pass the path as the value for <code class="docutils literal"><span class="pre">--parameter-file</span></code>.</p>
 </div>
 </div>
 </div>
@@ -346,7 +335,7 @@ E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -362,19 +351,23 @@ E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
 </ul>
 </li>
 </ul>
-
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="invoking.html"
-                        title="previous chapter">Invoking GGADT</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="diffscat.html"
-                        title="next chapter">Differential scattering cross section</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/options.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="invoking.html" title="previous chapter">Invoking GGADT</a></li>
+      <li>Next: <a href="diffscat.html" title="next chapter">Differential scattering cross section</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/options.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -391,24 +384,20 @@ E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="diffscat.html" title="Differential scattering cross section"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="invoking.html" title="Invoking GGADT"
-             >previous</a> |</li>
-        <li><a href="index.html">ggadt 1.1.0 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
     <div class="footer">
-        &copy; Copyright 2015, John Hoffman.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      &copy;2015, John Hoffman, Michael Tarczon.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/options.txt"
+          rel="nofollow">Page source</a>
     </div>
+
+    
+
+    
   </body>
 </html>
