@@ -1,0 +1,40 @@
+################
+Installing GGADT
+################
+
+GGADT should install easily on most Unix-based systems (e.g. Linux, Mac) by following the standard GNU install procedures, described in ``INSTALL``::
+    
+        $ ./configure [--enable-openmp] ...
+        $ make
+
+The ggadt binary is now located in the src directory. An optional next step is to do ``make install``, which installs the ggadt into a globally-accessible folder (usually ``/usr/local/bin``). If you would like to do this, fine, but we prefer a more self-contained setup. We will assume for the remainder of the documentation that you did not do a ``make install``.
+
+If you did do ``make install``, you can undo it by running ``make uninstall``. To clean and remake GGADT, simply do ``make clean`` and then ``make``.
+
+It should give you a slight (5 - 10%) speed advantage to use the ``-O3`` optimization flag. We tried using ``-Ofast``, but this produced a segfault for moderately large 2d grid sizes, and we didn’t spend too much time trying to figure out why. So, you can use ``-Ofast`` for a little extra oomph, but just know that things might break unexpectedly (the normal, 1d case worked fine for us)::
+        
+        $ ./configure FCFLAGS="-O3" [--enable-openmp] ...
+
+
+
+********************
+Package Dependencies
+********************
+
+**Suitable C and Fortran 90 compilers**  
+	GGADT was developed using the GNU compiler suite (version 4.5.4 and higher) throughout, but the configure script will try to work with most common compilers. GGADT has been tested to compile on versions 4.3 and later of `gfortran`. If you experience any compilation problems, please let us know!
+**OpenMP** 
+	For the OpenMP version of GGADT, you must have C and Fortran compilers that are compatible with OpenMP version 4.0.
+
+Mac Users
+=========
+
+* Install the latest edition of ``XCode command-line tools``. As of Mac OSX v10.9.1, the command-line tools are not included in XCode automatically, so you have to do this on your own.
+* **Macports** is highly recommended. To install,
+
+        #. Download and install macports from http://www.macports.org/
+        #. Install the `coreutils` package: ``sudo port install coreutils``
+        #. Install `gcc` (4.5.4 or higher is recommended): ``sudo port install gcc45``
+        #. Set the gcc compiler: ``sudo port select --set gcc mp-gcc45``
+
+

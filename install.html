@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installing GGADT &mdash; ggadt 1.1.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="ggadt 1.1.2 documentation" href="index.html" />
+    <link rel="next" title="Quick Example" href="example.html" />
+    <link rel="prev" title="General Geometry Anomalous Diffraction Theory" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="installing-ggadt">
+<h1>Installing GGADT<a class="headerlink" href="#installing-ggadt" title="Permalink to this headline">¶</a></h1>
+<p>GGADT should install easily on most Unix-based systems (e.g. Linux, Mac) by following the standard GNU install procedures, described in <code class="docutils literal"><span class="pre">INSTALL</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ ./configure [--enable-openmp] ...
+$ make
+</pre></div>
+</div>
+<p>The ggadt binary is now located in the src directory. An optional next step is to do <code class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></code>, which installs the ggadt into a globally-accessible folder (usually <code class="docutils literal"><span class="pre">/usr/local/bin</span></code>). If you would like to do this, fine, but we prefer a more self-contained setup. We will assume for the remainder of the documentation that you did not do a <code class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></code>.</p>
+<p>If you did do <code class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></code>, you can undo it by running <code class="docutils literal"><span class="pre">make</span> <span class="pre">uninstall</span></code>. To clean and remake GGADT, simply do <code class="docutils literal"><span class="pre">make</span> <span class="pre">clean</span></code> and then <code class="docutils literal"><span class="pre">make</span></code>.</p>
+<p>It should give you a slight (5 - 10%) speed advantage to use the <code class="docutils literal"><span class="pre">-O3</span></code> optimization flag. We tried using <code class="docutils literal"><span class="pre">-Ofast</span></code>, but this produced a segfault for moderately large 2d grid sizes, and we didn’t spend too much time trying to figure out why. So, you can use <code class="docutils literal"><span class="pre">-Ofast</span></code> for a little extra oomph, but just know that things might break unexpectedly (the normal, 1d case worked fine for us):</p>
+<div class="highlight-python"><div class="highlight"><pre>$ ./configure FCFLAGS=&quot;-O3&quot; [--enable-openmp] ...
+</pre></div>
+</div>
+<div class="section" id="package-dependencies">
+<h2>Package Dependencies<a class="headerlink" href="#package-dependencies" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><strong>Suitable C and Fortran 90 compilers</strong></dt>
+<dd>GGADT was developed using the GNU compiler suite (version 4.5.4 and higher) throughout, but the configure script will try to work with most common compilers. GGADT has been tested to compile on versions 4.3 and later of <cite>gfortran</cite>. If you experience any compilation problems, please let us know!</dd>
+<dt><strong>OpenMP</strong></dt>
+<dd>For the OpenMP version of GGADT, you must have C and Fortran compilers that are compatible with OpenMP version 4.0.</dd>
+</dl>
+<div class="section" id="mac-users">
+<h3>Mac Users<a class="headerlink" href="#mac-users" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">Install the latest edition of <code class="docutils literal"><span class="pre">XCode</span> <span class="pre">command-line</span> <span class="pre">tools</span></code>. As of Mac OSX v10.9.1, the command-line tools are not included in XCode automatically, so you have to do this on your own.</p>
+</li>
+<li><p class="first"><strong>Macports</strong> is highly recommended. To install,</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Download and install macports from <a class="reference external" href="http://www.macports.org/">http://www.macports.org/</a></li>
+<li>Install the <cite>coreutils</cite> package: <code class="docutils literal"><span class="pre">sudo</span> <span class="pre">port</span> <span class="pre">install</span> <span class="pre">coreutils</span></code></li>
+<li>Install <cite>gcc</cite> (4.5.4 or higher is recommended): <code class="docutils literal"><span class="pre">sudo</span> <span class="pre">port</span> <span class="pre">install</span> <span class="pre">gcc45</span></code></li>
+<li>Set the gcc compiler: <code class="docutils literal"><span class="pre">sudo</span> <span class="pre">port</span> <span class="pre">select</span> <span class="pre">--set</span> <span class="pre">gcc</span> <span class="pre">mp-gcc45</span></code></li>
+</ol>
+</div></blockquote>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installing GGADT</a><ul>
+<li><a class="reference internal" href="#package-dependencies">Package Dependencies</a><ul>
+<li><a class="reference internal" href="#mac-users">Mac Users</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">General Geometry Anomalous Diffraction Theory</a></li>
+      <li>Next: <a href="example.html" title="next chapter">Quick Example</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/install.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, John Hoffman, Michael Tarczon.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/install.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
