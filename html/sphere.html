@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Sphere &mdash; ggadt 1.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="ggadt 1.1.0 documentation" href="index.html" />
+    <link rel="next" title="Ellipsoids" href="ellipsoids.html" />
+    <link rel="prev" title="Differential scattering cross section" href="diffscat.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ellipsoids.html" title="Ellipsoids"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="diffscat.html" title="Differential scattering cross section"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">ggadt 1.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="sphere">
+<h1>Sphere<a class="headerlink" href="#sphere" title="Permalink to this headline">¶</a></h1>
+<p>For spherical particles, GGADT uses the following integral expression (see, e.g. <a class="reference internal" href="#da2006" id="id1">[DA2006]</a>)</p>
+<div class="math">
+<p><img src="_images/math/101a6cc8b1ea341aa8f525b1828d31cb021850e6.png" alt="S(\theta) = (ka)^2\int_{0}^{\pi/2}du J_0(ka\sin\theta\cos u)\left(1 - e^{i\rho\sin u}\right)\sin u \cos u,"/></p>
+</div><p>Here, <img class="math" src="_images/math/4d91d6697998096d0a587990d9d65c7915cb47c7.png" alt="J_0"/> is the <img class="math" src="_images/math/60b7f67a53ef96126e7d4f4b189af51ef701a35e.png" alt="n=0"/> Bessel function. By default, GGADT will numerically solve this integral (much faster than solving the general equations). You can force GGADT to use the general solution by passing the <tt class="docutils literal"><span class="pre">--force-numerical</span></tt> flag (alternatively, you can set <tt class="docutils literal"><span class="pre">force-numerical=T</span></tt> in your parameter file).</p>
+<table class="docutils citation" frame="void" id="da2006" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[DA2006]</a></td><td>Draine, B. T., &amp; Allaf-Akbari, K. 2006, ApJ, 652, 1318</td></tr>
+</tbody>
+</table>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="diffscat.html"
+                        title="previous chapter">Differential scattering cross section</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ellipsoids.html"
+                        title="next chapter">Ellipsoids</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/sphere.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ellipsoids.html" title="Ellipsoids"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="diffscat.html" title="Differential scattering cross section"
+             >previous</a> |</li>
+        <li><a href="index.html">ggadt 1.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, John Hoffman.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

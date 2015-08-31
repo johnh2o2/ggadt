@@ -1,0 +1,62 @@
+Using a customized geometry
+===========================
+
+GGADT supports three common ways to specify the geometry of a grain: either as a sphere, an ellipsoid, or an agglomeration of spheres. If you would like to explore other grain geometries that are not adequately described by these three options, you may program a grain geometry yourself (and then subsequently recompile GGADT).
+
+To do this, you must know Fortran 90/95. Open the ``custom.f90`` file, and edit the ``ior_custom()`` function to return the index of refraction at an arbitrary position in the grain. At the moment, the custom grain geometry is set up to be a spherical grain.
+
+.. code-block:: fortran
+
+	function ior_custom(x,y,z,en,ephots,ior_res,ior_ims,a)
+	
+        real(kind=dp_real), intent(in) :: x,y,z,en
+        real(kind=dp_real), intent(in) :: ephots(:)
+        real(kind=dp_real), intent(in) :: ior_res(:,:), ior_ims(:,:)
+        complex(kind=dp_complex) :: ior_custom
+
+        ! write code for your own grain geometry here.
+        ! 
+        ! This function is currently set up to do a sphere
+        ! 
+
+        ! inputs : 
+        !          x,y,z               cartesian coordinates of the grain in the DDSCAT axis convention
+        !
+        !          en                  photon energy at which the index of refraction is requested
+        !
+        !          ephots              an array of photon energies to use for interpolation purposes
+        !
+        !          ior_res, ior_ims    The real and imaginary components of the index of refraction for
+        !                              the material(s) specified. 
+        !
+        !          a                   The effective radius of the grain
+        !
+        ! note: the ephots and ior_res/ior_ims arrays are organized such that 
+        !        
+        !                   m - 1 = ior_res(i,j) + sqrt(-1) * ior_ims(i,j) 
+        !
+        !       is the index of refraction (minus one) for material number "i" at a photon
+        !       energy of ephots(j). Linear interpolation can be used to obtain m-1 for arbitrary 
+        !       photon energies.
+
+        real(kind=dp_real), intent(in) :: a 
+        
+        if (mag(x,y,z) < a) then
+            if (size(ior_res(1,:)) .eq. 1) then 
+                ior_custom = CMPLX(ior_res(1,1),ior_ims(1,1))
+            else
+                ior_custom = CMPLX(linterp(ephots,ior_res(1,:),en),linterp(ephots,ior_ims(1,:),en) )
+            end if 
+        else
+            ior_custom = CMPLX(0.0,0.0)
+        end if 
+
+    end function ior_custom
+
+After you have finished writing the function corresponding to the desired grain geometry, you’ll need to recompile ggadt by moving to the parent directory and doing::
+
+	make clean
+	make
+
+Then, set the ``--grain-geometry`` parameter to "custom" the next time you run GGADT. 
+

@@ -1,0 +1,14 @@
+Sphere
+======
+
+For spherical particles, GGADT uses the following integral expression (see, e.g. [DA2006]_)
+
+.. math::
+
+	S(\theta) = (ka)^2\int_{0}^{\pi/2}du J_0(ka\sin\theta\cos u)\left(1 - e^{i\rho\sin u}\right)\sin u \cos u,
+
+Here, :math:`J_0` is the :math:`n=0` Bessel function. By default, GGADT will numerically solve this integral (much faster than solving the general equations). You can force GGADT to use the general solution by passing the ``--force-numerical`` flag (alternatively, you can set ``force-numerical=T`` in your parameter file).
+
+
+
+.. [DA2006] Draine, B. T., & Allaf-Akbari, K. 2006, ApJ, 652, 1318 

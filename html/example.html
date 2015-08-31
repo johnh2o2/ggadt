@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Quick Example &mdash; ggadt 1.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="ggadt 1.1.0 documentation" href="index.html" />
+    <link rel="next" title="Invoking GGADT" href="invoking.html" />
+    <link rel="prev" title="Installing GGADT" href="install.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="invoking.html" title="Invoking GGADT"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installing GGADT"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">ggadt 1.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="quick-example">
+<h1>Quick Example<a class="headerlink" href="#quick-example" title="Permalink to this headline">¶</a></h1>
+<p>A directory containing two example cases, <tt class="docutils literal"><span class="pre">example/</span></tt>, is found in the parent directory of <strong class="program">GGADT</strong>. In this directory, you will find:</p>
+<dl class="docutils">
+<dt><strong>README</strong></dt>
+<dd>A small file detailing the contents of the directory</dd>
+<dt><strong>Parameter files</strong></dt>
+<dd><dl class="first last docutils">
+<dt><tt class="docutils literal"><span class="pre">parameters_total_xs.ini</span></tt></dt>
+<dd>Parameter file for computing total (abs, sca, ext) cross sections as a function of energy</dd>
+<dt><tt class="docutils literal"><span class="pre">parameters_diffscat.ini</span></tt></dt>
+<dd>Parameter file for computing differential scattering cross section as a function of scattering angle.</dd>
+</dl>
+</dd>
+<dt><strong>Python scripts</strong></dt>
+<dd><dl class="first last docutils">
+<dt><tt class="docutils literal"><span class="pre">plot_total_xs.py</span></tt></dt>
+<dd>Plots output of GGADT calculations of total cross section</dd>
+<dt><tt class="docutils literal"><span class="pre">plot_diffscat.py</span></tt></dt>
+<dd>Plots output of GGADT calculations of differential scattering cross section</dd>
+</dl>
+</dd>
+<dt><strong>Target files for clusters of spheres</strong></dt>
+<dd><p class="first">describes the geometry of a cluster of spheres, see <a class="reference internal" href="#s2003" id="id1">[S2003]</a> for more information</p>
+<dl class="last docutils">
+<dt><tt class="docutils literal"><span class="pre">BA.256.1.targ</span></tt></dt>
+<dd>More porous aggregate</dd>
+<dt><tt class="docutils literal"><span class="pre">BAM2.256.1.targ</span></tt></dt>
+<dd>Less porous aggregate</dd>
+</dl>
+</dd>
+</dl>
+<table class="docutils citation" frame="void" id="s2003" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[S2003]</a></td><td>Shen, Y., Draine, B. T., &amp; Johnson, E. T. 2008, ApJ, 689, 260 <a class="reference external" href="http://adsabs.harvard.edu/abs/2008ApJ...689..260S">ads</a></td></tr>
+</tbody>
+</table>
+<div class="section" id="example-1-total-cross-sections-as-a-function-of-energy">
+<h2>Example 1: Total cross sections as a function of energy<a class="headerlink" href="#example-1-total-cross-sections-as-a-function-of-energy" title="Permalink to this headline">¶</a></h2>
+<p>The first example uses <strong class="program">GGADT</strong> to compute the total cross sections (i.e. absorption, scattering, extinction) for a particular set of parameters, listed in <tt class="docutils literal"><span class="pre">parameters_total_xs.ini</span></tt>. A more detailed look at the parameter will come a bit later.</p>
+<p>To run <strong class="program">GGADT</strong> with the parameters specified in the parameter file <tt class="docutils literal"><span class="pre">parameters_total_xs.ini</span></tt>, simply do:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ ../src/ggadt --parameter-file=parameters_total_xs.ini &gt; total_xs.out
+</pre></div>
+</div>
+<p>This will store the results into the file <tt class="docutils literal"><span class="pre">total_xs.out</span></tt>, which can then be read in by the python script <strong class="program">plot_total_xs.py</strong>. To plot the results:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ python plot_total_xs.py total_xs.out
+</pre></div>
+</div>
+<p>Generating a plot that should look something like this</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/total_xs.png"><img alt="_images/total_xs.png" src="_images/total_xs.png" style="width: 500px;" /></a>
+<p class="caption">Total cross section (<strong>example 1</strong>)</p>
+</div>
+<div class="section" id="a-more-thorough-look-at-the-parameter-file-parameters-total-xs-ini">
+<h3>A more thorough look at the parameter file <tt class="docutils literal"><span class="pre">parameters_total_xs.ini</span></tt><a class="headerlink" href="#a-more-thorough-look-at-the-parameter-file-parameters-total-xs-ini" title="Permalink to this headline">¶</a></h3>
+<p>Let&#8217;s take a closer look at the parameter file now.</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="c1"># Geometry of grain</span>
+<span class="c1"># | one of: &#39;sphere&#39;,&#39;spheres&#39; (or &#39;agglomerate&#39;), or &#39;ellipsoid&#39;</span>
+<span class="na">grain-geometry</span>                 <span class="o">=</span> <span class="s">&#39;spheres&#39;</span>
+<span class="na">agglom-file</span>                    <span class="o">=</span> <span class="s">&#39;BAM2.256.1.targ&#39;</span>
+</pre></div>
+</div>
+<p>These lines tell <strong class="program">GGADT</strong> about the kind of object it will be dealing with. By specifying <tt class="docutils literal"><span class="pre">grain-geometry=spheres</span></tt>, we&#8217;re saying that the object is a cluster of spheres, and that the cluster is parameterized in the file <tt class="docutils literal"><span class="pre">BAM2.256.1.targ</span></tt>. Without going into too much detail, suffice it to say that this file describes the following object:</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/BAM2_256_1_noheader.png"><img alt="_images/BAM2_256_1_noheader.png" src="_images/BAM2_256_1_noheader.png" style="width: 500px;" /></a>
+<p class="caption">The grain parameterized by <tt class="docutils literal"><span class="pre">BAM2.256.1.targ</span></tt></p>
+</div>
+<p>Let&#8217;s move on.</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">use-efficiencies</span>               <span class="o">=</span> <span class="s">T</span>
+<span class="na">integrated</span>                     <span class="o">=</span> <span class="s">T</span>
+</pre></div>
+</div>
+<p>Here, we&#8217;re telling <strong class="program">GGADT</strong> that we want it to output results in terms of <em>efficiencies</em>, <img class="math" src="_images/math/26aa4a683a4c14ec474ed2a341a9b0b36cc94245.png" alt="Q\equiv C/\pi a^2"/>, and that we&#8217;re computing the integrated cross sections (and not the differential scattering cross section).</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="c1"># effective radius (radius of sphere with same volume)</span>
+<span class="na">aeff</span>                           <span class="o">=</span> <span class="s">0.2</span>
+<span class="c1"># Number of grid elements (along one dimension) to resolve grain</span>
+<span class="na">ngrain</span>                         <span class="o">=</span> <span class="s">128</span>
+</pre></div>
+</div>
+<p>This tells <strong class="program">GGADT</strong> that the effective radius of the grain <img class="math" src="_images/math/4f35587a09081f139de65574d8b70a5b8332b044.png" alt="a_{\rm eff}\equiv (3V/4\pi)^{1/3}"/> is 0.2 microns, and that it should be represented on a 128 x 128 two-dimensional grid.</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">material-file</span>                  <span class="o">=</span> <span class="s">&quot;index_silD03&quot;</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">material-file</span></tt> argument gives the location of the &#8220;index file&#8221;: a file specifying the energy-dependent refractive index of the grain material.</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">dephot</span>                         <span class="o">=</span> <span class="s">0.1</span>
+<span class="na">ephot-min</span>                      <span class="o">=</span> <span class="s">0.1</span>
+<span class="na">ephot-max</span>                      <span class="o">=</span> <span class="s">5.0</span>
+</pre></div>
+</div>
+<p>These parameters set the energy range (and the energy resolution) over which the cross sections are computed.</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">angle-mode</span>                     <span class="o">=</span> <span class="s">&#39;random&#39;   # Either &#39;sequential&#39;, &#39;random&#39; or &#39;file&#39;</span>
+<span class="s">                                            # | tells GGADT how to choose orientations over which to average</span>
+<span class="s">                                            # | calculations.</span>
+<span class="na">norientations</span>                  <span class="o">=</span> <span class="s">64</span>
+<span class="s">                                                                                        # If angle-mode is NOT &#39;file&#39;; number of orientations</span>
+<span class="s">                                            # | over which to average calcuations</span>
+</pre></div>
+</div>
+<p>Here we&#8217;re saying that GGADT should average over 64 random orientations of the object.</p>
+</div>
+</div>
+<div class="section" id="example-2-differential-scattering-cross-section">
+<h2>Example 2: Differential scattering cross section<a class="headerlink" href="#example-2-differential-scattering-cross-section" title="Permalink to this headline">¶</a></h2>
+<p>The second example uses GGADT to calculate the differential scattering cross section for a particular object and set of parameters. The <tt class="docutils literal"><span class="pre">parameters_diffscat.ini</span></tt> parameter file is used here.</p>
+<p>To run <strong class="program">GGADT</strong> with the parameters specified in the parameter file <tt class="docutils literal"><span class="pre">parameters_total_xs.ini</span></tt>, simply do:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ ../src/ggadt --parameter-file=parameters_diffscat.ini &gt; diffscat.out
+</pre></div>
+</div>
+<p>This will store the results into the file <tt class="docutils literal"><span class="pre">total_xs.out</span></tt>, which can then be read in by the python script <strong class="program">plot_total_xs.py</strong>. To plot the results:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ python plot_diffscat.py diffscat.out
+</pre></div>
+</div>
+<p>Generating a plot that should look something like this</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/diffscat.png"><img alt="_images/diffscat.png" src="_images/diffscat.png" style="width: 500px;" /></a>
+<p class="caption">Differential scattering cross section (<strong>example 2</strong>)</p>
+</div>
+<div class="section" id="a-more-thorough-look-at-the-parameter-file-parameters-diffscat-ini">
+<h3>A more thorough look at the parameter file <tt class="docutils literal"><span class="pre">parameters_diffscat.ini</span></tt><a class="headerlink" href="#a-more-thorough-look-at-the-parameter-file-parameters-diffscat-ini" title="Permalink to this headline">¶</a></h3>
+<p>We&#8217;ll pick through the differences between <tt class="docutils literal"><span class="pre">parameters_diffscat.ini</span></tt> and <tt class="docutils literal"><span class="pre">parameters_total_xs.ini</span></tt>.</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="c1"># parameters for differential scattering cross section calculation</span>
+<span class="c1"># units: keV</span>
+<span class="na">ephot</span>                          <span class="o">=</span> <span class="s">2.0</span>
+<span class="c1">#  Re(m-1)</span>
+<span class="c1"># ior-re                         =-1.920E-4</span>
+<span class="c1">#  Re(m)</span>
+<span class="c1"># ior-im                         = 2.807E-5</span>
+<span class="c1"># |</span>
+<span class="c1"># | DO NOT define ior-re or ior-im if you also have defined</span>
+<span class="c1"># | a material-file and &#39;ephot&#39;. It will pull m(E) automatically.</span>
+<span class="c1"># |</span>
+</pre></div>
+</div>
+<p>Here, we do the calculation at <em>one</em> photon energy (i.e. for a single value of the index of refraction, <img class="math" src="_images/math/c4bb40dd65eae6c11b325989b14e0b8d35e4e3ef.png" alt="m"/>). We can either set <tt class="docutils literal"><span class="pre">ior-re</span></tt> and <tt class="docutils literal"><span class="pre">ior-im</span></tt> ourselves, <em>or</em> we can specify a <tt class="docutils literal"><span class="pre">material-file</span></tt> and a photon energy, <tt class="docutils literal"><span class="pre">ephot</span></tt> (in keV). We&#8217;ve chosen the latter here.</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="c1">## number of angles to calculate diff. scat. cross section (ntheta) or spacing between them (dtheta)</span>
+<span class="c1"># (arcseconds) Choose only one of these parameters</span>
+<span class="na">dtheta</span>                         <span class="o">=</span> <span class="s">25.0</span>
+<span class="c1">#nscatter                      = 100</span>
+
+<span class="c1">## Maximum angle for which the diff. scat. cross section is calculated</span>
+<span class="c1"># (arcseconds)</span>
+<span class="na">max-angle</span>                      <span class="o">=</span> <span class="s">6000.</span>
+</pre></div>
+</div>
+<p>This tells GGADT that you want to compute <img class="math" src="_images/math/55d20eed017ebeaf5a8e10a9f2f0bf2a8661f917.png" alt="dC_{\rm sca}/d\Omega"/> from 0 to 6000 arcseconds, with values spaced every <img class="math" src="_images/math/352e0c598fe5d285c1279e08915ee864b0c82107.png" alt="\delta\theta=25"/> arcseconds.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Quick Example</a><ul>
+<li><a class="reference internal" href="#example-1-total-cross-sections-as-a-function-of-energy">Example 1: Total cross sections as a function of energy</a><ul>
+<li><a class="reference internal" href="#a-more-thorough-look-at-the-parameter-file-parameters-total-xs-ini">A more thorough look at the parameter file <tt class="docutils literal"><span class="pre">parameters_total_xs.ini</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example-2-differential-scattering-cross-section">Example 2: Differential scattering cross section</a><ul>
+<li><a class="reference internal" href="#a-more-thorough-look-at-the-parameter-file-parameters-diffscat-ini">A more thorough look at the parameter file <tt class="docutils literal"><span class="pre">parameters_diffscat.ini</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="install.html"
+                        title="previous chapter">Installing GGADT</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="invoking.html"
+                        title="next chapter">Invoking GGADT</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/example.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="invoking.html" title="Invoking GGADT"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installing GGADT"
+             >previous</a> |</li>
+        <li><a href="index.html">ggadt 1.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, John Hoffman.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

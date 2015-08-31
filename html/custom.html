@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using a customized geometry &mdash; ggadt 1.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="ggadt 1.1.0 documentation" href="index.html" />
+    <link rel="next" title="Angle conventions" href="conventions.html" />
+    <link rel="prev" title="Agglomerations of spherical monomers" href="agglomerate.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="conventions.html" title="Angle conventions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="agglomerate.html" title="Agglomerations of spherical monomers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">ggadt 1.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-a-customized-geometry">
+<h1>Using a customized geometry<a class="headerlink" href="#using-a-customized-geometry" title="Permalink to this headline">¶</a></h1>
+<p>GGADT supports three common ways to specify the geometry of a grain: either as a sphere, an ellipsoid, or an agglomeration of spheres. If you would like to explore other grain geometries that are not adequately described by these three options, you may program a grain geometry yourself (and then subsequently recompile GGADT).</p>
+<p>To do this, you must know Fortran 90/95. Open the <tt class="docutils literal"><span class="pre">custom.f90</span></tt> file, and edit the <tt class="docutils literal"><span class="pre">ior_custom()</span></tt> function to return the index of refraction at an arbitrary position in the grain. At the moment, the custom grain geometry is set up to be a spherical grain.</p>
+<div class="highlight-fortran"><div class="highlight"><pre>    <span class="k">function </span><span class="n">ior_custom</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">en</span><span class="p">,</span><span class="n">ephots</span><span class="p">,</span><span class="n">ior_res</span><span class="p">,</span><span class="n">ior_ims</span><span class="p">,</span><span class="n">a</span><span class="p">)</span>
+
+    <span class="kt">real</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">dp_real</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">en</span>
+    <span class="kt">real</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">dp_real</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ephots</span><span class="p">(:)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">dp_real</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ior_res</span><span class="p">(:,:),</span> <span class="n">ior_ims</span><span class="p">(:,:)</span>
+    <span class="kt">complex</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">dp_complex</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ior_custom</span>
+
+    <span class="c">! write code for your own grain geometry here.</span>
+    <span class="c">!</span>
+    <span class="c">! This function is currently set up to do a sphere</span>
+    <span class="c">!</span>
+
+    <span class="c">! inputs :</span>
+    <span class="c">!          x,y,z               cartesian coordinates of the grain in the DDSCAT axis convention</span>
+    <span class="c">!</span>
+    <span class="c">!          en                  photon energy at which the index of refraction is requested</span>
+    <span class="c">!</span>
+    <span class="c">!          ephots              an array of photon energies to use for interpolation purposes</span>
+    <span class="c">!</span>
+    <span class="c">!          ior_res, ior_ims    The real and imaginary components of the index of refraction for</span>
+    <span class="c">!                              the material(s) specified.</span>
+    <span class="c">!</span>
+    <span class="c">!          a                   The effective radius of the grain</span>
+    <span class="c">!</span>
+    <span class="c">! note: the ephots and ior_res/ior_ims arrays are organized such that</span>
+    <span class="c">!</span>
+    <span class="c">!                   m - 1 = ior_res(i,j) + sqrt(-1) * ior_ims(i,j)</span>
+    <span class="c">!</span>
+    <span class="c">!       is the index of refraction (minus one) for material number &quot;i&quot; at a photon</span>
+    <span class="c">!       energy of ephots(j). Linear interpolation can be used to obtain m-1 for arbitrary</span>
+    <span class="c">!       photon energies.</span>
+
+    <span class="kt">real</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">dp_real</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">mag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">a</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        if</span> <span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">ior_res</span><span class="p">(</span><span class="mi">1</span><span class="p">,:))</span> <span class="p">.</span><span class="n">eq</span><span class="p">.</span> <span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">ior_custom</span> <span class="o">=</span> <span class="nb">CMPLX</span><span class="p">(</span><span class="n">ior_res</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">ior_ims</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span>
+<span class="k">            </span><span class="n">ior_custom</span> <span class="o">=</span> <span class="nb">CMPLX</span><span class="p">(</span><span class="n">linterp</span><span class="p">(</span><span class="n">ephots</span><span class="p">,</span><span class="n">ior_res</span><span class="p">(</span><span class="mi">1</span><span class="p">,:),</span><span class="n">en</span><span class="p">),</span><span class="n">linterp</span><span class="p">(</span><span class="n">ephots</span><span class="p">,</span><span class="n">ior_ims</span><span class="p">(</span><span class="mi">1</span><span class="p">,:),</span><span class="n">en</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">end if</span>
+<span class="k">    else</span>
+<span class="k">        </span><span class="n">ior_custom</span> <span class="o">=</span> <span class="nb">CMPLX</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">end if</span>
+
+<span class="k">end function </span><span class="n">ior_custom</span>
+</pre></div>
+</div>
+<p>After you have finished writing the function corresponding to the desired grain geometry, you’ll need to recompile ggadt by moving to the parent directory and doing:</p>
+<div class="highlight-python"><div class="highlight"><pre>make clean
+make
+</pre></div>
+</div>
+<p>Then, set the <tt class="docutils literal"><span class="pre">--grain-geometry</span></tt> parameter to &#8220;custom&#8221; the next time you run GGADT.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="agglomerate.html"
+                        title="previous chapter">Agglomerations of spherical monomers</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="conventions.html"
+                        title="next chapter">Angle conventions</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/custom.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="conventions.html" title="Angle conventions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="agglomerate.html" title="Agglomerations of spherical monomers"
+             >previous</a> |</li>
+        <li><a href="index.html">ggadt 1.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, John Hoffman.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
