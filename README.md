@@ -7,7 +7,7 @@ README last updated: August 31, 2015
 
 GGADT is a set of Fortran 95 routines that calculate the x-ray scattering and absorption properties of dust grains using anomalous diffraction theory (valid when the grain is large compared to the wavelength of incident light).
 
-**[Full documentation](ggadt.org)** (in browsable, HTML form) is available. A pdf manual is also included. 
+**[Full documentation](http://ggadt.org)** (in browsable, HTML form) is available. A pdf manual is also included. 
 
 See the **ChangeLog** for the gritty details of what's been changed in GGADT over time. This is just a spit-out of the current git log, and so probably contains more information than you need.
 
@@ -16,7 +16,7 @@ Quick install instructions
 
 **Recommended reading**: 
 
-* The HTML documentation for GGADT, available on-line at [ggadt.org](ggadt.org)
+* The HTML documentation for GGADT, available on-line at [ggadt.org](http://ggadt.org)
 * the INSTALL file (which is a general-use file provided by GNU and may not be 100% applicable to GGADT)
 
 Do the following from a terminal

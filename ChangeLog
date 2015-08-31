@@ -1,3 +1,9 @@
+* commit ed800efcff96b72880ba5a95f27b68f1ac56aca4
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Aug 31 16:15:02 2015 -0400
+| 
+|     Added to the EXTRA_DIST variable in Makefile.am; also removed a debugging statement in ggadt.f90.in.
+|  
 * commit 04d614b988820b72391fed495259a0d7957b5cfc
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Mon Aug 31 15:21:14 2015 -0400
