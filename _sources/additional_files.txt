@@ -3,5 +3,5 @@ Additional files
 
 To keep GGADT lean, we opted not to include target files and index files (except for those in the ``example`` directory). You can download tarballs of both index files and a complete list of target files pulled from http://www.astro.princeton.edu/~draine/agglom.html .
 
-* `Index files <index_files.tar.gz>`_ (328 Kb)
-* `Target files <target_files.tar.gz>`_ (6.6 Mb)
+* :download:`Index files <index_files.tar.gz>` (328 Kb)
+* :download:`Target files <target_files.tar.gz>` (6.6 Mb)
