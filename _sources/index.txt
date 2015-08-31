@@ -10,6 +10,8 @@ General Geometry Anomalous Diffraction Theory
 *Version*: |version|
 *Last updated*: |today|
 
+* **Latest release**: `ggadt-1.1.2.tar.gz <ggadt-1.1.2.tar.gz>`_
+
 :program:`GGADT` is short for General Geometry Anomalous Diffraction Theory. It is a Fortran 90 program that uses Anomalous Diffraction Theory (ADT; see [VDH1957]_) to compute the differential scattering cross section (or the total cross sections as a function of energy) for a specified grain. ADT is valid when
 
 .. math::
