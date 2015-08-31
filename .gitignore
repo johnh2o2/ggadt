@@ -4,6 +4,7 @@ data_dev/*
 *o
 *a
 *npy
+doc/*
 src/ggadt
 batch.sh
 **dat

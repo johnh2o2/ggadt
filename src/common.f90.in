@@ -25,10 +25,7 @@ module common_mod
 
   character(len=50)                      ::  geometry  
   character(len=50)                      ::  angle_mode
-  character(len=50)                      ::  rotation_axis
-
-
-
+  !character(len=50)                      ::  rotation_axis
 
   integer                                ::  ngrain
   integer                                ::  nscatter_min 
@@ -39,8 +36,7 @@ module common_mod
   integer                                ::  nphi
   integer                                ::  ierr
 
-  integer, allocatable                   ::  allowed_ngrids(:) ! this 
-
+  integer, allocatable                   ::  allowed_ngrids(:)
 
   real(dp_real)                          ::  grid_width  
   real(dp_real)                          ::  dtheta
@@ -63,6 +59,8 @@ module common_mod
   logical                                ::  do_phi_averaging
   logical                                ::  save_shadow_function
   logical                                ::  save_phi_grid
+  logical                                ::  grid_width_manually_set
+
 
   character(len=200)                     ::  parameter_file_name
 
@@ -99,14 +97,15 @@ module common_mod
          rank_ephot, rank_use_padded_fft, rank_force_numerical, &
          rank_integrated_mode, rank_use_efficiencies, rank_verbose_mode, &
          rank_timing_mode, rank_ior_re, rank_ior_im, rank_geometry, rank_angle_mode, &
-         rank_rotation_axis, rank_angle_file, rank_ngrain, rank_nscatter, &
+         !rank_rotation_axis, 
+         rank_angle_file, rank_ngrain, rank_nscatter, &
          rank_norientations, rank_dtheta, rank_max_angle, rank_agglom_file_name, &
          rank_fftw_optimization_mode_name, rank_ephot_min, rank_ephot_max, rank_nephots, &
          rank_dephot, rank_material_files(max_num_mats), rank_material_tags(max_num_mats), &
          rank_agglom_composition_file, rank_material_file, rank_asked_for_version, &
          rank_asked_for_help, rank_parameter_file_name, rank_axes_convention, rank_do_full_2d_fft, &
          rank_quiet_mode, rank_sang_correction, rank_nthreads, rank_do_phi_averaging, rank_save_shadow_function, &
-         rank_save_phi_grid, rank_save_file_root, rank_nphi
+         rank_save_phi_grid, rank_save_file_root, rank_nphi, rank_grid_width
 
   contains
 
@@ -209,8 +208,6 @@ module common_mod
         "agglom-composition-file","",&
         description="File matching each agglomerate with a material tag")
 
-
-
       call define_option_string(opts,&
         "grain-geometry",default_grain_geometry,&
         description="SPHERES (or AGGLOMERATION), ELLIPSOID, SPHERE, or CUSTOM")
@@ -245,6 +242,9 @@ module common_mod
       call define_option_real(opts,&
         "dtheta",default_dtheta, &
         description="Angular resolution for dQscatter/dOmega calculation")
+      call define_option_real(opts,&
+        "grid-width",default_grid_width, &
+        description="Parameter to set the width of the grid (in microns). This is automatically set by GGADT otherwise.")
 
       call define_option_integer(opts,&
         "ngrain",default_ngrain,&
@@ -265,9 +265,9 @@ module common_mod
       call define_option_string(opts,&
         "angle-mode",default_angle_mode,&
         description="How to choose Euler angles (sequential, random, file)")
-      call define_option_string(opts,&
-        "rotation-axis",default_rotation_axis,&
-        description="Sampled orientations will be rotations about this axis (none, xaxis, yaxis, zaxis)")
+      !call define_option_string(opts,&
+      !  "rotation-axis",default_rotation_axis,&
+      !  description="Sampled orientations will be rotations about this axis (none, xaxis, yaxis, zaxis)")
 
       call define_option_string(opts,&
         "axes-convention",default_axes_convention,&
@@ -361,6 +361,7 @@ module common_mod
       call get_option_real(opts,"ephot-min", ephot_min, rank_ephot_min)
       call get_option_real(opts,"ephot-max", ephot_max, rank_ephot_max)
       call get_option_real(opts,"dephot", dephot, rank_dephot)
+      call get_option_real(opts,"grid-width", grid_width, rank_grid_width)
 
       call get_flag(opts,"use-padded-fft",use_padded_fft,rank_use_padded_fft)
       call get_flag(opts,"force-numerical",force_numerical,rank_force_numerical)
@@ -379,7 +380,7 @@ module common_mod
       call get_option_string(opts,"grain-geometry",geometry, rank_geometry)
       call get_option_string(opts,"axes-convention",axes_convention, rank_axes_convention)
       call get_option_string(opts,"angle-mode",angle_mode, rank_angle_mode)
-      call get_option_string(opts,"rotation-axis",rotation_axis, rank_rotation_axis)
+      !call get_option_string(opts,"rotation-axis",rotation_axis, rank_rotation_axis)
       call get_option_string(opts,"angle-file",angle_file, rank_angle_file)
       call get_option_string(opts,"agglom-file",agglom_file_name, rank_agglom_file_name)
       call get_option_string(opts,"fftw-optimization",fftw_optimization_mode_name, rank_fftw_optimization_mode_name)
@@ -429,13 +430,17 @@ module common_mod
       ! Set to lower case
       fftw_optimization_mode_name = strlowcase(fftw_optimization_mode_name)
       angle_mode = strlowcase(angle_mode)
-      rotation_axis = strlowcase(rotation_axis)
+      !rotation_axis = strlowcase(rotation_axis)
       geometry = strlowcase(geometry)
       axes_convention = strlowcase(axes_convention)
 
       write(phi_grid_file, *) trim(save_file_root)//"_phigrid_o"
       write(shadow_function_file, *) trim(save_file_root)//"_shadow_function_o"
 
+      grid_width_manually_set = option_found(opts, 'grid-width')
+      if (grid_width_manually_set) then
+        grid_width = grid_width/a_eff
+      end if
       ! multiply max_angle by sqrt(2) if using super_fast_fft_mode 
       !   we want to calculate out to (thetax, thetay) = (max_angle, max_angle).
       ! if (super_fast_fft_mode) max_angle = max_angle * sqrt(2.0)
@@ -529,11 +534,8 @@ module common_mod
       end if
 
       ! output where you're saving the phi_grid and shadow function
-      if (save_phi_grid) then
-        write(stderr, *) "Note: Will be saving phi grid to ", trim(phi_grid_file)//"<orientation>.dat"
-      end if
       if (save_shadow_function) then
-        write(stderr, *) "Note: Will be saving phi grid to ", trim(shadow_function_file)//"<orientation>.dat"
+        write(stderr, *) "Note: Will be saving shadow function grid to ", trim(shadow_function_file)//"<orientation>.dat"
       end if
 
 
@@ -591,13 +593,10 @@ module common_mod
         stop
       end if 
 
-
-      ! TEMPORARY warning about rotation-axis option
-
-      if (.not. (rotation_axis == 'none')) then
-        write(stderr, *) "WARNING: the current implementation of the rotation-axis option is faulty."
-        write(stderr, *) "    Future versions will have rotation and precession axis options."
-      end if 
+      !if (.not. (rotation_axis == 'none')) then
+      !  write(stderr, *) "WARNING: the current implementation of the rotation-axis option is faulty."
+      !  write(stderr, *) "    Future versions will have rotation and precession axis options."
+      !end if 
       if (.not. integrated_mode) then
           nephots = 1
           dephot = 0.0

@@ -138,9 +138,11 @@ module spheres
        
         do i=1,nspheres
             read(1, *) n, pos(i,1), pos(i,2), pos(i,3), radii(i)
-
+            !write(stderr, *) n, pos(i,1), pos(i,2), pos(i,3), radii(i)
+            !write(stderr, *) pos(i,1) + pos(i,2)
             ! orient grain so that the A_1 vector is in the direction of propagation
             pos(i,:) = matmul(rm,pos(i,:))
+            !write(stderr, *) pos(i,1), pos(i,2), pos(i,3)
 
             ior_r(i) = default_ior_r
             ior_i(i) = default_ior_i
@@ -163,13 +165,16 @@ module spheres
 
         
         max_dist = 0.0
+       ! write(stderr, *) "nspheres", nspheres, "a_eff_temp", a_eff_temp, "conv", conv
         do i=1,nspheres
             pos(i,1) = pos(i,1)*conv
             pos(i,2) = pos(i,2)*conv 
             pos(i,3) = pos(i,3)*conv
             radii(i) = radii(i)*conv   
+            !write(stderr, *) "pos1", pos(i,1), "pos2", pos(i,2), "pos3",pos(i,3), "r", radii(i)
 
             dist = sqrt(pos(i,1)*pos(i,1) + pos(i,2)*pos(i,2) + pos(i,3)*pos(i,3) ) + radii(i)
+            !write(stderr, *) "dist", dist
             if (dist > max_dist) max_dist = dist
 
             pos_rot(i,1) = pos(i,1)
@@ -216,12 +221,16 @@ module spheres
             
             if (yf < 0 .or. yf > size(y)) then
                 write (0,*) "ERROR (spheres module, phi_spheres function) yf = ",yf," but size(y)=",size(y)
+                stop 1
             else if (yi < 0 .or. yi > size(y)) then
                 write (0,*) "ERROR (spheres module, phi_spheres function) yi = ",yi," but size(y)=",size(y)
+                stop 1
             else if (xi < 0 .or. xi > size(x)) then
                 write (0,*) "ERROR (spheres module, phi_spheres function) xi = ",xi," but size(x)=",size(x)
+                stop 1
             else if (xf < 0 .or. xf > size(x)) then
                 write (0,*) "ERROR (spheres module, phi_spheres function) xf = ",xf," but size(x)=",size(x)
+                stop 1
             end if 
             do j=xi,xf
                 do n=yi,yf

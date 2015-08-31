@@ -43,6 +43,7 @@ module constants
   integer, parameter                       ::  default_norientations          = 100
   real(dp_real), parameter                 ::  default_dtheta                 = 10.0D0
   real(dp_real), parameter                 ::  default_max_angle              = 3000.D0
+  real(dp_real), parameter                 ::  default_grid_width             = 1.0
   character(len=200), parameter            ::  default_agglom_file_name       = ''
   character(len=200), parameter            ::  default_axes_convention        = 'ddscat'
   character(len=100), parameter            ::  default_fftw_opt_name          = 'estimate'
