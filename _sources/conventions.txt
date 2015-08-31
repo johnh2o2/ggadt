@@ -1,0 +1,25 @@
+.. _conventions:
+
+Angle conventions
+=================
+
+GGADT supports two different angle conventions. The first is the same angle conventions that are used in the `DDSCAT`_ code:
+
+.. figure:: ddscat_orientations.png
+	:width: 600px
+	:align: center
+
+	DDSCAT conventions
+
+The second is that used in the `MSTM`_ code:
+
+.. figure:: mackowski_orientations.png
+	:width: 600px
+	:align: center
+
+	MSTM conventions
+
+You can tell GGADT which one to use by specifying the ``--axes-convention`` parameter as either ``mstm`` or ``ddscat``.
+
+.. _DDSCAT : http://www.ddscat.org/
+.. _MSTM : http://eng.auburn.edu/users/dmckwski/scatcodes/

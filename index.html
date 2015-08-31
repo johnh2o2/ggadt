@@ -1,187 +1,176 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<!-- This manual is for GGADT (version 1.0.0, 9 June 2015),
-which calculates scattering properties of dust grains in the interstellar
-medium by using anomalous diffraction theory (ADT). 
-
-Permission is granted to copy, distribute and/or modify this document
-under the terms of the GNU Free Documentation License, Version 1.3 or
-any later version published by the Free Software Foundation; with no
-Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
-Texts.  A copy of the license is included in the section entitled
-"GNU Free Documentation License". -->
-<!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
-<head>
-<title>GGADT 1.0.0: Top</title>
-
-<meta name="description" content="GGADT 1.0.0: Top">
-<meta name="keywords" content="GGADT 1.0.0: Top">
-<meta name="resource-type" content="document">
-<meta name="distribution" content="global">
-<meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="#Top" rel="start" title="Top">
-<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
-<link href="#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="../dir/index.html" rel="up" title="(dir)">
-<link href="Overview.html#Overview" rel="next" title="Overview">
-<style type="text/css">
-<!--
-a.summary-letter {text-decoration: none}
-blockquote.smallquotation {font-size: smaller}
-div.display {margin-left: 3.2em}
-div.example {margin-left: 3.2em}
-div.indentedblock {margin-left: 3.2em}
-div.lisp {margin-left: 3.2em}
-div.smalldisplay {margin-left: 3.2em}
-div.smallexample {margin-left: 3.2em}
-div.smallindentedblock {margin-left: 3.2em; font-size: smaller}
-div.smalllisp {margin-left: 3.2em}
-kbd {font-style:oblique}
-pre.display {font-family: inherit}
-pre.format {font-family: inherit}
-pre.menu-comment {font-family: serif}
-pre.menu-preformatted {font-family: serif}
-pre.smalldisplay {font-family: inherit; font-size: smaller}
-pre.smallexample {font-size: smaller}
-pre.smallformat {font-family: inherit; font-size: smaller}
-pre.smalllisp {font-size: smaller}
-span.nocodebreak {white-space:nowrap}
-span.nolinebreak {white-space:nowrap}
-span.roman {font-family:serif; font-weight:normal}
-span.sansserif {font-family:sans-serif; font-weight:normal}
-ul.no-bullet {list-style: none}
--->
-</style>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-</head>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>General Geometry Anomalous Diffraction Theory &mdash; ggadt 1.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="ggadt 1.1.0 documentation" href="#" />
+    <link rel="next" title="Installing GGADT" href="install.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="install.html" title="Installing GGADT"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">ggadt 1.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
 
-<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
-<h1 class="settitle" align="center">GGADT 1.0.0</h1>
-
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-
-
-<a name="SEC_Contents"></a>
-<h2 class="contents-heading">Table of Contents</h2>
-
-<div class="contents">
-
-<ul class="no-bullet">
-  <li><a name="toc-Overview-1" href="Overview.html#Overview">1 Overview</a>
-  <ul class="no-bullet">
-    <li><a name="toc-Background" href="Overview.html#Background">1.1 Background</a>
-    <ul class="no-bullet">
-      <li><a name="toc-Dust-in-the-interstellar-medium-_0028ISM_0029" href="Overview.html#Dust-in-the-interstellar-medium-_0028ISM_0029">1.1.1 Dust in the interstellar medium (ISM)</a></li>
-      <li><a name="toc-Anomalous-Diffraction-Theory-_0028ADT_0029" href="Overview.html#Anomalous-Diffraction-Theory-_0028ADT_0029">1.1.2 Anomalous Diffraction Theory (ADT)</a></li>
-    </ul></li>
-    <li><a name="toc-Basic-GGADT-logic-outline" href="Overview.html#Basic-GGADT-logic-outline">1.2 Basic GGADT logic outline</a></li>
-  </ul></li>
-  <li><a name="toc-Installation-1" href="Installation.html#Installation">2 Installation</a>
-  <ul class="no-bullet">
-    <li><a name="toc-System-requirements" href="Installation.html#System-requirements">2.1 System requirements</a></li>
-    <li><a name="toc-Package-dependencies" href="Installation.html#Package-dependencies">2.2 Package dependencies</a></li>
-  </ul></li>
-  <li><a name="toc-Invoking-GGADT-1" href="Invoking-GGADT.html#Invoking-GGADT">3 Invoking GGADT</a>
-  <ul class="no-bullet">
-    <li><a name="toc-Setting-parameter-values" href="Invoking-GGADT.html#Setting-parameter-values">3.1 Setting parameter values</a></li>
-    <li><a name="toc-Parameter-file-syntax" href="Invoking-GGADT.html#Parameter-file-syntax">3.2 Parameter file syntax</a></li>
-    <li><a name="toc-Options-and-parameters" href="Invoking-GGADT.html#Options-and-parameters">3.3 Options and parameters</a>
-    <ul class="no-bullet">
-      <li><a name="toc-General-options" href="Invoking-GGADT.html#General-options">3.3.1 General options</a></li>
-      <li><a name="toc-Ellipsoidal-grains" href="Invoking-GGADT.html#Ellipsoidal-grains">3.3.2 Ellipsoidal grains</a></li>
-      <li><a name="toc-Agglomerations-of-spherical-particles-_0028single-or-multiple-composition_0029" href="Invoking-GGADT.html#Agglomerations-of-spherical-particles-_0028single-or-multiple-composition_0029">3.3.3 Agglomerations of spherical particles (single or multiple composition)</a></li>
-      <li><a name="toc-Differential-scattering-cross-section" href="Invoking-GGADT.html#Differential-scattering-cross-section">3.3.4 Differential scattering cross section</a></li>
-      <li><a name="toc-Using-your-own-customized-grain-geometry" href="Invoking-GGADT.html#Using-your-own-customized-grain-geometry">3.3.5 Using your own customized grain geometry</a></li>
-      <li><a name="toc-Energy_002ddependent-scattering-and-absorption-cross-sections-_0028integrated-mode_0029" href="Invoking-GGADT.html#Energy_002ddependent-scattering-and-absorption-cross-sections-_0028integrated-mode_0029">3.3.6 Energy-dependent scattering and absorption cross sections (<code>integrated</code> mode)</a></li>
-    </ul></li>
-    <li><a name="toc-Default-parameter-values" href="Invoking-GGADT.html#Default-parameter-values">3.4 Default parameter values</a></li>
-    <li><a name="toc-Axes-conventions" href="Invoking-GGADT.html#Axes-conventions">3.5 Axes conventions</a>
-    <ul class="no-bullet">
-      <li><a name="toc-Agglomerations" href="Invoking-GGADT.html#Agglomerations">3.5.1 Agglomerations</a></li>
-      <li><a name="toc-DDSCAT-conventions" href="Invoking-GGADT.html#DDSCAT-conventions">3.5.2 DDSCAT conventions</a></li>
-      <li><a name="toc-MSTM-conventions" href="Invoking-GGADT.html#MSTM-conventions">3.5.3 MSTM conventions</a></li>
-    </ul></li>
-    <li><a name="toc-Future-goals" href="Invoking-GGADT.html#Future-goals">3.6 Future goals</a></li>
-  </ul></li>
-  <li><a name="toc-Example-usage-1" href="Example-usage.html#Example-usage">4 Example usage</a>
-  <ul class="no-bullet">
-    <li><a name="toc-Default-case" href="Example-usage.html#Default-case">4.1 Default case</a></li>
-    <li><a name="toc-Using-make_005fsample_005fplots_002epy" href="Example-usage.html#Using-make_005fsample_005fplots_002epy">4.2 Using <code>make_sample_plots.py</code></a></li>
-    <li><a name="toc-Ellipsoids-and-spheroids-_002d_002d-orientational-averages-about-a-principal-axis" href="Example-usage.html#Ellipsoids-and-spheroids-_002d_002d-orientational-averages-about-a-principal-axis">4.3 Ellipsoids and spheroids &ndash; orientational averages about a principal axis</a>
-    <ul class="no-bullet">
-      <li><a name="toc-Example-runs-for-a-prolate-spheroid" href="Example-usage.html#Example-runs-for-a-prolate-spheroid">4.3.1 Example runs for a prolate spheroid</a></li>
-    </ul></li>
-  </ul></li>
-  <li><a name="toc-Testing-against-previous-results-1" href="Testing-against-previous-results.html#Testing-against-previous-results">5 Testing against previous results</a>
-  <ul class="no-bullet">
-    <li><a name="toc-Spherical-case-_0028ADT_002fMie-theory_0029" href="Testing-against-previous-results.html#Spherical-case-_0028ADT_002fMie-theory_0029">5.1 Spherical case (ADT/Mie theory)</a>
-    <ul class="no-bullet">
-      <li><a name="toc-GGADT-1" href="Testing-against-previous-results.html#GGADT-1">5.1.1 GGADT</a></li>
-      <li><a name="toc-Actual-_0028Figure-1_0029-from-Draine-_0026-Allaf_002dAkbari-2006" href="Testing-against-previous-results.html#Actual-_0028Figure-1_0029-from-Draine-_0026-Allaf_002dAkbari-2006">5.1.2 Actual (Figure 1) from Draine &amp; Allaf-Akbari 2006</a></li>
-    </ul></li>
-    <li><a name="toc-Ellipsoidal-case-_0028Draine-and-Allaf_002dAkbari-2006_0029" href="Testing-against-previous-results.html#Ellipsoidal-case-_0028Draine-and-Allaf_002dAkbari-2006_0029">5.2 Ellipsoidal case (Draine and Allaf-Akbari 2006)</a>
-    <ul class="no-bullet">
-      <li><a name="toc-GGADT-2" href="Testing-against-previous-results.html#GGADT-2">5.2.1 GGADT</a></li>
-      <li><a name="toc-Actual-_0028Figure-2_0029-from-Draine-_0026-Allaf_002dAkbari-2006" href="Testing-against-previous-results.html#Actual-_0028Figure-2_0029-from-Draine-_0026-Allaf_002dAkbari-2006">5.2.2 Actual (Figure 2) from Draine &amp; Allaf-Akbari 2006</a></li>
-    </ul></li>
-    <li><a name="toc-Agglomeration-of-spheres-_0028Heng-_0026-Draine-2009_0029" href="Testing-against-previous-results.html#Agglomeration-of-spheres-_0028Heng-_0026-Draine-2009_0029">5.3 Agglomeration of spheres (Heng &amp; Draine 2009)</a></li>
-  </ul></li>
-  <li><a name="toc-FFT-comparison-1" href="FFT-comparison.html#FFT-comparison">6 FFT comparison</a>
-  <ul class="no-bullet">
-    <li><a name="toc-Efficient-calculation-of-_005c_0028d_005csigma_002fd_005cOmega_0028_005ctheta_0029_005c_0029" href="FFT-comparison.html#Efficient-calculation-of-_005c_0028d_005csigma_002fd_005cOmega_0028_005ctheta_0029_005c_0029">6.1 Efficient calculation of \(d\sigma/d\Omega(\theta)\)</a></li>
-  </ul></li>
-  <li><a name="toc-GNU-Free-Documentation-License-1" href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License">Appendix A GNU Free Documentation License</a></li>
-  <li><a name="toc-Concept-index-1" href="Concept-index.html#Concept-index">Concept index</a></li>
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="general-geometry-anomalous-diffraction-theory">
+<h1>General Geometry Anomalous Diffraction Theory<a class="headerlink" href="#general-geometry-anomalous-diffraction-theory" title="Permalink to this headline">¶</a></h1>
+<p><em>Last updated</em>: August 31, 2015</p>
+<p><strong class="program">GGADT</strong> is short for General Geometry Anomalous Diffraction Theory. It is a Fortran 90 program that uses Anomalous Diffraction Theory (ADT; see <a class="reference internal" href="#vdh1957" id="id1">[VDH1957]</a>) to compute the differential scattering cross section (or the total cross sections as a function of energy) for a specified grain. ADT is valid when</p>
+<div class="math">
+<p><img src="_images/math/6956ae39f128cfa38f4bca37d0663bbf38785863.png" alt="|m-1| \ll 1"/></p>
+</div><p>(i.e. when the grain is optically thin), and when</p>
+<div class="math">
+<p><img src="_images/math/1c348b9e6aa2d63709abe18d128615611b0fc9e2.png" alt="ka \gg 1"/></p>
+</div><p>here <img class="math" src="_images/math/e9203da50e1059455123460d4e716c9c7f440cc3.png" alt="k"/> is the wavenumber of the incident photons and <img class="math" src="_images/math/7dd2a5ea01fbd72ad2a58dd1f3d6ecbfde6208a1.png" alt="a"/> is the effective radius of the grain, defined to be</p>
+<div class="math">
+<p><img src="_images/math/391caddd707878b5efdb8d7920fd6a8c13007d85.png" alt="a \equiv \left(\frac{3V}{4\pi}\right)^{1/3}"/></p>
+</div><table class="docutils citation" frame="void" id="vdh1957" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[VDH1957]</a></td><td>van de Hulst H., Light scattering by small particles, 1957, John Wiley &amp; Sons, Inc., NY.</td></tr>
+</tbody>
+</table>
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing GGADT</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#package-dependencies">Package Dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="example.html">Quick Example</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="example.html#example-1-total-cross-sections-as-a-function-of-energy">Example 1: Total cross sections as a function of energy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example.html#example-2-differential-scattering-cross-section">Example 2: Differential scattering cross section</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="invoking.html">Invoking GGADT</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="invoking.html#setting-parameter-values">Setting parameter values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invoking.html#parameter-file-syntax">Parameter file syntax</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="options.html">Arguments and parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="options.html#general-options">General options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#ellipsoidal-grains">Ellipsoidal grains</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#agglomerations-of-spherical-particles-single-or-multiple-composition">Agglomerations of spherical particles (single or multiple composition)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#differential-scattering-cross-section">Differential scattering cross section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#energy-dependent-scattering-and-absorption-cross-sections-integrated-mode">Energy-dependent scattering and absorption cross sections (integrated mode)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="diffscat.html">Differential scattering cross section</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="diffscat.html#orientation-averaging">Orientation averaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diffscat.html#d-vs-2d-results">1d vs 2d results</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sphere.html">Sphere</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ellipsoids.html">Ellipsoids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="agglomerate.html">Agglomerations of spherical monomers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="agglomerate.html#format-of-the-target-file">Format of the target file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="agglomerate.html#multiple-compositions">Multiple compositions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="custom.html">Using a customized geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conventions.html">Angle conventions</a></li>
 </ul>
 </div>
-
-
-
-
-<a name="Top"></a>
-<div class="header">
-<p>
-Next: <a href="Overview.html#Overview" accesskey="n" rel="next">Overview</a>, Up: <a href="../dir/index.html" accesskey="u" rel="up">(dir)</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
-<hr>
-
-<a name="GGADT"></a>
-<h1 class="top">GGADT</h1>
-<p>This manual is for GGADT (version 1.0.0, 9 June 2015),
-which calculates scattering properties of dust grains in the interstellar
-medium by using anomalous diffraction theory (ADT). 
-</p>
-<table class="menu" border="0" cellspacing="0">
-<tr><td align="left" valign="top">&bull; <a href="Overview.html#Overview" accesskey="1">Overview</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">General purpose and information.
-</td></tr>
-<tr><td align="left" valign="top">&bull; <a href="Installation.html#Installation" accesskey="2">Installation</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">How to install <code>ggadt</code> on your system.
-</td></tr>
-<tr><td align="left" valign="top">&bull; <a href="Invoking-GGADT.html#Invoking-GGADT" accesskey="3">Invoking GGADT</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Giving <code>ggadt</code> your input.	
-</td></tr>
-<tr><td align="left" valign="top">&bull; <a href="Example-usage.html#Example-usage" accesskey="4">Example usage</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Quick examples to get you started.
-</td></tr>
-<tr><td align="left" valign="top">&bull; <a href="Testing-against-previous-results.html#Testing-against-previous-results" accesskey="5">Testing against previous results</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Comparing GGADT to existing literature
-</td></tr>
-<tr><td align="left" valign="top">&bull; <a href="FFT-comparison.html#FFT-comparison" accesskey="6">FFT comparison</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Comparison between GPFA and FFTW3 timing.
-</td></tr>
-<tr><td align="left" valign="top">&bull; <a href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License" accesskey="7">GNU Free Documentation License</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Copying and sharing this documentation.
-</td></tr>
-<tr><td align="left" valign="top">&bull; <a href="Concept-index.html#Concept-index" accesskey="8">Concept index</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Index of concepts.
-</td></tr>
-</table>
-
-
-<hr>
-<div class="header">
-<p>
-Next: <a href="Overview.html#Overview" accesskey="n" rel="next">Overview</a>, Up: <a href="../dir/index.html" accesskey="u" rel="up">(dir)</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
 </div>
 
 
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">General Geometry Anomalous Diffraction Theory</a><ul>
+<li><a class="reference internal" href="#contents">Contents</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+</ul>
 
-</body>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="install.html"
+                        title="next chapter">Installing GGADT</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="install.html" title="Installing GGADT"
+             >next</a> |</li>
+        <li><a href="#">ggadt 1.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, John Hoffman.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
 </html>

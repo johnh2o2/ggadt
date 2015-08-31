@@ -1,0 +1,36 @@
+Differential scattering cross section
+=====================================
+
+GGADT by default will produce an orientation-averaged, 1-dimensional result for :math:`dC_{\rm sca}/d\Omega(\theta)` for a set of :math:`theta_m` determined by either the ``dtheta`` parameter or the ``nscatter`` parameter.
+
+
+Orientation averaging
+---------------------
+
+GGADT has three methods for producing averages over orientations, all of which are set by the ``angle-mode`` parameter.
+
+**random**
+	GGADT will chose ``norientations`` random orientations
+
+**sequential**
+	GGADT will choose ``norientations``, evenly spaced over 
+
+**file**
+	GGADT will read in **file**; each line contains three floating point numbers, representing :math:`(\beta, \theta, \phi)` (if ``axes-convention=ddscat``), or :math:`(\alpha,\beta,\gamma)` if ``axes-convention=mstm``. See :ref:`conventions` for more information about axes conventions. The file should have just three columns, each separated by white-space of some kind (e.g. tab, space)::
+
+		0.0 0.0 0.0
+		0.234 0.12 0.0
+		...
+
+
+1d vs 2d results
+----------------
+
+
+.. figure :: fig_heatmaps_debug_small.png
+	:align: center
+
+	GGADT results for many examples
+
+Using the ``nphi`` parameter
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^

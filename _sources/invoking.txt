@@ -1,0 +1,68 @@
+
+Invoking GGADT
+==============
+
+To see usage and all available options for ggadt, simply use the ``-h`` option::
+
+	$ ggadt -h
+
+A detailed description of all of the available options are available in the :ref:`options` section.
+
+Setting parameter values
+------------------------
+
+The format for running GGADT is::
+
+	$ ggadt [option]
+
+With no options, ggadt runs calculations on a set of default grain parameters (specified in the ``default.params`` file). By default GGADT will calculate the differential scattering cross section as a function of scattering angle. To calculate the integrated scattering and absorption cross sections for a range of energies, add the ``--integrated`` flag as a command-line argument.
+
+Parameters may be specified as command-line arguments,::
+
+	$ ggadt --parameter=value ...
+
+or in a parameter file that is specified as a command-line argument,::
+
+	$ ggadt --parameter-file=/path/to/parameterfile
+
+or a combination of the two:::
+
+	$ ggadt --parameter-file=/path/to/parametefile --parameter=value …
+
+If a parameter is set by a command-line argument and by a parameter file, the command-line argument is used.
+
+Parameter file syntax
+---------------------
+
+The syntax of parameter files is:::
+
+	#comment
+	parameter           = value
+	another-parameter   = another-value
+	...
+
+.. warning:: 
+
+	One annoying feature of parameter file syntax is this: you cannot have spaces after a numerical parameter value. This is somewhat of a low-priority bug for the time being.
+
+.. warning::	
+	
+	The ``agglom-file`` and ``angle-file`` options must be specified with quotes surrounding their values. In order to make the parameter file portable, you should specify an absolute file path, not a relative one.
+
+	E.g.::
+
+		agglom-file='/absolute/path/to/parameter-file.ini'
+	
+	**NOT**::
+
+		agglom-file=/absolute/path/to/parameter-file.ini
+	
+	or::
+
+		agglom-file='../../parameter-file.ini'
+	
+	Specifying a relative file-path (as in the last example) will work, as long as you always invoke GGADT from the location where the relative file-path is valid. For example, if I am in the parent directory, and my parameter file is in the data/parameter-files directory,::
+
+		agglom-file='data/parameter-files/parameter-file.ini'
+	
+	will work, as long as I **always** run GGADT from the parent directory.
