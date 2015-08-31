@@ -905,7 +905,6 @@ contains
         end if 
       
         L = z(size(z)) - z(1)  ! length of grid in physical coords
-        write(stderr, *) "L = ", L
 
     ! figures out what kmin, kmax, enhancement and kactual are.
         if (do_full_2d_fft .and. .not. do_phi_averaging) then

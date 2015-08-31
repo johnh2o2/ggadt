@@ -318,7 +318,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-EXTRA_DIST = configure src
+EXTRA_DIST = configure src manual.pdf README.md allowed_ngrid_values.txt default.params.in make_allowed_ngrids.py
 SUBDIRS = src
 all: all-recursive
 

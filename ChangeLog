@@ -1,3 +1,9 @@
+* commit 04d614b988820b72391fed495259a0d7957b5cfc
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Aug 31 15:21:14 2015 -0400
+| 
+|     Added pdf manual. Changed src/Makefile.am to remove the \*-local instructions; this was messing everything up because data_dir is not set by configure anymore (check this?)
+|  
 * commit c96c061e2960ab74b421032e166b2c9b1f665e8b
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Mon Aug 31 14:49:13 2015 -0400
