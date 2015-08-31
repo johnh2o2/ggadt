@@ -19,7 +19,7 @@ rm -f doc/Makefile
 rm -f doc/ggadt.info
 rm -f -r doc/ggadt.html
 rm -f test_output.dat
-
+rm -f default.params
 rm -f src/ggadt
 rm -f src/*o
 rm -f src/*mod

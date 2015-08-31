@@ -1,3 +1,9 @@
+* commit 431457ad4d051940490082ba16f0c91f2badf7e8
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Mon Aug 31 11:11:08 2015 -0400
+| 
+|     Updated documentation; I also added some comments to the ggadt.f90 file. NEW SPHINX DOCUMENTATION. Don't need the problematic doc/ folder, so I added it to gitignore. I'll put a pdf manual in the parent directory.
+|  
 * commit 44dabdbf5a1bad525275b630ed3293c7ae553f12
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Thu Aug 27 14:10:46 2015 -0400

@@ -30,7 +30,7 @@ agglom-composition-file        = ''
 
 # Grain composition
 # Path to material index file
-# material-file                  = "@abs_top_srcdir@/data/materials/index_silD03"
+# material-file                  = "/Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/ggadt/data/materials/index_silD03"
 
 # parameters for differential scattering cross section calculation
 # units: keV
@@ -58,6 +58,7 @@ fftw-optimization              = 'estimate'
 
 #grain_axis_ratio              = 1.0
 
+rotation-axis                  = 'none'     # For ellipsoidal or agglomerate grains
 angle-mode                     = 'random'   # Either 'sequential', 'random' or 'file' 
                                             # | tells GGADT how to choose orientations over which to average
                                             # | calculations.

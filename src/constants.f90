@@ -1,0 +1,68 @@
+module constants
+  implicit none
+
+  save
+  integer, parameter                       ::  stdout                         = 6
+  integer, parameter                       ::  stderr                         = 0
+  integer, parameter                       ::  input_unit                     = 1
+  integer, parameter                       ::  file_unit                      = 7
+
+  integer, parameter                       ::  max_str_len                    = 300
+  integer, parameter                       ::  max_num_mats                   = 3 ! must be less than 100
+  
+  integer, parameter                       ::  ISIGN                          = 1
+
+  
+  !integer, parameter                           ::  dp_real                = 4
+  integer, parameter                           ::  dp_real                = 8
+  integer, parameter                       ::  dp_complex                     = dp_real
+  integer, parameter                       ::  ip                             = 4
+  real(dp_real), parameter                 ::  pi                             = 3.14159265358979323846
+  real(dp_real), parameter                 ::  twopi                          = 2*3.14159265358979323846
+  real(dp_real), parameter                 ::  HUGE_NUMBER                    = 1.0D20
+  real(dp_real), parameter                 ::  ARCSECONDS_PER_RADIAN          = (360.0D0*60.0D0*60.0D0)/(2.0D0*pi)
+  integer, parameter                       ::  MAX_NGRID                      = 4096
+
+  real(dp_real), parameter                 ::  hc                             = 1.23984193D0
+  real(dp_real), parameter                 ::  default_aeff                   = 2.0D-1
+  real(dp_real), parameter                 ::  default_ephot                  = 2.0D0
+  real(dp_real), parameter                 ::  default_grain_a1               = 1.0D0
+  real(dp_real), parameter                 ::  default_grain_a2               = 1.0D0
+  real(dp_real), parameter                 ::  default_grain_a3               = 1.0D0
+  real(dp_real), parameter                 ::  default_ior_re                 = -1.920D-4
+  real(dp_real), parameter                 ::  default_ior_im                 = 2.807D-5
+  real(dp_real), parameter                 ::  default_grain_axis_ratio       = 1.0D0
+  character(len=200), parameter            ::  default_grain_geometry         = 'sphere'
+  character(len=200), parameter            ::  allowed_ngrid_values_filename &
+    & = '/Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/ggadt/allowed_ngrid_values.txt'
+  character(len=50), parameter             ::  default_angle_mode       = 'random'
+  character(len=50), parameter             ::  default_rotation_axis          = 'none'
+  character(len=200), parameter            ::  default_angle_file       = ''
+  integer, parameter                       ::  default_ngrain                 = 256
+  integer, parameter                       ::  default_nscatter               = 100
+  integer, parameter                       ::  default_norientations          = 100
+  real(dp_real), parameter                 ::  default_dtheta                 = 10.0D0
+  real(dp_real), parameter                 ::  default_max_angle              = 3000.D0
+  real(dp_real), parameter                 ::  default_grid_width             = 1.0
+  character(len=200), parameter            ::  default_agglom_file_name       = ''
+  character(len=200), parameter            ::  default_axes_convention        = 'ddscat'
+  character(len=100), parameter            ::  default_fftw_opt_name          = 'estimate'
+  integer, parameter                       ::  default_nthreads               = -1
+  integer, parameter                       ::  default_nphi                   = 50
+  integer, parameter                       :: nu_sphere                       = 1000
+
+
+! defaults for integrated cross section calculations
+  integer, parameter                       ::  default_nephots                = 100
+  real(dp_real), parameter                 ::  default_ephot_min              = 1.0D-1
+  real(dp_real), parameter                 ::  default_ephot_max              = 5.0D0
+  character(len=200), parameter            ::  default_material               = "custom"
+  character(len=200), parameter            ::  default_material_file          = ""
+  real(dp_real), parameter                 ::  default_dephot                 = 1.0D-1
+  character(len=200), parameter ::  defaults_file_name &
+    &=  "/Users/jah5/Desktop/Draine_temp/GGADT_JohnsMac/ggadt/default.params"
+     
+  logical, parameter                        :: options_debug  = .false.
+
+
+end module constants

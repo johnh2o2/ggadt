@@ -4,6 +4,10 @@ data_dev/*
 *o
 *a
 *npy
+cleandist-custom.sh
+reconf-custom.sh
+remake.sh
+update-github-doc.sh
 doc/*
 src/ggadt
 batch.sh

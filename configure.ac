@@ -2,7 +2,7 @@
 # Autoconf configuration script.
 
 
-AC_INIT([ggadt], [1.1.1], [jah5@princeton.edu])
+AC_INIT([ggadt], [1.1.2], [jah5@princeton.edu])
 AC_PREREQ([2.69]) 
 AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/sphere.f90])
@@ -360,7 +360,7 @@ AC_RUN_IFELSE([
 # if that didn't work, check that iargc() works.
 if test $com_arg_cnt_works = false
   then
-  AC_MSG_CHECKING([Fortran compiler didn't seem to recognize command_argument_count, trying iargc])
+  AC_MSG_CHECKING([Fortran compiler didnt seem to recognize command_argument_count, trying iargc])
 
   AC_RUN_IFELSE([ 
   AC_LANG_PROGRAM([], 
@@ -417,19 +417,19 @@ AM_CONDITIONAL([USING_FFTW], [test $using_fftw3 = true])
 AM_CONDITIONAL([USING_GPFA], [test $using_gpfa = true])
 
 AC_PROG_INSTALL
-AC_CONFIG_FILES([ 	Makefile 
-					src/Makefile 
-					doc/Makefile 
-					src/fftwmod.f90
-          src/spheres.f90
-					src/common.f90
-          src/constants.f90
-          src/options.f90
-          src/ggadt.f90
+AC_CONFIG_FILES([ 	
+	Makefile 
+	src/Makefile 
+	src/fftwmod.f90
+        src/spheres.f90
+	src/common.f90
+        src/constants.f90
+        src/options.f90
+        src/ggadt.f90
 
-          scripts/installation_vars.py
+        scripts/installation_vars.py
 
-          default.params
+        default.params
 				])
 AC_SUBST(fftw3_inc_dir)
 AC_SUBST(plan_dir)
