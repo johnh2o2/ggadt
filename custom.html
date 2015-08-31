@@ -55,24 +55,28 @@
     <span class="c">!</span>
 
     <span class="c">! inputs :</span>
-    <span class="c">!          x,y,z               cartesian coordinates of the grain in the DDSCAT axis convention</span>
+    <span class="c">!        *  x,y,z</span>
+    <span class="c">!            cartesian coordinates of the grain in the DDSCAT axis convention</span>
     <span class="c">!</span>
-    <span class="c">!          en                  photon energy at which the index of refraction is requested</span>
+    <span class="c">!        *  en</span>
+    <span class="c">!            photon energy at which the index of refraction is requested</span>
     <span class="c">!</span>
-    <span class="c">!          ephots              an array of photon energies to use for interpolation purposes</span>
+    <span class="c">!        *  ephots</span>
+    <span class="c">!            an array of photon energies to use for interpolation purposes</span>
     <span class="c">!</span>
-    <span class="c">!          ior_res, ior_ims    The real and imaginary components of the index of refraction for</span>
-    <span class="c">!                              the material(s) specified.</span>
+    <span class="c">!        *  ior_res, ior_ims</span>
+    <span class="c">!            The real and imaginary components of the index of refraction</span>
     <span class="c">!</span>
-    <span class="c">!          a                   The effective radius of the grain</span>
+    <span class="c">!        *  a</span>
+    <span class="c">!                        The effective radius of the grain</span>
     <span class="c">!</span>
-    <span class="c">! note: the ephots and ior_res/ior_ims arrays are organized such that</span>
+    <span class="c">! :note: the ephots and ior_res/ior_ims arrays are organized such that</span>
     <span class="c">!</span>
     <span class="c">!                   m - 1 = ior_res(i,j) + sqrt(-1) * ior_ims(i,j)</span>
     <span class="c">!</span>
-    <span class="c">!       is the index of refraction (minus one) for material number &quot;i&quot; at a photon</span>
-    <span class="c">!       energy of ephots(j). Linear interpolation can be used to obtain m-1 for arbitrary</span>
-    <span class="c">!       photon energies.</span>
+    <span class="c">!       is the index of refraction (minus one) for material number</span>
+    <span class="c">!               &quot;i&quot; at a photon energy of ephots(j). Linear interpolation</span>
+    <span class="c">!               can be used to obtain m-1 for arbitrary photon energies.</span>
 
     <span class="kt">real</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">dp_real</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span>
 
@@ -80,7 +84,8 @@
 <span class="k">        if</span> <span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">ior_res</span><span class="p">(</span><span class="mi">1</span><span class="p">,:))</span> <span class="p">.</span><span class="n">eq</span><span class="p">.</span> <span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">            </span><span class="n">ior_custom</span> <span class="o">=</span> <span class="nb">CMPLX</span><span class="p">(</span><span class="n">ior_res</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">ior_ims</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
         <span class="k">else</span>
-<span class="k">            </span><span class="n">ior_custom</span> <span class="o">=</span> <span class="nb">CMPLX</span><span class="p">(</span><span class="n">linterp</span><span class="p">(</span><span class="n">ephots</span><span class="p">,</span><span class="n">ior_res</span><span class="p">(</span><span class="mi">1</span><span class="p">,:),</span><span class="n">en</span><span class="p">),</span><span class="n">linterp</span><span class="p">(</span><span class="n">ephots</span><span class="p">,</span><span class="n">ior_ims</span><span class="p">(</span><span class="mi">1</span><span class="p">,:),</span><span class="n">en</span><span class="p">)</span> <span class="p">)</span>
+<span class="k">            </span><span class="n">ior_custom</span> <span class="o">=</span> <span class="nb">CMPLX</span><span class="p">(</span><span class="n">linterp</span><span class="p">(</span><span class="n">ephots</span><span class="p">,</span><span class="n">ior_res</span><span class="p">(</span><span class="mi">1</span><span class="p">,:),</span><span class="n">en</span><span class="p">),&amp;</span>
+                                            <span class="n">linterp</span><span class="p">(</span><span class="n">ephots</span><span class="p">,</span><span class="n">ior_ims</span><span class="p">(</span><span class="mi">1</span><span class="p">,:),</span><span class="n">en</span><span class="p">)</span> <span class="p">)</span>
         <span class="k">end if</span>
 <span class="k">    else</span>
 <span class="k">        </span><span class="n">ior_custom</span> <span class="o">=</span> <span class="nb">CMPLX</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">)</span>

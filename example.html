@@ -129,12 +129,14 @@
 </pre></div>
 </div>
 <p>These parameters set the energy range (and the energy resolution) over which the cross sections are computed.</p>
-<div class="highlight-ini"><div class="highlight"><pre><span class="na">angle-mode</span>                     <span class="o">=</span> <span class="s">&#39;random&#39;   # Either &#39;sequential&#39;, &#39;random&#39; or &#39;file&#39;</span>
-<span class="s">                                            # | tells GGADT how to choose orientations over which to average</span>
-<span class="s">                                            # | calculations.</span>
-<span class="na">norientations</span>                  <span class="o">=</span> <span class="s">64</span>
-<span class="s">                                                                                        # If angle-mode is NOT &#39;file&#39;; number of orientations</span>
-<span class="s">                                            # | over which to average calcuations</span>
+<div class="highlight-ini"><div class="highlight"><pre>   <span class="na">angle-mode</span>                     <span class="o">=</span> <span class="s">&#39;random&#39;</span>
+<span class="s">    # Either &#39;sequential&#39;, &#39;random&#39; or &#39;file&#39;</span>
+<span class="s">    # | tells GGADT how to choose orientations over which to average</span>
+<span class="c1"># | calculations.</span>
+
+   <span class="na">norientations</span>                  <span class="o">=</span> <span class="s">64</span>
+<span class="s">    # If angle-mode is NOT &#39;file&#39;; number of orientations</span>
+<span class="c1"># | over which to average calcuations</span>
 </pre></div>
 </div>
 <p>Here we&#8217;re saying that GGADT should average over 64 random orientations of the object.</p>
@@ -173,13 +175,14 @@
 </pre></div>
 </div>
 <p>Here, we do the calculation at <em>one</em> photon energy (i.e. for a single value of the index of refraction, <img class="math" src="_images/math/c4bb40dd65eae6c11b325989b14e0b8d35e4e3ef.png" alt="m"/>). We can either set <code class="docutils literal"><span class="pre">ior-re</span></code> and <code class="docutils literal"><span class="pre">ior-im</span></code> ourselves, <em>or</em> we can specify a <code class="docutils literal"><span class="pre">material-file</span></code> and a photon energy, <code class="docutils literal"><span class="pre">ephot</span></code> (in keV). We&#8217;ve chosen the latter here.</p>
-<div class="highlight-ini"><div class="highlight"><pre><span class="c1">## number of angles to calculate diff. scat. cross section (ntheta) or spacing between them (dtheta)</span>
+<div class="highlight-ini"><div class="highlight"><pre><span class="c1"># number of angles to calculate diff. scat.</span>
+<span class="c1"># cross section (ntheta) or spacing between them (dtheta)</span>
 <span class="c1"># (arcseconds) Choose only one of these parameters</span>
 <span class="na">dtheta</span>                         <span class="o">=</span> <span class="s">25.0</span>
 <span class="c1">#nscatter                      = 100</span>
 
-<span class="c1">## Maximum angle for which the diff. scat. cross section is calculated</span>
-<span class="c1"># (arcseconds)</span>
+<span class="c1"># Maximum angle for which the diff. scat. cross</span>
+<span class="c1"># section is calculated (arcseconds)</span>
 <span class="na">max-angle</span>                      <span class="o">=</span> <span class="s">6000.</span>
 </pre></div>
 </div>

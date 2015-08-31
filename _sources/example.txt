@@ -108,12 +108,14 @@ These parameters set the energy range (and the energy resolution) over which the
 
 .. code-block:: ini
 
-	angle-mode                     = 'random'   # Either 'sequential', 'random' or 'file'
-	                                            # | tells GGADT how to choose orientations over which to average
-	                                            # | calculations.
+	angle-mode                     = 'random'  
+	 # Either 'sequential', 'random' or 'file'
+   	 # | tells GGADT how to choose orientations over which to average
+     # | calculations.
+
 	norientations                  = 64
-												# If angle-mode is NOT 'file'; number of orientations
-	                                            # | over which to average calcuations
+	 # If angle-mode is NOT 'file'; number of orientations
+     # | over which to average calcuations
 
 Here we're saying that GGADT should average over 64 random orientations of the object.
 
@@ -162,13 +164,14 @@ Here, we do the calculation at *one* photon energy (i.e. for a single value of t
 
 .. code-block:: ini
 
-	## number of angles to calculate diff. scat. cross section (ntheta) or spacing between them (dtheta)
+	# number of angles to calculate diff. scat. 
+	# cross section (ntheta) or spacing between them (dtheta)
 	# (arcseconds) Choose only one of these parameters
 	dtheta                         = 25.0
 	#nscatter                      = 100
 
-	## Maximum angle for which the diff. scat. cross section is calculated
-	# (arcseconds)
+	# Maximum angle for which the diff. scat. cross 
+	# section is calculated (arcseconds)
 	max-angle                      = 6000.
 
 This tells GGADT that you want to compute :math:`dC_{\rm sca}/d\Omega` from 0 to 6000 arcseconds, with values spaced every :math:`\delta\theta=25` arcseconds.

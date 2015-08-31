@@ -82,8 +82,7 @@ General options
 	
 	The axes convention to use. Must be one of DDSCAT or MSTM. These conventions are explained later in the documentation.
 
-.. option:: --fftw-optimization=value
-	
+.. option --fftw-optimization=value
 	Must be one of ESTIMATE, MEASURE, PATIENT or EXHAUSTIVE. For more information about what these tags mean and about FFTW wisdom, see http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans.
 
 .. option:: --angle-mode=value

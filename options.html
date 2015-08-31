@@ -155,12 +155,6 @@
 </dd></dl>
 
 <dl class="option">
-<dt id="cmdoption--fftw-optimization">
-<code class="descname">--fftw-optimization</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--fftw-optimization" title="Permalink to this definition">¶</a></dt>
-<dd><p>Must be one of ESTIMATE, MEASURE, PATIENT or EXHAUSTIVE. For more information about what these tags mean and about FFTW wisdom, see <a class="reference external" href="http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans">http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans</a>.</p>
-</dd></dl>
-
-<dl class="option">
 <dt id="cmdoption--angle-mode">
 <code class="descname">--angle-mode</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--angle-mode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Must be one of random, sequential, or file. Specifying random will average over norientations grain orientations, with each angle chosen from a uniform distribution over the domain of orientation angles. Specifying sequential will make GGADT use a set of angles that are evenly spaced over each of the orientation angle domains. Specifying file allows you to give GGADT specific orientation angles to use in orientational averaging. The file mode requires that you also specify &#8211;angle-file=/path/to/angle-file which contains a list of orientation angles.</p>

@@ -56,23 +56,24 @@
 <tr><td class="label"><a class="fn-backref" href="#id1">[VDH1957]</a></td><td>van de Hulst H., Light scattering by small particles, 1957, John Wiley &amp; Sons, Inc., NY.</td></tr>
 </tbody>
 </table>
-<div class="section" id="additional-files">
-<h2>Additional files<a class="headerlink" href="#additional-files" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><a class="reference external" href="index_files.tar.gz">index_files</a> (328 Kb)</li>
-<li><a class="reference external" href="target_files.tar.gz">target_files</a> (6.6 Mb)</li>
-</ul>
-<div class="section" id="contents">
-<h3>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installing GGADT</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#package-dependencies">Package Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#package-dependencies">Package Dependencies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install.html#mac-users">Mac Users</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="example.html">Quick Example</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="example.html#example-1-total-cross-sections-as-a-function-of-energy">Example 1: Total cross sections as a function of energy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="example.html#example-2-differential-scattering-cross-section">Example 2: Differential scattering cross section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example.html#example-1-total-cross-sections-as-a-function-of-energy">Example 1: Total cross sections as a function of energy</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="example.html#a-more-thorough-look-at-the-parameter-file-parameters-total-xs-ini">A more thorough look at the parameter file <code class="docutils literal"><span class="pre">parameters_total_xs.ini</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="example.html#example-2-differential-scattering-cross-section">Example 2: Differential scattering cross section</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="example.html#a-more-thorough-look-at-the-parameter-file-parameters-diffscat-ini">A more thorough look at the parameter file <code class="docutils literal"><span class="pre">parameters_diffscat.ini</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="invoking.html">Invoking GGADT</a><ul>
@@ -85,12 +86,18 @@
 <li class="toctree-l2"><a class="reference internal" href="options.html#ellipsoidal-grains">Ellipsoidal grains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="options.html#agglomerations-of-spherical-particles-single-or-multiple-composition">Agglomerations of spherical particles (single or multiple composition)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="options.html#differential-scattering-cross-section">Differential scattering cross section</a></li>
-<li class="toctree-l2"><a class="reference internal" href="options.html#energy-dependent-scattering-and-absorption-cross-sections-integrated-mode">Energy-dependent scattering and absorption cross sections (integrated mode)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="options.html#energy-dependent-scattering-and-absorption-cross-sections-integrated-mode">Energy-dependent scattering and absorption cross sections (integrated mode)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="options.html#default-parameter-values">Default parameter values</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="diffscat.html">Differential scattering cross section</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="diffscat.html#orientation-averaging">Orientation averaging</a></li>
-<li class="toctree-l2"><a class="reference internal" href="diffscat.html#d-vs-2d-results">1d vs 2d results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diffscat.html#d-vs-2d-results">1d vs 2d results</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="diffscat.html#using-the-nphi-parameter">Using the <code class="docutils literal"><span class="pre">nphi</span></code> parameter</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sphere.html">Sphere</a></li>
@@ -106,17 +113,16 @@
 <li class="toctree-l2"><a class="reference internal" href="conventions.html#mstm">MSTM</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="additional_files.html">Additional files</a></li>
 </ul>
 </div>
-</div>
 <div class="section" id="indices-and-tables">
-<h3>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h3>
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><a class="reference internal" href="genindex.html"><span>Index</span></a></li>
 <li><a class="reference internal" href="py-modindex.html"><span>Module Index</span></a></li>
 <li><a class="reference internal" href="search.html"><span>Search Page</span></a></li>
 </ul>
-</div>
 </div>
 </div>
 
@@ -129,11 +135,7 @@
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">General Geometry Anomalous Diffraction Theory</a><ul>
-<li><a class="reference internal" href="#additional-files">Additional files</a><ul>
-<li><a class="reference internal" href="#contents">Contents</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
