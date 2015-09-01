@@ -39,19 +39,19 @@
           <div class="body" role="main">
             
   <div class="section" id="differential-scattering-cross-section">
-<h1>Differential scattering cross section<a class="headerlink" href="#differential-scattering-cross-section" title="Permalink to this headline">¶</a></h1>
-<p>GGADT by default will produce an orientation-averaged, 1-dimensional result for <img class="math" src="_images/math/c47bf9879a2864f1510fdf829dc5d09a101235f5.png" alt="dC_{\rm sca}/d\Omega(\theta)"/> for a set of <img class="math" src="_images/math/f9f01e3588ff93bddafa4660de6cd5cca9df1d59.png" alt="theta_m"/> determined by either the <code class="docutils literal"><span class="pre">dtheta</span></code> parameter or the <code class="docutils literal"><span class="pre">nscatter</span></code> parameter.</p>
+<span id="diffscat"></span><span id="index-0"></span><h1>Differential scattering cross section<a class="headerlink" href="#differential-scattering-cross-section" title="Permalink to this headline">¶</a></h1>
+<p>GGADT by default will produce an orientation-averaged, 1-dimensional result for <img class="math" src="_images/math/c47bf9879a2864f1510fdf829dc5d09a101235f5.png" alt="dC_{\rm sca}/d\Omega(\theta)"/> for a set of <img class="math" src="_images/math/f9f01e3588ff93bddafa4660de6cd5cca9df1d59.png" alt="theta_m"/> determined by either the <a class="reference internal" href="options.html#cmdoption--dtheta"><code class="xref std std-option docutils literal"><span class="pre">--dtheta</span></code></a> parameter or the <a class="reference internal" href="options.html#cmdoption--nscatter"><code class="xref std std-option docutils literal"><span class="pre">--nscatter</span></code></a> parameter.</p>
 <div class="section" id="orientation-averaging">
 <h2>Orientation averaging<a class="headerlink" href="#orientation-averaging" title="Permalink to this headline">¶</a></h2>
-<p>GGADT has three methods for producing averages over orientations, all of which are set by the <code class="docutils literal"><span class="pre">angle-mode</span></code> parameter.</p>
+<p>GGADT has three methods for producing averages over orientations, all of which are set by the <code class="xref std std-option docutils literal"><span class="pre">angle-mode</span></code> parameter.</p>
 <dl class="docutils">
 <dt><strong>random</strong></dt>
 <dd>GGADT will chose <code class="docutils literal"><span class="pre">norientations</span></code> random orientations</dd>
 <dt><strong>sequential</strong></dt>
 <dd>GGADT will choose <code class="docutils literal"><span class="pre">norientations</span></code>, evenly spaced over <img class="math" src="_images/math/e7d97568956b2494dac59b43229d7f096d935d14.png" alt="(\beta, \theta, \phi)"/>.</dd>
 <dt><strong>file</strong></dt>
-<dd><p class="first">GGADT will read in <strong>file</strong>; each line contains three floating point numbers, representing <img class="math" src="_images/math/e7d97568956b2494dac59b43229d7f096d935d14.png" alt="(\beta, \theta, \phi)"/> (if <code class="docutils literal"><span class="pre">axes-convention=ddscat</span></code>), or <img class="math" src="_images/math/2b87ba9131b59a994e8e3ba97d49e5e4315cc50b.png" alt="(\alpha,\beta,\gamma)"/> if <code class="docutils literal"><span class="pre">axes-convention=mstm</span></code>. See <a class="reference internal" href="conventions.html#conventions"><span>Angle conventions</span></a> for more information about axes conventions. The file should have just three columns, each separated by white-space of some kind (e.g. tab, space):</p>
-<div class="last highlight-python"><div class="highlight"><pre>0.0 0.0 0.0
+<dd><p class="first">GGADT will read in <strong>file</strong>; each line contains three floating point numbers, representing <img class="math" src="_images/math/e7d97568956b2494dac59b43229d7f096d935d14.png" alt="(\beta, \theta, \phi)"/> (if <a class="reference internal" href="options.html#cmdoption--axes-convention"><code class="xref std std-option docutils literal"><span class="pre">--axes-convention</span></code></a> is set to <code class="docutils literal"><span class="pre">DDSCAT</span></code>), or <img class="math" src="_images/math/2b87ba9131b59a994e8e3ba97d49e5e4315cc50b.png" alt="(\alpha,\beta,\gamma)"/> if <a class="reference internal" href="options.html#cmdoption--axes-convention"><code class="xref std std-option docutils literal"><span class="pre">--axes-convention</span></code></a> is set to <code class="docutils literal"><span class="pre">MSTM</span></code>. See <a class="reference internal" href="conventions.html#conventions"><span>Angle conventions</span></a> for more information about axes conventions. The file should have just three columns, each separated by white-space of some kind (e.g. tab, space):</p>
+<div class="last highlight-python"><div class="highlight"><pre>0.0        0.0 0.0
 0.234 0.12 0.0
 ...
 </pre></div>
@@ -62,8 +62,8 @@
 <div class="section" id="d-vs-2d-results">
 <h2>1d vs 2d results<a class="headerlink" href="#d-vs-2d-results" title="Permalink to this headline">¶</a></h2>
 <div class="figure align-center" id="id1">
-<img alt="_images/fig_heatmaps_debug_small.png" src="_images/fig_heatmaps_debug_small.png" />
-<p class="caption"><span class="caption-text">GGADT results for many examples</span></p>
+<img alt="_images/fig_norientation_convergence_sm.png" src="_images/fig_norientation_convergence_sm.png" />
+<p class="caption"><span class="caption-text">How fast 1d and 2d computations converge. 2d computations, however, usually take significantly longer to run.</span></p>
 </div>
 <div class="section" id="using-the-nphi-parameter">
 <h3>Using the <code class="docutils literal"><span class="pre">nphi</span></code> parameter<a class="headerlink" href="#using-the-nphi-parameter" title="Permalink to this headline">¶</a></h3>

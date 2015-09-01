@@ -1,9 +1,11 @@
+.. index :: MSTM, DDSCAT, angle conventions
+
 .. _conventions:
 
 Angle conventions
 =================
 
-GGADT supports two different angle conventions. You can tell GGADT which one to use by specifying the ``--axes-convention`` parameter as either ``mstm`` or ``ddscat``.
+GGADT supports two different angle conventions. You can tell GGADT which one to use by specifying the :option:`--axes-convention` parameter as either ``MSTM`` or ``DDSCAT``.
 
 DDSCAT
 ^^^^^^

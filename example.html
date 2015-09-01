@@ -39,33 +39,33 @@
           <div class="body" role="main">
             
   <div class="section" id="quick-example">
-<h1>Quick Example<a class="headerlink" href="#quick-example" title="Permalink to this headline">¶</a></h1>
-<p>A directory containing two example cases, <code class="docutils literal"><span class="pre">example/</span></code>, is found in the parent directory of <strong class="program">GGADT</strong>. In this directory, you will find:</p>
+<span id="index-0"></span><h1>Quick Example<a class="headerlink" href="#quick-example" title="Permalink to this headline">¶</a></h1>
+<p>A directory containing two example cases, <code class="file docutils literal"><span class="pre">example/</span></code>, is found in the parent directory of <strong class="program">GGADT</strong>. In this directory, you will find:</p>
 <dl class="docutils">
 <dt><strong>README</strong></dt>
 <dd>A small file detailing the contents of the directory</dd>
 <dt><strong>Parameter files</strong></dt>
 <dd><dl class="first last docutils">
-<dt><code class="docutils literal"><span class="pre">parameters_total_xs.ini</span></code></dt>
+<dt><code class="file docutils literal"><span class="pre">parameters_total_xs.ini</span></code></dt>
 <dd>Parameter file for computing total (abs, sca, ext) cross sections as a function of energy</dd>
-<dt><code class="docutils literal"><span class="pre">parameters_diffscat.ini</span></code></dt>
+<dt><code class="file docutils literal"><span class="pre">parameters_diffscat.ini</span></code></dt>
 <dd>Parameter file for computing differential scattering cross section as a function of scattering angle.</dd>
 </dl>
 </dd>
 <dt><strong>Python scripts</strong></dt>
 <dd><dl class="first last docutils">
-<dt><code class="docutils literal"><span class="pre">plot_total_xs.py</span></code></dt>
+<dt><code class="file docutils literal"><span class="pre">plot_total_xs.py</span></code></dt>
 <dd>Plots output of GGADT calculations of total cross section</dd>
-<dt><code class="docutils literal"><span class="pre">plot_diffscat.py</span></code></dt>
+<dt><code class="file docutils literal"><span class="pre">plot_diffscat.py</span></code></dt>
 <dd>Plots output of GGADT calculations of differential scattering cross section</dd>
 </dl>
 </dd>
 <dt><strong>Target files for clusters of spheres</strong></dt>
 <dd><p class="first">describes the geometry of a cluster of spheres, see <a class="reference internal" href="#s2003" id="id1">[S2003]</a> for more information</p>
 <dl class="last docutils">
-<dt><code class="docutils literal"><span class="pre">BA.256.1.targ</span></code></dt>
+<dt><code class="file docutils literal"><span class="pre">BA.256.1.targ</span></code></dt>
 <dd>More porous aggregate</dd>
-<dt><code class="docutils literal"><span class="pre">BAM2.256.1.targ</span></code></dt>
+<dt><code class="file docutils literal"><span class="pre">BAM2.256.1.targ</span></code></dt>
 <dd>Less porous aggregate</dd>
 </dl>
 </dd>
@@ -78,22 +78,22 @@
 </table>
 <div class="section" id="example-1-total-cross-sections-as-a-function-of-energy">
 <h2>Example 1: Total cross sections as a function of energy<a class="headerlink" href="#example-1-total-cross-sections-as-a-function-of-energy" title="Permalink to this headline">¶</a></h2>
-<p>The first example uses <strong class="program">GGADT</strong> to compute the total cross sections (i.e. absorption, scattering, extinction) for a particular set of parameters, listed in <code class="docutils literal"><span class="pre">parameters_total_xs.ini</span></code>. A more detailed look at the parameter will come a bit later.</p>
-<p>To run <strong class="program">GGADT</strong> with the parameters specified in the parameter file <code class="docutils literal"><span class="pre">parameters_total_xs.ini</span></code>, simply do:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ ../src/ggadt --parameter-file=parameters_total_xs.ini &gt; total_xs.out
+<p>The first example uses <strong class="program">GGADT</strong> to compute the total cross sections (i.e. absorption, scattering, extinction) for a particular set of parameters, listed in <code class="file docutils literal"><span class="pre">parameters_total_xs.ini</span></code>. A more detailed look at the parameter will come a bit later.</p>
+<p>To run <strong class="program">GGADT</strong> with the parameters specified in the parameter file <code class="file docutils literal"><span class="pre">parameters_total_xs.ini</span></code>, simply do:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ ggadt --parameter-file=parameters_total_xs.ini &gt; total_xs.out
 </pre></div>
 </div>
-<p>This will store the results into the file <code class="docutils literal"><span class="pre">total_xs.out</span></code>, which can then be read in by the python script <strong class="program">plot_total_xs.py</strong>. To plot the results:</p>
+<p>This will store the results into the file <code class="file docutils literal"><span class="pre">total_xs.out</span></code>, which can then be read in by the python script <strong class="program">plot_total_xs.py</strong>. To plot the results:</p>
 <div class="highlight-python"><div class="highlight"><pre>$ python plot_total_xs.py total_xs.out
 </pre></div>
 </div>
 <p>Generating a plot that should look something like this</p>
 <div class="figure align-center" id="id2">
 <a class="reference internal image-reference" href="_images/total_xs.png"><img alt="_images/total_xs.png" src="_images/total_xs.png" style="width: 500px;" /></a>
-<p class="caption"><span class="caption-text">Total cross section (<strong>example 1</strong>)</span></p>
+<p class="caption"><span class="caption-text">Total cross section (<strong>Example 1</strong>)</span></p>
 </div>
 <div class="section" id="a-more-thorough-look-at-the-parameter-file-parameters-total-xs-ini">
-<h3>A more thorough look at the parameter file <code class="docutils literal"><span class="pre">parameters_total_xs.ini</span></code><a class="headerlink" href="#a-more-thorough-look-at-the-parameter-file-parameters-total-xs-ini" title="Permalink to this headline">¶</a></h3>
+<h3>A more thorough look at the parameter file <code class="file docutils literal"><span class="pre">parameters_total_xs.ini</span></code><a class="headerlink" href="#a-more-thorough-look-at-the-parameter-file-parameters-total-xs-ini" title="Permalink to this headline">¶</a></h3>
 <p>Let&#8217;s take a closer look at the parameter file now.</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="c1"># Geometry of grain</span>
 <span class="c1"># | one of: &#39;sphere&#39;,&#39;spheres&#39; (or &#39;agglomerate&#39;), or &#39;ellipsoid&#39;</span>
@@ -101,17 +101,17 @@
 <span class="na">agglom-file</span>                    <span class="o">=</span> <span class="s">&#39;BAM2.256.1.targ&#39;</span>
 </pre></div>
 </div>
-<p>These lines tell <strong class="program">GGADT</strong> about the kind of object it will be dealing with. By specifying <code class="docutils literal"><span class="pre">grain-geometry=spheres</span></code>, we&#8217;re saying that the object is a cluster of spheres, and that the cluster is parameterized in the file <code class="docutils literal"><span class="pre">BAM2.256.1.targ</span></code>. Without going into too much detail, suffice it to say that this file describes the following object:</p>
+<p>These lines tell <strong class="program">GGADT</strong> about the kind of object it will be dealing with. By specifying <code class="xref std std-option docutils literal"><span class="pre">--grain-geometry=spheres</span></code>, we&#8217;re saying that the object is a cluster of spheres, and that the cluster is parameterized in the file <code class="file docutils literal"><span class="pre">BAM2.256.1.targ</span></code>. Without going into too much detail, suffice it to say that this file describes the following object:</p>
 <div class="figure align-center" id="id3">
 <a class="reference internal image-reference" href="_images/BAM2_256_1_noheader.png"><img alt="_images/BAM2_256_1_noheader.png" src="_images/BAM2_256_1_noheader.png" style="width: 500px;" /></a>
-<p class="caption"><span class="caption-text">The grain parameterized by <code class="docutils literal"><span class="pre">BAM2.256.1.targ</span></code></span></p>
+<p class="caption"><span class="caption-text">The grain parameterized by <code class="file docutils literal"><span class="pre">BAM2.256.1.targ</span></code></span></p>
 </div>
 <p>Let&#8217;s move on.</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="na">use-efficiencies</span>               <span class="o">=</span> <span class="s">T</span>
 <span class="na">integrated</span>                     <span class="o">=</span> <span class="s">T</span>
 </pre></div>
 </div>
-<p>Here, we&#8217;re telling <strong class="program">GGADT</strong> that we want it to output results in terms of <em>efficiencies</em>, <img class="math" src="_images/math/26aa4a683a4c14ec474ed2a341a9b0b36cc94245.png" alt="Q\equiv C/\pi a^2"/>, and that we&#8217;re computing the integrated cross sections (and not the differential scattering cross section).</p>
+<p>Here, we&#8217;re telling <strong class="program">GGADT</strong> that we want it to output results in terms of <span class="target" id="index-1"></span>efficiencies, <img class="math" src="_images/math/26aa4a683a4c14ec474ed2a341a9b0b36cc94245.png" alt="Q\equiv C/\pi a^2"/>, and that we&#8217;re computing the <span class="target" id="index-2"></span>integrated cross sections (and not the differential scattering cross section).</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="c1"># effective radius (radius of sphere with same volume)</span>
 <span class="na">aeff</span>                           <span class="o">=</span> <span class="s">0.2</span>
 <span class="c1"># Number of grid elements (along one dimension) to resolve grain</span>
@@ -122,7 +122,7 @@
 <div class="highlight-ini"><div class="highlight"><pre><span class="na">material-file</span>                  <span class="o">=</span> <span class="s">&quot;index_silD03&quot;</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal"><span class="pre">material-file</span></code> argument gives the location of the &#8220;index file&#8221;: a file specifying the energy-dependent refractive index of the grain material.</p>
+<p>The <a class="reference internal" href="options.html#cmdoption--material-file"><code class="xref std std-option docutils literal"><span class="pre">--material-file</span></code></a> argument gives the location of the <a class="reference internal" href="glossary.html#term-index-file"><span class="xref std std-term">index file</span></a>: a file specifying the energy-dependent <span class="target" id="index-3"></span>refractive index of the grain material.</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="na">dephot</span>                         <span class="o">=</span> <span class="s">0.1</span>
 <span class="na">ephot-min</span>                      <span class="o">=</span> <span class="s">0.1</span>
 <span class="na">ephot-max</span>                      <span class="o">=</span> <span class="s">5.0</span>
@@ -139,17 +139,17 @@
 <span class="c1"># | over which to average calcuations</span>
 </pre></div>
 </div>
-<p>Here we&#8217;re saying that GGADT should average over 64 random orientations of the object.</p>
+<p>Here we&#8217;re saying that GGADT should average over 64 <span class="target" id="index-4"></span>random orientations of the object.</p>
 </div>
 </div>
 <div class="section" id="example-2-differential-scattering-cross-section">
 <h2>Example 2: Differential scattering cross section<a class="headerlink" href="#example-2-differential-scattering-cross-section" title="Permalink to this headline">¶</a></h2>
-<p>The second example uses GGADT to calculate the differential scattering cross section for a particular object and set of parameters. The <code class="docutils literal"><span class="pre">parameters_diffscat.ini</span></code> parameter file is used here.</p>
-<p>To run <strong class="program">GGADT</strong> with the parameters specified in the parameter file <code class="docutils literal"><span class="pre">parameters_total_xs.ini</span></code>, simply do:</p>
+<p>The second example uses GGADT to calculate the <a class="reference internal" href="glossary.html#term-differential-scattering-cross-section"><span class="xref std std-term">differential scattering cross section</span></a> for a particular object and set of parameters. The <code class="file docutils literal"><span class="pre">parameters_diffscat.ini</span></code> parameter file is used here.</p>
+<p>To run <strong class="program">GGADT</strong> with the parameters specified in the parameter file <code class="file docutils literal"><span class="pre">parameters_total_xs.ini</span></code>, simply do:</p>
 <div class="highlight-python"><div class="highlight"><pre>$ ../src/ggadt --parameter-file=parameters_diffscat.ini &gt; diffscat.out
 </pre></div>
 </div>
-<p>This will store the results into the file <code class="docutils literal"><span class="pre">total_xs.out</span></code>, which can then be read in by the python script <strong class="program">plot_total_xs.py</strong>. To plot the results:</p>
+<p>This will store the results into the file <code class="file docutils literal"><span class="pre">total_xs.out</span></code>, which can then be read in by the python script <strong class="program">plot_total_xs.py</strong>. To plot the results:</p>
 <div class="highlight-python"><div class="highlight"><pre>$ python plot_diffscat.py diffscat.out
 </pre></div>
 </div>
@@ -159,8 +159,8 @@
 <p class="caption"><span class="caption-text">Differential scattering cross section (<strong>example 2</strong>)</span></p>
 </div>
 <div class="section" id="a-more-thorough-look-at-the-parameter-file-parameters-diffscat-ini">
-<h3>A more thorough look at the parameter file <code class="docutils literal"><span class="pre">parameters_diffscat.ini</span></code><a class="headerlink" href="#a-more-thorough-look-at-the-parameter-file-parameters-diffscat-ini" title="Permalink to this headline">¶</a></h3>
-<p>We&#8217;ll pick through the differences between <code class="docutils literal"><span class="pre">parameters_diffscat.ini</span></code> and <code class="docutils literal"><span class="pre">parameters_total_xs.ini</span></code>.</p>
+<h3>A more thorough look at the parameter file <code class="file docutils literal"><span class="pre">parameters_diffscat.ini</span></code><a class="headerlink" href="#a-more-thorough-look-at-the-parameter-file-parameters-diffscat-ini" title="Permalink to this headline">¶</a></h3>
+<p>We&#8217;ll pick through the differences between <code class="file docutils literal"><span class="pre">parameters_diffscat.ini</span></code> and <code class="file docutils literal"><span class="pre">parameters_total_xs.ini</span></code>.</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="c1"># parameters for differential scattering cross section calculation</span>
 <span class="c1"># units: keV</span>
 <span class="na">ephot</span>                          <span class="o">=</span> <span class="s">2.0</span>
@@ -174,7 +174,7 @@
 <span class="c1"># |</span>
 </pre></div>
 </div>
-<p>Here, we do the calculation at <em>one</em> photon energy (i.e. for a single value of the index of refraction, <img class="math" src="_images/math/c4bb40dd65eae6c11b325989b14e0b8d35e4e3ef.png" alt="m"/>). We can either set <code class="docutils literal"><span class="pre">ior-re</span></code> and <code class="docutils literal"><span class="pre">ior-im</span></code> ourselves, <em>or</em> we can specify a <code class="docutils literal"><span class="pre">material-file</span></code> and a photon energy, <code class="docutils literal"><span class="pre">ephot</span></code> (in keV). We&#8217;ve chosen the latter here.</p>
+<p>Here, we do the calculation at <em>one</em> <span class="target" id="index-5"></span>photon energy (i.e. for a single value of the index of refraction, <img class="math" src="_images/math/c4bb40dd65eae6c11b325989b14e0b8d35e4e3ef.png" alt="m"/>). We can either set <a class="reference internal" href="options.html#cmdoption--ior-re"><code class="xref std std-option docutils literal"><span class="pre">--ior-re</span></code></a> and <a class="reference internal" href="options.html#cmdoption--ior-im"><code class="xref std std-option docutils literal"><span class="pre">--ior-im</span></code></a> ourselves, <em>or</em> we can specify a <a class="reference internal" href="options.html#cmdoption--material-file"><code class="xref std std-option docutils literal"><span class="pre">--material-file</span></code></a> and a photon energy, <code class="xref std std-option docutils literal"><span class="pre">ephot</span></code> (in keV). We&#8217;ve chosen the latter here.</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="c1"># number of angles to calculate diff. scat.</span>
 <span class="c1"># cross section (ntheta) or spacing between them (dtheta)</span>
 <span class="c1"># (arcseconds) Choose only one of these parameters</span>
@@ -186,7 +186,7 @@
 <span class="na">max-angle</span>                      <span class="o">=</span> <span class="s">6000.</span>
 </pre></div>
 </div>
-<p>This tells GGADT that you want to compute <img class="math" src="_images/math/55d20eed017ebeaf5a8e10a9f2f0bf2a8661f917.png" alt="dC_{\rm sca}/d\Omega"/> from 0 to 6000 arcseconds, with values spaced every <img class="math" src="_images/math/352e0c598fe5d285c1279e08915ee864b0c82107.png" alt="\delta\theta=25"/> arcseconds.</p>
+<p>This tells GGADT that you want to compute <img class="math" src="_images/math/55d20eed017ebeaf5a8e10a9f2f0bf2a8661f917.png" alt="dC_{\rm sca}/d\Omega"/> from 0 to 6000 <a class="reference internal" href="glossary.html#term-arcseconds"><span class="xref std std-term">arcseconds</span></a>, with values spaced every <img class="math" src="_images/math/352e0c598fe5d285c1279e08915ee864b0c82107.png" alt="\delta\theta=25"/> arcseconds.</p>
 </div>
 </div>
 </div>
@@ -201,11 +201,11 @@
   <ul>
 <li><a class="reference internal" href="#">Quick Example</a><ul>
 <li><a class="reference internal" href="#example-1-total-cross-sections-as-a-function-of-energy">Example 1: Total cross sections as a function of energy</a><ul>
-<li><a class="reference internal" href="#a-more-thorough-look-at-the-parameter-file-parameters-total-xs-ini">A more thorough look at the parameter file <code class="docutils literal"><span class="pre">parameters_total_xs.ini</span></code></a></li>
+<li><a class="reference internal" href="#a-more-thorough-look-at-the-parameter-file-parameters-total-xs-ini">A more thorough look at the parameter file <code class="file docutils literal"><span class="pre">parameters_total_xs.ini</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#example-2-differential-scattering-cross-section">Example 2: Differential scattering cross section</a><ul>
-<li><a class="reference internal" href="#a-more-thorough-look-at-the-parameter-file-parameters-diffscat-ini">A more thorough look at the parameter file <code class="docutils literal"><span class="pre">parameters_diffscat.ini</span></code></a></li>
+<li><a class="reference internal" href="#a-more-thorough-look-at-the-parameter-file-parameters-diffscat-ini">A more thorough look at the parameter file <code class="file docutils literal"><span class="pre">parameters_diffscat.ini</span></code></a></li>
 </ul>
 </li>
 </ul>

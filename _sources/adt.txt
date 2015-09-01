@@ -1,0 +1,16 @@
+
+.. _adt:
+
+Anomalous Diffraction Theory
+============================
+
+
+
+When is ADT a valid approximation?
+----------------------------------
+
+.. figure :: fig_validity.png
+	:align: center
+
+	Validity regions for several approximate methods of solving Maxwells' equations for scattering and absorption
+	

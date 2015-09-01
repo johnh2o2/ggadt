@@ -6,8 +6,8 @@ Arguments and parameters
 
 GGADT supports the following options:
 
-General options
-^^^^^^^^^^^^^^^
+Flags
+^^^^^
 .. option:: --help, -h
 	
 	The "help" screen–prints usage information and available options.
@@ -22,11 +22,11 @@ General options
 
 .. option:: --quiet, -q
 	
-	Do not print progress. GGADT by default will print out a percent complete: XX.X% statement during runtime; this option suppresses that.
+	Do not print progress. GGADT by default will print out a ``percent complete: XX.X%`` statement during runtime; this option suppresses that.
 
 .. option:: --timing, -t
 	
-	Do not output data. No I/O is useful if you care about measuring the runtime of GGADT.
+	Do not output data. No output is useful if you care about measuring the runtime of GGADT.
 
 .. option:: --nthreads=value
 
@@ -34,7 +34,7 @@ General options
 
 .. option:: --use-padded-fft, -s
 	
-	This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by nscatter), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.
+	This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by :option:`--nscatter`), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.
 
 .. option:: --force-numerical
 	
@@ -42,11 +42,14 @@ General options
 
 .. option:: --do-full-2d-fft
 	
-	Do not utilize the fact that you can make a 2d FFT a 1d FFT if you only care about the orientationally averaged value of dσ/dΩ(θ)
+	Do not utilize the fact that you can make a 2d FFT a 1d FFT if you only care about the orientationally averaged value of :math:`dC_{\rm sca}/d\Omega(\theta)`
 
 .. option:: --save-shadow-function
 	
 	You can save a copy of the 2d shadow function of your grain (useful as a sanity check or to make pretty pictures)
+
+General options
+^^^^^^^^^^^^^^^
 
 .. option:: --save-file-root=value
 
@@ -60,15 +63,23 @@ General options
 
 .. option:: --grain-geometry=value
 	
-	Geometry of dust grain. Must be one of SPHERE, ELLIPSOID, CUSTOM, SPHERES (or equivalently, AGGLOMERATION). A SPHERES grain geometry means that your grain is a conglomerate of smaller spheres. If you wish to use this grain geometry, you should supply a file (hereafter called a “agglomeration file", see the next option) that defines the relative positions of the spheres that make up the grain. The sizes of these spheres will be normalized so that the effective radius of the grain is consistent with aeff.
+	Geometry of dust grain. Must be one of ``SPHERE``, ``ELLIPSOID``, ``CUSTOM``, ``SPHERES`` (or equivalently, ``AGGLOMERATION``). These are not case sensitive. 
+
+	.. note:: 
+
+		A ``SPHERES`` grain geometry means that your grain is a conglomerate of smaller spheres. If you wish to use this grain geometry, you should supply a file (hereafter called a "agglomeration file", see the next option) that defines the relative positions of the spheres that make up the grain. The sizes of these spheres will be normalized so that the effective radius of the grain is consistent with :option:`--aeff`.
 
 .. option:: --aeff=value
 	
-	Effective radius of dust grain. The effective radius is defined to be the radius of a sphere with the same volume as the dust grain.
+	Effective radius of dust grain. 
+
+	.. math::
+
+		a_{\rm eff} \equiv \left(\frac{3V}{4\pi}\right)^{1/3}
 
 .. option:: --ngrain=value
 
-	The (square root) of the number of grid elements with which you would like to resolve your grain. To get accurate results out to about 4000 arcseconds, we’ve found that a value of 64 is good enough.
+	The (square root) of the number of grid elements with which you would like to resolve your grain. To get accurate results out to about 4000 arcseconds, we’ve found that using ``ngrain=64`` and higher provides sufficient accuracy for our needs.
 
 .. option:: --norientations=value
 	
@@ -80,18 +91,25 @@ General options
 
 .. option:: --axes-convention=value
 	
-	The axes convention to use. Must be one of DDSCAT or MSTM. These conventions are explained later in the documentation.
+	The axes convention to use. Must be one of ``DDSCAT`` or ``MSTM`` (not case-sensitive). These conventions are explained in :ref:`conventions`.
 
 .. option --fftw-optimization=value
 	Must be one of ESTIMATE, MEASURE, PATIENT or EXHAUSTIVE. For more information about what these tags mean and about FFTW wisdom, see http://fftw.org/fftw3_doc/Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans.
 
 .. option:: --angle-mode=value
 	
-	Must be one of random, sequential, or file. Specifying random will average over norientations grain orientations, with each angle chosen from a uniform distribution over the domain of orientation angles. Specifying sequential will make GGADT use a set of angles that are evenly spaced over each of the orientation angle domains. Specifying file allows you to give GGADT specific orientation angles to use in orientational averaging. The file mode requires that you also specify --angle-file=/path/to/angle-file which contains a list of orientation angles.
+	Must be one of ``RANDOM``, ``SEQUENTIAL``, or ``FILE``. 
+
+	**RANDOM**
+		Specifying random will average over norientations grain orientations, with each angle chosen from a uniform distribution over the domain of orientation angles. 
+	**SEQUENTIAL**
+		Specifying sequential will make GGADT use a set of angles that are evenly spaced over each of the orientation angle domains. 
+	**FILE**
+		Specifying file allows you to give GGADT specific orientation angles to use in orientational averaging. The file mode requires that you also specify :option:`--angle-file` as the path to a file containing a list of orientation angles.
 
 .. option:: --angle-file=value
 	
-	Path to a file containing a list of orientation angles which GGADT will use to compute orientational averages. Only used when --angle-mode=file.
+	Path to a file containing a list of orientation angles which GGADT will use to compute orientational averages. Only used when :option:`--angle-mode` is set to ``FILE``.
 
 .. option:: --material-file=value
 	
@@ -111,31 +129,28 @@ General options
 Ellipsoidal grains
 ^^^^^^^^^^^^^^^^^^
 
-.. option:: --grain-axis-x=value
+.. option:: --grain-axis-x=value, --grain-axis-y=value, --grain-axis-z=value
 	
-	For ELLIPSOID grains, we define the lengths of x, y and z axes.
-
-.. option:: --grain-axis-y=value
-.. option:: --grain-axis-z=value
+	For ELLIPSOID grains, these define the *ratio* of the lengths of the x, y and z axes.
 
 Agglomerations of spherical particles (single or multiple composition)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. option:: --agglom-file=value
 	
-	Path to a correctly formatted agglomeration file. Several agglomeration files are included with the distribution (see data/agglomerations), and if you wish to create your own, you must mimic exactly the format of these files.
+	Path to a correctly formatted agglomeration file. Several agglomeration files are included with the distribution (see :ref:`additional_files`), and if you wish to create your own, you must mimic exactly the format of these files.
 
 .. option:: --material-file1=value, --material-file2=value, --material-filen=value
 	
-	Path(s) to the index file for material 1, 2, 3, etc.
+	Path(s) to the index file for material 1, 2, 3, etc. See :ref:`multiple_compositions`.
 
 .. option:: --material-tag1=value, --material-tag2=value, --material-tagn=value
 	
-	The name(s) by which material 1, 2, 3, etc. are referred to in the agglomerate composition file.
+	The name(s) by which material 1, 2, 3, etc. are referred to in the agglomerate composition file. See :ref:`multiple_compositions`
 
 .. option:: --agglom-composition-file=value
 	
-	Provides the path to a text file that lists the spherical agglomerates and a material ’tag’ which is associated with an index file.
+	Provides the path to a text file that lists the spherical agglomerates and a material 'tag' which is associated with an index file. See :ref:`multiple_compositions` for more information.
 
 	The agglomerate composition file is assumed to be formatted with one header line, followed by as many lines as there are agglomerates in the grain, with each line containing the index of an agglomerate and a material 'tag'::
 
@@ -155,7 +170,7 @@ Differential scattering cross section
 
 .. option:: --dtheta=value
 	
-	Alternate to --nscatter: this defines the spacing of the scattering angles (in arcseconds) that you would like to calculate the differential cross section.
+	Alternate to :option:`--nscatter`: this defines the spacing of the scattering angles (in arcseconds) that you would like to calculate the differential cross section.
 
 .. option:: --ephot=value
 	
@@ -163,24 +178,24 @@ Differential scattering cross section
 
 .. option:: --ior-re=value, --ior-im=value
 	
-	The real and imaginary components of the complex index of refraction, minus one. If --material-file is specified, these parameters are overwritten by the linearly interpolated value of the index of refraction at E = ephot.
+	The real and imaginary components of the complex index of refraction, minus one. If :option:`--material-file` is specified, these parameters are overwritten by the linearly interpolated value of the index of refraction at E = :option:`--ephot`.
 
 .. option:: --max-angle=value
 	
-	The maximum scattering angle for which you would like to calculate the differential scattering cross section.
+	The maximum scattering angle for which you would like to calculate the :term:`differential scattering cross section`.
 
 .. option:: --do-phi-averaging
 	
-	If ``--do-full-2d-fft`` is set, you have the option of also setting ``--do-phi-averaging``, which averages the resulting :math:`dC_{\rm sca}/d\Omega(\theta,\phi)` over :math:`\phi` at each orientation, giving you a 1d result. In certain cases (i.e. for ``custom`` geometries), this is faster than doing many 1d FFT's.
+	If :option:`--do-full-2d-fft` is set, you have the option of also setting :option:`--do-phi-averaging`, which averages the resulting :math:`dC_{\rm sca}/d\Omega(\theta,\phi)` over :math:`\phi` at each orientation, giving you a 1d result. In certain cases (e.g. for ``CUSTOM`` geometries), this is faster than doing many 1d FFT's. In almost all cases that we've run, however, doing a full 2d FFT makes things slower.
 
 .. option:: --nphi=value
 	
-	When ``--do-phi-averaging`` is set, you can set the number of :math:`\phi` values over which you average the 2d differential scattering cross section.
+	When :option:`--do-phi-averaging` is set, you can set the number of :math:`\phi` values over which you average the 2d differential scattering cross section.
 
 Energy-dependent scattering and absorption cross sections (integrated mode)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You must also define a ``--material-file`` to do this calculation.
+You must also define a :option:`--material-file` to do this calculation.
 
 .. option:: --integrated
 	
@@ -188,11 +203,11 @@ You must also define a ``--material-file`` to do this calculation.
 
 .. option:: --nephots=value
 	
-	Defines the number of photon energies to calculate the cross sections between --ephot-min and --ephot-max. You can also define the energy spacing directly, via the --dephot parameter.
+	Defines the number of photon energies to calculate the cross sections between :option:`--ephot-min` and :option:`--ephot-max`. You can also define the energy spacing directly, via the :option:`--dephot` parameter.
 
 .. option:: --dephot=value
 	
-	Alternate to --nephots, defines the energy spacing between different photon energies for which the cross sections are calculated.
+	Alternate to :option:`--nephots`, defines the energy spacing between different photon energies for which the cross sections are calculated.
 
 .. option:: --ephot-min=value
 	
@@ -205,5 +220,7 @@ You must also define a ``--material-file`` to do this calculation.
 Default parameter values
 ------------------------
 
-Default parameter values are loaded from the ``.defaults`` file located in the parent directory of GGADT. You can edit this file, or (as a safer option), edit a copy of this file and pass the path as the value for ``--parameter-file``.
+Default parameter values are loaded from the :file:`default.params` file located in the parent directory of GGADT. You can edit this file, or (as a safer option), edit a copy of this file and pass the path as the value for :option:`--parameter-file`.
+
+
 

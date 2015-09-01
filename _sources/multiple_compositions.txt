@@ -1,0 +1,48 @@
+.. index :: material tags, multiple compositions, material file
+
+.. _multiple_compositions :
+
+Multiple Compositions
+=====================
+
+For grains consisting of spherical monomers, GGADT allows you to vary the composition throughout the grain.
+
+#. 
+	Create a file that provides the composition of each monomer (e.g. :file:`composition_file.dat`) in the following format::
+
+			j    material-tag
+			1		iron
+			2		carbon
+			3		iron
+			4		silicate
+			...
+
+	Here, ``iron``, ``silicate``, etc. are :term:`material tags`, and ``j`` refers to the index of the monomer.
+
+#. 
+	Tell GGADT which index files these tags refer to by setting
+
+	.. code-block:: ini
+
+		agglom-composition-file = /path/to/composition_file.dat
+
+		material-tag1			= iron
+		material-file1			= /path/to/iron_index.dat
+
+		material-tag2			= carbon
+		material-file2			= /path/to/carbon_index.dat
+
+		material-tag3			= silicate
+		material-file3			= /path/to/silicate_index.dat
+
+	in your parameter file (or via the command line).
+
+#. 
+	Tell GGADT that you're using a ``SPHERES`` geometry
+
+	.. code-block:: ini
+		
+		grain-geometry			= spheres
+		agglom-file 			= /path/to/target_file.targ
+
+

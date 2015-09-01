@@ -1,8 +1,10 @@
 
+.. index :: default.params, differential scattering cross section, parameter file, agglom-file
+
 Invoking GGADT
 ==============
 
-To see usage and all available options for ggadt, simply use the ``-h`` option::
+To see usage and all available options for ggadt, simply use the :option:`-h` option::
 
 	$ ggadt -h
 
@@ -15,7 +17,7 @@ The format for running GGADT is::
 
 	$ ggadt [option]
 
-With no options, ggadt runs calculations on a set of default grain parameters (specified in the ``default.params`` file). By default GGADT will calculate the differential scattering cross section as a function of scattering angle. To calculate the integrated scattering and absorption cross sections for a range of energies, add the ``--integrated`` flag as a command-line argument.
+With no options, GGADT runs calculations on a set of :index:`default grain parameters` (specified in the :file:`default.params` file). By default GGADT will calculate the differential scattering cross section as a function of scattering angle. To calculate the integrated scattering and absorption cross sections for a range of energies, add the :option:`--integrated` flag as a command-line argument.
 
 Parameters may be specified as command-line arguments,::
 

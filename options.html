@@ -41,8 +41,8 @@
   <div class="section" id="arguments-and-parameters">
 <span id="options"></span><h1>Arguments and parameters<a class="headerlink" href="#arguments-and-parameters" title="Permalink to this headline">¶</a></h1>
 <p>GGADT supports the following options:</p>
-<div class="section" id="general-options">
-<h2>General options<a class="headerlink" href="#general-options" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="flags">
+<h2>Flags<a class="headerlink" href="#flags" title="Permalink to this headline">¶</a></h2>
 <dl class="option">
 <dt id="cmdoption--help">
 <span id="cmdoption-h"></span><code class="descname">--help</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">-h</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--help" title="Permalink to this definition">¶</a></dt>
@@ -64,13 +64,13 @@
 <dl class="option">
 <dt id="cmdoption--quiet">
 <span id="cmdoption-q"></span><code class="descname">--quiet</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">-q</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--quiet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Do not print progress. GGADT by default will print out a percent complete: XX.X% statement during runtime; this option suppresses that.</p>
+<dd><p>Do not print progress. GGADT by default will print out a <code class="docutils literal"><span class="pre">percent</span> <span class="pre">complete:</span> <span class="pre">XX.X%</span></code> statement during runtime; this option suppresses that.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--timing">
 <span id="cmdoption-t"></span><code class="descname">--timing</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">-t</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--timing" title="Permalink to this definition">¶</a></dt>
-<dd><p>Do not output data. No I/O is useful if you care about measuring the runtime of GGADT.</p>
+<dd><p>Do not output data. No output is useful if you care about measuring the runtime of GGADT.</p>
 </dd></dl>
 
 <dl class="option">
@@ -82,7 +82,7 @@
 <dl class="option">
 <dt id="cmdoption--use-padded-fft">
 <span id="cmdoption-s"></span><code class="descname">--use-padded-fft</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">-s</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--use-padded-fft" title="Permalink to this definition">¶</a></dt>
-<dd><p>This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by nscatter), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.</p>
+<dd><p>This will force GGADT to do only one FFT. In order to provide you with the desired angular resolution of the differential cross section (set by <a class="reference internal" href="#cmdoption--nscatter"><code class="xref std std-option docutils literal"><span class="pre">--nscatter</span></code></a>), GGADT will pad the 2-d grid on which the shadow function is defined. Forcing GGADT to use a padded FFT, instead of the more efficient method without padding, will run much slower.</p>
 </dd></dl>
 
 <dl class="option">
@@ -94,7 +94,7 @@
 <dl class="option">
 <dt id="cmdoption--do-full-2d-fft">
 <code class="descname">--do-full-2d-fft</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--do-full-2d-fft" title="Permalink to this definition">¶</a></dt>
-<dd><p>Do not utilize the fact that you can make a 2d FFT a 1d FFT if you only care about the orientationally averaged value of dσ/dΩ(θ)</p>
+<dd><p>Do not utilize the fact that you can make a 2d FFT a 1d FFT if you only care about the orientationally averaged value of <img class="math" src="_images/math/c47bf9879a2864f1510fdf829dc5d09a101235f5.png" alt="dC_{\rm sca}/d\Omega(\theta)"/></p>
 </dd></dl>
 
 <dl class="option">
@@ -103,6 +103,9 @@
 <dd><p>You can save a copy of the 2d shadow function of your grain (useful as a sanity check or to make pretty pictures)</p>
 </dd></dl>
 
+</div>
+<div class="section" id="general-options">
+<h2>General options<a class="headerlink" href="#general-options" title="Permalink to this headline">¶</a></h2>
 <dl class="option">
 <dt id="cmdoption--save-file-root">
 <code class="descname">--save-file-root</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--save-file-root" title="Permalink to this definition">¶</a></dt>
@@ -121,19 +124,25 @@
 <dl class="option">
 <dt id="cmdoption--grain-geometry">
 <code class="descname">--grain-geometry</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--grain-geometry" title="Permalink to this definition">¶</a></dt>
-<dd><p>Geometry of dust grain. Must be one of SPHERE, ELLIPSOID, CUSTOM, SPHERES (or equivalently, AGGLOMERATION). A SPHERES grain geometry means that your grain is a conglomerate of smaller spheres. If you wish to use this grain geometry, you should supply a file (hereafter called a “agglomeration file&#8221;, see the next option) that defines the relative positions of the spheres that make up the grain. The sizes of these spheres will be normalized so that the effective radius of the grain is consistent with aeff.</p>
+<dd><p>Geometry of dust grain. Must be one of <code class="docutils literal"><span class="pre">SPHERE</span></code>, <code class="docutils literal"><span class="pre">ELLIPSOID</span></code>, <code class="docutils literal"><span class="pre">CUSTOM</span></code>, <code class="docutils literal"><span class="pre">SPHERES</span></code> (or equivalently, <code class="docutils literal"><span class="pre">AGGLOMERATION</span></code>). These are not case sensitive.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A <code class="docutils literal"><span class="pre">SPHERES</span></code> grain geometry means that your grain is a conglomerate of smaller spheres. If you wish to use this grain geometry, you should supply a file (hereafter called a &#8220;agglomeration file&#8221;, see the next option) that defines the relative positions of the spheres that make up the grain. The sizes of these spheres will be normalized so that the effective radius of the grain is consistent with <a class="reference internal" href="#cmdoption--aeff"><code class="xref std std-option docutils literal"><span class="pre">--aeff</span></code></a>.</p>
+</div>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--aeff">
 <code class="descname">--aeff</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--aeff" title="Permalink to this definition">¶</a></dt>
-<dd><p>Effective radius of dust grain. The effective radius is defined to be the radius of a sphere with the same volume as the dust grain.</p>
-</dd></dl>
+<dd><p>Effective radius of dust grain.</p>
+<div class="math">
+<p><img src="_images/math/f1752dea52c7fce4896471482d82cc8e47c8270d.png" alt="a_{\rm eff} \equiv \left(\frac{3V}{4\pi}\right)^{1/3}"/></p>
+</div></dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--ngrain">
 <code class="descname">--ngrain</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--ngrain" title="Permalink to this definition">¶</a></dt>
-<dd><p>The (square root) of the number of grid elements with which you would like to resolve your grain. To get accurate results out to about 4000 arcseconds, we’ve found that a value of 64 is good enough.</p>
+<dd><p>The (square root) of the number of grid elements with which you would like to resolve your grain. To get accurate results out to about 4000 arcseconds, we’ve found that using <code class="docutils literal"><span class="pre">ngrain=64</span></code> and higher provides sufficient accuracy for our needs.</p>
 </dd></dl>
 
 <dl class="option">
@@ -151,19 +160,27 @@
 <dl class="option">
 <dt id="cmdoption--axes-convention">
 <code class="descname">--axes-convention</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--axes-convention" title="Permalink to this definition">¶</a></dt>
-<dd><p>The axes convention to use. Must be one of DDSCAT or MSTM. These conventions are explained later in the documentation.</p>
+<dd><p>The axes convention to use. Must be one of <code class="docutils literal"><span class="pre">DDSCAT</span></code> or <code class="docutils literal"><span class="pre">MSTM</span></code> (not case-sensitive). These conventions are explained in <a class="reference internal" href="conventions.html#conventions"><span>Angle conventions</span></a>.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--angle-mode">
 <code class="descname">--angle-mode</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--angle-mode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Must be one of random, sequential, or file. Specifying random will average over norientations grain orientations, with each angle chosen from a uniform distribution over the domain of orientation angles. Specifying sequential will make GGADT use a set of angles that are evenly spaced over each of the orientation angle domains. Specifying file allows you to give GGADT specific orientation angles to use in orientational averaging. The file mode requires that you also specify &#8211;angle-file=/path/to/angle-file which contains a list of orientation angles.</p>
+<dd><p>Must be one of <code class="docutils literal"><span class="pre">RANDOM</span></code>, <code class="docutils literal"><span class="pre">SEQUENTIAL</span></code>, or <code class="docutils literal"><span class="pre">FILE</span></code>.</p>
+<dl class="docutils">
+<dt><strong>RANDOM</strong></dt>
+<dd>Specifying random will average over norientations grain orientations, with each angle chosen from a uniform distribution over the domain of orientation angles.</dd>
+<dt><strong>SEQUENTIAL</strong></dt>
+<dd>Specifying sequential will make GGADT use a set of angles that are evenly spaced over each of the orientation angle domains.</dd>
+<dt><strong>FILE</strong></dt>
+<dd>Specifying file allows you to give GGADT specific orientation angles to use in orientational averaging. The file mode requires that you also specify <a class="reference internal" href="#cmdoption--angle-file"><code class="xref std std-option docutils literal"><span class="pre">--angle-file</span></code></a> as the path to a file containing a list of orientation angles.</dd>
+</dl>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--angle-file">
 <code class="descname">--angle-file</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--angle-file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Path to a file containing a list of orientation angles which GGADT will use to compute orientational averages. Only used when &#8211;angle-mode=file.</p>
+<dd><p>Path to a file containing a list of orientation angles which GGADT will use to compute orientational averages. Only used when <a class="reference internal" href="#cmdoption--angle-mode"><code class="xref std std-option docutils literal"><span class="pre">--angle-mode</span></code></a> is set to <code class="docutils literal"><span class="pre">FILE</span></code>.</p>
 </dd></dl>
 
 <dl class="option">
@@ -189,19 +206,9 @@ E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
 <h2>Ellipsoidal grains<a class="headerlink" href="#ellipsoidal-grains" title="Permalink to this headline">¶</a></h2>
 <dl class="option">
 <dt id="cmdoption--grain-axis-x">
-<code class="descname">--grain-axis-x</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--grain-axis-x" title="Permalink to this definition">¶</a></dt>
-<dd><p>For ELLIPSOID grains, we define the lengths of x, y and z axes.</p>
+<span id="cmdoption--grain-axis-y"></span><span id="cmdoption--grain-axis-z"></span><code class="descname">--grain-axis-x</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--grain-axis-y</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--grain-axis-z</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--grain-axis-x" title="Permalink to this definition">¶</a></dt>
+<dd><p>For ELLIPSOID grains, these define the <em>ratio</em> of the lengths of the x, y and z axes.</p>
 </dd></dl>
-
-<dl class="option">
-<dt id="cmdoption--grain-axis-y">
-<code class="descname">--grain-axis-y</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--grain-axis-y" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="option">
-<dt id="cmdoption--grain-axis-z">
-<code class="descname">--grain-axis-z</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--grain-axis-z" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </div>
 <div class="section" id="agglomerations-of-spherical-particles-single-or-multiple-composition">
@@ -209,25 +216,25 @@ E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
 <dl class="option">
 <dt id="cmdoption--agglom-file">
 <code class="descname">--agglom-file</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--agglom-file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Path to a correctly formatted agglomeration file. Several agglomeration files are included with the distribution (see data/agglomerations), and if you wish to create your own, you must mimic exactly the format of these files.</p>
+<dd><p>Path to a correctly formatted agglomeration file. Several agglomeration files are included with the distribution (see <a class="reference internal" href="additional_files.html#additional-files"><span>Additional files</span></a>), and if you wish to create your own, you must mimic exactly the format of these files.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--material-file1">
 <span id="cmdoption--material-file2"></span><span id="cmdoption--material-filen"></span><code class="descname">--material-file1</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--material-file2</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--material-filen</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--material-file1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Path(s) to the index file for material 1, 2, 3, etc.</p>
+<dd><p>Path(s) to the index file for material 1, 2, 3, etc. See <a class="reference internal" href="multiple_compositions.html#multiple-compositions"><span>Multiple Compositions</span></a>.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--material-tag1">
 <span id="cmdoption--material-tag2"></span><span id="cmdoption--material-tagn"></span><code class="descname">--material-tag1</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--material-tag2</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--material-tagn</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--material-tag1" title="Permalink to this definition">¶</a></dt>
-<dd><p>The name(s) by which material 1, 2, 3, etc. are referred to in the agglomerate composition file.</p>
+<dd><p>The name(s) by which material 1, 2, 3, etc. are referred to in the agglomerate composition file. See <a class="reference internal" href="multiple_compositions.html#multiple-compositions"><span>Multiple Compositions</span></a></p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--agglom-composition-file">
 <code class="descname">--agglom-composition-file</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--agglom-composition-file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Provides the path to a text file that lists the spherical agglomerates and a material ’tag’ which is associated with an index file.</p>
+<dd><p>Provides the path to a text file that lists the spherical agglomerates and a material &#8216;tag&#8217; which is associated with an index file. See <a class="reference internal" href="multiple_compositions.html#multiple-compositions"><span>Multiple Compositions</span></a> for more information.</p>
 <p>The agglomerate composition file is assumed to be formatted with one header line, followed by as many lines as there are agglomerates in the grain, with each line containing the index of an agglomerate and a material &#8216;tag&#8217;:</p>
 <div class="highlight-python"><div class="highlight"><pre>j      material tag
 1    silicate
@@ -251,7 +258,7 @@ E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
 <dl class="option">
 <dt id="cmdoption--dtheta">
 <code class="descname">--dtheta</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--dtheta" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alternate to &#8211;nscatter: this defines the spacing of the scattering angles (in arcseconds) that you would like to calculate the differential cross section.</p>
+<dd><p>Alternate to <a class="reference internal" href="#cmdoption--nscatter"><code class="xref std std-option docutils literal"><span class="pre">--nscatter</span></code></a>: this defines the spacing of the scattering angles (in arcseconds) that you would like to calculate the differential cross section.</p>
 </dd></dl>
 
 <dl class="option">
@@ -263,31 +270,31 @@ E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
 <dl class="option">
 <dt id="cmdoption--ior-re">
 <span id="cmdoption--ior-im"></span><code class="descname">--ior-re</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--ior-im</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--ior-re" title="Permalink to this definition">¶</a></dt>
-<dd><p>The real and imaginary components of the complex index of refraction, minus one. If &#8211;material-file is specified, these parameters are overwritten by the linearly interpolated value of the index of refraction at E = ephot.</p>
+<dd><p>The real and imaginary components of the complex index of refraction, minus one. If <a class="reference internal" href="#cmdoption--material-file"><code class="xref std std-option docutils literal"><span class="pre">--material-file</span></code></a> is specified, these parameters are overwritten by the linearly interpolated value of the index of refraction at E = <a class="reference internal" href="#cmdoption--ephot"><code class="xref std std-option docutils literal"><span class="pre">--ephot</span></code></a>.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--max-angle">
 <code class="descname">--max-angle</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--max-angle" title="Permalink to this definition">¶</a></dt>
-<dd><p>The maximum scattering angle for which you would like to calculate the differential scattering cross section.</p>
+<dd><p>The maximum scattering angle for which you would like to calculate the <span class="xref std std-term">differential scattering cross section</span>.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--do-phi-averaging">
 <code class="descname">--do-phi-averaging</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--do-phi-averaging" title="Permalink to this definition">¶</a></dt>
-<dd><p>If <code class="docutils literal"><span class="pre">--do-full-2d-fft</span></code> is set, you have the option of also setting <code class="docutils literal"><span class="pre">--do-phi-averaging</span></code>, which averages the resulting <img class="math" src="_images/math/70c3262f2ce0b68e6af81967bfdf208a5b9b7dac.png" alt="dC_{\rm sca}/d\Omega(\theta,\phi)"/> over <img class="math" src="_images/math/10e009bdb83f96c5f47c58b34d5d4b12ef268d5b.png" alt="\phi"/> at each orientation, giving you a 1d result. In certain cases (i.e. for <code class="docutils literal"><span class="pre">custom</span></code> geometries), this is faster than doing many 1d FFT&#8217;s.</p>
+<dd><p>If <a class="reference internal" href="#cmdoption--do-full-2d-fft"><code class="xref std std-option docutils literal"><span class="pre">--do-full-2d-fft</span></code></a> is set, you have the option of also setting <a class="reference internal" href="#cmdoption--do-phi-averaging"><code class="xref std std-option docutils literal"><span class="pre">--do-phi-averaging</span></code></a>, which averages the resulting <img class="math" src="_images/math/70c3262f2ce0b68e6af81967bfdf208a5b9b7dac.png" alt="dC_{\rm sca}/d\Omega(\theta,\phi)"/> over <img class="math" src="_images/math/10e009bdb83f96c5f47c58b34d5d4b12ef268d5b.png" alt="\phi"/> at each orientation, giving you a 1d result. In certain cases (e.g. for <code class="docutils literal"><span class="pre">CUSTOM</span></code> geometries), this is faster than doing many 1d FFT&#8217;s. In almost all cases that we&#8217;ve run, however, doing a full 2d FFT makes things slower.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--nphi">
 <code class="descname">--nphi</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--nphi" title="Permalink to this definition">¶</a></dt>
-<dd><p>When <code class="docutils literal"><span class="pre">--do-phi-averaging</span></code> is set, you can set the number of <img class="math" src="_images/math/10e009bdb83f96c5f47c58b34d5d4b12ef268d5b.png" alt="\phi"/> values over which you average the 2d differential scattering cross section.</p>
+<dd><p>When <a class="reference internal" href="#cmdoption--do-phi-averaging"><code class="xref std std-option docutils literal"><span class="pre">--do-phi-averaging</span></code></a> is set, you can set the number of <img class="math" src="_images/math/10e009bdb83f96c5f47c58b34d5d4b12ef268d5b.png" alt="\phi"/> values over which you average the 2d differential scattering cross section.</p>
 </dd></dl>
 
 </div>
 <div class="section" id="energy-dependent-scattering-and-absorption-cross-sections-integrated-mode">
 <h2>Energy-dependent scattering and absorption cross sections (integrated mode)<a class="headerlink" href="#energy-dependent-scattering-and-absorption-cross-sections-integrated-mode" title="Permalink to this headline">¶</a></h2>
-<p>You must also define a <code class="docutils literal"><span class="pre">--material-file</span></code> to do this calculation.</p>
+<p>You must also define a <a class="reference internal" href="#cmdoption--material-file"><code class="xref std std-option docutils literal"><span class="pre">--material-file</span></code></a> to do this calculation.</p>
 <dl class="option">
 <dt id="cmdoption--integrated">
 <code class="descname">--integrated</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption--integrated" title="Permalink to this definition">¶</a></dt>
@@ -297,13 +304,13 @@ E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
 <dl class="option">
 <dt id="cmdoption--nephots">
 <code class="descname">--nephots</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--nephots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines the number of photon energies to calculate the cross sections between &#8211;ephot-min and &#8211;ephot-max. You can also define the energy spacing directly, via the &#8211;dephot parameter.</p>
+<dd><p>Defines the number of photon energies to calculate the cross sections between <a class="reference internal" href="#cmdoption--ephot-min"><code class="xref std std-option docutils literal"><span class="pre">--ephot-min</span></code></a> and <a class="reference internal" href="#cmdoption--ephot-max"><code class="xref std std-option docutils literal"><span class="pre">--ephot-max</span></code></a>. You can also define the energy spacing directly, via the <a class="reference internal" href="#cmdoption--dephot"><code class="xref std std-option docutils literal"><span class="pre">--dephot</span></code></a> parameter.</p>
 </dd></dl>
 
 <dl class="option">
 <dt id="cmdoption--dephot">
 <code class="descname">--dephot</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--dephot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alternate to &#8211;nephots, defines the energy spacing between different photon energies for which the cross sections are calculated.</p>
+<dd><p>Alternate to <a class="reference internal" href="#cmdoption--nephots"><code class="xref std std-option docutils literal"><span class="pre">--nephots</span></code></a>, defines the energy spacing between different photon energies for which the cross sections are calculated.</p>
 </dd></dl>
 
 <dl class="option">
@@ -320,7 +327,7 @@ E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
 
 <div class="section" id="default-parameter-values">
 <h3>Default parameter values<a class="headerlink" href="#default-parameter-values" title="Permalink to this headline">¶</a></h3>
-<p>Default parameter values are loaded from the <code class="docutils literal"><span class="pre">.defaults</span></code> file located in the parent directory of GGADT. You can edit this file, or (as a safer option), edit a copy of this file and pass the path as the value for <code class="docutils literal"><span class="pre">--parameter-file</span></code>.</p>
+<p>Default parameter values are loaded from the <code class="file docutils literal"><span class="pre">default.params</span></code> file located in the parent directory of GGADT. You can edit this file, or (as a safer option), edit a copy of this file and pass the path as the value for <a class="reference internal" href="#cmdoption--parameter-file"><code class="xref std std-option docutils literal"><span class="pre">--parameter-file</span></code></a>.</p>
 </div>
 </div>
 </div>
@@ -334,6 +341,7 @@ E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Arguments and parameters</a><ul>
+<li><a class="reference internal" href="#flags">Flags</a></li>
 <li><a class="reference internal" href="#general-options">General options</a></li>
 <li><a class="reference internal" href="#ellipsoidal-grains">Ellipsoidal grains</a></li>
 <li><a class="reference internal" href="#agglomerations-of-spherical-particles-single-or-multiple-composition">Agglomerations of spherical particles (single or multiple composition)</a></li>

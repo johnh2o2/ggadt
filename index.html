@@ -40,21 +40,34 @@
   <div class="section" id="general-geometry-anomalous-diffraction-theory">
 <h1>General Geometry Anomalous Diffraction Theory<a class="headerlink" href="#general-geometry-anomalous-diffraction-theory" title="Permalink to this headline">¶</a></h1>
 <p><em>Version</em>: 1.1.2
-<em>Last updated</em>: August 31, 2015</p>
-<ul class="simple">
-<li><strong>Latest release</strong>: <a class="reference download internal" href="_downloads/ggadt-1.1.2.tar.gz"><code class="xref download docutils literal"><span class="pre">ggadt-1.1.2.tar.gz</span></code></a></li>
-<li><strong>PDF documentation</strong>: <a class="reference download internal" href="_downloads/manual.pdf"><code class="xref download docutils literal"><span class="pre">Manual</span></code></a></li>
-</ul>
-<p><strong class="program">GGADT</strong> is short for General Geometry Anomalous Diffraction Theory. It is a Fortran 90 program that uses Anomalous Diffraction Theory (ADT; see <a class="reference internal" href="#vdh1957" id="id1">[VDH1957]</a>) to compute the differential scattering cross section (or the total cross sections as a function of energy) for a specified grain. ADT is valid when</p>
+<em>Last updated</em>: September 01, 2015</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Latest release:</th><td class="field-body"><a class="reference download internal" href="_downloads/ggadt-1.1.2.tar.gz"><code class="xref download docutils literal"><span class="pre">ggadt-1.1.2.tar.gz</span></code></a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Repository:</th><td class="field-body"><a class="reference external" href="https://github.com/johnh2o2/ggadt">Github</a></td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">PDF Documentation:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><a class="reference download internal" href="_downloads/manual.pdf"><code class="xref download docutils literal"><span class="pre">Manual</span></code></a></td>
+</tr>
+</tbody>
+</table>
+<p><strong class="program">GGADT</strong> is short for General Geometry Anomalous Diffraction Theory. It is a Fortran 90 program that uses <abbr title="Anomalous Diffraction Theory">ADT</abbr> (see <a class="reference internal" href="#vdh1957" id="id1">[VDH1957]</a>) to compute the differential scattering cross section (or the total cross sections as a function of energy) for a specified grain. ADT is valid when</p>
 <div class="math">
 <p><img src="_images/math/6956ae39f128cfa38f4bca37d0663bbf38785863.png" alt="|m-1| \ll 1"/></p>
-</div><p>(i.e. when the grain is optically thin), and when</p>
+</div><p>(i.e. when the grain is <span class="target" id="index-0"></span>optically thin), and when</p>
 <div class="math">
 <p><img src="_images/math/1c348b9e6aa2d63709abe18d128615611b0fc9e2.png" alt="ka \gg 1"/></p>
-</div><p>here <img class="math" src="_images/math/e9203da50e1059455123460d4e716c9c7f440cc3.png" alt="k"/> is the wavenumber of the incident photons and <img class="math" src="_images/math/7dd2a5ea01fbd72ad2a58dd1f3d6ecbfde6208a1.png" alt="a"/> is the effective radius of the grain, defined to be</p>
+</div><p>here <img class="math" src="_images/math/e9203da50e1059455123460d4e716c9c7f440cc3.png" alt="k"/> is the <span class="target" id="index-1"></span>wavenumber of the incident photons and <img class="math" src="_images/math/7dd2a5ea01fbd72ad2a58dd1f3d6ecbfde6208a1.png" alt="a"/> is the <span class="target" id="index-2"></span>effective radius of the grain, defined to be</p>
 <div class="math">
 <p><img src="_images/math/391caddd707878b5efdb8d7920fd6a8c13007d85.png" alt="a \equiv \left(\frac{3V}{4\pi}\right)^{1/3}"/></p>
-</div><table class="docutils citation" frame="void" id="vdh1957" rules="none">
+</div><div class="figure" id="id2">
+<img alt="_images/fig_heatmaps_all_sm.png" src="_images/fig_heatmaps_all_sm.png" />
+<p class="caption"><span class="caption-text">GGADT results for two clusters of spheres with different porosities. See <a class="reference internal" href="agglomerate.html#agglomerates"><span>Agglomerations of spherical monomers</span></a></span></p>
+</div>
+<table class="docutils citation" frame="void" id="vdh1957" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id1">[VDH1957]</a></td><td>van de Hulst H., Light scattering by small particles, 1957, John Wiley &amp; Sons, Inc., NY.</td></tr>
@@ -69,13 +82,17 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="adt.html">Anomalous Diffraction Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="adt.html#when-is-adt-a-valid-approximation">When is ADT a valid approximation?</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="example.html">Quick Example</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="example.html#example-1-total-cross-sections-as-a-function-of-energy">Example 1: Total cross sections as a function of energy</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="example.html#a-more-thorough-look-at-the-parameter-file-parameters-total-xs-ini">A more thorough look at the parameter file <code class="docutils literal"><span class="pre">parameters_total_xs.ini</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="example.html#a-more-thorough-look-at-the-parameter-file-parameters-total-xs-ini">A more thorough look at the parameter file <code class="file docutils literal"><span class="pre">parameters_total_xs.ini</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="example.html#example-2-differential-scattering-cross-section">Example 2: Differential scattering cross section</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="example.html#a-more-thorough-look-at-the-parameter-file-parameters-diffscat-ini">A more thorough look at the parameter file <code class="docutils literal"><span class="pre">parameters_diffscat.ini</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="example.html#a-more-thorough-look-at-the-parameter-file-parameters-diffscat-ini">A more thorough look at the parameter file <code class="file docutils literal"><span class="pre">parameters_diffscat.ini</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -86,6 +103,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="options.html">Arguments and parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="options.html#flags">Flags</a></li>
 <li class="toctree-l2"><a class="reference internal" href="options.html#general-options">General options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="options.html#ellipsoidal-grains">Ellipsoidal grains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="options.html#agglomerations-of-spherical-particles-single-or-multiple-composition">Agglomerations of spherical particles (single or multiple composition)</a></li>
@@ -108,23 +126,23 @@
 <li class="toctree-l1"><a class="reference internal" href="ellipsoids.html">Ellipsoids</a></li>
 <li class="toctree-l1"><a class="reference internal" href="agglomerate.html">Agglomerations of spherical monomers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="agglomerate.html#format-of-the-target-file">Format of the target file</a></li>
-<li class="toctree-l2"><a class="reference internal" href="agglomerate.html#multiple-compositions">Multiple compositions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="custom.html">Using a customized geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="multiple_compositions.html">Multiple Compositions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conventions.html">Angle conventions</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="conventions.html#ddscat">DDSCAT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conventions.html#mstm">MSTM</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="additional_files.html">Additional files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 </div>
 <div class="section" id="indices-and-tables">
 <h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><a class="reference internal" href="genindex.html"><span>Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span>Module Index</span></a></li>
 <li><a class="reference internal" href="search.html"><span>Search Page</span></a></li>
 </ul>
 </div>

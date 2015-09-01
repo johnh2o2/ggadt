@@ -1,7 +1,11 @@
+.. index :: index file, target file, BA, BAM2, BAM1
+
+.. _additional_files :
+
 Additional files
 ================
 
-To keep GGADT lean, we opted not to include target files and index files (except for those in the ``example`` directory). You can download tarballs of both index files and a complete list of target files pulled from http://www.astro.princeton.edu/~draine/agglom.html .
+To keep GGADT lean, we opted not to include target files and index files (except for those in the :file:`example/` directory). You can download tarballs of both index files and a complete list of target files pulled from http://www.astro.princeton.edu/~draine/agglom.html .
 
 * :download:`Index files <index_files.tar.gz>` (328 Kb)
 * :download:`Target files <target_files.tar.gz>` (6.6 Mb)
