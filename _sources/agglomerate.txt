@@ -1,4 +1,4 @@
-.. _agglomerates:
+.. _agglomerates_section:
 
 Agglomerations of spherical monomers
 ====================================
