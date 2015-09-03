@@ -67,7 +67,10 @@ contains
 
         call get_integrated_cross_sections(sigma_scats, sigma_abss)
         do i=1,nephots
-            write(stdout,*) ephots(i), sigma_scats(i), sigma_abss(i), sigma_scats(i) + sigma_abss(i) 
+            write(stdout,&
+                '(4('//trim(output_fmt)//'))') &
+                     ephots(i), sigma_scats(i), sigma_abss(i),&
+                      sigma_scats(i) + sigma_abss(i) 
         end do
     end subroutine calculate_int_cross_sections
 
@@ -322,6 +325,8 @@ contains
         if (.not. quiet_mode) then 
             write(stderr, *) ""
         end if 
+
+
     end subroutine get_integrated_cross_sections
 
     subroutine set_gftsh()
@@ -477,7 +482,9 @@ contains
                     
                     do i=1,size(z)
                         do j=1,size(y)
-                            write(9, *) z(i), y(j), REAL(sh(i,j)), IMAG(sh(i,j))
+                            write(9, &
+                                '(4('//trim(output_fmt)//'))') &
+                                     z(i), y(j), REAL(sh(i,j)), IMAG(sh(i,j))
                         end do
                     end do
                     close(9)
@@ -611,7 +618,9 @@ contains
                         
                         do i=1,size(z)
                             do j=1,size(y)
-                                write(9, *) z(i), y(j), REAL(sh(i,j)), IMAG(sh(i,j))
+                                write(9, &
+                                    '(4('//trim(output_fmt)//'))') &
+                                z(i), y(j), REAL(sh(i,j)), IMAG(sh(i,j))
                             end do
                         end do
                         close(9)
@@ -622,19 +631,22 @@ contains
                 end if
             endif 
         endif
-       
 
         if (timing_mode) stop 
 
         ! for the fast fft mode, we ASSUME isotropy, so just 1d
         if ((.not. do_full_2d_fft) .or. do_phi_averaging) then 
             do i=1,size(thetaz)
-                write(stdout,*) thetaz(i),gscatter(i)*norm_const
+                write(stdout,&
+                    '(2('//trim(output_fmt)//')') &
+                thetaz(i),gscatter(i)*norm_const
             end do
         else
             do i=1,size(thetaz)
                 do j=1,size(thetay)
-                    write(stdout,*) thetay(j),thetaz(i),scatter(i,j)*norm_const
+                    write(stdout, &
+                        '(3('//trim(output_fmt)//'))') &
+                    thetay(j),thetaz(i),scatter(i,j)*norm_const
                 end do
             end do
         end if
@@ -1008,6 +1020,21 @@ contains
             end if 
         end if 
 
+        if (save_orientations) then
+
+            if (axes_convention .eq. "mstm") then 
+                write(stderr, *) "WARNING: orientations are &
+                    &saved in DDSCAT-defined angles (alpha, beta, gamma).&
+                    & MSTM output will come in later versions."
+            end if
+
+            open(unit=orfile_unit, file=trim(adjustl(orientations_file)), iostat=allocatestatus)
+            if (allocatestatus /= 0) then
+                write(stderr,*) "ERROR: Cannot open orientations file: ", trim(adjustl(orientations_file))
+            end if
+
+        end if 
+
 
 
     end subroutine initialize_and_allocate_vars
@@ -1098,11 +1125,6 @@ contains
         real(kind=dp_real) :: norm
         integer :: cbrt_norientations, nbeta, ntheta, nph, sqrt_norientations
 
-
-        ! Note (JAH, June 26, 2014) -- this function needs to be fixed for rotating
-        !                 about a given axis (check if mstm or ddscat orienation,
-        !                 or better yet, provide a rotation/precession axis option.
-
         if (angle_mode .eq. 'sequential') then 
             !if (rotation_axis == 'none') then 
             cbrt_norientations = int(norientations**(1.0/3.0))
@@ -1123,22 +1145,6 @@ contains
             get_new_angles(1) = (2*pi*(nbeta-1))*norm - pi
             get_new_angles(2) = (pi*(ntheta-1))*norm
                 
-            !else if ( rotation_axis .eq. 'xaxis' ) then 
-            !    norm = real(norientations ,kind=dp_real)**(-1.0)
-            !    get_new_angles(1) =  2*pi*(i-1)*norm - pi
-            !    get_new_angles(2) = 0.0
-            !    get_new_angles(3) = 0.0
-            !else if ( rotation_axis .eq. 'yaxis' ) then 
-            !    get_new_angles(1) = 0.0
-            !    get_new_angles(2) = pi*(i-1)*norm
-            !    get_new_angles(3) = 0.0
-            !else if ( rotation_axis .eq. 'zaxis' ) then 
-            !    get_new_angles(1) = 0.0
-            !    get_new_angles(2) = 0.0
-            !    get_new_angles(3) = 2*pi*(i-1)*norm - pi
-            !else 
-            !    write(stderr,*) "ERROR (get_new_angles): Do not understand rotation_axis: '",trim(adjustl(rotation_axis)),"'"
-            !end if 
         else if ( angle_mode .eq. 'file' ) then
             open(unit=1,file=angle_file)
             if (i > 1) then 
@@ -1153,32 +1159,24 @@ contains
             end if 
         else if ( angle_mode .eq. 'random' ) then
             call random_number(get_new_angles)
-        
-            !if (rotation_axis .eq. "none") then 
             get_new_angles(1) = 2*pi*get_new_angles(1) - pi
             get_new_angles(2) = pi*get_new_angles(2) 
             get_new_angles(3) = 2*pi*get_new_angles(3) - pi
-            !else if ( rotation_axis .eq. 'xaxis' ) then 
-            !    get_new_angles(1) = 2*pi*get_new_angles(1) - pi
-            !    get_new_angles(2) = 0.0
-            !    get_new_angles(3) = 0.0
-            !else if ( rotation_axis .eq. 'yaxis' ) then 
-            !    get_new_angles(1) = 0.0
-            !    get_new_angles(2) = pi*get_new_angles(2)
-            !    get_new_angles(3) = 0.0
-            !else if ( rotation_axis .eq. 'zaxis' ) then 
-            !    get_new_angles(1) = 0.0
-            !    get_new_angles(2) = 0.0
-            !    get_new_angles(3) = 2*pi*get_new_angles(3) - pi
-            !else 
-            !    write(stderr,*) "ERROR (get_new_angles): Do not understand rotation_axis: '",trim(adjustl(rotation_axis)),"'"
-            !end if 
         else 
             write(stderr, *) "ERROR (get_new_angles): Do not understand&
             & angle_mode '",trim(adjustl(angle_mode)),"'."
-            stop 
+            stop 1
 
         endif
+
+        if (save_orientations) then
+            if (axes_convention == 'ddscat') then
+
+                write(orfile_unit, '(3'//trim(output_fmt)//'))') get_new_angles(1), get_new_angles(2), get_new_angles(3)
+            else
+                write(orfile_unit, '(3'//trim(output_fmt)//'))') get_new_angles(1), get_new_angles(2), get_new_angles(3)
+            end if
+        end if 
 
         
     end function get_new_angles
@@ -1186,6 +1184,11 @@ contains
     subroutine cleanup()
         implicit none 
         integer :: deallocatestatus
+
+        if (save_orientations) then
+            close(orfile_unit)
+        end if
+
         deallocate(z,stat=deallocatestatus)
         deallocate(y,stat=deallocatestatus)
         deallocate(kz,stat=deallocatestatus)

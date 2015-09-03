@@ -6,11 +6,14 @@ module constants
   integer, parameter                       ::  stderr                         = 0
   integer, parameter                       ::  input_unit                     = 1
   integer, parameter                       ::  file_unit                      = 7
+  integer, parameter                       ::  orfile_unit                    = 11
 
   integer, parameter                       ::  max_str_len                    = 300
   integer, parameter                       ::  max_num_mats                   = 3 ! must be less than 100
   
   integer, parameter                       ::  ISIGN                          = 1
+  integer, parameter                       ::  output_sf_buffer               = 8
+
 
   
   @SINGLE_UNCOMMENT@integer, parameter                           ::  dp_real                = 4
@@ -49,7 +52,8 @@ module constants
   character(len=100), parameter            ::  default_fftw_opt_name          = 'estimate'
   integer, parameter                       ::  default_nthreads               = -1
   integer, parameter                       ::  default_nphi                   = 50
-  integer, parameter                       :: nu_sphere                       = 1000
+  integer, parameter                       ::  nu_sphere                       = 1000
+  integer, parameter                       ::  default_output_sigfigs         = 4
 
 
 ! defaults for integrated cross section calculations

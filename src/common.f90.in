@@ -28,6 +28,8 @@ module common_mod
   !character(len=50)                      ::  rotation_axis
 
   integer                                ::  ngrain
+  integer                                ::  output_sigfigs
+  integer                                ::  output_sf_wl
   integer                                ::  nscatter_min 
   integer                                ::  ngrid
   integer                                ::  nscatter
@@ -58,11 +60,15 @@ module common_mod
   logical                                ::  quiet_mode
   logical                                ::  do_phi_averaging
   logical                                ::  save_shadow_function
-  logical                                ::  save_phi_grid
+  logical                                ::  save_orientations
   logical                                ::  grid_width_manually_set
 
 
   character(len=200)                     ::  parameter_file_name
+
+  character(len=2)                       ::  c_nsigfig
+  character(len=2)                       ::  c_w
+  character(len=15)                      ::  output_fmt
 
 
 ! new variables
@@ -79,7 +85,7 @@ module common_mod
   character(len=200), dimension(max_num_mats)           ::  material_files
   character(len=200), dimension(max_num_mats)           ::  material_tags
   character(len=200)                                    ::  agglom_composition_file
-  character(len=200)                                    ::  save_file_root, phi_grid_file, shadow_function_file
+  character(len=200)                                    ::  save_file_root, shadow_function_file, orientations_file
   character(len=200)                                    ::  axes_convention
   integer, allocatable                                  ::  agglom_material_tags(:)
   integer                                               ::  nmaterials
@@ -105,7 +111,8 @@ module common_mod
          rank_agglom_composition_file, rank_material_file, rank_asked_for_version, &
          rank_asked_for_help, rank_parameter_file_name, rank_axes_convention, rank_do_full_2d_fft, &
          rank_quiet_mode, rank_sang_correction, rank_nthreads, rank_do_phi_averaging, rank_save_shadow_function, &
-         rank_save_phi_grid, rank_save_file_root, rank_nphi, rank_grid_width
+         rank_save_file_root, rank_nphi, rank_grid_width, &
+         rank_save_orientations, rank_output_sigfigs
 
   contains
 
@@ -170,6 +177,9 @@ module common_mod
       call define_flag(opts, &
         "save-shadow-function",&
         description="Save shadow function (use save-file-root option)")
+      call define_flag(opts, &
+        "save-orientations",&
+        description="Save a list of the orientations used")
 
       call define_flag(opts, &
         "do-phi-averaging",&
@@ -249,6 +259,10 @@ module common_mod
       call define_option_integer(opts,&
         "ngrain",default_ngrain,&
         description="Number of grid points along 1 dimension with which we should resolve the grain")
+      call define_option_integer(opts,&
+        "output-sigfigs",default_output_sigfigs,&
+        description="Number of significant digits that GGADT outputs")
+
       call define_option_integer(opts,&
         "nscatter",default_nscatter,&
         description="Number of angles along 1 dimension with which we should calculate the scattering cross section")
@@ -364,6 +378,7 @@ module common_mod
       call get_option_real(opts,"grid-width", grid_width, rank_grid_width)
 
       call get_flag(opts,"use-padded-fft",use_padded_fft,rank_use_padded_fft)
+      call get_flag(opts,"save-orientations",save_orientations,rank_save_orientations)
       call get_flag(opts,"force-numerical",force_numerical,rank_force_numerical)
       call get_flag(opts,"integrated",integrated_mode, rank_integrated_mode) 
       call get_flag(opts,"use-efficiencies",use_efficiencies, rank_use_efficiencies)  
@@ -388,14 +403,13 @@ module common_mod
 
 
       call get_option_integer(opts,"ngrain",ngrain, rank_ngrain)
+      call get_option_integer(opts,"output-sigfigs", output_sigfigs, rank_output_sigfigs)
       call get_option_integer(opts,"nthreads",nthreads, rank_nthreads)
       call get_option_integer(opts,"nphi",nphi, rank_nphi)
       call get_option_integer(opts,"nscatter",nscatter, rank_nscatter)
       call get_option_integer(opts,"norientations",norientations, rank_norientations)
       call get_option_integer(opts,"nephots", nephots, rank_nephots)
 
-      
-      save_phi_grid = .FALSE.
 
       do i=1,max_num_mats
         if (i .gt. 10) then
@@ -427,15 +441,39 @@ module common_mod
 
       delm = cmplx(ior_re,ior_im)
 
-      ! Set to lower case
+      ! Set num sig figs!
+      output_sf_wl = output_sigfigs + output_sf_buffer
+      
+      if (output_sigfigs .gt. 99) then
+        stop "ERROR: too large a value specified for output-sigfigs"
+      else if (output_sigfigs .gt. 9) then
+        write(c_nsigfig, '(I2)') output_sigfigs
+      else
+        write(c_nsigfig, '(I1)') output_sigfigs
+      end if
+
+      if (output_sf_wl .gt. 99) then
+        stop "ERROR: too large a value specified for output-sigfigs"
+      else if (output_sf_wl .gt. 9) then
+        write(c_w, '(I2)') output_sf_wl
+      else
+        write(c_w, '(I1)') output_sf_wl
+      end if
+
+      write(output_fmt, *) "ES"//trim(c_w)//"."//trim(c_nsigfig)
+      output_fmt = adjustl(output_fmt)
+
+      
+      ! Set other options to lower case
       fftw_optimization_mode_name = strlowcase(fftw_optimization_mode_name)
+      
       angle_mode = strlowcase(angle_mode)
       !rotation_axis = strlowcase(rotation_axis)
       geometry = strlowcase(geometry)
       axes_convention = strlowcase(axes_convention)
 
-      write(phi_grid_file, *) trim(save_file_root)//"_phigrid_o"
       write(shadow_function_file, *) trim(save_file_root)//"_shadow_function_o"
+      write(orientations_file, *) trim(save_file_root)//"_orientations.dat"
 
       grid_width_manually_set = option_found(opts, 'grid-width')
       if (grid_width_manually_set) then
@@ -1230,6 +1268,9 @@ module common_mod
 
 
     end subroutine convert_mstm_to_ddscat
+
+    !subroutine convert_ddscat_to_mstm(angles)
+    ! TODO!!!
 
 
 end module common_mod
