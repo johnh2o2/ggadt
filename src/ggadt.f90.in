@@ -419,7 +419,7 @@ contains
             write(stdout,*) "# [thetaz] [thetay] [dsigma_scat/domega]"
         end if 
 
-        ! CASE: sphere
+        ! CASE: sphere (analytical)
         if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
             if (verbose_mode) write(stderr,*) " Using analytical ADT for sphere..."
 
@@ -638,7 +638,7 @@ contains
         if ((.not. do_full_2d_fft) .or. do_phi_averaging) then 
             do i=1,size(thetaz)
                 write(stdout,&
-                    '(2('//trim(output_fmt)//')') &
+                    '(2('//trim(output_fmt)//'))') &
                 thetaz(i),gscatter(i)*norm_const
             end do
         else
@@ -786,7 +786,7 @@ contains
             
             ! make the grid a little larger to accomodate furthest part of grain
             if (.not. grid_width_manually_set) then 
-                grid_width = 2.001*max_dist/a_eff
+                grid_width = (2.00 + VERY_SMALL)*max_dist/a_eff
             end if
 
         else if (geometry == 'ellipsoid') then
@@ -799,7 +799,7 @@ contains
 
             ! make the grid a little larger than the longest principal axis
             if (.not. grid_width_manually_set) then 
-                grid_width = 2.001*max(grain_a(1), grain_a(2), grain_a(3))/a_eff
+                grid_width = (2.00 + VERY_SMALL)*max(grain_a(1), grain_a(2), grain_a(3))/a_eff
             end if
         else
             write(stderr,*) "ERROR: cannot understand ", geometry
@@ -809,7 +809,7 @@ contains
         if (grid_width*a_eff < lambda) then
             write(stderr, *) "WARNING: a_eff >> lambda is violated. ADT is not valid here!"
             if (.not. grid_width_manually_set) then 
-                grid_width = 2.001 * lambda / a_eff
+                grid_width = (2.00 + VERY_SMALL)* lambda / a_eff
             end if
         end if
         
@@ -883,10 +883,6 @@ contains
                 if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (gsh) array ***"
         end if
         if (integrated_mode) then
-         !   allocate(phi1(ngrid,ngrid),stat = allocatestatus)
-         !       if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi1) array ***"
-         !   allocate(phi2(ngrid,ngrid),stat = allocatestatus)
-         !       if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi2) array ***"
             allocate(phi_total(ngrid,ngrid),stat = allocatestatus)
                 if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi_total) array ***"
         end if 
@@ -924,8 +920,6 @@ contains
         else
             call get_fft_vals(0.0D0,max_angle,nscatter,kmin,kmax,enhancement,kactual)   
         end if
-        !write(stderr, *) "max_angle = ", max_angle, "kmin,kmax,enh = ", kmin, kmax, enhancement
-        !write(stderr, *) "L, 2pi/L = ", L, (TWOPI/L), "k=",k
       
     ! allocate arrays that depend on kactual
 
@@ -963,20 +957,10 @@ contains
         do i=1,size(kz)
             kz(i) = ((i-1)*dk + kmin)*(TWOPI/L)
             ky(i) = kz(i)
-            
-            !
-            ! This 1/ngrid factor is a fudge factor to ensure the alignment of the minima
-            ! its a heuristic for now, unless there's a bug lingering somewhere to explain
-            ! why it works. If you don't use it, the minima shift outward by a factor of ~1/ngrid 
-            ! 
-            if (sang_correction) then
-                thetaz(i) = asin((kz(i)/k)*(1 - 1./ngrid))
-                thetay(i) = asin((ky(i)/k)*(1 - 1./ngrid))
-            else 
-                thetaz(i) = asin(kz(i)/k)
-                thetay(i) = asin(ky(i)/k)
-            end if 
-
+          
+            thetaz(i) = asin(kz(i)/k)
+            thetay(i) = asin(ky(i)/k)
+        
             ! Initialize arrays
             if (.not. do_full_2d_fft .or. do_phi_averaging) then 
                 gscatter(i) = 0.0D0
@@ -1045,21 +1029,18 @@ contains
         real(kind=dp_real), intent(in) :: thetamin, thetamax
         integer, intent(in) :: Kask
         integer, intent(out) :: kmin,kmax,enhancement, Kout
-        integer :: i
 
         enhancement = 0
-        !write(stderr, *) "thetamin, sin(thetamin), k, L, prod = ",thetamin, sin(thetamin), k, L, k*sin(thetamin)*(L/TWOPI)
+
         kmin = int(floor(k*sin(thetamin)*(L/TWOPI)))
         kmax = int(ceiling(k*sin(thetamax)*(L/TWOPI)))
 
         Kout = kmax - kmin
-        i = 1
-        do while ( (enhancement + 1) * Kout < Kask) 
-            enhancement = allowed_ngrids(i) - 1
-            i = i + 1
+        do while ( ((enhancement + 1) * Kout + 1) < Kask ) 
+            enhancement = enhancement + 1
         end do 
 
-        Kout = (enhancement + 1)*Kout
+        Kout = (enhancement + 1)*Kout + 1
 
     end subroutine get_fft_vals
 
@@ -1225,8 +1206,17 @@ contains
             write(i,*) "# delm: ",delm
             write(i,*) "# ephot: ",ephot, "keV"
             write(i,*) "# nscatter: ",nscatter
-            write(i,*) "# ior_re: ",ior_re
-            write(i,*) "# ior_im: ",ior_im
+            if (.not. material_file_specified)
+                write(i,*) "# ior_re: ",ior_re
+                write(i,*) "# ior_im: ",ior_im
+            else 
+                do i=j,nmaterials
+                    write(i,*) "# material ", j
+                    write(i,*) "#    ior_re: ",ior_res_single_en(j)
+                    write(i,*) "#    ior_im: ",ior_ims_single_en(j)
+                end do
+            end if
+
         else 
             write(i,*) "# ephot_min: ",ephot_min, " keV"
             write(i,*) "# ephot_max: ",ephot_max, " keV"

@@ -49,7 +49,6 @@ module common_mod
 
   logical                                ::  use_padded_fft
   logical                                ::  use_efficiencies
-  logical                                ::  sang_correction
   logical                                ::  asked_for_version
   logical                                ::  asked_for_help
   logical                                ::  verbose_mode
@@ -76,7 +75,6 @@ module common_mod
   real(dp_real)                          ::  ephot_min
   real(dp_real)                          ::  dephot
   real(dp_real)                          ::  ephot_max 
- !character(len=200)                     ::  material          ! name of predefined material
   character(len=200)                     ::  material_file     ! file that defines ior_re and ior_im for a range of energies
   logical                                ::  integrated_mode          
                                                               
@@ -103,14 +101,13 @@ module common_mod
          rank_ephot, rank_use_padded_fft, rank_force_numerical, &
          rank_integrated_mode, rank_use_efficiencies, rank_verbose_mode, &
          rank_timing_mode, rank_ior_re, rank_ior_im, rank_geometry, rank_angle_mode, &
-         !rank_rotation_axis, 
          rank_angle_file, rank_ngrain, rank_nscatter, &
          rank_norientations, rank_dtheta, rank_max_angle, rank_agglom_file_name, &
          rank_fftw_optimization_mode_name, rank_ephot_min, rank_ephot_max, rank_nephots, &
          rank_dephot, rank_material_files(max_num_mats), rank_material_tags(max_num_mats), &
          rank_agglom_composition_file, rank_material_file, rank_asked_for_version, &
          rank_asked_for_help, rank_parameter_file_name, rank_axes_convention, rank_do_full_2d_fft, &
-         rank_quiet_mode, rank_sang_correction, rank_nthreads, rank_do_phi_averaging, rank_save_shadow_function, &
+         rank_quiet_mode,  rank_nthreads, rank_do_phi_averaging, rank_save_shadow_function, &
          rank_save_file_root, rank_nphi, rank_grid_width, &
          rank_save_orientations, rank_output_sigfigs
 
@@ -129,7 +126,6 @@ module common_mod
       do i=1, nallowed_gridpoints
         read(file_unit, *) allowed_ngrids(i)
       end do
-
     end subroutine set_allowed_ngrids
 
     subroutine set_parameter_values()
@@ -168,19 +164,11 @@ module common_mod
         "do-full-2d-fft",&
         description="Do not assume axisymmetry (dQ/dOmega is a function of phi)")
       call define_flag(opts, &
-        "sang-correction",&
-        description="Use a heurstic 1/ngrid correction to the scattering angles")
-
-      !call define_flag(opts, &
-      !  "save-phi-grid",&
-      !  description="Save phi grid (use save-file-root option)")
-      call define_flag(opts, &
         "save-shadow-function",&
         description="Save shadow function (use save-file-root option)")
       call define_flag(opts, &
         "save-orientations",&
         description="Save a list of the orientations used")
-
       call define_flag(opts, &
         "do-phi-averaging",&
         description="Assumes --do-full-2d-fft flag is specified; averages over phi to get 1d dsigma_sca/dOmega")
@@ -386,7 +374,6 @@ module common_mod
       call get_flag(opts,"timing",timing_mode, rank_timing_mode)
       call get_flag(opts,"do-full-2d-fft",do_full_2d_fft, rank_do_full_2d_fft)
       call get_flag(opts,"quiet",quiet_mode, rank_quiet_mode)
-      call get_flag(opts,"sang-correction",sang_correction, rank_sang_correction)
       call get_flag(opts,"do-phi-averaging",do_phi_averaging, rank_do_phi_averaging)
       !call get_flag(opts,"save-phi-grid",save_phi_grid, rank_save_phi_grid)
       call get_flag(opts,"save-shadow-function",save_shadow_function, rank_save_shadow_function)
@@ -466,7 +453,7 @@ module common_mod
       
       ! Set other options to lower case
       fftw_optimization_mode_name = strlowcase(fftw_optimization_mode_name)
-      
+
       angle_mode = strlowcase(angle_mode)
       !rotation_axis = strlowcase(rotation_axis)
       geometry = strlowcase(geometry)
@@ -523,7 +510,6 @@ module common_mod
           material_file_specified = .FALSE.
         end if 
       end if 
-     
 
       ! If multiple compositions specified, but the grain isn't an agglomerate
       if ( nmaterials .gt. 0 .and. .not. (geometry == "spheres" .or. geometry == "agglomerate")) then
@@ -663,7 +649,6 @@ module common_mod
           end if
 
       end if 
-
     end subroutine set_parameter_values
 
     subroutine print_help(opts)
@@ -676,7 +661,6 @@ module common_mod
       call print_options(opts)
       stop
     end subroutine print_help
-
 
     function rotation_matrix(beta,theta,phi)
       ! Rotation matrix for a set of Euler angles -- for some reason this function does not work!
@@ -749,7 +733,6 @@ module common_mod
       rot_z(3,2) = 0.0
       rot_z(3,3) = 1.0
     end function rot_z
-
     
     function strlowcase(input_string) 
         character(*),parameter :: lower_case = 'abcdefghijklmnopqrstuvwxyz' 
@@ -804,9 +787,9 @@ module common_mod
             fft1d_output(i) = working_fft1d(i)
           end do
         else
-          norig = kmax - kmin 
+          norig = kmax - kmin
           
-          fft1dsize = norig*(enhancement + 1)
+          fft1dsize = norig*(enhancement + 1) + 1
 
           if (fft1dsize .ne. size(fft1d_output)) then
             write(stderr,*) "ERROR: (fft1d_faster) fft1d_output size is ",size(fft1d_output),&
@@ -832,9 +815,7 @@ module common_mod
           !-$omp do schedule(dynamic) private(i, delta, new_grid, working_fft1d, a, ix)
           do i=0,enhancement
               delta = real(i)/real(enhancement + 1)
-              !write(stderr,*) i, delta
               new_grid = kspace_shift_1d(f,delta)
-              !write(stderr,*) "about to make working fft1d"
               working_fft1d = fft1d_firstk(new_grid,norig)
                   
               do a=1,norig
@@ -857,6 +838,7 @@ module common_mod
         ! shift the input function back.
         f = kspace_shift_1d(f,real(-kmin,dp_real)) 
     end subroutine fft1d_faster
+
     function fft1d_firstk(f,K)
         ! How this calculation works:
         !   Say I have 15 data points, in one dimension, for which I only care about the first 5 values of its fft1d.
@@ -882,11 +864,11 @@ module common_mod
 
         keff    = k
         N       = size(f)
-        Nfft1d    = N/Keff
+        Nfft1d  = N/Keff
 
         ! Make sure N is divisible by K.
-        !    if not, we take the first K+n values of the fft1d 
-        !    and throw away n of them (n is the smallest integer such that K+n | N)
+        !   if not, we take the first K+n values of the fft1d 
+        !   and throw away n of them (n is the smallest integer such that K+n | N)
         do while ((.not. keff*Nfft1d .eq. N) .and. keff < N )
             keff = keff + 1
             Nfft1d = N/Keff 
@@ -895,7 +877,7 @@ module common_mod
         lentwids = N
 
         ! allocate twids, small_fft1d and fft1d_firstk_working arrays
-        !   twids               -- contain twiddle factors needed to combine the different fft1d calculations
+        !   twids                 -- contain twiddle factors needed to combine the different fft1d calculations
         !   small_fft1d           -- the array in which each fft1d is temporarily stored
         !   fft1d_firstk_working  -- array of length Keff >~ K to which FFT values are stored.
 
@@ -935,8 +917,8 @@ module common_mod
 
         do l=1,Nfft1d
             ! execute plan
-            ! write(stderr, *) "about to do fft1d() call.", l, N, Nfft1d
             small_fft1d = fft1d(f(l:N:Nfft1d))
+
             ! transfer results to master array
             do i=1,Keff
                 fft1d_firstk_working(i) = fft1d_firstk_working(i) + small_fft1d(i)*twids( i+(l-1)*Keff )
@@ -978,8 +960,6 @@ module common_mod
         end do
     end function kspace_shift_1d
 
-
-
     subroutine fft2d_faster(f,kmin,kmax,enhancement, fft2d_output)
         ! Performs an efficient series of FFT's to suit our needs
         ! Astrophysical applications of ADT for x-ray scattering of dust
@@ -1006,6 +986,7 @@ module common_mod
         if (enhancement .eq. 0) then
           allocate(working_fft2d(size(f(1,:)), size(f(:,1))))
           working_fft2d = fft2d(f)
+          !working_fft2d = fft2d_firstk(f, fsize)
 
           !fft_output = fft_firstk(f, size(fft_output(:,1)))
           !write(stderr, *) fsize, size(fft_output(:,1))
@@ -1016,9 +997,9 @@ module common_mod
             end do
           end do
         else
-          norig = kmax - kmin 
+          norig = kmax - kmin
           
-          fft2dsize = norig*(enhancement + 1)
+          fft2dsize = norig*(enhancement + 1) + 1
 
           if (fft2dsize .ne. size(fft2d_output(1,:))) then
             write(stderr,*) "ERROR: (fft_faster) fft_output size is ",size(fft2d_output(1,:)),&
@@ -1049,9 +1030,7 @@ module common_mod
                   deltay = real(j)/real(enhancement + 1)
                   
                   new_grid = kspace_shift_2d(f,deltaz,deltay)
-                  !write(stderr, *) "about to do fft2d_firstk!!"
                   working_fft2d = fft2d_firstk(new_grid,norig)
-                  !write(stderr, *) "done!"
                   
                   do a=1,norig
                       do b=1,norig
@@ -1059,9 +1038,7 @@ module common_mod
                           iy = j + (b-1)*(enhancement + 1) + 1
                         
                           if ((ix <= fft2dsize) .and. (iy <= fft2dsize)) then
-                              !-$OMP CRITICAL
                               fft2d_output(ix, iy) = working_fft2d(a,b)
-                              !-$OMP END CRITICAL
                           end if 
                       end do
                   end do 
@@ -1076,6 +1053,7 @@ module common_mod
         ! shift the input function back.
         f = kspace_shift_2d(f,real(-kmin,dp_real),real(-kmin,dp_real)) 
     end subroutine fft2d_faster
+
     function fft2d_firstk(f,K)
         ! How this calculation works:
         !   Say I have 15 data points, in one dimension, for which I only care about the first 5 values of its (1d) fft.
@@ -1099,9 +1077,9 @@ module common_mod
 
         integer                                             :: N, Nfft2d, i,j,l,m 
 
-        keff    = k
+        keff    = K
         N       = size(f(:,1))
-        Nfft2d    = N/Keff
+        Nfft2d  = N/Keff
 
         ! Make sure N is divisible by K.
         !    if not, we take the first K+n values of the fft2d 
@@ -1114,7 +1092,7 @@ module common_mod
         lentwids = N
 
         ! allocate twids, small_fft2d and fft2d_firstk_working arrays
-        !   twids               -- contain twiddle factors needed to combine the different fft2d calculations
+        !   twids                 -- contain twiddle factors needed to combine the different fft2d calculations
         !   small_fft2d           -- the array in which each fft2d is temporarily stored
         !   fft2d_firstk_working  --
 
@@ -1151,10 +1129,8 @@ module common_mod
             do j=0,(keff-1)
                 do l=0,(Nfft2d-1)
                     do m=0,(Nfft2d-1)
-                        !-$OMP CRITICAL
                         twids(1 + i + l*Keff, 1 + j + m*Keff ) &
                             & = zexp(CMPLX(0,1)*ISIGN*twopi*(real(i*l+j*m))/real(N))
-                        !-$OMP END CRITICAL
                     end do 
                 end do 
             end do 
@@ -1183,10 +1159,8 @@ module common_mod
                 ! transfer results to master array
                 do i=1,Keff
                     do j=1,Keff 
-                        !-$OMP CRITICAL
                         fft2d_firstk_working(i,j) = fft2d_firstk_working(i,j) &
                                             & + small_fft2d(i,j)*twids( i+(l-1)*Keff , j+(m-1)*Keff )
-                        !-OMP END CRITICAL
                     end do 
                 end do 
             end do 
@@ -1226,18 +1200,14 @@ module common_mod
         do i=1,n
             do j=1,n
                 !-$OMP CRITICAL
-                kspace_shift_2d(i,j) = f(i,j)*exp(ISIGN*CMPLX(0,1.0, kind=dp_complex)*twopi*(shiftz*(i-1)+shifty*(j-1))/real(n))
+                kspace_shift_2d(i,j) = f(i,j)*exp(ISIGN*CMPLX(0,1.0, kind=dp_complex)*twopi*(shiftz*(i-1)+shifty*(j-1))/real(n)) 
                 !-$OMP END CRITICAL
             end do
         end do
         !-$omp end do
         !-$omp end parallel 
-
     end function kspace_shift_2d
     
-
-    
-
     subroutine convert_mstm_to_ddscat(angles)
      implicit none
      real(dp_real), dimension(3), intent(inout) :: angles
@@ -1264,9 +1234,6 @@ module common_mod
         angles(3) = -angles(3)
       end if 
      end if 
-     
-
-
     end subroutine convert_mstm_to_ddscat
 
     !subroutine convert_ddscat_to_mstm(angles)

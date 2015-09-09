@@ -1,3 +1,9 @@
+* commit 5a4316afc9fa9523c2d139d93a14ab394d11031c
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Thu Sep 3 19:08:48 2015 -0400
+| 
+|     GGADT now can save orientations used AND allows user to specify sigfigs with --output-sigfigs. Still need to add function to convert DDSCAT --> MSTM and adjust the saving of orientations accordingly.
+|  
 * commit 0bf1616ac88f85aac1a9e84fc7d4bbeb737375b3
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Mon Aug 31 16:22:42 2015 -0400
