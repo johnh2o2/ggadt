@@ -96,10 +96,6 @@ contains
         ! Read header
         read(1,'(i2,a8,a64)') ICOMP, junk, mat
 
-        ! Print header (if verbose mode is set)
-        if (verbose_mode) write(stderr,*) "# Material file: '",trim(adjustl(matfile)),"'"
-        if (verbose_mode) write(stderr,*) "# Material: '",trim(adjustl(mat)),"'"
-        
         ! Now get the LENGTH of the file
         read(1,*) junk 
         niors = 0
@@ -176,10 +172,10 @@ contains
         ! Normalize depending on whether we're outputting efficiencies (= C/pi*a^2) or simply the cross sections (C)
         if (use_efficiencies) then 
             norm_const = 1.0/(pi*a_eff*a_eff)
-            write(stdout,*) "# [ephot] [Q_scat] [Q_abs] [Q_ext]"
+            write(stdout,*) "# [ephot] [Q_sca] [Q_abs] [Q_ext]"
         else 
             norm_const = 1.0
-            write(stdout,*) "# [ephot] [sigma_scat] [sigma_abs] [sigma_ext]"
+            write(stdout,*) "# [ephot] [C_sca] [C_abs] [C_ext]"
         end if 
 
 
@@ -410,13 +406,21 @@ contains
         ! Scalar value (for when there's only one material)
         delm = delms(1)
 
-        ! Set the normalization factor for efficiencies = C/pi*a^2        
+        ! Set the normalization factor for efficiencies = C/pi*a^2       
         if (use_efficiencies) then 
             norm_const = 1.0D0/(pi*a_eff*a_eff)
-            write(stdout,*) "# [thetaz] [thetay] [dQ_scat/domega]"
+            if (do_full_2d_fft) then
+                write(stdout,*) "# [thetax] [thetay] [dQ_sca/dOmega]"
+            else
+                write(stdout,*) "# [theta] [dQ_sca/dOmega]"
+            end if
         else 
             norm_const = 1.0D0
-            write(stdout,*) "# [thetaz] [thetay] [dsigma_scat/domega]"
+            if (do_full_2d_fft) then
+                write(stdout,*) "# [thetax] [thetay] [dC_sca/dOmega]"
+            else
+                write(stdout,*) "# [theta] [dC_sca/dOmega]"
+            end if
         end if 
 
         ! CASE: sphere (analytical)
@@ -1200,51 +1204,85 @@ contains
     subroutine print_parameters(i)
         implicit none 
         integer, intent(in) :: i
-        write(i,*) "# Parameter values"
-        write(i,*) "# -----------------------------------"
+        integer :: j
+        write(i,'(A)') "# GGADT v@VERSION@"
+        write(i,'(A)') "# =-=-="
+        
         if (.not. integrated_mode) then 
-            write(i,*) "# delm: ",delm
-            write(i,*) "# ephot: ",ephot, "keV"
-            write(i,*) "# nscatter: ",nscatter
-            if (.not. material_file_specified)
-                write(i,*) "# ior_re: ",ior_re
-                write(i,*) "# ior_im: ",ior_im
+            write(i, '(A)') "# Differential scattering cross section calculation"
+        else
+            write(i, '(A)') "# Total cross sections as a function of energy"
+        end if 
+        write(i,'(A)') "# -----------------------------------"
+        write(i,'(A)') "# Parameter values"
+
+        write(i,'(A)') "# -----------------------------------"
+        if (.not. integrated_mode) then 
+            
+            write(i,'(A,ES15.5,A)') "# ephot:                           ",ephot, " keV"
+            write(i,'(A,I15)')      "# nscatter:                        ",nscatter 
+            if (.not. material_file_specified) then
+              write(i,'(A,ES15.5)') "# Re(m-1):                         ",ior_re
+              write(i,'(A,ES15.5)') "# Im(m-1):                         ",ior_im
             else 
-                do i=j,nmaterials
-                    write(i,*) "# material ", j
-                    write(i,*) "#    ior_re: ",ior_res_single_en(j)
-                    write(i,*) "#    ior_im: ",ior_ims_single_en(j)
-                end do
+             do j=1,nmaterials
+              write(i,'(A,I15)')    "# material                         ",j
+              write(i, '(A,A16,A)') "#    tag:                          ", '', trim(adjustl(material_tags(j)))
+              write(i, '(A,A16,A)') "#    file:                         ", '', trim(adjustl(material_files(j)))
+              write(i,'(A,ES15.5)') "#    Re(m-1):                      ",ior_res_single_en(j)
+              write(i,'(A,ES15.5)') "#    Im(m-1):                      ",ior_ims_single_en(j)
+             end do
             end if
 
         else 
-            write(i,*) "# ephot_min: ",ephot_min, " keV"
-            write(i,*) "# ephot_max: ",ephot_max, " keV"
-            write(i,*) "# nephots: ",nephots
-            write(i,*) "# Material file: '",trim(adjustl(material_file)),"'"
+        
+         write(i,'(A,ES15.5,A15)')  "# ephot_min:                       ",ephot_min, " keV"
+         write(i,'(A,ES15.5,A15)')  "# ephot_max:                       ",ephot_max, " keV"
+         write(i,'(A,I15)')         "# nephots:                         ",nephots
         end if 
-        write(i,*) "# geometry: ", trim(adjustl(geometry))
-        write(i,*) "# angle_mode: ",trim(adjustl(angle_mode))
+        if (material_file_specified) then
+            write(i,'(A,A16,A)')    "# Material file:                   ",'', trim(adjustl(material_file))
+        else if (nmaterials > 1) then
+            do j=1,nmaterials
+              write(i,'(A,I15)')    "# material                         ",j
+              write(i, '(A,A16,A)') "#    tag:                          ", '', trim(adjustl(material_tags(j)))
+              write(i, '(A,A16,A)') "#    file:                         ", '', trim(adjustl(material_files(j)))
+             end do
+        end if
+            write(i,'(A,A16,A)')    "# geometry:                        ",'', trim(adjustl(geometry))
+            write(i,'(A,A16,A)')    "# angle_mode:                      ",'',trim(adjustl(angle_mode))
         if (do_phi_averaging) then
-            write(i,*) "# do-phi-averaging; nphi = ",nphi
+            write(i,'(A,I15)')      "# do-phi-averaging;         nphi = ",nphi
         end if
         if (do_full_2d_fft) then
-            write(i,*) "# do-full-2d-fft"
+            write(i,'(A)')          "# do-full-2d-fft set to TRUE"
         end if
-        if (angle_mode == "file") write(i,*) "# angle_file: ", trim(adjustl(angle_file))
-        write(i,*) "# ngrain: ",ngrain
-        write(i,*) "# norientations: ",norientations
-        write(i,*) "# grain-axis-z: ",grain_a(1), "microns"
-        write(i,*) "# grain-axis-y: ",grain_a(2), "microns"
-        write(i,*) "# grain-axis-z: ",grain_a(3), "microns"
-        write(i,*) "# grid-width: ", grid_width * a_eff, "microns"
+        if (angle_mode == "file") then
+            write(i,'(A,A16,A)')    "# angle_file:                      ", '',trim(adjustl(angle_file))
+        end if
+        write(i,'(A,I15)')          "# ngrain:                          ",ngrain
+        write(i,'(A,I15)')          "# norientations:                   ",norientations
+        if (geometry .eq. 'ellipsoid') then
+            write(i,'(A,ES15.5,A)') "# grain-axis-z:                    ",grain_a(1), " microns"
+            write(i,'(A,ES15.5,A)') "# grain-axis-y:                    ",grain_a(2), " microns"
+            write(i,'(A,ES15.5,A)') "# grain-axis-z:                    ",grain_a(3), " microns"
+        end if
+        write(i,'(A,ES15.5,A)')     "# grid-width:                      ", grid_width * a_eff, " microns"
         !write(i,*) "# rotation-axis: ",rotation_axis
-        write(i,*) "# use_padded_fft: ",use_padded_fft
-        write(i,*) "# parameter_file_name: ",trim(adjustl(parameter_file_name))
-        write(i,*) "# fftw_optimization_mode_name: ",trim(adjustl(fftw_optimization_mode_name))
+        if (use_padded_fft) then
+            write(i,'(A,A)')        "# use_padded_fft:                  ",use_padded_fft
+        end if
+        if (save_shadow_function .or. save_orientations) then
+            write(i,'(A,A15,A)')    "# save-file-root:                  ", '', trim(adjustl(save_file_root))
+
+            if (save_shadow_function) write(i,'(A)')          "# shadow functions saved!"
+            if (save_orientations) write(i, '(A)') "# orientations saved!"
+        end if
+        write(i,'(A,A16,A)')        "# axes-convention:                 ", '', trim(adjustl(axes_convention))
+        write(i,'(A,A16,A)')        "# parameter_file_name:             ",'',trim(adjustl(parameter_file_name))
         if (geometry == "spheres" .or. geometry .eq. 'agglomeration') &
-            & write(i,*) "# agglom_file_name: ",trim(adjustl(agglom_file_name))
-        write(i,*) "# -----------------------------------"
+            & write(i,('(A,A16,A)'))"# agglom_file_name:                ",'',trim(adjustl(agglom_file_name))
+        write(i,'(A)') "# -----------------------------------"
     
 
     end subroutine print_parameters
