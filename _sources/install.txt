@@ -1,6 +1,18 @@
+.. index :: 
+	single: compilers; gcc, gfortran
+	single: Xcode
+	single: configure
+	single: compiler flags; FCFLAGS, -O3, -Ofast
+	single: parallelization; --enable-openmp, OpenMP
+
+
 ################
 Installing GGADT
 ################
+
+
+
+
 
 GGADT should :index:`install` easily on most Unix-based systems (e.g. Linux, Mac) by following the standard GNU install procedures, described in ``INSTALL``::
 
@@ -11,20 +23,23 @@ The ggadt binary is now located in the src directory. An optional next step is t
 
 If you did do :command:`make install`, you can undo it by running :command:`make uninstall`. To clean and remake GGADT, simply do :command:`make clean` and then :command:`make`.
 
+Optimization
+============
+
 It should give you a slight (5 - 10%) speed advantage to use the ``-O3`` optimization flag. We tried using ``-Ofast``, but this produced a segfault for moderately large 2d grid sizes, and we didn’t spend too much time trying to figure out why. So, you can use ``-Ofast`` for a little extra oomph, but just know that things might break unexpectedly (the normal, 1d case worked fine for us)::
         
         $ ./configure FCFLAGS="-O3" [--enable-openmp] ...
 
 
-
-********************
-Package Dependencies
-********************
+What you need
+=============
 
 **Suitable C and Fortran 90 compilers**  
 	GGADT was developed using the GNU compiler suite (version 4.5.4 and higher) throughout, but the configure script will try to work with most common compilers. GGADT has been tested to compile on versions 4.3 and later of :program:`gfortran`. If you experience any compilation problems, please let us know!
 **OpenMP** 
-	For the :index:`OpenMP` version of GGADT, you must have C and Fortran compilers that are compatible with OpenMP version 4.0.
+	For the :index:`OpenMP` version of GGADT, you must have C and Fortran compilers that are compatible with OpenMP version 4.0 or later.
+
+
 
 Mac Users
 =========
@@ -38,4 +53,3 @@ Mac Users
         #. Set the :program:`gcc` compiler: :command:`sudo port select --set gcc mp-gcc45`
 
 
-.. index :: gcc, gfortran, Xcode, configure, FCFLAGS, -O3, -Ofast, --enable-openmp, OpenMP, optimization flags

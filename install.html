@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Installing GGADT &mdash; ggadt 1.1.3 documentation</title>
+    <title>Installing GGADT &mdash; GGADT</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.1.3',
+        VERSION:     '1.1.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,8 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="shortcut icon" href="_static/ggadtfav.ico"/>
-    <link rel="top" title="ggadt 1.1.3 documentation" href="index.html" />
-    <link rel="next" title="Anomalous Diffraction Theory" href="adt.html" />
+    <link rel="top" title="GGADT" href="index.html" />
+    <link rel="next" title="Quick Example" href="example.html" />
     <link rel="prev" title="General Geometry Anomalous Diffraction Theory" href="index.html" />
    
   
@@ -40,35 +40,39 @@
           <div class="body" role="main">
             
   <div class="section" id="installing-ggadt">
-<h1>Installing GGADT<a class="headerlink" href="#installing-ggadt" title="Permalink to this headline">¶</a></h1>
-<p>GGADT should <span class="target" id="index-0"></span>install easily on most Unix-based systems (e.g. Linux, Mac) by following the standard GNU install procedures, described in <code class="docutils literal"><span class="pre">INSTALL</span></code>:</p>
+<span id="index-0"></span><h1>Installing GGADT<a class="headerlink" href="#installing-ggadt" title="Permalink to this headline">¶</a></h1>
+<p>GGADT should <span class="target" id="index-1"></span>install easily on most Unix-based systems (e.g. Linux, Mac) by following the standard GNU install procedures, described in <code class="docutils literal"><span class="pre">INSTALL</span></code>:</p>
 <div class="highlight-python"><div class="highlight"><pre>$ ./configure [--enable-openmp] ...
 $ make
 </pre></div>
 </div>
 <p>The ggadt binary is now located in the src directory. An optional next step is to do <strong class="command">make install</strong>, which installs the ggadt into a globally-accessible folder (usually <code class="file docutils literal"><span class="pre">/usr/local/bin</span></code>).</p>
 <p>If you did do <strong class="command">make install</strong>, you can undo it by running <strong class="command">make uninstall</strong>. To clean and remake GGADT, simply do <strong class="command">make clean</strong> and then <strong class="command">make</strong>.</p>
+<div class="section" id="optimization">
+<h2>Optimization<a class="headerlink" href="#optimization" title="Permalink to this headline">¶</a></h2>
 <p>It should give you a slight (5 - 10%) speed advantage to use the <code class="docutils literal"><span class="pre">-O3</span></code> optimization flag. We tried using <code class="docutils literal"><span class="pre">-Ofast</span></code>, but this produced a segfault for moderately large 2d grid sizes, and we didn’t spend too much time trying to figure out why. So, you can use <code class="docutils literal"><span class="pre">-Ofast</span></code> for a little extra oomph, but just know that things might break unexpectedly (the normal, 1d case worked fine for us):</p>
 <div class="highlight-python"><div class="highlight"><pre>$ ./configure FCFLAGS=&quot;-O3&quot; [--enable-openmp] ...
 </pre></div>
 </div>
-<div class="section" id="package-dependencies">
-<h2>Package Dependencies<a class="headerlink" href="#package-dependencies" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="what-you-need">
+<h2>What you need<a class="headerlink" href="#what-you-need" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
 <dt><strong>Suitable C and Fortran 90 compilers</strong></dt>
 <dd>GGADT was developed using the GNU compiler suite (version 4.5.4 and higher) throughout, but the configure script will try to work with most common compilers. GGADT has been tested to compile on versions 4.3 and later of <strong class="program">gfortran</strong>. If you experience any compilation problems, please let us know!</dd>
 <dt><strong>OpenMP</strong></dt>
-<dd>For the <span class="target" id="index-1"></span>OpenMP version of GGADT, you must have C and Fortran compilers that are compatible with OpenMP version 4.0.</dd>
+<dd>For the <span class="target" id="index-2"></span>OpenMP version of GGADT, you must have C and Fortran compilers that are compatible with OpenMP version 4.0 or later.</dd>
 </dl>
+</div>
 <div class="section" id="mac-users">
-<h3>Mac Users<a class="headerlink" href="#mac-users" title="Permalink to this headline">¶</a></h3>
+<h2>Mac Users<a class="headerlink" href="#mac-users" title="Permalink to this headline">¶</a></h2>
 <ul>
 <li><p class="first">Install the latest edition of <strong class="program">XCode command-line tools</strong>. As of Mac OSX v10.9.1, the command-line tools are not included in <strong class="program">XCode</strong> automatically, so you have to do this on your own.</p>
 </li>
 <li><p class="first"><strong>Macports</strong> is highly recommended. To install,</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>Download and install <span class="target" id="index-2"></span>macports from <a class="reference external" href="http://www.macports.org/">http://www.macports.org/</a></li>
+<li>Download and install <span class="target" id="index-3"></span>macports from <a class="reference external" href="http://www.macports.org/">http://www.macports.org/</a></li>
 <li>Install the <strong class="program">coreutils</strong> package: <strong class="command">sudo port install coreutils</strong></li>
 <li>Install <strong class="program">gcc</strong> (4.5.4 or higher is recommended): <strong class="command">sudo port install gcc45</strong></li>
 <li>Set the <strong class="program">gcc</strong> compiler: <strong class="command">sudo port select --set gcc mp-gcc45</strong></li>
@@ -76,7 +80,6 @@ $ make
 </div></blockquote>
 </li>
 </ul>
-<span class="target" id="index-3"></span></div>
 </div>
 </div>
 
@@ -92,10 +95,9 @@ $ make
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Installing GGADT</a><ul>
-<li><a class="reference internal" href="#package-dependencies">Package Dependencies</a><ul>
+<li><a class="reference internal" href="#optimization">Optimization</a></li>
+<li><a class="reference internal" href="#what-you-need">What you need</a></li>
 <li><a class="reference internal" href="#mac-users">Mac Users</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -104,7 +106,7 @@ $ make
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">General Geometry Anomalous Diffraction Theory</a></li>
-      <li>Next: <a href="adt.html" title="next chapter">Anomalous Diffraction Theory</a></li>
+      <li>Next: <a href="example.html" title="next chapter">Quick Example</a></li>
   </ul></li>
 </ul>
 </div>

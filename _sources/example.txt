@@ -6,8 +6,10 @@
 	single: agglomerates; BAM2 
 	single: python; plot_total_xs.py
 	single: python; plot_diffscat.py
+	single: python; plot_diffscat_2d.py
 	single: parameter file; parameters_total_xs.ini
 	single: parameter file; parameters_diffscat.ini
+	single: parameter file; parameters_diffscat_2d.ini
 
 Quick Example
 =============
@@ -22,12 +24,16 @@ A directory containing two example cases, :file:`example/`, is found in the pare
 		Parameter file for computing total (abs, sca, ext) cross sections as a function of energy 
 	:file:`parameters_diffscat.ini`
 		Parameter file for computing differential scattering cross section as a function of scattering angle.
+	:file:`parameters_diffscat_2d.ini`
+		Parameter file for computing (2d) differential scattering cross section as a function of scattering angle.
 
 **Python scripts**
 	:file:`plot_total_xs.py`
 		Plots output of GGADT calculations of total cross section
 	:file:`plot_diffscat.py`
 		Plots output of GGADT calculations of differential scattering cross section
+	:file:`plot_diffscat_2d.py`
+		Plots output of GGADT calculations of (2d) differential scattering cross section
 
 **Target files for clusters of spheres**
 	describes the geometry of a cluster of spheres, see [S2003]_ for more information
@@ -185,3 +191,18 @@ Here, we do the calculation at *one* :index:`photon energy` (i.e. for a single v
 	max-angle                      = 6000.
 
 This tells GGADT that you want to compute :math:`dC_{\rm sca}/d\Omega` from 0 to 6000 :term:`arcseconds`, with values spaced every :math:`\delta\theta=25` arcseconds.
+
+Example 3: Differential scattering cross section (in 2 dimensions)
+------------------------------------------------------------------
+
+The third example uses GGADT to calculate the differential scattering cross section, with the following differences:
+
+#. :option:`--do-full-2d-fft` is set to ``T``.
+#. :option:`--norientations` is set to ``1`` (only beause this makes the plot look more interesting...)
+#. :option:`--ephot` is changed to 0.5 keV (for no particular reason).
+
+.. figure:: diffscat2d.png
+	:width: 500px
+	:align: center
+
+	Two-dimensional differential scattering cross section (**example 3**)

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>General Geometry Anomalous Diffraction Theory &mdash; ggadt 1.1.3 documentation</title>
+    <title>General Geometry Anomalous Diffraction Theory &mdash; GGADT</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.1.3',
+        VERSION:     '1.1.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="shortcut icon" href="_static/ggadtfav.ico"/>
-    <link rel="top" title="ggadt 1.1.3 documentation" href="#" />
+    <link rel="top" title="GGADT" href="#" />
     <link rel="next" title="Installing GGADT" href="install.html" />
    
   
@@ -41,21 +41,19 @@
   <div class="section" id="general-geometry-anomalous-diffraction-theory">
 <h1>General Geometry Anomalous Diffraction Theory<a class="headerlink" href="#general-geometry-anomalous-diffraction-theory" title="Permalink to this headline">¶</a></h1>
 <p><em>Version</em>: 1.1
-<em>Last updated</em>: September 01, 2015</p>
+<em>Last updated</em>: September 09, 2015</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Latest release:</th><td class="field-body"><a class="reference download internal" href="_downloads/ggadt-1.1.3.tar.gz"><code class="xref download docutils literal"><span class="pre">ggadt-1.1.3.tar.gz</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Latest release:</th><td class="field-body"><a class="reference download internal" href="_downloads/ggadt-1.1.5.tar.gz"><code class="xref download docutils literal"><span class="pre">ggadt-1.1.5.tar.gz</span></code></a></td>
 </tr>
-<tr class="field-even field"><th class="field-name">PDF:</th><td class="field-body"><a class="reference download internal" href="_downloads/manual-1.1.3.pdf"><code class="xref download docutils literal"><span class="pre">Manual</span></code></a></td>
+<tr class="field-even field"><th class="field-name">PDF:</th><td class="field-body"><a class="reference download internal" href="_downloads/manual-1.1.5.pdf"><code class="xref download docutils literal"><span class="pre">Manual</span></code></a></td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Repository:</th><td class="field-body"><a class="reference external" href="https://github.com/johnh2o2/ggadt">Github</a></td>
 </tr>
 </tbody>
 </table>
-<div class="section" id="brief-description">
-<h2>Brief description<a class="headerlink" href="#brief-description" title="Permalink to this headline">¶</a></h2>
 <p><strong class="program">GGADT</strong> is short for General Geometry Anomalous Diffraction Theory. It is a Fortran 90 program that uses <abbr title="Anomalous Diffraction Theory">ADT</abbr> (see <a class="reference internal" href="#vdh1957" id="id1">[VDH1957]</a>) to compute the differential scattering cross section (or the total cross sections as a function of energy) for a specified grain. ADT is valid when</p>
 <div class="math">
 <p><img src="_images/math/6956ae39f128cfa38f4bca37d0663bbf38785863.png" alt="|m-1| \ll 1"/></p>
@@ -79,16 +77,19 @@
 <p class="caption"><span class="caption-text">Table of Contents</span><a class="headerlink" href="#mastertoc" title="Permalink to this toctree">¶</a></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installing GGADT</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#package-dependencies">Package Dependencies</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="adt.html">Anomalous Diffraction Theory</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="adt.html#when-is-adt-a-valid-approximation">When is ADT a valid approximation?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#optimization">Optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#what-you-need">What you need</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#mac-users">Mac Users</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="example.html">Quick Example</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="example.html#example-1-total-cross-sections-as-a-function-of-energy">Example 1: Total cross sections as a function of energy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example.html#example-2-differential-scattering-cross-section">Example 2: Differential scattering cross section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example.html#example-3-differential-scattering-cross-section-in-2-dimensions">Example 3: Differential scattering cross section (in 2 dimensions)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="adt.html">Anomalous Diffraction Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="adt.html#when-is-adt-a-valid-approximation">When is ADT a valid approximation?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="invoking.html">Invoking GGADT</a><ul>
@@ -127,7 +128,6 @@
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 </div>
-</div>
 <div class="section" id="indices-and-tables">
 <h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -149,7 +149,6 @@
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">General Geometry Anomalous Diffraction Theory</a><ul>
-<li><a class="reference internal" href="#brief-description">Brief description</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </li>

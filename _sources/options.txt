@@ -48,8 +48,23 @@ Flags
 	
 	You can save a copy of the 2d shadow function of your grain (useful as a sanity check or to make pretty pictures)
 
+.. option:: --save-orientations
+
+	You can output all orientations that GGADT used in its calculation.
+	
+	.. versionadded:: 1.1.5
+
+		(added)
+
 General options
 ^^^^^^^^^^^^^^^
+.. option:: --output-sigfigs=value
+	
+	You can set how many significant digits GGADT will give you (this is useful for cutting down filesizes and read-in time).
+
+	.. versionadded:: 1.1.5
+
+		(added)
 
 .. option:: --save-file-root=value
 

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Quick Example &mdash; ggadt 1.1.3 documentation</title>
+    <title>Quick Example &mdash; GGADT</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.1.3',
+        VERSION:     '1.1.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,9 +24,9 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="shortcut icon" href="_static/ggadtfav.ico"/>
-    <link rel="top" title="ggadt 1.1.3 documentation" href="index.html" />
-    <link rel="next" title="Invoking GGADT" href="invoking.html" />
-    <link rel="prev" title="Anomalous Diffraction Theory" href="adt.html" />
+    <link rel="top" title="GGADT" href="index.html" />
+    <link rel="next" title="Anomalous Diffraction Theory" href="adt.html" />
+    <link rel="prev" title="Installing GGADT" href="install.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -51,6 +51,8 @@
 <dd>Parameter file for computing total (abs, sca, ext) cross sections as a function of energy</dd>
 <dt><code class="file docutils literal"><span class="pre">parameters_diffscat.ini</span></code></dt>
 <dd>Parameter file for computing differential scattering cross section as a function of scattering angle.</dd>
+<dt><code class="file docutils literal"><span class="pre">parameters_diffscat_2d.ini</span></code></dt>
+<dd>Parameter file for computing (2d) differential scattering cross section as a function of scattering angle.</dd>
 </dl>
 </dd>
 <dt><strong>Python scripts</strong></dt>
@@ -59,6 +61,8 @@
 <dd>Plots output of GGADT calculations of total cross section</dd>
 <dt><code class="file docutils literal"><span class="pre">plot_diffscat.py</span></code></dt>
 <dd>Plots output of GGADT calculations of differential scattering cross section</dd>
+<dt><code class="file docutils literal"><span class="pre">plot_diffscat_2d.py</span></code></dt>
+<dd>Plots output of GGADT calculations of (2d) differential scattering cross section</dd>
 </dl>
 </dd>
 <dt><strong>Target files for clusters of spheres</strong></dt>
@@ -190,6 +194,19 @@
 <p>This tells GGADT that you want to compute <img class="math" src="_images/math/55d20eed017ebeaf5a8e10a9f2f0bf2a8661f917.png" alt="dC_{\rm sca}/d\Omega"/> from 0 to 6000 <a class="reference internal" href="glossary.html#term-arcseconds"><span class="xref std std-term">arcseconds</span></a>, with values spaced every <img class="math" src="_images/math/352e0c598fe5d285c1279e08915ee864b0c82107.png" alt="\delta\theta=25"/> arcseconds.</p>
 </div>
 </div>
+<div class="section" id="example-3-differential-scattering-cross-section-in-2-dimensions">
+<h2>Example 3: Differential scattering cross section (in 2 dimensions)<a class="headerlink" href="#example-3-differential-scattering-cross-section-in-2-dimensions" title="Permalink to this headline">¶</a></h2>
+<p>The third example uses GGADT to calculate the differential scattering cross section, with the following differences:</p>
+<ol class="arabic simple">
+<li><a class="reference internal" href="options.html#cmdoption--do-full-2d-fft"><code class="xref std std-option docutils literal"><span class="pre">--do-full-2d-fft</span></code></a> is set to <code class="docutils literal"><span class="pre">T</span></code>.</li>
+<li><a class="reference internal" href="options.html#cmdoption--norientations"><code class="xref std std-option docutils literal"><span class="pre">--norientations</span></code></a> is set to <code class="docutils literal"><span class="pre">1</span></code> (only beause this makes the plot look more interesting...)</li>
+<li><a class="reference internal" href="options.html#cmdoption--ephot"><code class="xref std std-option docutils literal"><span class="pre">--ephot</span></code></a> is changed to 0.5 keV (for no particular reason).</li>
+</ol>
+<div class="figure align-center" id="id5">
+<a class="reference internal image-reference" href="_images/diffscat2d.png"><img alt="_images/diffscat2d.png" src="_images/diffscat2d.png" style="width: 500px;" /></a>
+<p class="caption"><span class="caption-text">Two-dimensional differential scattering cross section (<strong>example 3</strong>)</span></p>
+</div>
+</div>
 </div>
 
 
@@ -212,6 +229,7 @@
 <li><a class="reference internal" href="#a-more-thorough-look-at-the-parameter-file-parameters-diffscat-ini">A more thorough look at the parameter file <code class="file docutils literal"><span class="pre">parameters_diffscat.ini</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#example-3-differential-scattering-cross-section-in-2-dimensions">Example 3: Differential scattering cross section (in 2 dimensions)</a></li>
 </ul>
 </li>
 </ul>
@@ -219,8 +237,8 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="adt.html" title="previous chapter">Anomalous Diffraction Theory</a></li>
-      <li>Next: <a href="invoking.html" title="next chapter">Invoking GGADT</a></li>
+      <li>Previous: <a href="install.html" title="previous chapter">Installing GGADT</a></li>
+      <li>Next: <a href="adt.html" title="next chapter">Anomalous Diffraction Theory</a></li>
   </ul></li>
 </ul>
 </div>
