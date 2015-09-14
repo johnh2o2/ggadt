@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.1.5',
+        VERSION:     '1.1.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -200,6 +200,11 @@
 <dt id="cmdoption--angle-file">
 <code class="descname">--angle-file</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--angle-file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Path to a file containing a list of orientation angles which GGADT will use to compute orientational averages. Only used when <a class="reference internal" href="#cmdoption--angle-mode"><code class="xref std std-option docutils literal"><span class="pre">--angle-mode</span></code></a> is set to <code class="docutils literal"><span class="pre">FILE</span></code>.</p>
+<p>For <code class="xref std std-option docutils literal"><span class="pre">--axes-convention`=``DDSCAT`</span></code>, GGADT expects the file to contain three values per row: the first column is <img class="math" src="_images/math/8ce03f78ed945f2ef3dac87c8799b55b393527e7.png" alt="\beta"/> values, the second column is <img class="math" src="_images/math/a9cfbeb8ebee1f365919e147a79e242dcb67ee5d.png" alt="\theta"/> values and the third column contains <img class="math" src="_images/math/10e009bdb83f96c5f47c58b34d5d4b12ef268d5b.png" alt="\phi"/> values.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">At the moment, the MSTM convention is only partially supported, and GGADT might behave unpredictably if you use MSTM for now.</p>
+</div>
 </dd></dl>
 
 <dl class="option">

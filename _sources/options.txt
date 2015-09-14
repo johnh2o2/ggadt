@@ -125,6 +125,12 @@ General options
 .. option:: --angle-file=value
 	
 	Path to a file containing a list of orientation angles which GGADT will use to compute orientational averages. Only used when :option:`--angle-mode` is set to ``FILE``.
+        
+        For :option:`--axes-convention`=``DDSCAT``, GGADT expects the file to contain three values per row: the first column is :math:`\beta` values, the second column is :math:`\theta` values and the third column contains :math:`\phi` values.
+
+        .. warning :: 
+                
+                At the moment, the MSTM convention is only partially supported, and GGADT might behave unpredictably if you use MSTM for now.
 
 .. option:: --material-file=value
 	
