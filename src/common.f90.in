@@ -986,11 +986,7 @@ module common_mod
         if (enhancement .eq. 0) then
           allocate(working_fft2d(size(f(1,:)), size(f(:,1))))
           working_fft2d = fft2d(f)
-          !working_fft2d = fft2d_firstk(f, fsize)
-
-          !fft_output = fft_firstk(f, size(fft_output(:,1)))
-          !write(stderr, *) fsize, size(fft_output(:,1))
-
+          
           do i=1,size(fft2d_output(1,:))
             do j=1, size(fft2d_output(:,1))
               fft2d_output(i, j) = working_fft2d(i, j)

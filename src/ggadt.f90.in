@@ -13,7 +13,7 @@ program ggadt
     implicit none
 
     ! Declare variables...
-    real(kind=dp_real), allocatable :: z(:), y(:), kz(:), ky(:), thetaz(:), thetay(:)
+    real(kind=dp_real), allocatable :: z(:), y(:), kx(:), ky(:), thetax(:), thetay(:)
 
     complex(kind=dp_complex), allocatable :: sh(:,:), ftsh(:,:), phi_total(:,:), gsh(:), gftsh(:)
 
@@ -356,7 +356,7 @@ contains
 
         !$omp parallel shared(gscatter,gftsh,k,dy) 
         !$omp do schedule(dynamic) private(i)
-        do i=1, size(kz)
+        do i=1, size(kx)
             get_gscatter(i) = ( k * dy *abs(gftsh(i))/twopi)**2
         end do
         !$omp end do 
@@ -365,7 +365,7 @@ contains
 
     function phi_average(dSigdOm)
         ! Performs 'phi-averaging' over 2d dCsca/dOmega(theta, phi) grid.
-        !   returns a one-dimensional avearage at each theta in the thetaz array
+        !   returns a one-dimensional avearage at each theta in the thetax array
         implicit none
         integer i,j
         real(kind=dp_complex), dimension(size(gscatter)) :: phi_average
@@ -374,15 +374,15 @@ contains
         real(kind=dp_real) :: ph, th
         real(kind=dp_complex) :: dsdo_val
 
-        !$omp parallel shared(thetaz,nphi, dSigdOm, phi_average)
+        !$omp parallel shared(thetax,nphi, dSigdOm, phi_average)
         !$omp do schedule(dynamic) private(i,j,dsdo_val, th)
-        do i=1, size(thetaz)
+        do i=1, size(thetax)
             dsdo_val = 0.0D0
-            th = thetaz(i)
+            th = thetax(i)
 
             do j=1, nphi
                 ph = (0.5*pi)*(real(j) / real(nphi))
-                dsdo_val = dsdo_val + linterp2d(thetaz, thetaz, dSigdOm, th * cos(ph), th * sin(ph))
+                dsdo_val = dsdo_val + linterp2d(thetax, thetax, dSigdOm, th * cos(ph), th * sin(ph))
             end do 
             phi_average(i) = dsdo_val/nphi
         end do
@@ -395,7 +395,7 @@ contains
         implicit none 
         integer :: nangle, i, j
         real(kind=dp_real) :: th, sc, dth
-        real(kind=dp_real), dimension(2*size(thetaz)) :: sc_array, thets
+        real(kind=dp_real), dimension(2*size(thetax)) :: sc_array, thets
         complex(kind=dp_complex), dimension(10) :: delms
         
         ! Set the m-1 array for each material
@@ -429,23 +429,23 @@ contains
 
             ! If we're using the full 2d grid, make one
             if (do_full_2d_fft) then
-                dth = 2 * sqrt(2. + 1.0D-5)* thetaz(size(thetaz)) / (size(thets) - 1)
+                dth = 2 * sqrt(2. + 1.0D-5)* thetax(size(thetax)) / (size(thets) - 1)
 
-                !$omp parallel shared(thets, dth, thetaz, sc_array, k, a_eff, delm)
+                !$omp parallel shared(thets, dth, thetax, sc_array, k, a_eff, delm)
                 !$omp do schedule(dynamic) private(i)
                 do i=1,size(thets)
-                    thets(i) = - sqrt(2.0 + 1.0D-5)* thetaz(size(thetaz)) + (i-1)*dth
+                    thets(i) = - sqrt(2.0 + 1.0D-5)* thetax(size(thetax)) + (i-1)*dth
                     sc_array(i) = scatter_sphere(k, a_eff, thets(i), delm)
                 end do
                 !$omp end do 
                 !$omp end parallel
                 
 
-                !$omp parallel shared(scatter,thetaz,thetay, thets, sc_array)
+                !$omp parallel shared(scatter,thetax,thetay, thets, sc_array)
                 !$omp do schedule(dynamic) private(i,j, th)
-                do i=1,size(thetaz)
+                do i=1,size(thetax)
                     do j=1, size(thetay)
-                        th = sqrt(thetaz(i)*thetaz(i) + thetay(j)*thetay(j))
+                        th = sqrt(thetax(i)*thetax(i) + thetay(j)*thetay(j))
                         scatter(i,j) = linterp(thets, sc_array, th)
                     end do
                 end do
@@ -454,10 +454,10 @@ contains
 
             ! Otherwise, keep things 1d
             else
-                !$omp parallel shared(scatter,thetaz)
+                !$omp parallel shared(scatter,thetax)
                 !$omp do schedule(dynamic) private(i)
-                do i=1,size(thetaz)
-                    gscatter(i) = scatter_sphere(k, a_eff, thetaz(i), delm)
+                do i=1,size(thetax)
+                    gscatter(i) = scatter_sphere(k, a_eff, thetax(i), delm)
                 end do
                 !$omp end do 
                 !$omp end parallel 
@@ -500,7 +500,7 @@ contains
                     
                     !$omp parallel shared(scatter,ftsh,k,dz,dy) 
                     !$omp do schedule(dynamic) private(i,j)
-                    do i=1,size(kz)
+                    do i=1,size(kx)
                         do j=1,size(ky)
                             scatter(i,j) = (k*dz*dy*abs(ftsh(i,j))/twopi)**2
                         end do
@@ -557,7 +557,7 @@ contains
 
                             !$omp parallel shared(ftsh,k,dy,dz) 
                             !$omp do schedule(dynamic) private(i, j)
-                            do i=1, size(kz)
+                            do i=1, size(kx)
                                 do j=1, size(ky)
                                     !-$OMP CRITICAL
                                     scatter(i,j) = ( k*dz*dy*abs(ftsh(i,j))/twopi)**2
@@ -570,7 +570,7 @@ contains
                             gftsh(:) = phi_average(scatter)
                             !$omp parallel shared(gscatter,gftsh,k,dy, norientations) 
                             !$omp do schedule(dynamic) private(i)
-                            do i=1, size(kz)
+                            do i=1, size(kx)
                                 !-$OMP CRITICAL
                                 gscatter(i) = gscatter(i) + &
                                         gftsh(i)/real(norientations,kind=dp_real)
@@ -582,7 +582,7 @@ contains
                         else
                             !$omp parallel shared(scatter,ftsh,k,dz,dy, norientations) 
                             !$omp do schedule(dynamic) private(i,j)
-                            do i=1,size(kz)
+                            do i=1,size(kx)
                                 do j=1,size(ky)
                                     !-$OMP CRITICAL
                                     scatter(i,j) = scatter(i,j) +  &
@@ -602,7 +602,7 @@ contains
 
                         !$omp parallel shared(gscatter,gftsh,k,dy, norientations) 
                         !$omp do schedule(dynamic) private(i)
-                        do i=1, size(kz)
+                        do i=1, size(kx)
                             !-$OMP CRITICAL
                             gscatter(i) = gscatter(i) + ( k * dy *abs(gftsh(i))/twopi)**2/real(norientations,kind=dp_real)
                             !-$OMP END CRITICAL
@@ -640,17 +640,17 @@ contains
 
         ! for the fast fft mode, we ASSUME isotropy, so just 1d
         if ((.not. do_full_2d_fft) .or. do_phi_averaging) then 
-            do i=1,size(thetaz)
+            do i=1,size(thetax)
                 write(stdout,&
                     '(2('//trim(output_fmt)//'))') &
-                thetaz(i),gscatter(i)*norm_const
+                thetax(i),gscatter(i)*norm_const
             end do
         else
-            do i=1,size(thetaz)
+            do i=1,size(thetax)
                 do j=1,size(thetay)
                     write(stdout, &
                         '(3('//trim(output_fmt)//'))') &
-                    thetay(j),thetaz(i),scatter(i,j)*norm_const
+                    thetay(j),thetax(i),scatter(i,j)*norm_const
                 end do
             end do
         end if
@@ -703,11 +703,7 @@ contains
             ior_ims_single_en(1) = ior_im 
         end if 
 
-        
- 
-        ! Set angles -------------------------------
         if (angle_mode == 'sequential') then
-            !if (rotation_axis == 'none') then 
             if (do_phi_averaging) then
                 norientations_new = int(real(norientations)**(1.0/2.0))**2
                 if (norientations /= norientations_new) then
@@ -770,9 +766,6 @@ contains
             end if 
         end if 
 
-        
-
-    ! ---------------------------------------------------
         ! Set the grid length (in physical units)
         if ((geometry == 'sphere') .or. (geometry == 'spheres') .or. (geometry == 'agglomeration') .or. (geometry=='custom')) then 
             if (geometry == 'spheres' .or. geometry .eq. 'agglomeration') then
@@ -868,9 +861,8 @@ contains
         end if 
 
        
-    ! ---------------------------------------------------
    
-    ! allocate arrays that depend on ngrid
+        ! allocate arrays that depend on ngrid
 
         ! z , y
         allocate(z(ngrid),stat = allocatestatus)
@@ -890,9 +882,8 @@ contains
             allocate(phi_total(ngrid,ngrid),stat = allocatestatus)
                 if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (phi_total) array ***"
         end if 
-    ! ----------------------------------------------------
      
-    ! set grid boundaries and spacing in physical coords
+        ! set grid boundaries and spacing in physical coords
         zmin = -grid_width*a_eff/2.0D0
         ymin = -grid_width*a_eff/2.0D0
         zmax = grid_width*a_eff/2.0D0
@@ -900,16 +891,14 @@ contains
 
         dz = (zmax-zmin)/(size(z)-1)
         dy = (ymax-ymin)/(size(y)-1)
-    ! -------------------------
         
-    ! set z and y arrays
+        ! set z and y arrays
         do i=1,size(z)
             z(i) = zmin + (i-1)*dz
         end do
         do i=1,size(y)
             y(i) = ymin + (i-1)*dy
         end do
-    ! -------------------
         if (.not. do_full_2d_fft) then
             do i=1,size(z)
                 gsh(i) = 0.0D0
@@ -918,24 +907,24 @@ contains
       
         L = z(size(z)) - z(1)  ! length of grid in physical coords
 
-    ! figures out what kmin, kmax, enhancement and kactual are.
+        ! figures out what kmin, kmax, enhancement and kactual are.
         if (do_full_2d_fft .and. .not. do_phi_averaging) then
             call get_fft_vals(-max_angle,max_angle,nscatter,kmin,kmax,enhancement,kactual)   
         else
             call get_fft_vals(0.0D0,max_angle,nscatter,kmin,kmax,enhancement,kactual)   
         end if
       
-    ! allocate arrays that depend on kactual
+        ! allocate arrays that depend on kactual
 
-        ! kz
-        allocate(kz(kactual),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (kz) array ***"
+        ! kx
+        allocate(kx(kactual),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (kx) array ***"
         ! ky
         allocate(ky(kactual),stat = allocatestatus)
             if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (ky) array ***"
-        ! thetaz
-        allocate(thetaz(kactual),stat = allocatestatus)
-            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (thetaz) array ***"
+        ! thetax
+        allocate(thetax(kactual),stat = allocatestatus)
+            if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (thetax) array ***"
         ! thetay
         allocate(thetay(kactual),stat = allocatestatus)
             if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (thetay) array ***"
@@ -952,17 +941,16 @@ contains
             allocate(gscatter(kactual),stat = allocatestatus)
                 if (allocatestatus /= 0) stop "ERROR *** not enough memory to allocate (gscatter) array ***"
         end if 
-    ! ----------------------------------
 
-        dk = real(kmax-kmin)/real(size(kz) - 1)
+        dk = real(kmax-kmin)/real(size(kx) - 1)
         
-    ! set kz, ky, thetaz and thetay arrays
-    !   + make scatter array all zero
-        do i=1,size(kz)
-            kz(i) = ((i-1)*dk + kmin)*(TWOPI/L)
-            ky(i) = kz(i)
+        ! set kx, ky, thetax and thetay arrays
+        !   + make scatter array all zero
+        do i=1,size(kx)
+            kx(i) = ((i-1)*dk + kmin)*(TWOPI/L)
+            ky(i) = kx(i)
           
-            thetaz(i) = asin(kz(i)/k)
+            thetax(i) = asin(kx(i)/k)
             thetay(i) = asin(ky(i)/k)
         
             ! Initialize arrays
@@ -975,8 +963,6 @@ contains
 
             end do 
         end do
-    ! -----------------------------------
-        
 
         if (nmaterials .gt. 1) then 
             multiple_compositions = .TRUE.
@@ -1027,8 +1013,8 @@ contains
 
     end subroutine initialize_and_allocate_vars
 
-! -- given thetamin and thetamax and desired resolution in scattering angle, 
-!    sets the relevant FFT parameters (kmin, kmax, enhancement, Kout)
+    ! -- given thetamin and thetamax and desired resolution in scattering angle, 
+    !    sets the relevant FFT parameters (kmin, kmax, enhancement, Kout)
     subroutine get_fft_vals(thetamin,thetamax,Kask,kmin,kmax,enhancement,Kout)
         real(kind=dp_real), intent(in) :: thetamin, thetamax
         integer, intent(in) :: Kask
@@ -1050,19 +1036,15 @@ contains
 
 
     subroutine init_random_seed()
-        !use, intrinsic :: iso_fortran_env
         implicit none
 
         integer, allocatable :: seed(:)
         integer(4) :: i, n, un, istat, dt(8), pid, t(2), s
-        !integer(kind=1) :: getpid
         integer(8) :: count, tms
 
         call random_seed(size = n)
         allocate(seed(n))
         ! first try if the os provides a random number generator
-        !open(un, file="/dev/urandom", access="stream", &
-        !     form="unformatted", action="read", status="old", iostat=istat)
         istat = 1
         if (istat == 0) then
            read(un) seed
@@ -1085,8 +1067,8 @@ contains
               t = transfer(tms, t)
            end if
            s = ieor(t(1), t(2))
-           !pid = GETPID() + 1099279 ! add a prime
-           pid = 1099279
+           pid = GETPID() + 1099279 ! add a prime
+           !pid = 1099279
            s = ieor(s, pid)
            if (n >= 3) then
               seed(1) = t(1) + 36269
@@ -1176,9 +1158,9 @@ contains
 
         deallocate(z,stat=deallocatestatus)
         deallocate(y,stat=deallocatestatus)
-        deallocate(kz,stat=deallocatestatus)
+        deallocate(kx,stat=deallocatestatus)
         deallocate(ky,stat=deallocatestatus)
-        deallocate(thetaz,stat=deallocatestatus)
+        deallocate(thetax,stat=deallocatestatus)
         deallocate(thetay,stat=deallocatestatus)
         deallocate(sh,stat=deallocatestatus)
         deallocate(ftsh,stat=deallocatestatus)
