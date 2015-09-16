@@ -1,0 +1,8 @@
+.. _citations:
+
+Citing GGADT
+============
+
+If :program:`GGADT` has been useful to you in your research, we would welcome your citations! Please cite the following paper (**not** the manual):
+
+Hoffman, J., & Draine, B. T. 2015, *submitted for publication to the Astrophysical Journal*
