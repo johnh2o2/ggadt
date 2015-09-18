@@ -16,19 +16,31 @@ Installing GGADT
 
 GGADT should :index:`install` easily on most Unix-based systems (e.g. Linux, Mac) by following the standard GNU install procedures, described in ``INSTALL``::
 
-        $ ./configure [--enable-openmp] ...
+        $ ./configure --datadir=/path/to/datadir [--enable-openmp] ...
         $ make
+        $ make install
 
-The ggadt binary is now located in the src directory. An optional next step is to do :command:`make install`, which installs the ggadt into a globally-accessible folder (usually :file:`/usr/local/bin`). 
+This installs ggadt into a globally-accessible folder (usually :file:`/usr/local/bin`). 
 
-If you did do :command:`make install`, you can undo it by running :command:`make uninstall`. To clean and remake GGADT, simply do :command:`make clean` and then :command:`make`.
+.. warning :: 
+        
+        Users *must* give :file:`configure` a :option:`--distdir`. This is where the defaults file and a couple of other necessary files will be stored (they'll actually be stored in the ``${distdir}/ggadt`` subdirectory). Pick a location where you have adequate permissions (e.g. your home directory).
+
+If you did do :command:`make install`, you can undo it by running :command:`make uninstall`. To clean and remake GGADT, simply do :command:`make clean` and then :command:`make install`.
+
+FFT Options
+===========
+
+Right now, GGADT works with the GPFA FFT only (this is supplied with GGADT; you don't need to do anything extra to implement it). We originally planned to offer FFTW support, and this will come in future releases, but our benchmark tests didn't show any significant speed improvement when using FFTW over GPFA. 
+
+If you have another FFT library that you would like to use, let us know.
 
 Optimization
 ============
 
 It should give you a slight (5 - 10%) speed advantage to use the ``-O3`` optimization flag. We tried using ``-Ofast``, but this produced a segfault for moderately large 2d grid sizes, and we didn’t spend too much time trying to figure out why. So, you can use ``-Ofast`` for a little extra oomph, but just know that things might break unexpectedly (the normal, 1d case worked fine for us)::
         
-        $ ./configure FCFLAGS="-O3" [--enable-openmp] ...
+        $ ./configure FCFLAGS="-O3" --datadir=/path/to/datadir [--enable-openmp] ...
 
 
 What you need

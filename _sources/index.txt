@@ -13,8 +13,8 @@ General Geometry Anomalous Diffraction Theory
 
 
 
-:Latest release: :download:`ggadt-1.1.6.tar.gz <ggadt-1.1.6.tar.gz>`
-:PDF: :download:`Manual <manual-1.1.6.pdf>`
+:Latest release: :download:`ggadt-1.1.7.tar.gz <ggadt-1.1.7.tar.gz>`
+:PDF: :download:`Manual <manual-1.1.7.pdf>`
 :Repository: `Github <https://github.com/johnh2o2/ggadt>`_
 
 

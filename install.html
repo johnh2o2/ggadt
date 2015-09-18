@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.1.5',
+        VERSION:     '1.1.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <link rel="shortcut icon" href="_static/ggadtfav.ico"/>
     <link rel="top" title="GGADT" href="index.html" />
     <link rel="next" title="Quick Example" href="example.html" />
-    <link rel="prev" title="General Geometry Anomalous Diffraction Theory" href="index.html" />
+    <link rel="prev" title="Citing GGADT" href="citations.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -42,16 +42,26 @@
   <div class="section" id="installing-ggadt">
 <span id="index-0"></span><h1>Installing GGADT<a class="headerlink" href="#installing-ggadt" title="Permalink to this headline">¶</a></h1>
 <p>GGADT should <span class="target" id="index-1"></span>install easily on most Unix-based systems (e.g. Linux, Mac) by following the standard GNU install procedures, described in <code class="docutils literal"><span class="pre">INSTALL</span></code>:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ ./configure [--enable-openmp] ...
+<div class="highlight-python"><div class="highlight"><pre>$ ./configure --datadir=/path/to/datadir [--enable-openmp] ...
 $ make
+$ make install
 </pre></div>
 </div>
-<p>The ggadt binary is now located in the src directory. An optional next step is to do <strong class="command">make install</strong>, which installs the ggadt into a globally-accessible folder (usually <code class="file docutils literal"><span class="pre">/usr/local/bin</span></code>).</p>
-<p>If you did do <strong class="command">make install</strong>, you can undo it by running <strong class="command">make uninstall</strong>. To clean and remake GGADT, simply do <strong class="command">make clean</strong> and then <strong class="command">make</strong>.</p>
+<p>This installs ggadt into a globally-accessible folder (usually <code class="file docutils literal"><span class="pre">/usr/local/bin</span></code>).</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Users <em>must</em> give <code class="file docutils literal"><span class="pre">configure</span></code> a <code class="xref std std-option docutils literal"><span class="pre">--distdir</span></code>. This is where the defaults file and a couple of other necessary files will be stored (they&#8217;ll actually be stored in the <code class="docutils literal"><span class="pre">${distdir}/ggadt</span></code> subdirectory). Pick a location where you have adequate permissions (e.g. your home directory).</p>
+</div>
+<p>If you did do <strong class="command">make install</strong>, you can undo it by running <strong class="command">make uninstall</strong>. To clean and remake GGADT, simply do <strong class="command">make clean</strong> and then <strong class="command">make install</strong>.</p>
+<div class="section" id="fft-options">
+<h2>FFT Options<a class="headerlink" href="#fft-options" title="Permalink to this headline">¶</a></h2>
+<p>Right now, GGADT works with the GPFA FFT only (this is supplied with GGADT; you don&#8217;t need to do anything extra to implement it). We originally planned to offer FFTW support, and this will come in future releases, but our benchmark tests didn&#8217;t show any significant speed improvement when using FFTW over GPFA.</p>
+<p>If you have another FFT library that you would like to use, let us know.</p>
+</div>
 <div class="section" id="optimization">
 <h2>Optimization<a class="headerlink" href="#optimization" title="Permalink to this headline">¶</a></h2>
 <p>It should give you a slight (5 - 10%) speed advantage to use the <code class="docutils literal"><span class="pre">-O3</span></code> optimization flag. We tried using <code class="docutils literal"><span class="pre">-Ofast</span></code>, but this produced a segfault for moderately large 2d grid sizes, and we didn’t spend too much time trying to figure out why. So, you can use <code class="docutils literal"><span class="pre">-Ofast</span></code> for a little extra oomph, but just know that things might break unexpectedly (the normal, 1d case worked fine for us):</p>
-<div class="highlight-python"><div class="highlight"><pre>$ ./configure FCFLAGS=&quot;-O3&quot; [--enable-openmp] ...
+<div class="highlight-python"><div class="highlight"><pre>$ ./configure FCFLAGS=&quot;-O3&quot; --datadir=/path/to/datadir [--enable-openmp] ...
 </pre></div>
 </div>
 </div>
@@ -95,6 +105,7 @@ $ make
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Installing GGADT</a><ul>
+<li><a class="reference internal" href="#fft-options">FFT Options</a></li>
 <li><a class="reference internal" href="#optimization">Optimization</a></li>
 <li><a class="reference internal" href="#what-you-need">What you need</a></li>
 <li><a class="reference internal" href="#mac-users">Mac Users</a></li>
@@ -105,7 +116,7 @@ $ make
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">General Geometry Anomalous Diffraction Theory</a></li>
+      <li>Previous: <a href="citations.html" title="previous chapter">Citing GGADT</a></li>
       <li>Next: <a href="example.html" title="next chapter">Quick Example</a></li>
   </ul></li>
 </ul>
