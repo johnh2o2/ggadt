@@ -24,7 +24,7 @@ This installs ggadt into a globally-accessible folder (usually :file:`/usr/local
 
 .. warning :: 
         
-        Users *must* give :file:`configure` a :option:`--distdir`. This is where the defaults file and a couple of other necessary files will be stored (they'll actually be stored in the ``${distdir}/ggadt`` subdirectory). Pick a location where you have adequate permissions (e.g. your home directory).
+        Users *must* give :file:`configure` a :option:`--datadir`. This is where the defaults file and a couple of other necessary files will be stored (they'll actually be stored in the ``${datadir}/ggadt`` subdirectory). Pick a location where you have adequate permissions (e.g. your home directory).
 
 If you did do :command:`make install`, you can undo it by running :command:`make uninstall`. To clean and remake GGADT, simply do :command:`make clean` and then :command:`make install`.
 
