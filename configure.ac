@@ -2,7 +2,7 @@
 # Autoconf configuration script.
 
 
-AC_INIT([ggadt], [1.1.6], [jah5@princeton.edu])
+AC_INIT([ggadt], [1.1.7], [jah5@princeton.edu])
 AC_PREREQ([2.69]) 
 AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/sphere.f90])
@@ -28,6 +28,12 @@ if test "x$ac_prefix" = "xNONE"; then
 fi
 AC_SUBST(ac_prefix)
 AC_DEFINE_UNQUOTED(CONFIG_PREFIX, ["$ac_prefix"], [Default installation prefix.])
+
+#if test "x$ac_datadir" = "xNONE"; then
+#ac_datadir=$ac_prefix/share
+#fi
+#datadir=$ac_datadir
+#AC_SUBST(datadir)
 
 # User can specify non-standard location for macports.
 AC_ARG_VAR([macports_prefix], [ (Apple users ONLY) The parent directory from which the macports tree starts. Usually /opt ])
@@ -205,8 +211,8 @@ if test x$using_fftw3 = xtrue
   INC="$INC -I$fftw3_inc_dir"
   # Where to put the FFTW plans -- ideally we should figure out how to work
   # with the standard GNU datadir variable.
-  data_dir="${HOME}/.ggadt"
-  plan_dir="$data_dir/plans"
+  #data_dir="${HOME}/.ggadt"
+  plan_dir="$datadir/plans"
 
   mkdir -p $data_dir
   mkdir -p $plan_dir
@@ -429,7 +435,7 @@ AC_CONFIG_FILES([
 
         scripts/installation_vars.py
 
-        default.params
+        data/default.params
 				])
 AC_SUBST(fftw3_inc_dir)
 AC_SUBST(plan_dir)
@@ -448,6 +454,7 @@ AC_SUBST(GPFA_COMMENT)
 AC_SUBST(USE_GPFA)
 AC_SUBST(omp_lib)
 AC_SUBST(abs_builddir)
+AC_SUBST(abs_datadir)
 AC_SUBST(IF_GETARG) 
 AC_SUBST(IF_GET_COM_ARG)
 AC_SUBST(IF_IARGC)

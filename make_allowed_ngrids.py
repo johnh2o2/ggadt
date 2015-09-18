@@ -2,7 +2,7 @@ import numpy as np
 from math import *
 
 max_gridsize= 10000
-fname = ".allowed_ngrid_values"
+fname = "allowed_ngrid_values.txt"
 
 n = max_gridsize/2
 

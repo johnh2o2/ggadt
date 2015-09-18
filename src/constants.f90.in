@@ -38,7 +38,7 @@ module constants
   real(dp_real), parameter                 ::  default_grain_axis_ratio       = 1.0D0
   character(len=200), parameter            ::  default_grain_geometry         = 'sphere'
   character(len=200), parameter            ::  allowed_ngrid_values_filename &
-    & = '@abs_top_srcdir@/allowed_ngrid_values.txt'
+    & = '@datadir@/ggadt/allowed_ngrid_values.txt'
   character(len=50), parameter             ::  default_angle_mode       = 'random'
   character(len=50), parameter             ::  default_rotation_axis          = 'none'
   character(len=200), parameter            ::  default_angle_file       = ''
@@ -65,7 +65,7 @@ module constants
   character(len=200), parameter            ::  default_material_file          = ""
   real(dp_real), parameter                 ::  default_dephot                 = 1.0D-1
   character(len=200), parameter ::  defaults_file_name &
-    &=  "@abs_top_srcdir@/default.params"
+    &=  "@datadir@/ggadt/default.params"
      
   logical, parameter                        :: options_debug  = .false.
 

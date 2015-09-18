@@ -230,6 +230,7 @@ USE_OMP_LIB = @USE_OMP_LIB@
 USING_FFTW = @USING_FFTW@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
+abs_datadir = @abs_datadir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
@@ -597,6 +598,12 @@ uninstall-am: uninstall-binPROGRAMS
 	ps ps-am tags tags-am uninstall uninstall-am \
 	uninstall-binPROGRAMS
 
+
+#install-data-hook:
+#	echo "character(len=200), parameter :: allowed_ngrid_values_filename &" > install_dirs.f90
+#	echo "& = '$(datadir)/allowed_ngrid_values.txt'" >> install_dirs.f90
+#	echo "character(len=200), parameter ::  defaults_file_name &" >> install_dirs.f90
+#	echo "& = '$(datadir)/default.params'" >> install_dirs.f90
 
 #install-data-local:
 #	mkdir -p @data_dir@
