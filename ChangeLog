@@ -1,3 +1,9 @@
+* commit 00ddb86ce0cc4ce99ccc527bcdeafa3e6c54e636
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Sat Sep 19 17:08:11 2015 -0400
+| 
+|     Removed all FFTW-related files and options (or at least I think I did...
+|  
 * commit daf5d3d5ccc5a91c071ff0194322f88966dcba7f
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Fri Sep 18 11:13:19 2015 -0400

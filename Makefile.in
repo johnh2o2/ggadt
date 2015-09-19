@@ -87,8 +87,7 @@ DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	COPYING compile config.guess config.sub depcomp install-sh \
 	missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ac_find_file.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -247,10 +246,6 @@ EXEEXT = @EXEEXT@
 FC = @FC@
 FCFLAGS = @FCFLAGS@
 FCFLAGS_f90 = @FCFLAGS_f90@
-FFTW3_COMMENT = @FFTW3_COMMENT@
-FFTW3_UNCOMMENT = @FFTW3_UNCOMMENT@
-GPFA_COMMENT = @GPFA_COMMENT@
-GPFA_UNCOMMENT = @GPFA_UNCOMMENT@
 GREP = @GREP@
 IF_COM_ARG_CNT = @IF_COM_ARG_CNT@
 IF_GETARG = @IF_GETARG@
@@ -287,13 +282,9 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SINGLE_UNCOMMENT = @SINGLE_UNCOMMENT@
 STRIP = @STRIP@
-USE_FFTW = @USE_FFTW@
-USE_GPFA = @USE_GPFA@
 USE_OMP_LIB = @USE_OMP_LIB@
-USING_FFTW = @USING_FFTW@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
-abs_datadir = @abs_datadir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
@@ -318,7 +309,6 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
-fftw3_inc_dir = @fftw3_inc_dir@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
