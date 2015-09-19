@@ -1,6 +1,4 @@
 module gpfa
-	!use, intrinsic :: iso_c_binding
-    !use, intrinsic :: iso_fortran_env
 
     use gpfa_raw
     use constants

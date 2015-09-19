@@ -2,7 +2,7 @@
 # Autoconf configuration script.
 
 
-AC_INIT([ggadt], [1.1.7], [jah5@princeton.edu])
+AC_INIT([ggadt], [1.1.7r1], [jah5@princeton.edu])
 AC_PREREQ([2.69]) 
 AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR([src/sphere.f90])
@@ -62,16 +62,6 @@ AC_ARG_ENABLE([single],
 esac],[use_double=true])
 AM_CONDITIONAL([SINGLE], [test x$use_double = xfalse])
 
-#specify that you want to use the FFTW3 algorithm for your FFT's
-AC_ARG_ENABLE([fftw3],
-[  --enable-fftw3    Use the FFTW3 library (if installed) ],
-[case "${enableval}" in
-  yes) fftw3=true ; using_fftw3=true ; using_gpfa=false ;;
-  no)  fftw3=false ; using_fftw3=false ; using_gpfa=true ;;
-  *) AC_MSG_ERROR([bad value ${enableval} for --enable-fftw3]) ;;
-esac],[using_fftw3=false ; using_gpfa=true])
-AM_CONDITIONAL([FFTW3], [test x$using_fftw3 = xtrue])
-
 AC_CHECK_LIB([m],[cos]) #check for the math library
 
 
@@ -91,29 +81,6 @@ case $host_os in
         else
           AC_MSG_RESULT([yes])
           USING_MACPORTS="yes"
-          if test x$using_fftw3 = xtrue; then
-            AC_MSG_CHECKING([for macports install of fftw-3])
-            PORT_TEST_FFTW3=`port installed fftw-3 | awk "/fftw-3/"`
-
-            if [[ "X${PORT_TEST_FFTW3}" == "X" ]]
-            then
-              AC_MSG_RESULT([no])
-              AC_MSG_ERROR([Macports is installed, but fftw-3 is not.])
-              AC_MSG_ERROR([fix this by doing: sudo port install fftw-3])
-            else
-              AC_MSG_RESULT([yes])
-            fi
-            AC_MSG_CHECKING([guessing macports parent directory])
-            fftw3_header_file=`port contents fftw-3 | grep "fftw3.f03"`
-            macports_include=`dirname $fftw3_header_file`
-            PWD_OLD=$PWD
-            cd $macports_include
-            cd ../..
-            macports_prefix=$PWD
-            cd $PWD_OLD
-            AC_MSG_RESULT([$macports_prefix])
-          fi
-
           LDFLAGS="$LDFLAGS -L$macports_prefix/local/lib"
         fi
         AC_MSG_NOTICE([========================])
@@ -131,16 +98,9 @@ case $host_os in
 esac
 
 # Initial values for comments (double by default, GPFA used by default)
-FFTW3_UNCOMMENT="!"
-FFTW3_COMMENT=
-USE_FFTW=
 
 DOUBLE_UNCOMMENT="!"
 SINGLE_UNCOMMENT=
-
-GPFA_UNCOMMENT="!"
-GPFA_COMMENT=
-USE_GPFA=
 
 USE_OMP_LIB=
 OMP_COMMENT=
@@ -155,76 +115,7 @@ if test x$use_double = xtrue
 fi
 
 
-# Do checks if user wants to use fftw3
-if test x$using_fftw3 = xtrue
-  then
 
-  # uncomment things in the source code
-  FFTW3_UNCOMMENT=
-  FFTW3_COMMENT="!"
-
-  # include appropriate module.
-  USE_FFTW="use fftw"
-
-  # Basic checks
-  AC_CHECK_LIB(fftw3,fftw_plan_dft_1d,, AC_MSG_ERROR([Missing FFTW library])) #check for fftw3 library
-  AC_CHECK_HEADERS([ fftw3.h ]) #Check for necessary headers
-
-  # If openmp enabled, make sure fftw3_threads or fftw3_omp is installed
-  if test x$openmp = xtrue
-    then
-    AC_CHECK_LIB([fftw3_omp],[fftw_init_threads],[],\
-      [ AC_CHECK_LIB([fftw3_threads],[fftw_init_threads],[], \
-        [ AC_MSG_ERROR([ OpenMP enabled, but no fftw3_omp or fftw3_threads found. You should compile FFTW3 with --enable-openmp and/or --enable-threads] )
-        ])
-      ])
-  fi
-  
-
-  #Try to find the fftw3.f file
-  fftw3_inc_dir=${ac_srcdir}
-  AC_FIND_FILE("fftw3.f",  /usr/local/include /usr/include ${ac_srcdir} ${ac_prefix}/include ${macports_include} , fftw3_fortran_header)
-
-  if test -f "${macports_include}/fftw3.f"
-  then 
-    AC_MSG_NOTICE([Found fftw3.f file in ${macports_include}. Will use this directory for fortran header files.])
-    fftw3_inc_dir="${macports_include}"
-  elif test -f "${fftw3_inc_dir}/fftw3.f"
-  then 
-  	AC_MSG_NOTICE([Found fftw3.f file in ${fftw3_inc_dir}. Will use this directory for fortran header files.])
-  elif test -f "/usr/local/include/fftw3.f"
-  then 
-  	AC_MSG_NOTICE([Found fftw3.f file in /usr/local/include. Will use this directory for fortran header files.])
-  	fftw3_inc_dir="/usr/local/include"
-  elif test -f "/usr/include/fftw3.f"
-  then 
-  	AC_MSG_NOTICE([Found fftw3.f file in /usr/include. Will use this directory for fortran header files.])
-  	fftw3_inc_dir="/usr/include"
-  elif test -f "${ac_prefix}/include/fftw3.f"
-  then 
-  	AC_MSG_NOTICE([Found fftw3.f file in ${ac_prefix}. Will use this directory for fortran header files.])
-  	fftw3_inc_dir="${ac_prefix}/include"
-  else
-  	AC_MSG_ERROR([Cannot find fftw3 fortran headers!])
-  fi
-
-  INC="$INC -I$fftw3_inc_dir"
-  # Where to put the FFTW plans -- ideally we should figure out how to work
-  # with the standard GNU datadir variable.
-  #data_dir="${HOME}/.ggadt"
-  plan_dir="$datadir/plans"
-
-  mkdir -p $data_dir
-  mkdir -p $plan_dir
-  AC_MSG_NOTICE([using $plan_dir as the directory to store FFTW plans])
-elif test $using_gpfa = true
-  then
-    GPFA_UNCOMMENT="!"
-    GPFA_COMMENT=
-    USE_GPFA="use gpfa"
-else
-  AC_MSG_ERROR([There is no fft algorithm set!])
-fi
 # Now make sure the Fortran compiler is sane.
 
 AC_LANG([Fortran])
@@ -390,43 +281,12 @@ if test $com_arg_cnt_works = true
     IF_COM_ARG_CNT="!"
 fi
 
-AC_MSG_CHECKING([if Fortran compiler recognizes new_line('a')])
 
-AC_RUN_IFELSE([ 
-  AC_LANG_PROGRAM([], 
-            [[  
-               character(len=10) :: buf
-               buf = new_line('a')
-               
-            ]]
-      )],
-    [ AC_MSG_RESULT(yes) ; newline_works=true ],  
-    [ AC_MSG_RESULT(no) ; newline_works=false ]
-  )
-
-if test $newline_works = true
-  then 
-    IF_NO_NEWLINE="!"
-  else
-    IF_NEWLINE="!"
-fi
-
-if test $using_fftw3 = true
-  then
-  echo "USING FFTW3 -- should be in makefile..."
-fi
-if test $using_gpfa = true
-  then
-  echo "USING GPFA -- should be in makefile..."
-fi
-AM_CONDITIONAL([USING_FFTW], [test $using_fftw3 = true])
-AM_CONDITIONAL([USING_GPFA], [test $using_gpfa = true])
 
 AC_PROG_INSTALL
 AC_CONFIG_FILES([ 	
 	Makefile 
 	src/Makefile 
-	src/fftwmod.f90
         src/spheres.f90
 	src/common.f90
         src/constants.f90
@@ -437,24 +297,14 @@ AC_CONFIG_FILES([
 
         data/default.params
 				])
-AC_SUBST(fftw3_inc_dir)
 AC_SUBST(plan_dir)
 AC_SUBST(data_dir)
 AC_SUBST(OPENMP_FCFLAGS)
 AC_SUBST(USE_OMP_LIB)
 AC_SUBST(OMP_COMMENT)
 AC_SUBST(OMP_UNCOMMENT)
-AC_SUBST(FFTW3_UNCOMMENT)
-AC_SUBST(fftw3_inc_dir)
-AC_SUBST(FFTW3_COMMENT)
-AC_SUBST(USE_FFTW)
-AC_SUBST(USING_FFTW)
-AC_SUBST(GPFA_UNCOMMENT)
-AC_SUBST(GPFA_COMMENT)
-AC_SUBST(USE_GPFA)
 AC_SUBST(omp_lib)
 AC_SUBST(abs_builddir)
-AC_SUBST(abs_datadir)
 AC_SUBST(IF_GETARG) 
 AC_SUBST(IF_GET_COM_ARG)
 AC_SUBST(IF_IARGC)
