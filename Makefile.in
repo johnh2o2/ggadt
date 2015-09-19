@@ -82,7 +82,6 @@ subdir = .
 DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
-	$(top_srcdir)/scripts/installation_vars.py.in \
 	$(top_srcdir)/data/default.params.in $(dist_pkgdata_DATA) \
 	COPYING compile config.guess config.sub depcomp install-sh \
 	missing
@@ -93,7 +92,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_CLEAN_FILES = scripts/installation_vars.py data/default.params
+CONFIG_CLEAN_FILES = data/default.params
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -380,8 +379,6 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
-scripts/installation_vars.py: $(top_builddir)/config.status $(top_srcdir)/scripts/installation_vars.py.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 data/default.params: $(top_builddir)/config.status $(top_srcdir)/data/default.params.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-dist_pkgdataDATA: $(dist_pkgdata_DATA)

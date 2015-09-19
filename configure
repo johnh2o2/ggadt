@@ -5332,10 +5332,49 @@ if test $com_arg_cnt_works = true
     IF_COM_ARG_CNT="!"
 fi
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if Fortran compiler recognizes new_line('a')" >&5
+$as_echo_n "checking if Fortran compiler recognizes new_line('a')... " >&6; }
+
+if test "$cross_compiling" = yes; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "cannot run test program while cross compiling
+See \`config.log' for more details" "$LINENO" 5; }
+else
+  cat > conftest.$ac_ext <<_ACEOF
+
+        program main
+
+               character(len=10) :: buf
+               buf = new_line('a')
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/spheres.f90 src/common.f90 src/constants.f90 src/options.f90 src/ggadt.f90 scripts/installation_vars.py data/default.params"
+      end
+_ACEOF
+if ac_fn_fc_try_run "$LINENO"; then :
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; } ; newline_works=true
+else
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; } ; newline_works=false
+
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+
+if test $newline_works = true
+  then
+    IF_NO_NEWLINE="!"
+  else
+    IF_NEWLINE="!"
+fi
+
+
+
+ac_config_files="$ac_config_files Makefile src/Makefile src/spheres.f90 src/common.f90 src/custom.f90 src/constants.f90 src/options.f90 src/ggadt.f90 data/default.params"
 
 
 
@@ -6111,10 +6150,10 @@ do
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/spheres.f90") CONFIG_FILES="$CONFIG_FILES src/spheres.f90" ;;
     "src/common.f90") CONFIG_FILES="$CONFIG_FILES src/common.f90" ;;
+    "src/custom.f90") CONFIG_FILES="$CONFIG_FILES src/custom.f90" ;;
     "src/constants.f90") CONFIG_FILES="$CONFIG_FILES src/constants.f90" ;;
     "src/options.f90") CONFIG_FILES="$CONFIG_FILES src/options.f90" ;;
     "src/ggadt.f90") CONFIG_FILES="$CONFIG_FILES src/ggadt.f90" ;;
-    "scripts/installation_vars.py") CONFIG_FILES="$CONFIG_FILES scripts/installation_vars.py" ;;
     "data/default.params") CONFIG_FILES="$CONFIG_FILES data/default.params" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

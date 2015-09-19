@@ -281,6 +281,26 @@ if test $com_arg_cnt_works = true
     IF_COM_ARG_CNT="!"
 fi
 
+AC_MSG_CHECKING([if Fortran compiler recognizes new_line('a')])
+
+AC_RUN_IFELSE([
+  AC_LANG_PROGRAM([],
+            [[
+               character(len=10) :: buf
+               buf = new_line('a')
+
+            ]]
+      )],
+    [ AC_MSG_RESULT(yes) ; newline_works=true ],
+    [ AC_MSG_RESULT(no) ; newline_works=false ]
+  )
+
+if test $newline_works = true
+  then
+    IF_NO_NEWLINE="!"
+  else
+    IF_NEWLINE="!"
+fi
 
 
 AC_PROG_INSTALL
@@ -288,13 +308,11 @@ AC_CONFIG_FILES([
 	Makefile 
 	src/Makefile 
         src/spheres.f90
-	src/common.f90
+        src/common.f90
+        src/custom.f90
         src/constants.f90
         src/options.f90
         src/ggadt.f90
-
-        scripts/installation_vars.py
-
         data/default.params
 				])
 AC_SUBST(plan_dir)

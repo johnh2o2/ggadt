@@ -79,31 +79,23 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = ggadt$(EXEEXT)
-@USING_FFTW_TRUE@am__append_1 = fftwmod.f90 
-@USING_FFTW_FALSE@am__append_2 = gpfa.f90 gpfamod.f90
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(srcdir)/fftwmod.f90.in $(srcdir)/spheres.f90.in \
-	$(srcdir)/common.f90.in $(srcdir)/constants.f90.in \
+	$(srcdir)/spheres.f90.in $(srcdir)/common.f90.in \
+	$(srcdir)/custom.f90.in $(srcdir)/constants.f90.in \
 	$(srcdir)/options.f90.in $(srcdir)/ggadt.f90.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ac_find_file.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_CLEAN_FILES = fftwmod.f90 spheres.f90 common.f90 constants.f90 \
+CONFIG_CLEAN_FILES = spheres.f90 common.f90 custom.f90 constants.f90 \
 	options.f90 ggadt.f90
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am__ggadt_SOURCES_DIST = constants.f90 options.f90 interp.f90 \
-	fftwmod.f90 gpfa.f90 gpfamod.f90 common.f90 sphere.f90 \
-	spheres.f90 ellipsoid.f90 custom.f90 ggadt.f90
-@USING_FFTW_TRUE@am__objects_1 = fftwmod.$(OBJEXT)
-@USING_FFTW_FALSE@am__objects_2 = gpfa.$(OBJEXT) gpfamod.$(OBJEXT)
 am_ggadt_OBJECTS = constants.$(OBJEXT) options.$(OBJEXT) \
-	interp.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
+	interp.$(OBJEXT) gpfa.$(OBJEXT) gpfamod.$(OBJEXT) \
 	common.$(OBJEXT) sphere.$(OBJEXT) spheres.$(OBJEXT) \
 	ellipsoid.$(OBJEXT) custom.$(OBJEXT) ggadt.$(OBJEXT)
 ggadt_OBJECTS = $(am_ggadt_OBJECTS)
@@ -134,7 +126,7 @@ am__v_FCLD_ = $(am__v_FCLD_@AM_DEFAULT_V@)
 am__v_FCLD_0 = @echo "  FCLD    " $@;
 am__v_FCLD_1 = 
 SOURCES = $(ggadt_SOURCES)
-DIST_SOURCES = $(am__ggadt_SOURCES_DIST)
+DIST_SOURCES = $(ggadt_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -184,10 +176,6 @@ EXEEXT = @EXEEXT@
 FC = @FC@
 FCFLAGS = @FCFLAGS@
 FCFLAGS_f90 = @FCFLAGS_f90@
-FFTW3_COMMENT = @FFTW3_COMMENT@
-FFTW3_UNCOMMENT = @FFTW3_UNCOMMENT@
-GPFA_COMMENT = @GPFA_COMMENT@
-GPFA_UNCOMMENT = @GPFA_UNCOMMENT@
 GREP = @GREP@
 IF_COM_ARG_CNT = @IF_COM_ARG_CNT@
 IF_GETARG = @IF_GETARG@
@@ -224,13 +212,9 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SINGLE_UNCOMMENT = @SINGLE_UNCOMMENT@
 STRIP = @STRIP@
-USE_FFTW = @USE_FFTW@
-USE_GPFA = @USE_GPFA@
 USE_OMP_LIB = @USE_OMP_LIB@
-USING_FFTW = @USING_FFTW@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
-abs_datadir = @abs_datadir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
@@ -255,7 +239,6 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
-fftw3_inc_dir = @fftw3_inc_dir@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -287,10 +270,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-ggadt_SOURCES = constants.f90 options.f90 interp.f90 $(am__append_1) \
-	$(am__append_2) common.f90 sphere.f90 spheres.f90 \
-	ellipsoid.f90 custom.f90 ggadt.f90
-@USING_FFTW_TRUE@AM_FCFLAGS = -I$(fftw3_inc_dir)
+ggadt_SOURCES = constants.f90 options.f90 interp.f90 gpfa.f90 gpfamod.f90 common.f90 sphere.f90 spheres.f90 ellipsoid.f90 custom.f90 ggadt.f90 
 all: all-am
 
 .SUFFIXES:
@@ -325,11 +305,11 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-fftwmod.f90: $(top_builddir)/config.status $(srcdir)/fftwmod.f90.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 spheres.f90: $(top_builddir)/config.status $(srcdir)/spheres.f90.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 common.f90: $(top_builddir)/config.status $(srcdir)/common.f90.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+custom.f90: $(top_builddir)/config.status $(srcdir)/custom.f90.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 constants.f90: $(top_builddir)/config.status $(srcdir)/constants.f90.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
@@ -598,20 +578,6 @@ uninstall-am: uninstall-binPROGRAMS
 	ps ps-am tags tags-am uninstall uninstall-am \
 	uninstall-binPROGRAMS
 
-
-#install-data-hook:
-#	echo "character(len=200), parameter :: allowed_ngrid_values_filename &" > install_dirs.f90
-#	echo "& = '$(datadir)/allowed_ngrid_values.txt'" >> install_dirs.f90
-#	echo "character(len=200), parameter ::  defaults_file_name &" >> install_dirs.f90
-#	echo "& = '$(datadir)/default.params'" >> install_dirs.f90
-
-#install-data-local:
-#	mkdir -p @data_dir@
-#uninstall-local:
-#	rm -rf @data_dir@
-#clean-local:
-#	rm -rf @data_dir@
-#	rm -rf *mod
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

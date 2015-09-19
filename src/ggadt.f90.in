@@ -35,9 +35,6 @@ program ggadt
     ! Now initialize/allocate arrays that need to be allocated
     call initialize_and_allocate_vars()
    
-    
-    @FFTW3_UNCOMMENT@call set_optimization_mode(fftw_optimization_mode_name)
-
     ! This prints the parameters to stdout; if you're running ggadt > output.dat, this is effectively a header
     call print_parameters(stdout)
     

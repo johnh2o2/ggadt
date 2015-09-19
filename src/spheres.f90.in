@@ -1,6 +1,4 @@
 module spheres
-
-    @FFTW3_UNCOMMENT@ use, intrinsic :: iso_c_binding
     use constants
     use sphere
     @USE_OMP_LIB@

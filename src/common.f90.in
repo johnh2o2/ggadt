@@ -1,6 +1,6 @@
 module common_mod
 
-  use gpfamod
+  use gpfa
   use options
   use constants
 
