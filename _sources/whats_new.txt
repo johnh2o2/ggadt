@@ -10,12 +10,12 @@ What's new
 ==========
 
 
-.. versionadded:: 1.1.8
+**1.1.8**
 	* **Removed** all files/options related to FFTW support in order to avoid any confusion and to declutter the installation. 
 		* FFTW support generates a disproportionate amount of overhead and complexity
 		* We have run comparisons between GPFA (see [T1992]_) and FFTW and haven't found any significant difference; if you are absolutely set on using another FFT library, let us know. If there are enough people that want support for additional FFT libraries, we will oblige.
 
-.. versionadded:: 1.1.7
+**1.1.7**
 	* Added ``datadir`` functionality for GGADT data files (i.e. the :file:`default.params` and :file:`allowed_ngrid_values.txt` files).
 		* Users now **must** provide :file:`configure` a :option:`--datadir` value. Users should choose a directory that they have adequate permissions to read/write files. All GGADT files will be stored in the ``datadir/ggadt`` subdirectory.
 

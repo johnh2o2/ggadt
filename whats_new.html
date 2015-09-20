@@ -41,15 +41,33 @@
             
   <div class="section" id="what-s-new">
 <span id="whats-new"></span><span id="index-0"></span><h1>What&#8217;s new<a class="headerlink" href="#what-s-new" title="Permalink to this headline">¶</a></h1>
-<div class="versionadded">
-<p><span class="versionmodified">New in version 1.1.8: </span>* <strong>Removed</strong> all files/options related to FFTW support in order to avoid any confusion and to declutter the installation.
-        * FFTW support generates a disproportionate amount of overhead and complexity
-        * We have run comparisons between GPFA (see <a class="reference internal" href="index.html#t1992" id="id1">[T1992]</a>) and FFTW and haven&#8217;t found any significant difference; if you are absolutely set on using another FFT library, let us know. If there are enough people that want support for additional FFT libraries, we will oblige.</p>
-</div>
-<div class="versionadded">
-<p><span class="versionmodified">New in version 1.1.7: </span>* Added <code class="docutils literal"><span class="pre">datadir</span></code> functionality for GGADT data files (i.e. the <code class="file docutils literal"><span class="pre">default.params</span></code> and <code class="file docutils literal"><span class="pre">allowed_ngrid_values.txt</span></code> files).
-        * Users now <strong>must</strong> provide <code class="file docutils literal"><span class="pre">configure</span></code> a <code class="xref std std-option docutils literal"><span class="pre">--datadir</span></code> value. Users should choose a directory that they have adequate permissions to read/write files. All GGADT files will be stored in the <code class="docutils literal"><span class="pre">datadir/ggadt</span></code> subdirectory.</p>
-</div>
+<dl class="docutils">
+<dt><strong>1.1.8</strong></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><strong>Removed</strong> all files/options related to FFTW support in order to avoid any confusion and to declutter the installation.</dt>
+<dd><ul class="first last simple">
+<li>FFTW support generates a disproportionate amount of overhead and complexity</li>
+<li>We have run comparisons between GPFA (see <a class="reference internal" href="index.html#t1992" id="id1">[T1992]</a>) and FFTW and haven&#8217;t found any significant difference; if you are absolutely set on using another FFT library, let us know. If there are enough people that want support for additional FFT libraries, we will oblige.</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><strong>1.1.7</strong></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt>Added <code class="docutils literal"><span class="pre">datadir</span></code> functionality for GGADT data files (i.e. the <code class="file docutils literal"><span class="pre">default.params</span></code> and <code class="file docutils literal"><span class="pre">allowed_ngrid_values.txt</span></code> files).</dt>
+<dd><ul class="first last simple">
+<li>Users now <strong>must</strong> provide <code class="file docutils literal"><span class="pre">configure</span></code> a <code class="xref std std-option docutils literal"><span class="pre">--datadir</span></code> value. Users should choose a directory that they have adequate permissions to read/write files. All GGADT files will be stored in the <code class="docutils literal"><span class="pre">datadir/ggadt</span></code> subdirectory.</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
 </div>
 
 
