@@ -13,8 +13,8 @@ General Geometry Anomalous Diffraction Theory
 
 
 
-:Latest release: :download:`ggadt-1.1.7.tar.gz <ggadt-1.1.7.tar.gz>`
-:PDF: :download:`Manual <manual-1.1.7.pdf>`
+:Latest release: :download:`ggadt-1.1.8.tar.gz <ggadt-1.1.8.tar.gz>`
+:PDF: :download:`Manual <manual-1.1.8.pdf>`
 :Repository: `Github <https://github.com/johnh2o2/ggadt>`_
 
 
@@ -52,7 +52,7 @@ This documentation is a work in progress -- some sections may be incomplete. Ple
 .. [DA2006] Draine, B. T., & Allaf-Akbari, K. 2006, ApJ, 652, 1318
 .. [HD2015] Hoffman, J., & Draine, B. T. 2015, *submitted for publication to the Astrophysical Journal*
 .. [VDH1957] van de Hulst H., Light scattering by small particles, 1957, John Wiley & Sons, Inc., NY.
-
+.. [T1992] Temperton, C. 1992, A Generalized Prime Factor FFT Algorithm for Any :math:`N =2^p3^q5^r`, SIAM Journal of Scientific and Statistical Computing, 13, 676-686.
 
 .. toctree::
    :caption: Table of Contents
@@ -60,6 +60,7 @@ This documentation is a work in progress -- some sections may be incomplete. Ple
    :maxdepth: 2
 
    citations
+   whats_new
    install
    example
    invoking
