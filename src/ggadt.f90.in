@@ -969,7 +969,6 @@ contains
 
             do j=1,size(ky)
                 scatter(i,j) = 0.0D0
-
             end do 
         end do
     ! -----------------------------------

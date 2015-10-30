@@ -16,3 +16,5 @@ TODO.md
 fftw3-custom-portfile
 remake-*sh
 autom4te.cache/*
+*out
+*cfg
