@@ -9,6 +9,16 @@
 What's new
 ==========
 
+..Coming soon
+..^^^^^^^^^^^
+..	* Large-angle scattering calculations, more options for output formats (i.e.)
+..	* 
+..	* Support for layered spherical (and ellipsoidal) compositions
+..	* Longterm goal: Python wrappings for GGADT
+
+1.1.9
+^^^^^
+	* You can now tell GGADT what units you're using. See :option:`--units-file`.
 
 1.1.8
 ^^^^^

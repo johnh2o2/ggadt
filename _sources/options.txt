@@ -147,6 +147,64 @@ General options
 		2.000000E-05  2.435E+00 2.239E-03  1.080E+01 1.538E-02
 		...
 
+Units
+^^^^^
+
+.. option:: --input-unit-length=value, --input-unit-angle=value, --input-unit-energy=value
+	
+	Tells GGADT what units you're using for your input.
+
+	.. versionadded:: 1.1.9
+
+		(added)
+
+.. option:: --output-unit-length=value, --output-unit-angle=value, --output-unit-energy=value
+
+	Tells GGADT what units to use for outputting results. See :option:`--units-file` for information
+	about what units are available
+
+	.. versionadded:: 1.1.9
+
+		(added)
+
+.. option:: --units-file=value
+
+	Path to file describing a set of units that GGADT will read and interpret. The format of the file should be::
+
+		TYPE_OF_UNIT	NAME 	ABBREVIATION 		CONVERSION_FACTOR
+
+	Where **TYPE_OF_UNIT** is one of ``ENERGY``, ``LENGTH``, or ``ANGLE``. The **CONVERSION_FACTOR** should be a numerical value that
+	converts a quantity in this unit to the equivalent quantity in the corresponding SI unit.
+
+	The default units file is called :file:`units.txt` and is located in the ``datadir`` directory. The contents of the file are::
+
+	LENGTH			meter 				m 			1.0
+	LENGTH			millimeter			mm 			1.0d-3
+	LENGTH			centimeter			cm 			1.0d-2
+	LENGTH			micron				um			1.0d-6
+	LENGTH			micrometer			um			1.0d-6
+	LENGTH			nanometer			nm 			1.0d-9
+	LENGTH			angstrom 			A 			1.0d-10
+	ANGLE			radian 				rad 		1.0
+	ANGLE 			degree 				deg 		0.0174532925
+	ANGLE 			arcminute 			am 			0.000290888209
+	ANGLE   		arcsecond 			as			4.84813681d-6
+	ENERGY			joule				J			1.0
+	ENERGY			electron-volt			eV			1.60217662D-19
+	ENERGY			kiloelectron-volt		keV			1.60217662D-16
+
+
+	.. versionadded:: 1.1.9
+
+		(added)
+
+.. warning :: 
+
+	Make sure that **ALL** input values of a particular type (i.e. energy, length, angle), are in the same unit. **This includes default parameters 
+	that you may not have explicitly set**. The best way to ensure this is to use a parameter file and define all relevant variables there.
+
+	The one exception to this is the format of material (or index) files; GGADT assumes that the energy column of these files is in electron volts (eV).
+
 Ellipsoidal grains
 ^^^^^^^^^^^^^^^^^^
 
