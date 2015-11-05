@@ -231,7 +231,17 @@ E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
 <h2>Units<a class="headerlink" href="#units" title="Permalink to this headline">¶</a></h2>
 <dl class="option">
 <dt id="cmdoption--input-unit-length">
-<span id="cmdoption--input-unit-angle"></span><span id="cmdoption--input-unit-energy"></span><code class="descname">--input-unit-length</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--input-unit-angle</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--input-unit-energy</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--input-unit-length" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--input-unit-length</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--input-unit-length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption--input-unit-angle">
+<code class="descname">--input-unit-angle</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--input-unit-angle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption--input-unit-energy">
+<code class="descname">--input-unit-energy</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--input-unit-energy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tells GGADT what units you&#8217;re using for your input.</p>
 <div class="versionadded">
 <p><span class="versionmodified">New in version 1.1.9: </span>(added)</p>
@@ -240,7 +250,17 @@ E(eV)      Re(n)-1    Im(n)    Re(eps)-1  Im(eps)
 
 <dl class="option">
 <dt id="cmdoption--output-unit-length">
-<span id="cmdoption--output-unit-angle"></span><span id="cmdoption--output-unit-energy"></span><code class="descname">--output-unit-length</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--output-unit-angle</code><code class="descclassname">=value</code><code class="descclassname">, </code><code class="descname">--output-unit-energy</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--output-unit-length" title="Permalink to this definition">¶</a></dt>
+<code class="descname">--output-unit-length</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--output-unit-length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption--output-unit-angle">
+<code class="descname">--output-unit-angle</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--output-unit-angle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption--output-unit-energy">
+<code class="descname">--output-unit-energy</code><code class="descclassname">=value</code><a class="headerlink" href="#cmdoption--output-unit-energy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tells GGADT what units to use for outputting results. See <a class="reference internal" href="#cmdoption--units-file"><code class="xref std std-option docutils literal"><span class="pre">--units-file</span></code></a> for information
 about what units are available</p>
 <div class="versionadded">
@@ -255,10 +275,10 @@ about what units are available</p>
 <div class="highlight-python"><div class="highlight"><pre>TYPE_OF_UNIT    NAME    ABBREVIATION            CONVERSION_FACTOR
 </pre></div>
 </div>
-<p>Where <strong>TYPE_OF_UNIT</strong> is one of <code class="docutils literal"><span class="pre">ENERGY</span></code>, <code class="docutils literal"><span class="pre">LENGTH</span></code>, or <code class="docutils literal"><span class="pre">ANGLE</span></code>. The <strong>CONVERSION_FACTOR</strong> should be a numerical value that
-converts a quantity in this unit to the equivalent quantity in the corresponding SI unit.</p>
+<p>Where <strong>TYPE_OF_UNIT</strong> is one of <code class="docutils literal"><span class="pre">ENERGY</span></code>, <code class="docutils literal"><span class="pre">LENGTH</span></code>, or <code class="docutils literal"><span class="pre">ANGLE</span></code>.</p>
+<p>The <strong>CONVERSION_FACTOR</strong> should be a numerical value that converts a quantity in this unit to the equivalent quantity in the corresponding SI unit.</p>
 <p>The default units file is called <code class="file docutils literal"><span class="pre">units.txt</span></code> and is located in the <code class="docutils literal"><span class="pre">datadir</span></code> directory. The contents of the file are:</p>
-<p>LENGTH                  meter                           m                       1.0
+<div class="highlight-python"><div class="highlight"><pre>LENGTH                  meter                           m                       1.0
 LENGTH                  millimeter                      mm                      1.0d-3
 LENGTH                  centimeter                      cm                      1.0d-2
 LENGTH                  micron                          um                      1.0d-6
@@ -271,7 +291,9 @@ ANGLE                   arcminute                       am                      
 ANGLE                   arcsecond                       as                      4.84813681d-6
 ENERGY                  joule                           J                       1.0
 ENERGY                  electron-volt                   eV                      1.60217662D-19
-ENERGY                  kiloelectron-volt               keV                     1.60217662D-16</p>
+ENERGY                  kiloelectron-volt               keV                     1.60217662D-16
+</pre></div>
+</div>
 <div class="versionadded">
 <p><span class="versionmodified">New in version 1.1.9: </span>(added)</p>
 </div>
