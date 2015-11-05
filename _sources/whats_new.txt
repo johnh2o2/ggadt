@@ -9,13 +9,6 @@
 What's new
 ==========
 
-..Coming soon
-..^^^^^^^^^^^
-..	* Large-angle scattering calculations, more options for output formats (i.e.)
-..	* 
-..	* Support for layered spherical (and ellipsoidal) compositions
-..	* Longterm goal: Python wrappings for GGADT
-
 1.1.9
 ^^^^^
 	* You can now tell GGADT what units you're using. See :option:`--units-file`.
@@ -28,6 +21,7 @@ What's new
 
 1.1.7
 ^^^^^
-	* Added ``datadir`` functionality for GGADT data files (i.e. the :file:`default.params` and :file:`allowed_ngrid_values.txt` files).
+	* Added ``datadir`` functionality for GGADT data files 
+		* data files are refer to :file:`default.params` and :file:`allowed_ngrid_values.txt` files).
 		* Users now **must** provide :file:`configure` a :option:`--datadir` value. Users should choose a directory that they have adequate permissions to read/write files. All GGADT files will be stored in the ``datadir/ggadt`` subdirectory.
 
