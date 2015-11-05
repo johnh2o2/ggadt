@@ -3,6 +3,7 @@ module common_mod
   use gpfa
   use options
   use constants
+  use units
 
 
   implicit none
@@ -16,6 +17,13 @@ module common_mod
   character(len=100), parameter ::  VERSION="GGADT (General Geometry Anomalous Diffraction Theory) v@PACKAGE_VERSION@"
   character(len=100), parameter ::  INFO = "Written by John Hoffman (jah5@princeton.edu)&
     & and Michael Tarczon (mtarczon@princeton.edu)"
+
+  type(Unit)                             ::  input_unit_angle, input_unit_length, input_unit_energy
+  type(Unit)                             ::  output_unit_angle, output_unit_length, output_unit_energy
+  type(Unit)                             ::  u
+  type(Unit), dimension(:), allocatable  ::  all_units
+  character(len=100)                     ::  input_unit_name_angle, input_unit_name_length, input_unit_name_energy
+  character(len=100)                     ::  output_unit_name_angle, output_unit_name_length, output_unit_name_energy
 
   complex(kind=dp_complex)               ::  delm 
   
@@ -46,6 +54,7 @@ module common_mod
   real(dp_real), dimension(3)            ::  grain_a 
   real(dp_real)                          ::  max_angle
 
+  logical                                ::  provided_unit_file
   logical                                ::  use_padded_fft
   logical                                ::  use_efficiencies
   logical                                ::  asked_for_version
@@ -63,21 +72,20 @@ module common_mod
 
 
   character(len=200)                     ::  parameter_file_name
-
+  character(len=300)                     ::  units_file
   character(len=2)                       ::  c_nsigfig
   character(len=2)                       ::  c_w
   character(len=15)                      ::  output_fmt
 
 
-! new variables
   integer                                ::  nephots
+  integer                                ::  nunits
   real(dp_real)                          ::  ephot_min
   real(dp_real)                          ::  dephot
   real(dp_real)                          ::  ephot_max 
   character(len=200)                     ::  material_file     ! file that defines ior_re and ior_im for a range of energies
   logical                                ::  integrated_mode          
                                                               
-!-------
 
   character(len=200), dimension(max_num_mats)           ::  material_files
   character(len=200), dimension(max_num_mats)           ::  material_tags
@@ -108,7 +116,9 @@ module common_mod
          rank_asked_for_help, rank_parameter_file_name, rank_axes_convention, rank_do_full_2d_fft, &
          rank_quiet_mode,  rank_nthreads, rank_do_phi_averaging, rank_save_shadow_function, &
          rank_save_file_root, rank_nphi, rank_grid_width, &
-         rank_save_orientations, rank_output_sigfigs
+         rank_save_orientations, rank_output_sigfigs, rank_input_unit_name_length, rank_input_unit_name_angle, &
+         rank_input_unit_name_energy, rank_output_unit_name_length, rank_output_unit_name_angle, &
+         rank_output_unit_name_energy, rank_units_file
 
   contains
 
@@ -180,8 +190,31 @@ module common_mod
         "save-file-root","output",&
         description="Root name of output files (if --save-shadow-function flag is used)")
 
-      ! Allow user to specify up to max_num_mats materials:
+      ! UNITS ---------------------------------
+      call define_option_string(opts,&
+        "units-file",default_units_file,&
+        description="Path to file that defines various units")
+      call define_option_string(opts,&
+        "input-unit-angle",default_input_unit_angle_name,&
+        description="Name or abbreviation of angle units that you're using -- only for INPUT")
+      call define_option_string(opts,&
+        "input-unit-length",default_input_unit_length_name,&
+        description="Name or abbreviation of length units that you're using -- only for INPUT")
+      call define_option_string(opts,&
+        "input-unit-energy",default_input_unit_energy_name,&
+        description="Name or abbreviation of energy units that you're using -- only for INPUT")
+      call define_option_string(opts,&
+        "output-unit-angle",default_output_unit_angle_name,&
+        description="Name or abbreviation of angle unit that GGADT will use for OUTPUT")
+      call define_option_string(opts,&
+        "output-unit-length",default_output_unit_length_name,&
+        description="Name or abbreviation of length unit that GGADT will use for OUTPUT")
+      call define_option_string(opts,&
+        "output-unit-energy",default_output_unit_energy_name,&
+        description="Name or abbreviation of energy unit that GGADT will use for OUTPUT")
+      ! /UNITS --------------------------------
 
+      ! Allow user to specify up to max_num_mats materials:
       do i=1,max_num_mats
         if (i .gt. 10) then 
           write(optname,'(i2)') i 
@@ -355,7 +388,7 @@ module common_mod
       call get_option_real(opts,"grain-axis-y",grain_a(2),rank_grain_a2)
       call get_option_real(opts,"grain-axis-z",grain_a(3),rank_grain_a3)
       call get_option_real(opts,"ephot",ephot,rank_ephot)
-      call get_option_real(opts, "dtheta", dtheta, rank_dtheta)
+      call get_option_real(opts,"dtheta", dtheta, rank_dtheta)
       call get_option_real(opts,"max-angle",max_angle, rank_max_angle)
       call get_option_real(opts,"ior-re",ior_re, rank_ior_re)
       call get_option_real(opts,"ior-im",ior_im, rank_ior_im)
@@ -387,6 +420,13 @@ module common_mod
       call get_option_string(opts,"fftw-optimization",fftw_optimization_mode_name, rank_fftw_optimization_mode_name)
       call get_option_string(opts,"save-file-root",save_file_root, rank_save_file_root)
 
+      call get_option_string(opts,"units-file", units_file, rank_units_file)
+      call get_option_string(opts,"input-unit-length", input_unit_name_length, rank_input_unit_name_length)
+      call get_option_string(opts,"input-unit-angle", input_unit_name_angle, rank_input_unit_name_angle)
+      call get_option_string(opts,"input-unit-energy", input_unit_name_energy, rank_input_unit_name_energy)
+      call get_option_string(opts,"output-unit-length", output_unit_name_length, rank_output_unit_name_length)
+      call get_option_string(opts,"output-unit-angle", output_unit_name_angle, rank_output_unit_name_angle)
+      call get_option_string(opts,"output-unit-energy", output_unit_name_energy, rank_output_unit_name_energy)
 
       call get_option_integer(opts,"ngrain",ngrain, rank_ngrain)
       call get_option_integer(opts,"output-sigfigs", output_sigfigs, rank_output_sigfigs)
@@ -396,6 +436,62 @@ module common_mod
       call get_option_integer(opts,"norientations",norientations, rank_norientations)
       call get_option_integer(opts,"nephots", nephots, rank_nephots)
 
+      ! read and set units
+      call read_units(units_file, all_units, nunits)
+      do i=1,nunits
+
+        u = all_units(i)
+        if ( ( trim(adjustl(u%name)) .eq. trim(adjustl(input_unit_name_length)) &
+          .or. trim(adjustl(u%abbreviation)) .eq. trim(adjustl(input_unit_name_length)) ) &
+            .and. (u%kind_of_unit .eq. T_LENGTH) ) then
+
+          input_unit_length = u
+        else if ( ( trim(adjustl(u%name)) .eq. trim(adjustl(input_unit_name_angle)) &
+          .or. trim(adjustl(u%abbreviation)) .eq. trim(adjustl(input_unit_name_angle)) ) &
+            .and. (u%kind_of_unit .eq. T_ANGLE) ) then
+
+          input_unit_angle = u
+        else if ( ( trim(adjustl(u%name)) .eq. trim(adjustl(input_unit_name_energy)) &
+          .or. trim(adjustl(u%abbreviation)) .eq. trim(adjustl(input_unit_name_energy)) ) &
+            .and. (u%kind_of_unit .eq. T_ENERGY) ) then
+
+          input_unit_energy = u
+        end if
+
+        if ( ( trim(adjustl(u%name)) .eq. trim(adjustl(output_unit_name_length)) &
+          .or. trim(adjustl(u%abbreviation)) .eq. trim(adjustl(output_unit_name_length)) ) &
+            .and. (u%kind_of_unit .eq. T_LENGTH) ) then
+
+          output_unit_length = u
+        else if ( ( trim(adjustl(u%name)) .eq. trim(adjustl(output_unit_name_angle)) &
+          .or. trim(adjustl(u%abbreviation)) .eq. trim(adjustl(output_unit_name_angle)) ) &
+            .and. (u%kind_of_unit .eq. T_ANGLE) ) then
+
+          output_unit_angle = u
+        else if ( ( trim(adjustl(u%name)) .eq. trim(adjustl(output_unit_name_energy)) &
+          .or. trim(adjustl(u%abbreviation)) .eq. trim(adjustl(output_unit_name_energy)) ) &
+            .and. (u%kind_of_unit .eq. T_ENERGY) ) then
+
+          output_unit_energy = u
+        end if
+
+      end do
+
+      !write(stderr, *) "input: ",trim(adjustl(input_unit_length%name)), " output: ",trim(adjustl(output_unit_length%name))
+      !write(stderr, *) "input: ",trim(adjustl(input_unit_angle%name)), " output: ",trim(adjustl(output_unit_angle%name))
+      !write(stderr, *) "input: ",trim(adjustl(input_unit_energy%name)), " output: ",trim(adjustl(output_unit_energy%name))
+      ! convert units!
+      a_eff     = a_eff      * input_unit_length%value
+      grid_width= grid_width * input_unit_length%value
+
+      dtheta    = dtheta     * input_unit_angle%value
+      max_angle = max_angle  * input_unit_angle%value
+
+      ephot_min = ephot_min  * input_unit_energy%value
+      ephot_max = ephot_max  * input_unit_energy%value
+      dephot    = dephot     * input_unit_energy%value
+      ephot     = ephot      * input_unit_energy%value
+      ! -----------------------
 
       do i=1,max_num_mats
         if (i .gt. 10) then
@@ -463,7 +559,8 @@ module common_mod
 
       grid_width_manually_set = option_found(opts, 'grid-width')
       if (grid_width_manually_set) then
-        grid_width = grid_width/a_eff
+        write(stderr, *) "Grid width manually set to ", grid_width
+        grid_width = grid_width/a_eff    ! WARNING -- you need a_eff and grid_width to have the SAME dimension.
       end if
       ! multiply max_angle by sqrt(2) if using super_fast_fft_mode 
       !   we want to calculate out to (thetax, thetay) = (max_angle, max_angle).
@@ -568,10 +665,10 @@ module common_mod
           write(stderr,*) "Warning: You have specified BOTH the 'nscatter' and 'dtheta' options."
           write(stderr,*) "We will use your specified value of nscatter:", nscatter
         else if (rank_dtheta < rank_nscatter .or. rank_nscatter == 4) then
-          nscatter = int(ceiling(real(2*max_angle,dp_real)/dtheta))
+          nscatter = int(ceiling(real(2*max_angle,dp_real)/dtheta)) ! WARNING -- max_angle and dtheta must have SAME units.
         end if
       else if (option_found(opts,"dtheta")) then
-          nscatter = int(ceiling(real(2*max_angle,dp_real)/dtheta))
+          nscatter = int(ceiling(real(2*max_angle,dp_real)/dtheta)) ! WARNING -- max_angle and dtheta must have SAME units.
       end if 
 
       ! nephots and dephot
@@ -598,7 +695,7 @@ module common_mod
           if (min(rank_ephot, rank_material_file) == min(rank_ior_re, rank_ior_im) .and. rank_ephot .lt. 4) then
             write(stderr,*) "Warning: You have specified BOTH 'ephot'/'material-file' and 'ior-re'/'ior-im' parameters."
             write(stderr,*) "We will pull the index of refraction value from material-file=",material_file
-            write(stderr,*) "at a photon energy of ephot=",ephot,"keV."
+            write(stderr,*) "at a photon energy of ephot=",ephot,input_unit_energy%abbreviation
           else if (min(rank_ior_re,rank_ior_im) < min(rank_ephot,rank_material_file)) then
             material_file_specified = .FALSE.
             material_file=""
@@ -635,7 +732,7 @@ module common_mod
          if (verbose_mode) then 
             write(stderr,*) "GGADT will now calculate the INTEGRATED (ABS,SCA,EXT) CROSS SECTIONS"
             write(stderr,*) "for a single dust grain with a geometry of ", geometry
-            write(stderr,*) "over the energy range ", ephot_min," - ",ephot_max, " keV in ",dephot," keV increments"
+            write(stderr,*) "over the energy range ", ephot_min," - ",ephot_max, trim(adjustl(input_unit_energy%name))," in ",dephot," keV increments"
             write(stderr,*) "for a dust grain composed of ",nmaterials," materials:"
             do i=1,nmaterials
               write(stderr,*) " + ", material_files(i)

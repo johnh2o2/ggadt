@@ -94,10 +94,11 @@ CONFIG_CLEAN_FILES = spheres.f90 common.f90 custom.f90 constants.f90 \
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_ggadt_OBJECTS = constants.$(OBJEXT) options.$(OBJEXT) \
-	interp.$(OBJEXT) gpfa.$(OBJEXT) gpfamod.$(OBJEXT) \
-	common.$(OBJEXT) sphere.$(OBJEXT) spheres.$(OBJEXT) \
-	ellipsoid.$(OBJEXT) custom.$(OBJEXT) ggadt.$(OBJEXT)
+am_ggadt_OBJECTS = units.$(OBJEXT) constants.$(OBJEXT) \
+	options.$(OBJEXT) interp.$(OBJEXT) gpfa.$(OBJEXT) \
+	gpfamod.$(OBJEXT) common.$(OBJEXT) sphere.$(OBJEXT) \
+	spheres.$(OBJEXT) ellipsoid.$(OBJEXT) custom.$(OBJEXT) \
+	ggadt.$(OBJEXT)
 ggadt_OBJECTS = $(am_ggadt_OBJECTS)
 ggadt_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -270,7 +271,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-ggadt_SOURCES = constants.f90 options.f90 interp.f90 gpfa.f90 gpfamod.f90 common.f90 sphere.f90 spheres.f90 ellipsoid.f90 custom.f90 ggadt.f90 
+ggadt_SOURCES = units.f90 constants.f90 options.f90 interp.f90 gpfa.f90 gpfamod.f90 common.f90 sphere.f90 spheres.f90 ellipsoid.f90 custom.f90 ggadt.f90 
 all: all-am
 
 .SUFFIXES:

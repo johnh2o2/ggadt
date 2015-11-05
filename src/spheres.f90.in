@@ -86,7 +86,7 @@ module spheres
         real(kind=dp_real), dimension(3,3) :: rm
         real(kind=dp_real), dimension(3) :: centroid
 
-        open(unit=1,file=cluster_file_name) ! open sphere file.
+        open(unit=1,file=trim(adjustl(cluster_file_name))) ! open sphere file.
 
         ! Read header
         read(1,'(52X,i2,7X,i4)') MIGRATE,ISEED

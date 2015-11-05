@@ -66,7 +66,7 @@ contains
         do i=1,nephots
             write(stdout,&
                 '(4('//trim(output_fmt)//'))') &
-                     ephots(i), sigma_scats(i), sigma_abss(i),&
+                     ephots(i) / output_unit_energy%value , sigma_scats(i), sigma_abss(i),&
                       sigma_scats(i) + sigma_abss(i) 
         end do
     end subroutine calculate_int_cross_sections
@@ -124,7 +124,7 @@ contains
         ! Now read in the index file.
         do i=1,niors
             read(1,*) file_ephots(i), file_ior_re(i), file_ior_im(i), eps, imeps
-            file_ephots(i) = file_ephots(i) / 1000.0 ! convert from eV to keV
+            file_ephots(i) = file_ephots(i) * 1.60217662D-19 ! convert from eV to J <-- ASSUMES MATERIAL FILE USES eV
         end do
 
         ! Get the scalar values (only necessary for differential scattering cross section mode)
@@ -169,10 +169,13 @@ contains
         ! Normalize depending on whether we're outputting efficiencies (= C/pi*a^2) or simply the cross sections (C)
         if (use_efficiencies) then 
             norm_const = 1.0/(pi*a_eff*a_eff)
-            write(stdout,*) "# [ephot] [Q_sca] [Q_abs] [Q_ext]"
+            write(stdout,*) "# [ephot (", trim(adjustl(output_unit_energy%name)), ")] [Q_sca] [Q_abs] [Q_ext]"
         else 
-            norm_const = 1.0
-            write(stdout,*) "# [ephot] [C_sca] [C_abs] [C_ext]"
+            norm_const = 1.0 / (output_unit_length%value * output_unit_length%value)
+            write(stdout,*) "# [ephot (", trim(adjustl(output_unit_energy%name)), ")] [C_sca (",&
+                trim(adjustl(output_unit_length%name)),"^2",")] [C_abs (",&
+                trim(adjustl(output_unit_length%name)),"^2",")] [C_ext (",&
+                trim(adjustl(output_unit_length%name)),"^2",")]"
         end if 
 
 
@@ -212,7 +215,7 @@ contains
                 
                 ! delm (scalar) is used when nmaterials = 1.
                 delm = delms(1)
-                kphot = TWOPI*(1000*energy/hc)
+                kphot = TWOPI*(energy/hc)
 
                 ! CASE: sphere; using integral expression for S(theta)
                 if (geometry .eq. 'sphere' .and. .not. force_numerical) then 
@@ -405,18 +408,23 @@ contains
 
         ! Set the normalization factor for efficiencies = C/pi*a^2       
         if (use_efficiencies) then 
-            norm_const = 1.0D0/(pi*a_eff*a_eff)
+
+            norm_const = 1.0D0/(pi*a_eff*a_eff) 
             if (do_full_2d_fft) then
-                write(stdout,*) "# [thetax] [thetay] [dQ_sca/dOmega]"
+                write(stdout,*) "# [thetax (", trim(adjustl(output_unit_angle%name)),")] [thetay (",&
+                        trim(adjustl(output_unit_angle%name)),")] [dQ_sca/dOmega (1/sr)]"
             else
-                write(stdout,*) "# [theta] [dQ_sca/dOmega]"
+                write(stdout,*) "# [theta (", trim(adjustl(output_unit_angle%name)), ")] [dQ_sca/dOmega (1/sr)]"
             end if
         else 
-            norm_const = 1.0D0
+            norm_const = 1.0D0 / (output_unit_length%value * output_unit_length%value)
             if (do_full_2d_fft) then
-                write(stdout,*) "# [thetax] [thetay] [dC_sca/dOmega]"
+                write(stdout,*) "# [thetax (", trim(adjustl(output_unit_angle%name)),")] [thetay (",&
+                        trim(adjustl(output_unit_angle%name)),")] [dC_sca/dOmega (", &
+                        trim(adjustl(output_unit_length%name)), "^2/sr)]"
             else
-                write(stdout,*) "# [theta] [dC_sca/dOmega]"
+                write(stdout,*) "# [theta (", trim(adjustl(output_unit_angle%name)),")] [dC_sca/dOmega (", &
+                        trim(adjustl(output_unit_length%name)), "^2/sr)]"
             end if
         end if 
 
@@ -485,7 +493,8 @@ contains
                         do j=1,size(y)
                             write(9, &
                                 '(4('//trim(output_fmt)//'))') &
-                                     z(i), y(j), REAL(sh(i,j)), IMAG(sh(i,j))
+                                     z(i) / output_unit_length%value, y(j) / output_unit_length%value,&
+                                     REAL(sh(i,j)), IMAG(sh(i,j))
                         end do
                     end do
                     close(9)
@@ -556,9 +565,7 @@ contains
                             !$omp do schedule(dynamic) private(i, j)
                             do i=1, size(kz)
                                 do j=1, size(ky)
-                                    !-$OMP CRITICAL
                                     scatter(i,j) = ( k*dz*dy*abs(ftsh(i,j))/twopi)**2
-                                    !-$OMP END CRITICAL
                                 end do
                             end do
                             !$omp end do
@@ -568,10 +575,8 @@ contains
                             !$omp parallel shared(gscatter,gftsh,k,dy, norientations) 
                             !$omp do schedule(dynamic) private(i)
                             do i=1, size(kz)
-                                !-$OMP CRITICAL
                                 gscatter(i) = gscatter(i) + &
                                         gftsh(i)/real(norientations,kind=dp_real)
-                                !-$OMP END CRITICAL
                             end do
                             !$omp end do
                             !$omp end parallel
@@ -621,7 +626,8 @@ contains
                             do j=1,size(y)
                                 write(9, &
                                     '(4('//trim(output_fmt)//'))') &
-                                z(i), y(j), REAL(sh(i,j)), IMAG(sh(i,j))
+                                z(i) / output_unit_length%value, y(j) / output_unit_length%value, &
+                                REAL(sh(i,j)), IMAG(sh(i,j))
                             end do
                         end do
                         close(9)
@@ -640,14 +646,15 @@ contains
             do i=1,size(thetaz)
                 write(stdout,&
                     '(2('//trim(output_fmt)//'))') &
-                thetaz(i),gscatter(i)*norm_const
+                thetaz(i) / output_unit_angle%value , gscatter(i)*norm_const
             end do
         else
             do i=1,size(thetaz)
                 do j=1,size(thetay)
                     write(stdout, &
                         '(3('//trim(output_fmt)//'))') &
-                    thetay(j),thetaz(i),scatter(i,j)*norm_const
+                    thetay(j) / output_unit_angle%value ,thetaz(i) / output_unit_angle%value,&
+                    scatter(i,j)*norm_const
                 end do
             end do
         end if
@@ -680,8 +687,8 @@ contains
             ephots(1) = ephot
         end if 
 
-        ! wavelength (in micrometers)
-        lambda = 0.00123984193 / ephots(1) ! max(hc/E) = hc/min(E)
+        ! wavelength
+        lambda = hc / ephots(1) ! max(hc/E) = hc/min(E)
 
       
         ! if we have defined material files, read them
@@ -813,10 +820,8 @@ contains
                 grid_width = (2.00 + VERY_SMALL)* lambda / a_eff
             end if
         end if
-        
-        max_angle = max_angle/arcseconds_per_radian ! convert max_angle from arcseconds to radians
-        k = (2*pi/hc)*1000*ephot ! wave number
-        
+    
+        k = (2*pi/hc)*ephot ! wave number
 
         ngrid = ngrain ! Start with no padding 
 
@@ -1135,6 +1140,12 @@ contains
             end if 
             read(1,*) get_new_angles
             close(1)
+
+            ! convert to radians
+            do j=1,3
+                get_new_angles(j) = get_new_angles(j) * input_unit_angle%value
+            end do
+
             if (axes_convention == 'mstm') then
               call convert_mstm_to_ddscat(get_new_angles)
             end if 
@@ -1213,9 +1224,12 @@ contains
         write(i,'(A)') "# Parameter values"
 
         write(i,'(A)') "# -----------------------------------"
+        write(i,'(A,ES15.5,A)') "# a_eff:                           ",&
+            a_eff / output_unit_length%value," "//trim(adjustl(output_unit_length%name))
         if (.not. integrated_mode) then 
             
-            write(i,'(A,ES15.5,A)') "# ephot:                           ",ephot, " keV"
+            write(i,'(A,ES15.5,A)') "# ephot:                           ",&
+                ephot / output_unit_energy%value," "//trim(adjustl(output_unit_energy%name))
             write(i,'(A,I15)')      "# nscatter:                        ",nscatter 
             if (.not. material_file_specified) then
               write(i,'(A,ES15.5)') "# Re(m-1):                         ",ior_re
@@ -1232,8 +1246,10 @@ contains
 
         else 
         
-         write(i,'(A,ES15.5,A15)')  "# ephot_min:                       ",ephot_min, " keV"
-         write(i,'(A,ES15.5,A15)')  "# ephot_max:                       ",ephot_max, " keV"
+         write(i,'(A,ES15.5,A15)')  "# ephot_min:                       ",&
+            ephot_min / output_unit_energy%value, trim(adjustl(output_unit_energy%name))
+         write(i,'(A,ES15.5,A15)')  "# ephot_max:                       ",&
+            ephot_max / output_unit_energy%value, trim(adjustl(output_unit_energy%name))
          write(i,'(A,I15)')         "# nephots:                         ",nephots
         end if 
         if (material_file_specified) then
@@ -1259,11 +1275,15 @@ contains
         write(i,'(A,I15)')          "# ngrain:                          ",ngrain
         write(i,'(A,I15)')          "# norientations:                   ",norientations
         if (geometry .eq. 'ellipsoid') then
-            write(i,'(A,ES15.5,A)') "# grain-axis-z:                    ",grain_a(1), " microns"
-            write(i,'(A,ES15.5,A)') "# grain-axis-y:                    ",grain_a(2), " microns"
-            write(i,'(A,ES15.5,A)') "# grain-axis-z:                    ",grain_a(3), " microns"
+            write(i,'(A,ES15.5,A)') "# grain-axis-z:                    ",&
+                grain_a(1) / output_unit_length%value, " "//trim(adjustl(output_unit_length%name))
+            write(i,'(A,ES15.5,A)') "# grain-axis-y:                    ",&
+                grain_a(2) / output_unit_length%value, " "//trim(adjustl(output_unit_length%name))
+            write(i,'(A,ES15.5,A)') "# grain-axis-z:                    ",&
+                grain_a(3) / output_unit_length%value, " "//trim(adjustl(output_unit_length%name))
         end if
-        write(i,'(A,ES15.5,A)')     "# grid-width:                      ", grid_width * a_eff, " microns"
+        write(i,'(A,ES15.5,A)')     "# grid-width:                      ",&
+            grid_width * a_eff / output_unit_length%value, " "//trim(adjustl(output_unit_length%name))
         !write(i,*) "# rotation-axis: ",rotation_axis
         if (use_padded_fft) then
             write(i,'(A,A)')        "# use_padded_fft:                  ",use_padded_fft

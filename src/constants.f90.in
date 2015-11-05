@@ -27,7 +27,7 @@ module constants
   real(dp_real), parameter                 ::  ARCSECONDS_PER_RADIAN          = (360.0D0*60.0D0*60.0D0)/(2.0D0*pi)
   integer, parameter                       ::  MAX_NGRID                      = 4096
 
-  real(dp_real), parameter                 ::  hc                             = 1.23984193D0
+  real(dp_real), parameter                 ::  hc                             = 1.98644582D-25
   real(dp_real), parameter                 ::  default_aeff                   = 2.0D-1
   real(dp_real), parameter                 ::  default_ephot                  = 2.0D0
   real(dp_real), parameter                 ::  default_grain_a1               = 1.0D0
@@ -42,6 +42,15 @@ module constants
   character(len=50), parameter             ::  default_angle_mode       = 'random'
   character(len=50), parameter             ::  default_rotation_axis          = 'none'
   character(len=200), parameter            ::  default_angle_file       = ''
+  character(len=200), parameter            ::  default_units_file        = '@datadir@/ggadt/units.txt'
+
+  character(len=100), parameter            ::  default_input_unit_length_name       = 'micron'
+  character(len=100), parameter            ::  default_input_unit_angle_name       = 'arcsecond'
+  character(len=100), parameter            ::  default_input_unit_energy_name       = 'keV'
+  character(len=100), parameter            ::  default_output_unit_length_name       = 'micron'
+  character(len=100), parameter            ::  default_output_unit_angle_name       = 'arcsecond'
+  character(len=100), parameter            ::  default_output_unit_energy_name      = 'keV'
+
   integer, parameter                       ::  default_ngrain                 = 256
   integer, parameter                       ::  default_nscatter               = 100
   integer, parameter                       ::  default_norientations          = 100
