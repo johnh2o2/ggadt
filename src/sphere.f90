@@ -63,9 +63,10 @@ module sphere
         val = 0.0D0
         I = CMPLX(0.0D0,1.0D0)
 
+        !write(stderr, *) "debug: x = ", x, " rho=", rho
         do j=0,(nu_sphere-1)
             u = umin + j*du
-
+            
             ! val = val + du *( 1 - exp(-I*rho*sin(u)) ) * BesJ0( x*cos(u) ) * sin(u)*cos(u)
             ! ^ Draine & Allaf-Akbari 2006 is WRONG!!! This is the correct expression:
             val = val + du *( 1 - exp(I*rho*sin(u))  ) * BesJ0( x*cos(u) ) * sin(u)*cos(u)

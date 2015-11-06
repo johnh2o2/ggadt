@@ -664,7 +664,7 @@ contains
       implicit none 
 
       integer :: line, status, next, ng, n, allocatestatus, i, j, norientations_new, closest_ngrid
-      real(kind=dp_real) :: ds, max_dist, scale, lambda
+      real(kind=dp_real) :: ds, max_dist, scale, lambda, maximum_allowable_angle
       character(len=100) :: junk
         @OMP_UNCOMMENT@if (nthreads > 0) then
         @OMP_UNCOMMENT@    call omp_set_num_threads(nthreads)
@@ -823,6 +823,7 @@ contains
     
         k = (2*pi/hc)*ephot ! wave number
 
+
         ngrid = ngrain ! Start with no padding 
 
         ! ensure that ngrid is of the form (2**i)(3**j)(5**k)
@@ -926,7 +927,8 @@ contains
         else
             call get_fft_vals(0.0D0,max_angle,nscatter,kmin,kmax,enhancement,kactual)   
         end if
-      
+
+        
     ! allocate arrays that depend on kactual
 
         ! kz
@@ -957,13 +959,31 @@ contains
     ! ----------------------------------
 
         dk = real(kmax-kmin)/real(size(kz) - 1)
+
+        ! for large angle scattering, we have to be careful.
+        maximum_allowable_angle = asin( (lambda / L) * real(min( floor( L / lambda ), ngrid )))
+
+        if ( max_angle > maximum_allowable_angle .and. geometry /= 'sphere' ) then 
+            write(stderr, *) "ERROR *** cannot calculate angles greater than ", &
+                maximum_allowable_angle / output_unit_angle%value, " "//trim(adjustl(output_unit_angle%abbreviation)) 
+            stop 
+        end if 
+
         
     ! set kz, ky, thetaz and thetay arrays
     !   + make scatter array all zero
         do i=1,size(kz)
             kz(i) = ((i-1)*dk + kmin)*(TWOPI/L)
             ky(i) = kz(i)
-          
+
+            if ( kz(i) > k .or. ky(i) > k ) then 
+                write(stderr, *) "ERROR *** GGADT is trying to use angles greater than 90 degrees."
+                write(stderr, *) "      ***   if you set max_angle to something less than 90 degrees,"
+                write(stderr, *) "      ***   this error means that max_angle is *too close* to 90 degrees."
+                write(stderr, *) "      ***   The only way around this for now is to ensure max_angle << 90."
+                stop 
+            end if 
+
             thetaz(i) = asin(kz(i)/k)
             thetay(i) = asin(ky(i)/k)
         
@@ -1037,8 +1057,9 @@ contains
 
         enhancement = 0
 
-        kmin = int(floor(k*sin(thetamin)*(L/TWOPI)))
-        kmax = int(ceiling(k*sin(thetamax)*(L/TWOPI)))
+        kmin = max( -int(k * (L / TWOPI)) , int(floor(   k*sin(thetamin)*(L/TWOPI) ))  )
+        kmax = min(  int(k * (L / TWOPI)) , int(ceiling( k*sin(thetamax)*(L/TWOPI) ))  )
+
 
         Kout = kmax - kmin
         do while ( ((enhancement + 1) * Kout + 1) < Kask ) 

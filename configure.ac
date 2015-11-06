@@ -147,7 +147,7 @@ AC_RUN_IFELSE([
 
 #getpid is needed for the random number generator
 
-AC_MSG_CHECKING([to see if Fortran supports getpid ])
+AC_MSG_CHECKING([to see if Fortran supports GETPID() ])
 AC_RUN_IFELSE([
   		AC_LANG_PROGRAM([],	[[ 
   								integer :: i
@@ -157,6 +157,22 @@ AC_RUN_IFELSE([
   		AC_MSG_RESULT(yes), 
   		AC_MSG_RESULT(no)
   	)
+
+
+#isnan is needed to test that everything's ok
+AC_MSG_CHECKING([to see if Fortran supports ISNAN() ])
+AC_RUN_IFELSE([
+      AC_LANG_PROGRAM([], [[ 
+                  real :: x
+                  x = 0.1
+                  if (ISNAN(x)) then
+                    stop 1
+                  end if
+                ]]
+        )],
+      AC_MSG_RESULT(yes), 
+      AC_MSG_RESULT(no)
+    )
 
 
 # options file uses access='stream' option to read parameter files. This is not (to my knowledge)
