@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.1.5',
+        VERSION:     '1.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="shortcut icon" href="_static/ggadtfav.ico"/>
     <link rel="top" title="GGADT" href="index.html" />
-    <link rel="next" title="Sphere" href="sphere.html" />
+    <link rel="next" title="Agglomerations of spherical monomers" href="agglomerate.html" />
     <link rel="prev" title="Arguments and parameters" href="options.html" />
    
   
@@ -60,6 +60,16 @@
 </dd>
 </dl>
 </div>
+<div class="section" id="large-angle-scattering">
+<h2>Large angle scattering<a class="headerlink" href="#large-angle-scattering" title="Permalink to this headline">¶</a></h2>
+<p>ADT is asymptotically correct as <img class="math" src="_images/math/68adc76074e33210f0450d20e1c94d80a05a7391.png" alt="|m - 1|\rightarrow 0"/> and <img class="math" src="_images/math/b86cc7d44c1dc1bf57b9e97c97fc7909ba0cd736.png" alt="ka\rightarrow\infty"/>. In these limits, scattering at large angles is very small. If you&#8217;re worried about large angle scattering (say <img class="math" src="_images/math/62f3ef8800e25db16311e4909622a67e14d60401.png" alt="\theta &gt; 10^{\circ}"/>), be careful. Obtaining accurate estimates of small intensity scattering at large angles (especially angles &gt; 90 degrees) may require a more exact treatment of the scattering problem (e.g. Mie theory).</p>
+<p>Though, technically, the theoretical framework of ADT allows you to calculate <img class="math" src="_images/math/55d20eed017ebeaf5a8e10a9f2f0bf2a8661f917.png" alt="dC_{\rm sca}/d\Omega"/> out to arbitary scattering angle <img class="math" src="_images/math/a9cfbeb8ebee1f365919e147a79e242dcb67ee5d.png" alt="\theta"/>, GGADT will fail at angles close to 90 degrees. GGADT fails partly because of the computational shortcuts that allow GGADT to be extremely fast, and partly because the authors of GGADT didn&#8217;t intend for GGADT to be used at very large scattering angles where ADT may not give the correct results.</p>
+<p>If you&#8217;re using GGADT to do <em>very</em> large angle scattering (<img class="math" src="_images/math/b6273faa72de5e54018fcb6f797d428a094fb80c.png" alt="\theta &gt; 50^{\circ}"/>), you will likely run into one or more of these problems:</p>
+<ol class="arabic simple">
+<li>For the analytic case of <strong>spherical</strong> particles, GGADT <em>should</em> be fine up to any angle you want, but because of some <cite>programming quirks &lt;https://xkcd.com/1513/&gt;</cite>, GGADT will break at <img class="math" src="_images/math/268181e2c477e24ee8415390c73996925deaff2d.png" alt="\theta = 90^{\circ} - \delta"/>. To make <img class="math" src="_images/math/b35a9439ad8c8657b1b1d792ad5c2d77a52c0aef.png" alt="\delta"/> smaller, you should set <a class="reference internal" href="options.html#cmdoption--grid-width"><code class="xref std std-option docutils literal"><span class="pre">--grid-width</span></code></a> to as large a number as you need. An unfortunate side effect: computation time will increase as you increase <a class="reference internal" href="options.html#cmdoption--grid-width"><code class="xref std std-option docutils literal"><span class="pre">--grid-width</span></code></a>, even though you&#8217;re not bothering with any numerical grids. Depending on how close to 90 degrees you&#8217;d like to get, this may present too large a strain on your patience. We&#8217;d like to say this is all intentional in order to prevent you from abusing GGADT for large angle calculations, but really it&#8217;s because we&#8217;re terrible programmers.</li>
+<li>For numerical calculations, you run into another limit; <img class="math" src="_images/math/1905aa3ad4a21c30709e7c78b463338eb7443ca9.png" alt="\sin\theta_{\rm max} = \lambda / \Delta x"/>. This can be fixed by using a finer grid, but the above problems will still plague you.</li>
+</ol>
+</div>
 <div class="section" id="d-vs-2d-results">
 <h2>1d vs 2d results<a class="headerlink" href="#d-vs-2d-results" title="Permalink to this headline">¶</a></h2>
 <div class="figure align-center" id="id1">
@@ -68,6 +78,8 @@
 </div>
 <div class="section" id="using-the-nphi-parameter">
 <h3>Using the <code class="docutils literal"><span class="pre">nphi</span></code> parameter<a class="headerlink" href="#using-the-nphi-parameter" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="options.html#cmdoption--nphi"><code class="xref std std-option docutils literal"><span class="pre">--nphi</span></code></a> parameter (only used when <a class="reference internal" href="options.html#cmdoption--do-full-2d-fft"><code class="xref std std-option docutils literal"><span class="pre">--do-full-2d-fft</span></code></a> is specified) lets you take advantage of a full 2D calculation of <img class="math" src="_images/math/7f3d0c5b902e1abbcb263885e02bce7ccd9c1eba.png" alt="dC_{\rm sca}/d\Omega(\theta, \phi)"/>, so long as you&#8217;re only interested in the <em>orientation-averaged</em> result that only depend on the scattering angle <img class="math" src="_images/math/a9cfbeb8ebee1f365919e147a79e242dcb67ee5d.png" alt="\theta"/>.</p>
+<p>By averaging over <img class="math" src="_images/math/10e009bdb83f96c5f47c58b34d5d4b12ef268d5b.png" alt="\phi"/> for a single orientation, we reduce the number of random (or non-random) orientations that we need to calculate the full 2D <img class="math" src="_images/math/7f3d0c5b902e1abbcb263885e02bce7ccd9c1eba.png" alt="dC_{\rm sca}/d\Omega(\theta, \phi)"/> in order to reach an accurate estimate of <img class="math" src="_images/math/c47bf9879a2864f1510fdf829dc5d09a101235f5.png" alt="dC_{\rm sca}/d\Omega(\theta)"/> (the orientation-averaged result).</p>
 </div>
 </div>
 </div>
@@ -85,6 +97,7 @@
   <ul>
 <li><a class="reference internal" href="#">Differential scattering cross section</a><ul>
 <li><a class="reference internal" href="#orientation-averaging">Orientation averaging</a></li>
+<li><a class="reference internal" href="#large-angle-scattering">Large angle scattering</a></li>
 <li><a class="reference internal" href="#d-vs-2d-results">1d vs 2d results</a><ul>
 <li><a class="reference internal" href="#using-the-nphi-parameter">Using the <code class="docutils literal"><span class="pre">nphi</span></code> parameter</a></li>
 </ul>
@@ -97,7 +110,7 @@
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="options.html" title="previous chapter">Arguments and parameters</a></li>
-      <li>Next: <a href="sphere.html" title="next chapter">Sphere</a></li>
+      <li>Next: <a href="agglomerate.html" title="next chapter">Agglomerations of spherical monomers</a></li>
   </ul></li>
 </ul>
 </div>

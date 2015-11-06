@@ -30,16 +30,34 @@ GGADT has three methods for producing averages over orientations, all of which a
 		0.234 0.12 0.0
 		...
 
+Large angle scattering
+----------------------
+
+ADT is asymptotically correct as :math:`|m - 1|\rightarrow 0` and :math:`ka\rightarrow\infty`. In these limits, scattering at large angles is very small. If you're worried about large angle scattering (say :math:`\theta > 10^{\circ}`), be careful. Obtaining accurate estimates of small intensity scattering at large angles (especially angles > 90 degrees) may require a more exact treatment of the scattering problem (e.g. Mie theory). 
+
+Though, technically, the theoretical framework of ADT allows you to calculate :math:`dC_{\rm sca}/d\Omega` out to arbitary scattering angle :math:`\theta`, GGADT will fail at angles close to 90 degrees. GGADT fails partly because of the computational shortcuts that allow GGADT to be extremely fast, and partly because the authors of GGADT didn't intend for GGADT to be used at very large scattering angles where ADT may not give the correct results.
+
+If you're using GGADT to do *very* large angle scattering (:math:`\theta > 50^{\circ}`), you will likely run into one or more of these problems:
+
+#. For the analytic case of **spherical** particles, GGADT *should* be fine up to any angle you want, but because of some `programming quirks <https://xkcd.com/1513/>`, GGADT will break at :math:`\theta = 90^{\circ} - \delta`. To make :math:`\delta` smaller, you should set :option:`--grid-width` to as large a number as you need. An unfortunate side effect: computation time will increase as you increase :option:`--grid-width`, even though you're not bothering with any numerical grids. Depending on how close to 90 degrees you'd like to get, this may present too large a strain on your patience. We'd like to say this is all intentional in order to prevent you from abusing GGADT for large angle calculations, but really it's because we're terrible programmers.
+#. For numerical calculations, you run into another limit; :math:`\sin\theta_{\rm max} = \lambda / \Delta x`. This can be fixed by using a finer grid, but the above problems will still plague you.
+
+
 
 1d vs 2d results
 ----------------
 
 
-.. figure :: fig_norientation_convergence_sm.png
+.. figure:: fig_norientation_convergence_sm.png
 	:align: center
 
 	How fast 1d and 2d computations converge. 2d computations, however, usually take significantly longer to run.
 
+
 Using the ``nphi`` parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The :option:`--nphi` parameter (only used when :option:`--do-full-2d-fft` is specified) lets you take advantage of a full 2D calculation of :math:`dC_{\rm sca}/d\Omega(\theta, \phi)`, so long as you're only interested in the *orientation-averaged* result that only depend on the scattering angle :math:`\theta`. 
+
+By averaging over :math:`\phi` for a single orientation, we reduce the number of random (or non-random) orientations that we need to calculate the full 2D :math:`dC_{\rm sca}/d\Omega(\theta, \phi)` in order to reach an accurate estimate of :math:`dC_{\rm sca}/d\Omega(\theta)` (the orientation-averaged result).
 
