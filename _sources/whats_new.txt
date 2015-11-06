@@ -9,6 +9,10 @@
 What's new
 ==========
 
+1.2.0
+^^^^^
+	* GGADT should not break when attempting to do dCsca/dOmega calculations at large angles (i.e. close to 90 degrees).
+
 1.1.9
 ^^^^^
 	* You can now tell GGADT what units you're using. See :option:`--units-file`.
