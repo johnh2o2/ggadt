@@ -9,6 +9,11 @@
 What's new
 ==========
 
+1.2.1
+^^^^^
+	* Fixed minor bugs
+	* Now ``gfortran`` (v5.2.0) will compile GGADT without warnings when the ``-Wall`` flag is specified.
+
 1.2.0
 ^^^^^
 	* GGADT should not break when attempting to do dCsca/dOmega calculations at large angles (i.e. close to 90 degrees).

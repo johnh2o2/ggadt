@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.2.0',
+        VERSION:     '1.2.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -42,30 +42,39 @@
   <div class="section" id="what-s-new">
 <span id="whats-new"></span><span id="index-0"></span><h1>What&#8217;s new<a class="headerlink" href="#what-s-new" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="id1">
-<h2>1.2.0<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<h2>1.2.1<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>Fixed minor bugs</li>
+<li>Now <code class="docutils literal"><span class="pre">gfortran</span></code> (v5.2.0) will compile GGADT without warnings when the <code class="docutils literal"><span class="pre">-Wall</span></code> flag is specified.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="id2">
+<h2>1.2.0<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
 <li>GGADT should not break when attempting to do dCsca/dOmega calculations at large angles (i.e. close to 90 degrees).</li>
 </ul>
 </div></blockquote>
 </div>
-<div class="section" id="id2">
-<h2>1.1.9<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h2>1.1.9<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
 <li>You can now tell GGADT what units you&#8217;re using. See <a class="reference internal" href="options.html#cmdoption--units-file"><code class="xref std std-option docutils literal"><span class="pre">--units-file</span></code></a>.</li>
 </ul>
 </div></blockquote>
 </div>
-<div class="section" id="id3">
-<h2>1.1.8<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h2>1.1.8<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul>
 <li><dl class="first docutils">
 <dt><strong>Removed</strong> all files/options related to FFTW support in order to avoid any confusion and to declutter the installation.</dt>
 <dd><ul class="first last simple">
 <li>FFTW support generates a disproportionate amount of overhead and complexity</li>
-<li>We have run comparisons between GPFA (see <a class="reference internal" href="index.html#t1992" id="id4">[T1992]</a>) and FFTW and haven&#8217;t found any significant difference; if you are absolutely set on using another FFT library, let us know. If there are enough people that want support for additional FFT libraries, we will oblige.</li>
+<li>We have run comparisons between GPFA (see <a class="reference internal" href="index.html#t1992" id="id5">[T1992]</a>) and FFTW and haven&#8217;t found any significant difference; if you are absolutely set on using another FFT library, let us know. If there are enough people that want support for additional FFT libraries, we will oblige.</li>
 </ul>
 </dd>
 </dl>
@@ -73,8 +82,8 @@
 </ul>
 </div></blockquote>
 </div>
-<div class="section" id="id5">
-<h2>1.1.7<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id6">
+<h2>1.1.7<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul>
 <li><dl class="first docutils">
@@ -103,10 +112,11 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">What&#8217;s new</a><ul>
-<li><a class="reference internal" href="#id1">1.2.0</a></li>
-<li><a class="reference internal" href="#id2">1.1.9</a></li>
-<li><a class="reference internal" href="#id3">1.1.8</a></li>
-<li><a class="reference internal" href="#id5">1.1.7</a></li>
+<li><a class="reference internal" href="#id1">1.2.1</a></li>
+<li><a class="reference internal" href="#id2">1.2.0</a></li>
+<li><a class="reference internal" href="#id3">1.1.9</a></li>
+<li><a class="reference internal" href="#id4">1.1.8</a></li>
+<li><a class="reference internal" href="#id6">1.1.7</a></li>
 </ul>
 </li>
 </ul>
