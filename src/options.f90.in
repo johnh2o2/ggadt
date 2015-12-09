@@ -1306,7 +1306,7 @@ contains
     character(len=opt_len) :: buf, name, val
     character(len=1) :: eqlc, a
     integer :: iarg, max, j
-    logical :: help
+    !logical :: help
 
     integer :: m_rank 
 

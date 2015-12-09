@@ -57,9 +57,9 @@ module custom
         
         if (mag(x,y,z) < a) then
             if (size(ior_res(1,:)) .eq. 1) then 
-                ior_custom = CMPLX(ior_res(1,1),ior_ims(1,1))
+                ior_custom = CMPLX(ior_res(1,1),ior_ims(1,1), kind=dp_complex)
             else
-                ior_custom = CMPLX(linterp(ephots,ior_res(1,:),en),linterp(ephots,ior_ims(1,:),en) )
+                ior_custom = CMPLX(linterp(ephots,ior_res(1,:),en),linterp(ephots,ior_ims(1,:),en), kind=dp_complex )
             end if 
         else
             ior_custom = CMPLX(0.0,0.0)
@@ -68,10 +68,13 @@ module custom
     end function ior_custom
 
     function det(mat)
+        ! Yes, I know this is an idiotic function.
+        ! Could not get more standard functions to work
+        ! and in the interest of time, decided to just
+        ! handwrite this thing.
         implicit none
         real(kind=dp_real) :: det
         real(kind=dp_real), intent(in) :: mat(3,3)
-        integer :: i,j
 
         det = mat(1,1)*(mat(2,2)*mat(3,3) - mat(3,2)*mat(2,3)) &
             - mat(1,2)*(mat(2,1)*mat(3,3) - mat(3,1)*mat(2,3)) &
@@ -81,6 +84,7 @@ module custom
 
 
     function inverse(mat)
+        ! see explanation in det()
         implicit none
         real(kind=dp_real), dimension(3,3), intent(in) :: mat
         real(kind=dp_real), dimension(3,3) :: inverse
@@ -172,7 +176,6 @@ module custom
         real(kind=dp_real), intent(in) :: ior_res(:,:), ior_ims(:,:)
         real(kind=dp_real), intent(in) :: k,en
         real(kind=dp_real), intent(in) :: ephots(:)
-        real(kind=dp_real) :: xmin,xmax
         complex(kind=dp_complex), dimension(size(z),size(y)) :: shadow_custom, phi
         real(kind=dp_real), intent(in), dimension(3,3) :: rm
         integer, intent(in) :: nx

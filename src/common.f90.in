@@ -140,7 +140,7 @@ module common_mod
     subroutine set_parameter_values()
       implicit none
       character(len=100) :: optname
-      integer :: i, p, q, r
+      integer :: i
 
       !write(stderr, *) "in set_parameter_values"
       call set_allowed_ngrids()
@@ -521,7 +521,7 @@ module common_mod
         call print_help(opts) 
       end if 
 
-      delm = cmplx(ior_re,ior_im)
+      delm = cmplx(ior_re,ior_im,kind=dp_complex)
 
       ! Set num sig figs!
       output_sf_wl = output_sigfigs + output_sf_buffer
@@ -732,7 +732,8 @@ module common_mod
          if (verbose_mode) then 
             write(stderr,*) "GGADT will now calculate the INTEGRATED (ABS,SCA,EXT) CROSS SECTIONS"
             write(stderr,*) "for a single dust grain with a geometry of ", geometry
-            write(stderr,*) "over the energy range ", ephot_min," - ",ephot_max, trim(adjustl(input_unit_energy%name))," in ",dephot," keV increments"
+            write(stderr,*) "over the energy range ", ephot_min," - ",&
+                      ephot_max, trim(adjustl(input_unit_energy%name))," in ",dephot," keV increments"
             write(stderr,*) "for a dust grain composed of ",nmaterials," materials:"
             do i=1,nmaterials
               write(stderr,*) " + ", material_files(i)
@@ -864,7 +865,7 @@ module common_mod
         complex(kind=dp_complex), intent(out) :: fft1d_output(:)
         complex(kind=dp_complex), allocatable :: working_fft1d(:)
         complex(kind=dp_complex), dimension(size(f)) :: new_grid
-        integer :: i,j,a,b,norig, fsize, fft1dsize, ix, iy
+        integer :: i,a,norig, fsize, fft1dsize, ix
         real(dp_real) :: delta
 
         fsize = size(f)
@@ -1034,7 +1035,7 @@ module common_mod
         !        \hat{f*twids}_0, \hat{f*twids}_{last} ~ \hat{f}(-K), \hat{f}(K)
         complex(kind=dp_complex), intent(in) :: f(:)
         complex(kind=dp_complex), dimension(size(f)) :: fft1d_center
-        integer :: i, j, n
+        integer :: i, n
 
         n = size(f)
         do i=1,n  
@@ -1047,7 +1048,7 @@ module common_mod
         real(dp_real),  intent(in) :: shift
         complex(kind=dp_complex), intent(in) :: f(:)
         complex(kind=dp_complex), dimension(size(f)) :: kspace_shift_1d
-        integer :: i, j, n
+        integer :: i, n
 
         n = size(f)
 
@@ -1291,9 +1292,8 @@ module common_mod
         !-$OMP DO SCHEDULE(DYNAMIC) PRIVATE(i, j)
         do i=1,n
             do j=1,n
-                !-$OMP CRITICAL
-                kspace_shift_2d(i,j) = f(i,j)*exp(ISIGN*CMPLX(0,1.0, kind=dp_complex)*twopi*(shiftz*(i-1)+shifty*(j-1))/real(n)) 
-                !-$OMP END CRITICAL
+                kspace_shift_2d(i,j) = &
+                    f(i,j)*exp(ISIGN*CMPLX(0,1.0, kind=dp_complex)*twopi*(shiftz*(i-1)+shifty*(j-1))/real(n)) 
             end do
         end do
         !-$omp end do

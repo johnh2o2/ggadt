@@ -82,11 +82,11 @@ contains
         real(kind=dp_real), intent(out) :: iorres(:), iorims(:)
         real(kind=dp_real), intent(out) :: iorre, iorim
         real(kind=dp_real) :: eps, imeps
-        integer  :: i,j, allocatestatus, ICOMP, niors, counter, ios, maxrecs
+        integer  :: i, allocatestatus, ICOMP, niors, ios, maxrecs
         real(kind=dp_real), allocatable  :: file_ior_re(:), file_ior_im(:), file_ephots(:)
 
         ! Max records; just an arbitrary number. Change if needed
-        maxrecs = 100000
+        maxrecs = 1000000
 
         open(unit=1,file=matfile) ! open index file.
 
@@ -99,7 +99,7 @@ contains
         do i=1,maxrecs
             READ(1,*,IOSTAT=ios) junk 
             IF (ios /= 0) EXIT 
-            IF (J == maxrecs) THEN 
+            IF (i == maxrecs) THEN 
                 write(stderr,*) "ERROR (get_ior): Maximum number of records exceeded..."
                 STOP 
             ENDIF 
@@ -210,7 +210,7 @@ contains
                 sigma_abs = 0.0
                 ! Set m - 1 (delms) for each material
                 do j=1,nmaterials
-                    delms(j) = CMPLX(ior_res(j,i), ior_ims(j,i))
+                    delms(j) = CMPLX(ior_res(j,i), ior_ims(j,i), kind=dp_complex)
                 end do 
                 
                 ! delm (scalar) is used when nmaterials = 1.
@@ -351,7 +351,7 @@ contains
         ! Calculates dC/dOmega from gftsh (global)
         implicit none
         integer i
-        complex(kind=dp_complex), dimension(size(gscatter)) :: get_gscatter
+        real(kind=dp_real), dimension(size(gscatter)) :: get_gscatter
 
 
         !$omp parallel shared(gscatter,gftsh,k,dy) 
@@ -394,13 +394,13 @@ contains
         ! Calculates the differential scattering cross section and prints the results to stdout
         implicit none 
         integer :: nangle, i, j
-        real(kind=dp_real) :: th, sc, dth
+        real(kind=dp_real) :: th, dth
         real(kind=dp_real), dimension(2*size(thetaz)) :: sc_array, thets
         complex(kind=dp_complex), dimension(10) :: delms
         
         ! Set the m-1 array for each material
         do i=1,nmaterials
-            delms(i) = CMPLX(ior_res_single_en(i), ior_ims_single_en(i))
+            delms(i) = CMPLX(ior_res_single_en(i), ior_ims_single_en(i), kind=dp_complex)
         end do 
 
         ! Scalar value (for when there's only one material)
@@ -576,7 +576,7 @@ contains
                             !$omp do schedule(dynamic) private(i)
                             do i=1, size(kz)
                                 gscatter(i) = gscatter(i) + &
-                                        gftsh(i)/real(norientations,kind=dp_real)
+                                        abs(gftsh(i))/real(norientations,kind=dp_real)
                             end do
                             !$omp end do
                             !$omp end parallel

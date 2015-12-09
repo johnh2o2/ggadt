@@ -1,3 +1,9 @@
+* commit 661e605472068dd055fd54bd6801268c89b7f9ce
+| Author: John Hoffman <jah5@princeton.edu>
+| Date:   Thu Nov 5 20:11:23 2015 -0500
+| 
+|     Made some changes to handle users that try large angle scattering calculations
+|  
 * commit 78637838025b3770af62e881da900fff05167452
 | Author: John Hoffman <jah5@princeton.edu>
 | Date:   Thu Nov 5 16:26:56 2015 -0500
