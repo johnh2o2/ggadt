@@ -13,8 +13,8 @@ General Geometry Anomalous Diffraction Theory
 
 
 
-:Latest release: :download:`ggadt-1.2.0.tar.gz <ggadt-1.2.0.tar.gz>`
-:PDF: :download:`Manual <manual-1.2.0.pdf>`
+:Latest release: :download:`ggadt-1.2.1.tar.gz <ggadt-1.2.1.tar.gz>`
+:PDF: :download:`Manual <manual-1.2.1.pdf>`
 :Repository: `Github <https://github.com/johnh2o2/ggadt>`_
 
 
@@ -24,7 +24,7 @@ General Geometry Anomalous Diffraction Theory
 
 	|m-1| \ll 1
 
-(i.e. when the grain is :index:`optically thin`), and when
+(i.e. when the grain is :index:`optically soft`), and when
 
 .. math::
 

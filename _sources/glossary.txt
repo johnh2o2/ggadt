@@ -6,8 +6,11 @@ Glossary
 	material tags
 		Shortname that refers to a particular index file.
 
+	optically soft
+		Optically soft refers to materials with an index of refraction very close to 1. :math:`|m-1| \ll 1`
+
 	optically thin
-		Optically thin refers to materials with an index of refraction very close to 1. :math:`|m-1| \ll 1`
+		Optically thin refers to the case when :math:`{\rm Im}[m]ka\ll1`.
 
 	wavenumber
 		The wavenumber is defined to be
