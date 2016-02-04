@@ -49,8 +49,8 @@ This documentation is a work in progress -- some sections may be incomplete. Ple
 
 .. _GGADT Google Group: https://groups.google.com/d/forum/ggadt
 
-.. [DA2006] Draine, B. T., & Allaf-Akbari, K. 2006, ApJ, 652, 1318
-.. [HD2015] Hoffman, J., & Draine, B. T. 2015, *submitted for publication to the Astrophysical Journal*
+.. [DA2006] Draine, B. T., & Allaf-Akbari, K. 2006, *ApJ*, **652**, 1318
+.. [HD2015] Hoffman, J., & Draine, B. T., 2016, *ApJ*, **817**, 139 `DOI <http://dx.doi.org/10.3847/0004-637X/817/2/139>`_
 .. [VDH1957] van de Hulst H., Light scattering by small particles, 1957, John Wiley & Sons, Inc., NY.
 .. [T1992] Temperton, C. 1992, A Generalized Prime Factor FFT Algorithm for Any :math:`N =2^p3^q5^r`, SIAM Journal of Scientific and Statistical Computing, 13, 676-686.
 
